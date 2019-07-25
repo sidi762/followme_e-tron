@@ -25,7 +25,7 @@
   <safety>
 	<name>safety</name>
 	<mode>once</mode>
-	<path>Aircraft/followme/Sounds/Safety.wav</path>
+	<path>Aircraft/followme_e-tron/Sounds/Safety.wav</path>
 	<condition>
   	<equals>
 			<property>/controls/engines/engine/started</property>
