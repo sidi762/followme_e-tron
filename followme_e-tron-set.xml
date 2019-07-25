@@ -23,10 +23,10 @@
 	</tags>
 	
 	<flight-model>jsb</flight-model>
-	<aero>followme</aero>
+	<aero>followme_e-tron</aero>
 
 	<model>
-		<path>Aircraft/followme_e-tron/Models/followme_e-tron.xml</path>
+		<path>Aircraft/followme_e-tron/Models/followme.xml</path>
 		<livery>
 			<file type="string"/>
 		</livery>
