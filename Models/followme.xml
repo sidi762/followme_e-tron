@@ -4,10 +4,12 @@
 
 <nasal>
  <load>
- var livery_update = aircraft.livery_update.new("Aircraft/followme/Models/Messages");
+ var livery_update = aircraft.livery_update.new("Aircraft/followme_e-tron/Models/Messages");
+ var liveryFuse_update = followme.liveryFuse_update.new("Aircraft/followme_e-tron/Models/Texture");
  </load>   
  <unload>
  livery_update.stop();
+ livery2_update.stop();
  </unload>   
 </nasal>
 
@@ -17,6 +19,18 @@
  <property-base>sim/model/livery</property-base>
  <texture-prop>texture</texture-prop>
  <texture>blanco.png</texture>
+</animation>
+
+<animation>
+ <type>material</type>
+ <object-name>Mesh76.004</object-name>
+ <object-name>door.rl</object-name>
+ <object-name>door.rr</object-name>
+ <object-name>rdoor</object-name>
+ <object-name>ldoor</object-name>
+ <property-base>sim/model/livery</property-base>
+ <texture-prop>texture-fuse</texture-prop>
+ <texture>followmeoutside.png</texture>
 </animation>
 
 <model> 

@@ -17,7 +17,7 @@
    </volume>
    <pitch>
     <property>/velocities/airspeed-kt</property>
-    <factor>0.001</factor>
+    <factor>0.005</factor>
     <offset>1.5</offset>
    </pitch>
   </engine>
