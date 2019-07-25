@@ -1,7 +1,7 @@
 ####    Follow Me   ####
 ####    Gijs de Rooy    ####
 
-aircraft.livery.init("Aircraft/followme/Models/Messages");
+aircraft.livery.init("Aircraft/followme_e-tron/Models/Messages");
 
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
