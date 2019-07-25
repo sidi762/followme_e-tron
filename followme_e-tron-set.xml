@@ -3,8 +3,8 @@
 <PropertyList>
 <sim>
 
-	<description>Follow Me</description>
-	<author>Gijs de Rooy</author>
+	<description>Follow Me e-tron</description>
+	<author>Gijs de Rooy, Weihao Li, Sidi Liang</author>
 	<status>early production</status>
 	<rating>
 		<FDM type="int">4</FDM>
@@ -26,13 +26,16 @@
 	<aero>followme</aero>
 
 	<model>
-		<path>Aircraft/followme/Models/followme.xml</path>
+		<path>Aircraft/followme_e-tron/Models/followme_e-tron.xml</path>
 		<livery>
 			<file type="string"/>
 		</livery>
 	</model> 
-
-	<view n="0">
+    <sound>
+        <path>Aircraft/followme_e-tron/followme-sound.xml</path>
+        <switch type = "bool"></switch>
+    </sound>
+	<view n="/0">
 		<internal archive="y">true</internal>
 		<config>
 			<x-offset-m archive="y" type="double">-0.35</x-offset-m>
@@ -103,6 +106,20 @@
 					<binding>
 						<command>nasal</command>
 						<script>aircraft.livery.dialog.toggle()</script>
+					</binding>
+				</item>	
+				<item>
+					<label>Start Engine</label>
+					<binding>
+						<command>nasal</command>
+						<script>engine.startEngine()</script>
+					</binding>
+				</item>	
+				<item>
+					<label>Stop Engine</label>
+					<binding>
+						<command>nasal</command>
+						<script>engine.stopEngine()</script>
 					</binding>
 				</item>	
 			</menu>
@@ -243,8 +260,11 @@
 
 <nasal>
 	<followme>
-		<file>Aircraft/followme/Nasal/systems.nas</file>        
+		<file>Aircraft/followme_e-tron.xml/Nasal/systems.nas</file>        
 	</followme>
+    <engine>
+        <file>Aircraft/followme_e-tron.xml/Nasal/engine.nas</file>
+    </engine>
 </nasal>
 
 </PropertyList>

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+ 
+<PropertyList>
+
+ <fx>
+ 
+  <engine>
+   <name>rumble</name>
+   <mode>looped</mode>
+   <path>Sounds/rumble.wav</path>
+   <property>/velocities/airspeed-kt</property>
+   <volume>
+    <property>/velocities/airspeed-kt</property>
+    <factor>0.001</factor>
+    <min>0.0</min>
+    <max>0.0</max>
+   </volume>
+   <pitch>
+    <property>/velocities/airspeed-kt</property>
+    <factor>0.001</factor>
+    <offset>1.5</offset>
+   </pitch>
+  </engine>
+  
+  <safety>
+	<name>safety</name>
+	<mode>once</mode>
+	<path>Aircraft/followme/Sounds/Safety.wav</path>
+	<condition>
+  	<equals>
+			<property>/controls/engines/engine/started</property>
+			<value>1</value>
+		</equals>
+	</condition>
+	<volume>
+        <property>/controls/engines/engine/started</property>
+		<factor>5</factor>
+	</volume>
+  </safety>
+
+</fx>
+ 
+</PropertyList>

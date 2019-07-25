@@ -11,8 +11,8 @@
     </fileheader>
 
     <metrics>
-        <wingarea unit="M2">8</wingarea>
-        <wingspan unit="M">4</wingspan>
+        <wingarea unit="M2">1</wingarea>
+        <wingspan unit="M">1</wingspan>
         <chord unit="M">2</chord>
         <htailarea unit="M2">1</htailarea>
         <htailarm unit="M">1</htailarm>
@@ -111,24 +111,37 @@
         </contact>
     </ground_reactions>
 
-    <propulsion/>
+    <propulsion>
+        <!--<engine file="motor">
+            <location unit="M">
+    		<x> 1.5</x>
+    		<y> 0</y>
+    		<z> 0</z>
+            </location>
+			<orient unit="DEG">
+                <roll> 0.0 </roll>
+				<pitch> 0 </pitch>
+				<yaw> 0 </yaw>
+			</orient>
+            <feed>0</feed>
+		<thruster file="direct">
+			<location unit="M">
+        		<x> 1.5</x>
+        		<y> 0</y>
+        		<z> 0</z>
+			</location>
+			<orient unit="DEG">
+                <roll> 0.0 </roll>
+				<pitch> 0 </pitch>
+				<yaw> 0 </yaw>
+			</orient>
+		</thruster>
+        </engine>-->
+    </propulsion>
 
     <flight_control name="Truck">
-        <property value="1">/controls/engines/engine/direction</property>
-        <channel name="Engine">
-          <fcs_function name="fcs/engine-force">
-            <function>
-              <product>
-                <property>/controls/engines/engine/throttle</property>
-                <property>/controls/engines/engine/direction</property>
-                <value>1200</value>
-              </product>
-            </function>
-            <output>external_reactions/engine/magnitude</output>
-          </fcs_function>
-        </channel>
-
         <channel name="Steer">
+           
             <summer name="Steer Sum">
                 <input>fcs/rudder-cmd-norm</input>
                 <clipto>
