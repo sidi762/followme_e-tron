@@ -1,0 +1,173 @@
+<?xml-stylesheet href="JSBSim.xsl" type="application/xml"?>
+<fdm_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://jsbsim.sourceforge.net/JSBSim.xsd" name="SenecaII"
+    version="2.0" release="BETA">
+
+    <fileheader>
+        <author>Torsten Dreyer, Gijs de Rooy</author>
+        <filecreationdate>2010-08-24</filecreationdate>
+        <version>0.1</version>
+        <description>A follow me car</description>
+    </fileheader>
+
+    <metrics>
+        <wingarea unit="M2">8</wingarea>
+        <wingspan unit="M">4</wingspan>
+        <chord unit="M">2</chord>
+        <htailarea unit="M2">1</htailarea>
+        <htailarm unit="M">1</htailarm>
+        <vtailarea unit="M2">1</vtailarea>
+        <vtailarm unit="M">1</vtailarm>
+        <location name="AERORP" unit="M">
+            <x>0</x>
+            <y>0</y>
+            <z>1.20</z>
+        </location>
+        <location name="EYEPOINT" unit="M">
+            <x>-0.3 </x>
+            <y>0.0 </y>
+            <z>2.10</z>
+        </location>
+        <location name="VRP" unit="M">
+            <x> 0.0 </x>
+            <y> 0.0 </y>
+            <z> 0.0 </z>
+        </location>
+    </metrics>
+
+    <mass_balance>
+        <ixx unit="SLUG*FT2"> 5596 </ixx>
+        <iyy unit="SLUG*FT2"> 5334 </iyy>
+        <izz unit="SLUG*FT2"> 11945 </izz>
+        <ixz unit="SLUG*FT2"> 0 </ixz>
+        <emptywt unit="KG"> 3000 </emptywt>
+        <location name="CG" unit="M">
+            <x> 1.5 </x>
+            <y> 0.0 </y>
+            <z> 0.4 </z>
+        </location>
+    </mass_balance>
+
+    <ground_reactions>
+        <contact type="BOGEY" name="FL">
+            <location unit="M">
+                <x> 0.68</x>
+                <y>-0.66</y>
+                <z>-0.02</z>
+            </location>
+            <static_friction> 0.82 </static_friction>
+            <dynamic_friction> 0.5 </dynamic_friction>
+            <rolling_friction> 0.05 </rolling_friction>
+            <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
+            <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
+            <max_steer unit="DEG"> 45 </max_steer>
+            <brake_group> LEFT </brake_group>
+            <retractable>0</retractable>
+        </contact>
+        <contact type="BOGEY" name="FR">
+            <location unit="M">
+                <x> 0.68</x>
+                <y> 0.66</y>
+                <z>-0.02</z>
+            </location>
+            <static_friction> 0.82 </static_friction>
+            <dynamic_friction> 0.5 </dynamic_friction>
+            <rolling_friction> 0.05 </rolling_friction>
+            <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
+            <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
+            <max_steer unit="DEG"> 45 </max_steer>
+            <brake_group> RIGHT </brake_group>
+            <retractable>0</retractable>
+        </contact>
+        <contact type="BOGEY" name="BL">
+            <location unit="M">
+                <x> 3.17</x>
+                <y>-0.66</y>
+                <z>-0.03</z>
+            </location>
+            <static_friction> 1.95</static_friction>
+            <dynamic_friction> 0.7 </dynamic_friction>
+            <rolling_friction> 0.05 </rolling_friction>
+            <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
+            <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
+            <max_steer unit="DEG"> 0.0 </max_steer>
+            <brake_group> LEFT </brake_group>
+            <retractable>0</retractable>
+        </contact>
+        <contact type="BOGEY" name="BR">
+            <location unit="M">
+                <x> 3.17</x>
+                <y> 0.66</y>
+                <z>-0.03</z>
+            </location>
+            <static_friction> 1.95</static_friction>
+            <dynamic_friction> 0.7 </dynamic_friction>
+            <rolling_friction> 0.05 </rolling_friction>
+            <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
+            <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
+            <max_steer unit="DEG"> 0.0 </max_steer>
+            <brake_group> RIGHT </brake_group>
+            <retractable>0</retractable>
+        </contact>
+    </ground_reactions>
+
+    <propulsion/>
+
+    <flight_control name="Truck">
+        <property value="1">/controls/engines/engine/direction</property>
+        <channel name="Engine">
+          <fcs_function name="fcs/engine-force">
+            <function>
+              <product>
+                <property>/controls/engines/engine/throttle</property>
+                <property>/controls/engines/engine/direction</property>
+                <value>1200</value>
+              </product>
+            </function>
+            <output>external_reactions/engine/magnitude</output>
+          </fcs_function>
+        </channel>
+
+        <channel name="Steer">
+            <summer name="Steer Sum">
+                <input>fcs/rudder-cmd-norm</input>
+                <clipto>
+                    <min>-1</min>
+                    <max>1</max>
+                </clipto>
+                <output>fcs/rudder-pos-norm</output>
+            </summer>
+        </channel>
+    </flight_control>
+
+    <aerodynamics>
+        <axis name="DRAG">
+            <function name="aero/coefficient/CD">
+                <product>
+                    <property>aero/qbar-area</property>
+                    <value>0.8</value>
+                </product>
+            </function>
+        </axis>
+        <axis name="SIDE"/>
+        <axis name="ROLL"/>
+        <axis name="PITCH"/>
+        <axis name="YAW"/>
+    </aerodynamics>
+
+    <external_reactions>
+      <force name="engine" frame="BODY">
+        <location unit="M">
+		<x> 1.5</x>
+		<y> 0</y>
+		<z> 0</z>
+        </location>
+        <direction>
+          <x>1</x> 
+          <y>0</y>
+          <z>0</z>
+        </direction>
+      </force>
+    </external_reactions>
+</fdm_config>
+

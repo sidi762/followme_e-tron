@@ -1,0 +1,463 @@
+<PropertyList>
+ 
+<path>followme.ac</path>
+
+<nasal>
+ <load>
+ var livery_update = aircraft.livery_update.new("Aircraft/followme/Models/Messages");
+ </load>   
+ <unload>
+ livery_update.stop();
+ </unload>   
+</nasal>
+
+<animation>
+ <type>material</type>
+ <object-name>sign</object-name>
+ <property-base>sim/model/livery</property-base>
+ <texture-prop>texture</texture-prop>
+ <texture>blanco.png</texture>
+</animation>
+
+<model> 
+ <path>Aircraft/followme/Models/warninglight.xml</path>
+ <offsets> 
+  <x-m> 3.4</x-m>
+  <y-m>-0.4</y-m>
+  <z-m> 1.7</z-m>
+ </offsets>
+</model>
+
+<model> 
+ <path>Aircraft/followme/Models/warninglight.xml</path>
+ <offsets> 
+  <x-m> 3.4</x-m>
+  <y-m> 0.4</y-m>
+  <z-m> 1.7</z-m>
+ </offsets>
+</model>
+
+<!-- INSTRUMENTS -->
+
+<model> 
+ <path>Aircraft/followme/Models/Instruments/fuelgauge.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.25</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
+
+<model> 
+ <path>Aircraft/followme/Models/Instruments/speedometer.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.38</y-m>
+  <z-m>1.03</z-m>
+ </offsets>
+</model>
+	  
+<!-- STEERINGWHEEL -->
+
+<animation>  
+ <type>rotate</type>  
+ <object-name>steeringwheel</object-name>
+ <property>controls/flight/aileron</property>
+ <factor>-100</factor>
+ <center>
+  <x-m> 1.50</x-m>
+  <y-m>-0.33</y-m>
+  <z-m> 0.97</z-m>
+ </center>
+ <axis>
+  <x1-m>1.218</x1-m>
+  <y1-m>-0.33</y1-m>
+  <z1-m>0.713</z1-m>
+  <x2-m>1.783</x2-m>
+  <y2-m>-0.33</y2-m>
+  <z2-m>1.303</z2-m>
+ </axis>
+</animation>
+
+<!-- FRONT WHEEL LEFT -->
+
+<animation>
+ <type>rotate</type>
+ <object-name>Tyre1</object-name>
+ <property>gear/gear[0]/steering-norm</property>
+ <factor>-45</factor>
+ <center>
+  <x-m> 0.681</x-m>
+  <y-m>-0.557</y-m>
+  <z-m> 0.289</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
+
+<animation>
+ <type>translate</type>
+ <object-name>Tyre1</object-name>
+ <property>gear/gear[0]/compression-norm</property>
+ <interpolation>
+  <entry>
+   <ind>0.0</ind>	
+   <dep>0</dep>
+  </entry>
+  <entry>	
+	<ind>1.00</ind>
+	<dep>0.2</dep>
+  </entry>  
+ </interpolation>
+ <axis>
+  <x>0</x>	
+  <y>0</y>
+  <z>1</z>	
+ </axis>
+</animation>
+ 
+<animation>
+ <type>spin</type>
+ <object-name>Tyre1</object-name>
+ <property>gear/gear[2]/rollspeed-ms</property>
+ <factor>-15</factor>
+ <center>
+  <x-m>0.682</x-m>
+  <y-m>0.627</y-m>
+  <z-m>0.291</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>1.0</y>
+  <z>0.0</z>
+ </axis>
+</animation>
+
+<!-- FRONT WHEEL RIGHT -->
+
+<animation>
+ <type>rotate</type>
+ <object-name>Tyre2</object-name>
+ <property>gear/gear[1]/steering-norm</property>
+ <factor>-45</factor>
+ <center>
+  <x-m> 0.681</x-m>
+  <y-m> 0.557</y-m>
+  <z-m> 0.289</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
+
+<animation>
+ <type>translate</type>
+ <object-name>Tyre2</object-name>
+ <property>gear/gear[1]/compression-norm</property>
+ <interpolation>
+  <entry>
+   <ind>0.0</ind>
+   <dep>0</dep>
+  </entry>
+  <entry>
+   <ind>1.00</ind>
+   <dep>0.2</dep>
+  </entry>
+ </interpolation>
+ <axis>
+  <x>0</x>
+  <y>0</y>
+  <z>1</z>
+ </axis>
+</animation>
+ 
+<animation>
+ <type>spin</type>
+ <object-name>Tyre2</object-name> 
+ <property>gear/gear[1]/rollspeed-ms</property>
+ <factor>-15</factor>
+ <center>
+  <x-m>0.682</x-m>
+  <y-m>-0.627</y-m>
+  <z-m>0.291</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>1.0</y>
+  <z>0.0</z>
+ </axis>
+</animation>
+ 
+<!-- REAR WHEEL LEFT -->
+
+<animation>
+ <type>translate</type>
+ <object-name>Tyre3</object-name>
+ <property>gear/gear[2]/compression-norm</property>
+ <interpolation>
+  <entry>
+   <ind>0.0</ind>
+   <dep>0</dep>
+  </entry>
+  <entry>
+   <ind>1.00</ind>
+   <dep>0.2</dep>
+  </entry>
+ </interpolation>
+ <axis>
+  <x>0</x>
+  <y>0</y>
+  <z>1</z>
+ </axis>
+</animation>
+ 
+<animation>  
+ <type>spin</type>
+ <object-name>Tyre3</object-name>
+ <property>gear/gear[3]/rollspeed-ms</property>
+ <factor>-15</factor>
+ <center>
+  <x-m>3.17</x-m>
+  <y-m>0.625</y-m>
+  <z-m>0.282</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>1.0</y>
+  <z>0.0</z>
+ </axis>
+</animation>
+ 
+<!-- REAR WHEEL RIGHT -->
+
+<animation>
+ <type>translate</type>
+ <object-name>Tyre4</object-name>
+ <property>gear/gear[3]/compression-norm</property>
+ <interpolation>
+  <entry>
+   <ind>0.0</ind>
+   <dep>0</dep>
+  </entry>
+  <entry>
+   <ind>1.00</ind>
+   <dep>0.2</dep>
+  </entry>
+ </interpolation>
+ <axis>
+  <x>0</x>
+  <y>0</y>
+  <z>1</z>
+ </axis>
+</animation>
+
+<animation>
+ <type>spin</type>
+ <object-name>Tyre4</object-name>
+ <property>gear/gear[1]/rollspeed-ms</property>
+ <factor>-15</factor>
+ <center>
+  <x-m>3.17</x-m>
+  <y-m>-0.625</y-m>
+  <z-m>0.282</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>1.0</y>
+  <z>0.0</z>
+ </axis>
+</animation>
+
+<!-- DOOR ANIMATIONS -->
+
+<!-- LEFT FRONT DOOR -->
+
+<animation>
+ <type>pick</type>
+ <object-name>ldoor</object-name>
+ <action>
+  <button>0</button>
+  <repeatable>false</repeatable>  
+  <binding>
+   <command>nasal</command>
+   <script>followme.frontleft_door.toggle()</script>
+  </binding>
+ </action>
+</animation>
+ 
+<animation>
+ <type>rotate</type>
+ <object-name>ldoor</object-name>
+ <property>controls/doors/frontleft/position-norm</property>
+ <factor>-75</factor>
+ <center>
+  <x-m> 1</x-m>
+  <y-m>-0.78</y-m>
+  <z-m> 0</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
+
+<!-- RIGHT FRONT DOOR -->
+
+<animation>
+ <type>pick</type>
+ <object-name>rdoor</object-name>
+ <action>
+  <button>0</button>
+  <repeatable>false</repeatable>  
+  <binding>
+   <command>nasal</command>
+   <script>followme.frontright_door.toggle()</script>
+  </binding>
+ </action>
+</animation>
+
+<animation>
+ <type>rotate</type>
+ <object-name>rdoor</object-name>
+ <property>controls/doors/frontright/position-norm</property>
+ <factor>75</factor>
+ <center>
+  <x-m>1</x-m>
+  <y-m>0.78</y-m>
+  <z-m>0</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
+	
+<!--LEFT REAR DOOR -->
+
+<animation>
+ <type>pick</type>
+ <object-name>door.rl</object-name>
+ <action>
+  <button>0</button>
+  <repeatable>false</repeatable>  
+  <binding>
+   <command>nasal</command>
+   <script>followme.rearleft_door.toggle()</script>
+  </binding>
+ </action>
+</animation>
+
+<animation>
+ <type>rotate</type>
+ <object-name>door.rl</object-name>
+ <object-name>rearwiper</object-name>
+ <property>controls/doors/rearleft/position-norm</property>
+ <factor>-90</factor>
+ <center>
+  <x-m> 3.7</x-m>
+  <y-m>-0.6</y-m>
+  <z-m> 0</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
+
+<!-- RIGHT REAR DOOR -->
+
+<animation>
+ <type>pick</type>
+ <object-name>door.rr</object-name>
+ <action>
+  <button>0</button>
+  <repeatable>false</repeatable>  
+  <binding>
+   <command>nasal</command>
+   <script>followme.rearright_door.toggle()</script>
+  </binding>
+ </action>
+</animation>
+
+<animation>
+ <type>rotate</type>
+ <object-name>door.rr</object-name>
+ <property>controls/doors/rearright/position-norm</property>
+ <factor>90</factor>
+ <center>
+  <x-m>3.7</x-m>
+  <y-m>0.6</y-m>
+  <z-m>0</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
+
+<!-- LIGHTS -->
+
+<effect>
+ <inherits-from>Effects/light-cone</inherits-from>
+ <object-name>Cone</object-name>
+</effect>
+
+<animation>
+ <type>select</type>
+ <object-name>Cone</object-name>
+ <object-name>Cone-texture</object-name>
+ <condition>
+  <property>controls/lighting/headlight</property>
+ </condition>
+</animation>
+
+<animation>
+ <type>material</type>
+ <object-name>indicater_left</object-name>
+ <emission>
+  <red>1.0</red>
+  <green>0.8</green>
+  <blue>0.2</blue>
+  <factor-prop>sim/model/lights/indicator-left/state</factor-prop>
+ </emission>
+</animation>
+
+<animation>
+ <type>material</type>
+ <object-name>indicater_right</object-name>
+ <emission>
+  <red>1.0</red>
+  <green>0.8</green>
+  <blue>0.2</blue>
+  <factor-prop>sim/model/lights/indicator-right/state</factor-prop>
+ </emission>
+</animation>
+
+<animation>
+ <type>material</type>
+ <object-name>braking_lights</object-name>
+ <emission>
+  <red>1.0</red>
+  <green>0.0</green>
+  <blue>0.0</blue>
+  <factor-prop>/controls/gear/brake-left</factor-prop>
+ </emission>
+ <condition>
+  <greater-than>
+   <property>/controls/gear/brake-left</property>
+   <value>0.3</value>
+  </greater-than>
+ </condition>
+</animation>
+
+</PropertyList>
+ 

@@ -1,0 +1,28 @@
+AC3Db
+MATERIAL "default" rgb 0.5 0.5 0.5 amb 0.5 0.5 0.5 emis 0 0 0 spec 0.2 0.2 0.2 shi 128 trans 0
+MATERIAL "warninglight" rgb 1 1 1 amb 1 1 1 emis 1 1 1 spec 0.2 0.2 0.2 shi 128 trans 0.0000
+OBJECT world
+kids 1
+OBJECT poly
+name "warninglight"
+texture "warninglight.png"
+numvert 4
+-5.245000 10.550000 -0.000000
+5.245000 0.060000 -0.000000
+-5.245000 0.060000 -0.000000
+5.245000 10.550000 -0.000000
+numsurf 2
+SURF 0x30
+mat 1
+refs 3
+0 1.0151 1.0047
+1 0.0161 0.0056
+2 1.0151 0.0056
+SURF 0x30
+mat 1
+refs 3
+1 0.0161 0.0056
+0 1.0151 1.0047
+3 0.0161 1.0047
+kids 0
+

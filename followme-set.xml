@@ -1,0 +1,254 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+<sim>
+
+	<description>Follow Me</description>
+	<author>Gijs de Rooy</author>
+	<status>early production</status>
+	<rating>
+		<FDM type="int">4</FDM>
+		<systems type="int">2</systems>
+		<cockpit type="int">3</cockpit>
+		<model type="int">4</model>
+	</rating>
+
+	<tags>
+		<tag>groundvehicle</tag>
+		<tag>1970s</tag>
+		<tag>1980s</tag>
+		<tag>1990s</tag>
+		<tag>2000s</tag>
+		<tag>2010s</tag>
+	</tags>
+	
+	<flight-model>jsb</flight-model>
+	<aero>followme</aero>
+
+	<model>
+		<path>Aircraft/followme/Models/followme.xml</path>
+		<livery>
+			<file type="string"/>
+		</livery>
+	</model> 
+
+	<view n="0">
+		<internal archive="y">true</internal>
+		<config>
+			<x-offset-m archive="y" type="double">-0.35</x-offset-m>
+			<y-offset-m archive="y" type="double">1.35</y-offset-m>
+			<z-offset-m archive="y" type="double">1.88</z-offset-m>
+			<pitch-offset-deg>-10.0</pitch-offset-deg>
+			<field-of-view>65</field-of-view>
+		</config>
+	</view>
+
+	<view n="1">
+		<config>
+			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
+		</config>
+	</view>
+	
+	<view n="2">
+		<config>
+			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
+		</config>
+	</view>
+	
+	<view n="3">
+		<config>
+			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
+		</config>
+	</view>
+	
+	<view n="4">
+		<config>
+			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
+		</config>
+	</view>
+	
+	<view n="5">
+		<config>
+			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
+		</config>
+	</view>
+	
+	<view n="6">
+		<config>
+			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
+		</config>
+	</view>
+
+	<hud>
+		<enable3d>false</enable3d>
+	</hud>
+
+	<help>
+		<key>
+			<name>m</name>
+			<desc>Toggle direction</desc>
+		</key>
+		<text>
+		You can select the message to be displayed on the bar, through the "Follow Me > Select message" menu.
+		</text>
+	</help>
+	
+	<menubar>
+		<default>
+			<menu n="10">
+				<label>Follow me</label>
+				<enabled type="bool">true</enabled>	
+				<item>
+					<label>Select Message</label>
+					<binding>
+						<command>nasal</command>
+						<script>aircraft.livery.dialog.toggle()</script>
+					</binding>
+				</item>	
+			</menu>
+		</default>
+	</menubar>
+
+</sim>
+
+<engines>
+	<engine n="0">
+		<rpm type="double">2</rpm>
+	</engine>
+	<engine n="1">
+		<rpm type="double">2</rpm>
+	</engine>
+</engines>
+
+<controls>
+	<flight>
+		<aileron alias="/controls/flight/rudder" />
+	</flight>
+	<lighting>
+		<headlight>0</headlight>
+		<indicator-left>0</indicator-left>
+		<indicator-right>0</indicator-right>
+		<warning>1</warning>
+	</lighting>
+</controls>
+
+<input>
+	<keyboard>
+		<key n="91"> 
+			<name>[</name>
+			<desc>Toggle left indicator lights</desc>
+			<binding> 
+				<command>property-toggle</command>
+				<property>/controls/lighting/indicator-left</property>
+			</binding>
+		</key>
+		<key n="93"> 
+			<name>]</name>
+			<desc>Toggle right indicator lights</desc>
+			<binding> 
+				<command>property-toggle</command>
+				<property>/controls/lighting/indicator-right</property>
+			</binding>
+		</key>
+		<key n="109"> 
+			<name>m</name>
+			<desc>Toggle direction</desc>
+			<binding> 
+				<command>property-cycle</command>
+				<property>controls/engines/engine/direction</property>
+				<value type="double">-1</value>
+				<value type="double">1</value>
+			</binding>
+		</key>
+	    <key n="119">
+	      <name>w</name>
+	      <desc>gas pedal</desc>
+	      <repeatable>false</repeatable>
+		<binding> 
+			<command>property-assign</command>
+			<property>/controls/engines/engine/throttle</property>
+			<value>1</value>
+		</binding>
+	      <mod-up>
+	  		<binding> 
+	  			<command>property-assign</command>
+	  			<property>/controls/engines/engine/throttle</property>
+	  			<value>0</value>
+	  		</binding>
+	      </mod-up>
+	    </key>
+        <key n="115">
+            <name>s</name>
+            <desc>break</desc>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>property-assign</command>
+                <property>/controls/gear/brake-left</property>
+                <value>1</value>
+            </binding>
+            <binding>
+                <command>property-assign</command>
+                <property>/controls/gear/brake-right</property>
+                <value>1</value>
+            </binding>
+            <mod-up>
+                <binding>
+                    <command>property-assign</command>
+                    <property>/controls/gear/brake-left</property>
+                    <value>0</value>
+                </binding>
+                <binding>
+                    <command>property-assign</command>
+                    <property>/controls/gear/brake-right</property>
+                    <value>0</value>
+                </binding>
+            </mod-up>
+        </key>
+        <key n="97">
+            <name>a</name>
+            <desc>rudder-left</desc>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>property-assign</command>
+                <property>/controls/flight/rudder</property>
+                <value>-1</value>
+            </binding>
+            <mod-up>
+                <binding>
+                    <command>property-assign</command>
+                    <property>/controls/flight/rudder</property>
+                    <value>0</value>
+                </binding>
+            </mod-up>
+        </key>
+        <key n="100">
+            <name>d</name>
+            <desc>rudder-right</desc>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>property-assign</command>
+                <property>/controls/flight/rudder</property>
+                <value>1</value>
+            </binding>
+            <mod-up>
+                <binding>
+                    <command>property-assign</command>
+                    <property>/controls/flight/rudder</property>
+                    <value>0</value>
+                </binding>
+            </mod-up>
+        </key>
+	</keyboard>
+</input>
+
+<nasal>
+	<followme>
+		<file>Aircraft/followme/Nasal/systems.nas</file>        
+	</followme>
+</nasal>
+
+</PropertyList>
+
+
+
+

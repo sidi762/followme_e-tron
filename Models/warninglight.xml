@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<PropertyList>
+    <path>warninglight.ac</path>
+
+    <animation>
+        <type>noshadow</type>
+        <object-name>warninglight</object-name>
+    </animation>
+
+    <animation>
+        <type>alpha-test</type>
+        <alpha-factor>0.01</alpha-factor>
+    </animation>
+
+	<animation>
+		<type>select</type>
+		<object-name>warninglight</object-name>
+		<condition>
+			<property>/sim/model/lights/warning/state</property>
+		</condition>
+	</animation>
+
+    <animation>
+	  <type>range</type>
+	  <min-m>0</min-m>
+	  <max-m>6000</max-m>
+    </animation>
+
+    <animation>
+        <type>billboard</type>
+        <object-name>warninglight</object-name>
+        <spherical type="bool">true</spherical>
+    </animation>
+
+	<animation>
+		<type>dist-scale</type>
+		<object-name>warninglight</object-name>
+		<interpolation>
+			<entry>
+				<ind>0</ind>
+				<dep>0.025</dep>
+			</entry>
+			<entry>
+				<ind>300</ind>
+				<dep>0.1</dep>
+			</entry>
+			<entry>
+				<ind>1500</ind>
+				<dep>0.2</dep>
+			</entry>
+			<entry>
+				<ind>6000</ind>
+				<dep>.3</dep>
+			</entry>
+		</interpolation>
+  </animation>
+
+</PropertyList>
+
