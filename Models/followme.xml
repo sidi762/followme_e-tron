@@ -20,7 +20,7 @@
 </animation>
 
 <model> 
- <path>Aircraft/followme/Models/warninglight.xml</path>
+ <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
  <offsets> 
   <x-m> 3.4</x-m>
   <y-m>-0.4</y-m>
@@ -29,7 +29,7 @@
 </model>
 
 <model> 
- <path>Aircraft/followme/Models/warninglight.xml</path>
+ <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
  <offsets> 
   <x-m> 3.4</x-m>
   <y-m> 0.4</y-m>
@@ -40,7 +40,7 @@
 <!-- INSTRUMENTS -->
 
 <model> 
- <path>Aircraft/followme/Models/Instruments/fuelgauge.xml</path>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge.xml</path>
  <offsets> 
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
@@ -49,7 +49,7 @@
 </model>
 
 <model> 
- <path>Aircraft/followme/Models/Instruments/speedometer.xml</path>
+ <path>Aircraft/followme_e-tron/Models/Instruments/speedometer.xml</path>
  <offsets> 
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>

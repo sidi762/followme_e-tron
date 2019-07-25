@@ -279,10 +279,10 @@
 
 <nasal>
 	<followme>
-		<file>Aircraft/followme_e-tron.xml/Nasal/systems.nas</file>        
+		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>        
 	</followme>
     <engine>
-        <file>Aircraft/followme_e-tron.xml/Nasal/engine.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/engine.nas</file>
     </engine>
 </nasal>
 
