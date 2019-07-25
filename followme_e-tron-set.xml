@@ -91,8 +91,27 @@
 			<name>m</name>
 			<desc>Toggle direction</desc>
 		</key>
+		<key>
+			<name>w</name>
+			<desc>Full pedal</desc>
+		</key>
+		<key>
+			<name>s</name>
+			<desc>Full brake</desc>
+		</key>
+		<key>
+			<name>a</name>
+			<desc>Full left</desc>
+		</key>
+		<key>
+			<name>d</name>
+			<desc>Full right</desc>
+		</key>
 		<text>
 		You can select the message to be displayed on the bar, through the "Follow Me > Select message" menu.
+		</text>
+		<text>
+            e-tron Brought to you by FGPRC.
 		</text>
 	</help>
 	
