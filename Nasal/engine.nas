@@ -1,5 +1,5 @@
 var gearratio = 9.73;
-props.getNode("/",1).setValue("/controls/engines/engine/rpm1",1000);
+props.getNode("/",1).setValue("/controls/engines/engine/rpm1",0);
 props.getNode("/",1).setValue("/controls/engines/engine/direction",1);
 props.getNode("/",1).setValue("/controls/engines/engine/started",0);
 props.getNode("/",1).setValue("/controls/gear/brake-cmd",0);
@@ -74,6 +74,7 @@ var rpm_calculate = func(rpm_rate){
 
 
 var startEngine = func(){
+    props.getNode("/",1).setValue("/controls/engines/engine/rpm1",1000);
     props.getNode("/",1).setValue("/controls/engines/engine/started",1);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",1);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-bwd-eng",1);

@@ -8,10 +8,10 @@
    <name>rumble</name>
    <mode>looped</mode>
    <path>Sounds/rumble.wav</path>
-   <property>/velocities/airspeed-kt</property>
+   <property>/controls/engines/engine/rpma</property>
    <volume>
-    <property>/velocities/airspeed-kt</property>
-    <factor>0.01</factor>
+    <property>/controls/engines/engine/rpma</property>
+    <factor>0.00007</factor>
     <min>0.0</min>
     <max>0.0</max>
    </volume>
