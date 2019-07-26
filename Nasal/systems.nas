@@ -23,6 +23,8 @@ var liveryFuse_update = {
 aircraft.livery.init("Aircraft/followme_e-tron/Models/Messages");
 liveryFuse.init("Aircraft/followme_e-tron/Models/Texture");
 
+props.getNode("/",1).setValue("/systems/horn",0);
+
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
 var rearleft_door = aircraft.door.new("/controls/doors/rearleft", 1);

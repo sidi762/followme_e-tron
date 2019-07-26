@@ -11,7 +11,7 @@
    <property>/velocities/airspeed-kt</property>
    <volume>
     <property>/velocities/airspeed-kt</property>
-    <factor>0.001</factor>
+    <factor>0.01</factor>
     <min>0.0</min>
     <max>0.0</max>
    </volume>
@@ -37,6 +37,23 @@
 		<factor>5</factor>
 	</volume>
   </safety>
+  
+  <horn>
+	<name>horn</name>
+	<mode>looped</mode>
+	<path>Aircraft/followme_e-tron/Sounds/horn.wav</path>
+	<condition>
+  	<equals>
+			<property>/systems/horn</property>
+			<value>1</value>
+		</equals>
+	</condition>
+	<volume>
+        <property>/systems/horn</property>
+		<factor>5</factor>
+	</volume>
+  </horn>
+  
 
 </fx>
  

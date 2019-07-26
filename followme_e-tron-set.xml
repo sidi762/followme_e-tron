@@ -288,6 +288,23 @@
                 </binding>
             </mod-up>
         </key>
+        <key n="32">
+         <name>SPACE</name>
+         <desc>horn</desc>
+         <repeatable>false</repeatable>
+         <binding>
+             <command>property-assign</command>
+             <property>/systems/horn</property>
+             <value>1</value>
+         </binding>
+         <mod-up>
+          <binding>
+              <command>property-assign</command>
+              <property>/systems/horn</property>
+              <value>0</value>
+          </binding>
+         </mod-up>
+        </key>
 	</keyboard>
 </input>
 
