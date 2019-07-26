@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">Speed and power</name>
+			<texture>Messages/Speed and power.png</texture>
+		</livery>
+	</model>
+</sim>
+</PropertyList>

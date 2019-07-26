@@ -140,8 +140,8 @@
     </propulsion>
 
     <flight_control name="Truck">
+        
         <channel name="Steer">
-           
             <summer name="Steer Sum">
                 <input>fcs/rudder-cmd-norm</input>
                 <clipto>
