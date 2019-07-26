@@ -7,8 +7,9 @@
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>
-  <property>consumables/fuel/total-fuel-norm</property>
-  <factor>-90</factor>
+  <property>systems/electrical/e-tron/battery-kWh</property>
+  <factor>-1.125</factor>
+  <offset>22.5</offset>
   <center>
    <x-m>0.0</x-m>
    <y-m>0.0</y-m>

@@ -53,7 +53,7 @@ var brakesABS = func(){
 
 var absTimer = maketimer(0.001, brakesABS);
 
-var brakeWithABS = func(){
+var brakeWithABS = func(){# Seems to have bugs
     var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-cmd");
     if(brakeCmd){
         absTimer.start();
@@ -62,6 +62,6 @@ var brakeWithABS = func(){
     }
 }
 
-setlistener("/controls/gear/brake-cmd", brakeWithABS);
+#setlistener("/controls/gear/brake-cmd", brakeWithABS);
 
 

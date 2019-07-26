@@ -7,7 +7,7 @@
 	<!--up -->
 		
 
-    <path>speedometer.ac</path>
+<path>speedometer.ac</path>
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>
