@@ -16,7 +16,7 @@
     <max>0.0</max>
    </volume>
    <pitch>
-    <property>/velocities/airspeed-kt</property>
+    <property>/controls/engines/engine/rpma</property>
     <factor>0.005</factor>
     <offset>1.5</offset>
    </pitch>
