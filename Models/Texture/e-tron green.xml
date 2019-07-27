@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">e-tron green</name>
+			<texture-fuse>Texture/e-tron green.png</texture-fuse>
+		</livery>
+	</model>
+</sim>
+</PropertyList>
