@@ -6,12 +6,6 @@
  <load>
  var livery_update = aircraft.livery_update.new("Aircraft/followme_e-tron/Models/Messages");
  var liveryFuse_update = followme.liveryFuse_update.new("Aircraft/followme_e-tron/Models/Texture");
- var rplayer = cmdarg();
-   # Set up property aliases for animations.
-   rplayer.getNode("/controls/lighting/indicator-left", 1).
-     alias(rplayer.getNode("sim/multiplay/generic/float[0]"));
-   rplayer.getNode("/controls/lighting/indicator-right", 1).
-     alias(rplayer.getNode("sim/multiplay/generic/float[1]"));
  </load>   
  <unload>
  livery_update.stop();
@@ -447,7 +441,7 @@
   <red>1.0</red>
   <green>0.8</green>
   <blue>0.2</blue>
-  <factor-prop>sim/model/lights/indicator-left/state</factor-prop>
+  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
  </emission>
 </animation>
 
@@ -458,7 +452,7 @@
   <red>1.0</red>
   <green>0.8</green>
   <blue>0.2</blue>
-  <factor-prop>sim/model/lights/indicator-right/state</factor-prop>
+  <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
  </emission>
 </animation>
 

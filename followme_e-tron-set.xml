@@ -151,7 +151,14 @@
 			</menu>
 		</default>
 	</menubar>
-
+    
+    <multiplay>
+      <generic>
+        <int n="0" alias="/sim/model/lights/indicator-left/state"/>
+        <int n="1" alias="/sim/model/lights/indicator-right/state"/>
+        <int n="2" alias="/systems/horn"/>
+      </generic>
+    </multiplay>
 </sim>
 
 <engines>
@@ -175,12 +182,7 @@
 	</lighting>
 </controls>
 
-<multiplay>
-  <generic>
-    <int n="0" alias="/controls/lighting/indicator-left"/>
-    <int n="1" alias="/controls/lighting/indicator-right"/>
-  </generic>
-</multiplay>
+
 
 <input>
 	<keyboard>

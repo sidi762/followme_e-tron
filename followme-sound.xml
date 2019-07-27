@@ -44,12 +44,12 @@
 	<path>Aircraft/followme_e-tron/Sounds/horn.wav</path>
 	<condition>
   	<equals>
-			<property>/systems/horn</property>
+			<property>sim/multiplay/generic/int[2]</property>
 			<value>1</value>
 		</equals>
 	</condition>
 	<volume>
-        <property>/systems/horn</property>
+        <property>sim/multiplay/generic/int[2]</property>
 		<factor>5</factor>
 	</volume>
   </horn>

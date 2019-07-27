@@ -52,7 +52,30 @@ var update_engine = func(){
     }
     var force = 3.33*direction*torque*gearratio;
     #print("torque:"~torque);
-    props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/engine/magnitude", force);
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FL/magnitude", force/4);
+    }else{
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FL/magnitude", 0);
+    }
+    
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", force/4);
+    }else{
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
+    }
+    
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BL/magnitude", force/4);
+    }else{
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BL/magnitude", 0);
+    }
+    
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BR/magnitude", force/4);
+    }else{
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
+    }
+   
 }
 
 var engineTimer = maketimer(0.001, update_engine);
@@ -78,6 +101,7 @@ var startEngine = func(){
     props.getNode("/",1).setValue("/controls/engines/engine/started",1);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",1);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-bwd-eng",1);
+    engineTimer.simulatedTime = 1;
     engineTimer.start();
     print("Engine started");
 }
