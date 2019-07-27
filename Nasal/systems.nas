@@ -23,7 +23,8 @@ var liveryFuse_update = {
 aircraft.livery.init("Aircraft/followme_e-tron/Models/Messages");
 liveryFuse.init("Aircraft/followme_e-tron/Models/Texture");
 
-props.getNode("/",1).setValue("/systems/horn",false);
+props.getNode("/",1).setValue("/systems/horn", 0);
+props.getNode("/",1).setValue("/systems/false-light", 0);
 
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
@@ -37,6 +38,221 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-left", [0.8, 0.5],
 beacon_switch = props.globals.getNode("controls/switches/indicator-right", 2);
 var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.8, 0.5], "/controls/lighting/indicator-right");
 
+props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
+props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
+
+
+
+#var Led = {
+#    
+#    new: func() { return { parents:[Led] },
+#    node: props.getNode("/sim/model/livery/texture",1),
+#    blankTexture: "Messages/blanco.png",
+#    currentMessage: "",
+#    messageHistory : [],
+#    
+#    display: func(content){
+#        me.node.setValue(content);
+#    },
+#    
+#    
+#};
+
+
+
+var Indicator = {
+    
+    #     Usage:                                        #
+    #  var leftIndicator = Indicator.new("left");       #
+    #  var rightIndicator = Indicator.new("right");     #
+    #                                                   #
+    
+    type: "",
+    new: func(type) { return { parents:[Indicator], type: type}; },
+    state: 0,
+    switchOn: func(){
+        props.getNode("/", 1).setValue("/controls/lighting/indicator-"~me.type, 1);
+        me.state = 1;
+    },
+    switchOff: func(){
+        props.getNode("/", 1).setValue("/controls/lighting/indicator-"~me.type, 0);
+        me.state = 0;
+    },
+    isOn: func(){
+        return me.state;
+    },
+    isOff: func(){
+        if(me.state){
+            return 0;
+        }else{
+            return 1;
+        }
+    },
+};
+
+
+
+
+var IndicatorController = {
+    
+    #
+    #   Usage:
+    #       mode:
+    #           0:Off
+    #           1:Right without led
+    #           2:Left without led
+    #           3:both without led
+    #           4:Right with led
+    #           5:Left with led
+    #           6:both with led(WIP)
+    #       getMode(): Get currrent mode
+    #       setMode(mode): Set mode(0,1,2), return 0 if fail
+    #
+    #
+    #
+    #
+    #
+    
+    
+    
+    new: func() { return { parents:[IndicatorController]}; },
+    
+    leftIndicator : Indicator.new("left"),
+    rightIndicator : Indicator.new("right"),
+    
+    mode:0,
+    
+    falseLight: 0,
+    
+    ledMessage: props.getNode("/sim/model/livery/texture",1),
+    
+    currentMessage: "",
+    
+    textureRight: "Messages/right.png",
+    
+    textureLeft: "Messages/left.png",
+    
+    saveLedMessage: func(){
+        me.currentMessage = me.ledMessage.getValue();
+    },
+    
+    getSavedMessage: func(){
+        return me.currentMessage;
+    },
+    
+    clearSavedMessage: func(){
+        me.currentMessage = "";
+    },
+    
+    setLedMessage: func(content){
+        me.ledMessage.setValue(content);
+    },
+    
+    resumeLedMessage: func(){
+        if(me.getSavedMessage()){
+            me.setLedMessage(me.getSavedMessage());
+            me.clearSavedMessage();
+        }
+    },
+    
+    getMode: func(){
+        return me.mode;
+    },
+    
+    setMode: func(targetMode){
+        if(targetMode == 0){
+            me.resumeLedMessage();
+            me.rightIndicator.switchOff();
+            me.leftIndicator.switchOff();
+            me.mode = targetMode;
+            
+            if(me.falseLight == 1){
+                me.setMode(3);
+            }
+            
+        }else if(targetMode == 1){
+            me.resumeLedMessage();
+            me.rightIndicator.switchOn();
+            me.leftIndicator.switchOff();
+            me.mode = targetMode;
+        }else if(targetMode == 2){
+            me.resumeLedMessage();
+            me.rightIndicator.switchOff();
+            me.leftIndicator.switchOn();
+            me.mode = targetMode;
+        }else if(targetMode == 3){
+            me.resumeLedMessage();
+            me.rightIndicator.switchOn();
+            me.leftIndicator.switchOn();
+            me.mode = targetMode;
+        }else if(targetMode == 4){
+            
+            me.resumeLedMessage();
+            me.saveLedMessage();
+            
+            me.rightIndicator.switchOn();
+            me.leftIndicator.switchOff();
+            
+            me.setLedMessage(me.textureRight);
+            
+            me.mode = targetMode;
+        }else if(targetMode == 5){
+            
+            me.resumeLedMessage();
+            me.saveLedMessage();
+            
+            me.rightIndicator.switchOff();
+            me.leftIndicator.switchOn();
+            
+            me.setLedMessage(me.textureLeft);
+            
+            me.mode = targetMode;
+        }else if(targetMode == 6){
+            me.mode = targetMode;
+        }else{
+            return 0;
+        }
+    },
+    
+    right_indicator_toggle : func(){
+        if(me.getMode() != 4){
+            me.setMode(4);
+        }else if(me.getMode() == 4){
+            me.setMode(0);
+        }
+    },
+    
+    left_indicator_toggle : func(){
+        if(me.getMode() != 5){
+            me.setMode(5);
+        }else if(me.getMode() == 5){
+            me.setMode(0);
+        }
+    },
+    
+    falseLightOn : func(){
+        print("falseLight turned on");
+        me.falseLight = 1;
+        me.setMode(3);
+    },
+    
+    falseLightOff : func(){
+        print("falseLight turned off");
+        me.falseLight = 0;
+        me.setMode(0);
+    },
+    
+    false_light_toggle : func(){
+        if(me.falseLight == 0){
+            me.falseLightOn();
+        }else if(me.falseLight == 1){
+            me.falseLightOff();
+        }
+    },
+    
+};
+
+var indicatorController = IndicatorController.new();
 
 
 var brakesABS = func(){

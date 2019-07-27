@@ -107,6 +107,22 @@
 			<name>d</name>
 			<desc>Steer right 50%</desc>
 		</key>
+		<key>
+			<name>h</name>
+			<desc>Horn</desc>
+		</key>
+		<key>
+			<name>f</name>
+			<desc>Toggle false indicator light</desc>
+		</key>
+		<key>
+			<name>[</name>
+			<desc>Toggle left indicator light</desc>
+		</key>
+		<key>
+			<name>]</name>
+			<desc>Toggle right indicator light</desc>
+		</key>
 		<text>
 		You can select the message to be displayed on the bar, through the "Follow Me > Select message" menu.
 		</text>
@@ -190,18 +206,27 @@
 			<name>[</name>
 			<desc>Toggle left indicator lights</desc>
 			<binding> 
-				<command>property-toggle</command>
-				<property>/controls/lighting/indicator-left</property>
+				<command>nasal</command>
+                <script>followme.indicatorController.left_indicator_toggle();</script>
 			</binding>
 		</key>
 		<key n="93"> 
 			<name>]</name>
 			<desc>Toggle right indicator lights</desc>
 			<binding> 
-				<command>property-toggle</command>
-				<property>/controls/lighting/indicator-right</property>
+				<command>nasal</command>
+                <script>followme.indicatorController.right_indicator_toggle();</script>
 			</binding>
 		</key>
+        <key n="102">
+            <name>f</name>
+            <desc>false-light</desc>
+            <repeatable>false</repeatable>
+			<binding> 
+				<command>nasal</command>
+                <script>followme.indicatorController.false_light_toggle();</script>
+			</binding>
+        </key>
 		<key n="109"> 
 			<name>m</name>
 			<desc>Toggle direction</desc>
