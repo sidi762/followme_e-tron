@@ -1,5 +1,6 @@
 var electric_init = func(){  #Initialize
     props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-kWh",80);
+    props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-kWs",288000);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-U-V",760);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-bwd-eng",0);
@@ -15,6 +16,10 @@ var electric_init = func(){  #Initialize
 }
 
 var electric_update = func(){
+    
+    var currentBattery_kWs = props.getNode("/systems/electrical/e-tron/battery-kWs",1);
+    var currentBattery_kWh = props.getNode("/systems/electrical/e-tron/battery-kWh",1);
+    
     if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-fwd-eng") == 1){
         props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V-max",380);
         props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",747);
@@ -31,6 +36,14 @@ var electric_update = func(){
         props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
     }
     
+    #battery consume
+    
+    var currentFwdEngConsume = props.getNode("/systems/electrical/e-tron/fwd-eng-U-V",1).getValue() * props.getNode("/systems/electrical/e-tron/fwd-eng-I-A",1).getValue() * 0.001;
+    var currentBwdEngConsume = props.getNode("/systems/electrical/e-tron/bwd-eng-U-V",1).getValue() * props.getNode("/systems/electrical/e-tron/bwd-eng-I-A",1).getValue() * 0.001;
+    var currentTotalConsume = currentFwdEngConsume+currentBwdEngConsume;
+    props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-kWs", currentBattery_kWs.getValue() - currentTotalConsume);
+    
+    currentBattery_kWh.setValue(currentBattery_kWs.getValue()/3600);
 }
 
 var electricTimer = maketimer(1, electric_update);

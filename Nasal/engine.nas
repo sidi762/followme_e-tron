@@ -30,6 +30,8 @@ var update_engine = func(){
     
     var cmd_P_kW = (fwdPower + bwdPower)/1000;
     
+
+    
     
     #var cmd_P_kW = throttle*max_P_kW;
     
@@ -58,19 +60,19 @@ var update_engine = func(){
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FL/magnitude", 0);
     }
     
-    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/compression-ft") > 0){
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", force/4);
     }else{
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
     }
     
-    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[2]/compression-ft") > 0){
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BL/magnitude", force/4);
     }else{
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BL/magnitude", 0);
     }
     
-    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[3]/compression-ft") > 0){
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BR/magnitude", force/4);
     }else{
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
@@ -106,6 +108,7 @@ var startEngine = func(){
     print("Engine started");
 }
 var stopEngine = func(){
+    props.getNode("/",1).setValue("/controls/engines/engine/rpm1",0);
     props.getNode("/",1).setValue("/controls/engines/engine/started",0);
     props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/engine/magnitude", 0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",0);
