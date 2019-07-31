@@ -74,6 +74,10 @@
                         <command>property-toggle</command>
 		                <property>services/service-truck/enable</property>
                      </binding>
+                     <binding>
+                         <command>nasal</command>
+ 		                <script>setprop("/sim/sound/voices/pilot", "Hey there! How can I help you, comrade?")</script>
+                      </binding>
 	                 <binding>
                          <command>dialog-update</command>
                     </binding>
