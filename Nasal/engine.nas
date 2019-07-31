@@ -110,9 +110,9 @@ var startEngine = func(){
         engineTimer.simulatedTime = 1;
         engineTimer.start();
         if(props.getNode("systems/welcome-message", 1).getValue() == 1){
-            props.getNode("/sim/messages/copilot", 1).setValue("Beijing di san tsui jiao tong wei ti xing nin, Dao lu tsian wan tiao, an tsuan di yi tiao, xing che bull gui fun, tsin ren liang hang lei");
+            props.getNode("/sim/messages/copilot", 1).setValue("Beijing di san tsui jiao tong wei ti xing nin, Dao lu tsian wan tiao, ann tsuan di yi tiao, xing che bull gui fun, tsin ren liang hang lei");
         }else if(props.getNode("systems/welcome-message", 1).getValue() == 2){
-            props.getNode("/sim/messages/copilot", 1).setValue("The Traffic Commission of the Third District of Beijing reminds you that there are thousands of roads and safety is the first. If you drive recklessly, your loved ones will be filled with tears.");
+            props.getNode("/sim/messages/copilot", 1).setValue("This is a reminder from The Third District Traffic Commission of Beijing. There are thousands of roads, and the safety is the first. If you drive recklessly, your loved ones will be filled with tears.");
         }
         print("Engine started");
     }else if(followme.chargeTimer.isRunning()){
