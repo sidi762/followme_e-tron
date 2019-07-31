@@ -187,6 +187,28 @@
         <int n="0" alias="/sim/model/lights/indicator-left/state"/>
         <int n="1" alias="/sim/model/lights/indicator-right/state"/>
         <int n="2" alias="/systems/horn"/>
+        <int n="3" alias="/controls/lighting/headlight"/>
+        <int n="4" alias="/controls/gear/brake-left"/>
+        <int n="5" alias="/services/service-truck/enable"/>
+        
+        <float n="0" alias="/controls/doors/rearright/position-norm"/>
+        <float n="1" alias="/controls/doors/rearleft/position-norm"/>
+        <float n="2" alias="/controls/doors/frontright/position-norm"/>
+        <float n="3" alias="/controls/doors/frontleft/position-norm"/>
+        
+        <float n="4" alias="/gear/gear[0]/steering-norm"/>
+        <float n="5" alias="/gear/gear[0]/compression-norm"/>
+        <float n="6" alias="/gear/gear[0]/rollspeed-ms"/>
+        
+        <float n="7" alias="/gear/gear[1]/steering-norm"/>
+        <float n="8" alias="/gear/gear[1]/compression-norm"/>
+        <float n="9" alias="/gear/gear[1]/rollspeed-ms"/>
+        
+        <float n="10" alias="/gear/gear[2]/compression-norm"/>
+        <float n="11" alias="/gear/gear[2]/rollspeed-ms"/>
+        
+        <float n="12" alias="/gear/gear[3]/compression-norm"/>
+        <float n="13" alias="/gear/gear[3]/rollspeed-ms"/>
       </generic>
     </multiplay>
 </sim>

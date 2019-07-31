@@ -98,7 +98,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre1</object-name>
- <property>gear/gear[0]/steering-norm</property>
+ <property>sim/multiplay/generic/float[4]</property>
  <factor>-45</factor>
  <center>
   <x-m> 0.681</x-m>
@@ -115,7 +115,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre1</object-name>
- <property>gear/gear[0]/compression-norm</property>
+ <property>sim/multiplay/generic/float[5]</property>
  <interpolation>
   <entry>
    <ind>0.0</ind>	
@@ -136,7 +136,7 @@
 <animation>
  <type>spin</type>
  <object-name>Tyre1</object-name>
- <property>gear/gear[2]/rollspeed-ms</property>
+ <property>sim/multiplay/generic/float[6]</property>
  <factor>-15</factor>
  <center>
   <x-m>0.682</x-m>
@@ -155,7 +155,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre2</object-name>
- <property>gear/gear[1]/steering-norm</property>
+ <property>sim/multiplay/generic/float[7]</property>
  <factor>-45</factor>
  <center>
   <x-m> 0.681</x-m>
@@ -172,7 +172,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre2</object-name>
- <property>gear/gear[1]/compression-norm</property>
+ <property>sim/multiplay/generic/float[8]</property>
  <interpolation>
   <entry>
    <ind>0.0</ind>
@@ -193,7 +193,7 @@
 <animation>
  <type>spin</type>
  <object-name>Tyre2</object-name> 
- <property>gear/gear[1]/rollspeed-ms</property>
+ <property>sim/multiplay/generic/float[9]</property>
  <factor>-15</factor>
  <center>
   <x-m>0.682</x-m>
@@ -212,7 +212,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre3</object-name>
- <property>gear/gear[2]/compression-norm</property>
+ <property>sim/multiplay/generic/float[10]</property>
  <interpolation>
   <entry>
    <ind>0.0</ind>
@@ -233,7 +233,7 @@
 <animation>  
  <type>spin</type>
  <object-name>Tyre3</object-name>
- <property>gear/gear[3]/rollspeed-ms</property>
+ <property>sim/multiplay/generic/float[11]</property>
  <factor>-15</factor>
  <center>
   <x-m>3.17</x-m>
@@ -252,7 +252,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre4</object-name>
- <property>gear/gear[3]/compression-norm</property>
+ <property>sim/multiplay/generic/float[12]</property>
  <interpolation>
   <entry>
    <ind>0.0</ind>
@@ -273,7 +273,7 @@
 <animation>
  <type>spin</type>
  <object-name>Tyre4</object-name>
- <property>gear/gear[1]/rollspeed-ms</property>
+ <property>sim/multiplay/generic/float[13]</property>
  <factor>-15</factor>
  <center>
   <x-m>3.17</x-m>
@@ -307,7 +307,7 @@
 <animation>
  <type>rotate</type>
  <object-name>ldoor</object-name>
- <property>controls/doors/frontleft/position-norm</property>
+ <property>sim/multiplay/generic/float[3]</property>
  <factor>-75</factor>
  <center>
   <x-m> 1</x-m>
@@ -339,7 +339,7 @@
 <animation>
  <type>rotate</type>
  <object-name>rdoor</object-name>
- <property>controls/doors/frontright/position-norm</property>
+ <property>sim/multiplay/generic/float[2]</property>
  <factor>75</factor>
  <center>
   <x-m>1</x-m>
@@ -372,7 +372,7 @@
  <type>rotate</type>
  <object-name>door.rl</object-name>
  <object-name>rearwiper</object-name>
- <property>controls/doors/rearleft/position-norm</property>
+ <property>sim/multiplay/generic/float[1]</property>
  <factor>-90</factor>
  <center>
   <x-m> 3.7</x-m>
@@ -404,7 +404,7 @@
 <animation>
  <type>rotate</type>
  <object-name>door.rr</object-name>
- <property>controls/doors/rearright/position-norm</property>
+ <property>sim/multiplay/generic/float[0]</property>
  <factor>90</factor>
  <center>
   <x-m>3.7</x-m>
@@ -430,7 +430,7 @@
  <object-name>Cone</object-name>
  <object-name>Cone-texture</object-name>
  <condition>
-  <property>controls/lighting/headlight</property>
+  <property>sim/multiplay/generic/int[3]</property>
  </condition>
 </animation>
 
@@ -463,11 +463,11 @@
   <red>1.0</red>
   <green>0.0</green>
   <blue>0.0</blue>
-  <factor-prop>controls/gear/brake-left</factor-prop>
+  <factor-prop>sim/multiplay/generic/int[4]</factor-prop>
  </emission>
  <condition>
   <greater-than>
-   <property>controls/gear/brake-left</property>
+   <property>sim/multiplay/generic/int[4]</property>
    <value>0.3</value>
   </greater-than>
  </condition>
@@ -480,7 +480,7 @@
 	<condition>
 	    <and>
 			<equals>
-				<property>services/service-truck/enable</property>
+				<property>sim/multiplay/generic/int[5]</property>
 				<value>1</value>
 			</equals>
 			<less-than>
