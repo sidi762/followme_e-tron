@@ -45,6 +45,7 @@ props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
 
 props.getNode("/",1).setValue("services/service-truck/enable", 0);
 props.getNode("/controls/is-recharging", 1).setValue(0);
+props.getNode("systems/welcome-message", 1).setValue(0);
 
 
 #var Led = {
