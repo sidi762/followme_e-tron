@@ -272,7 +272,7 @@ var chargeBatterySec = func(){
 }
 var chargeTimer = maketimer(1, chargeBatterySec);
 var chargeBatteryStart = func(){
-    if(!chargeTimer.isRunning()){
+    if(!props.getNode("/controls/is-recharging", 1).getValue()){
         if(props.getNode("/",1).getValue("services/service-truck/connect") == 1 and props.getNode("/",1).getValue("/controls/engines/engine/started") == 0){
             var deltaBattery = 288000-props.getNode("/systems/electrical/e-tron/battery-kWs").getValue();
             var remainingTime = sprintf("%.0f", (deltaBattery / 240) / 60);      #Based on 20 mins from 0 to full
@@ -287,7 +287,7 @@ var chargeBatteryStart = func(){
             screen.log.write("Cannot recharge. Shut down the engine first.", 0, 0.584, 1);
             setprop("/sim/sound/voices/pilot", "Cannot recharge. Shut down the engine first.");
         }
-    }else if(chargeTimer.isRunning()){
+    }else if(props.getNode("/controls/is-recharging", 1).getValue()){
         chargeBatteryStop();
     }
 }
