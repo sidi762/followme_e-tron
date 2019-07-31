@@ -78,7 +78,7 @@
                          <command>nasal</command>
  		                <script>
                             
-                            if(!getprop(services/service-truck/enable)){
+                            if(!getprop("services/service-truck/enable")){
                                 setprop("/sim/sound/voices/pilot", "Hey there! How can I help you?");
                             }else{
                                 setprop("/sim/sound/voices/pilot", "Goodbye, drive safe!");
