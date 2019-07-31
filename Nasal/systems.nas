@@ -26,6 +26,7 @@ liveryFuse.init("Aircraft/followme_e-tron/Models/Texture");
 aircraft.livery.select("Blanco");
 
 props.getNode("/",1).setValue("/systems/horn", 0);
+props.getNode("/",1).setValue("/controls/mode", 1);
 
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
@@ -42,6 +43,8 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.8, 0.5]
 props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
 props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
 
+props.getNode("/",1).setValue("services/service-truck/enable", 0);
+props.getNode("/controls/is-recharging", 1).setValue(0);
 
 
 #var Led = {
@@ -254,6 +257,41 @@ var IndicatorController = {
 };
 
 var indicatorController = IndicatorController.new();
+
+
+
+var chargeBatterySec = func(){
+    var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
+    var currentBattery = battery.getValue();
+    if(currentBattery >= 288000){
+        screen.log.write("Battery is Successfully recharged!", 0, 0.584, 1);
+        chargeBatteryStop();
+    }
+    battery.setValue(currentBattery+240);
+}
+var chargeTimer = maketimer(1, chargeBatterySec);
+var chargeBatteryStart = func(){
+    if(props.getNode("/",1).getValue("services/service-truck/connect") == 1 and props.getNode("/",1).getValue("/controls/engines/engine/started") == 0){
+        var deltaBattery = 288000-props.getNode("/systems/electrical/e-tron/battery-kWs").getValue();
+        var remainingTime = sprintf("%.0f", (deltaBattery / 240) / 60);      #Based on 20 mins from 0 to full
+        #screen.log.write("Recharging. About "~remainingTime~" mins remaining.", 0, 0.584, 1);
+        setprop("/sim/sound/voices/pilot", "Recharging. About "~remainingTime~" mins remaining.");
+        chargeTimer.start();
+        props.getNode("/controls/is-recharging", 1).setValue(1);
+    }else if(!props.getNode("/",1).getValue("services/service-truck/connect")){
+        #screen.log.write("Cannot recharge. Call service truck and connect the cable first.", 0, 0.584, 1);
+        setprop("/sim/sound/voices/pilot", "Cannot recharge. Call service truck and connect the cable first.");
+    }else if(props.getNode("/",1).getValue("/controls/engines/engine/started")){
+        #screen.log.write("Cannot recharge. Shut down the engine first.", 0, 0.584, 1);
+        setprop("/sim/sound/voices/pilot", "Cannot recharge. Shut down the engine first.");
+    }
+}
+
+var chargeBatteryStop = func(){
+   chargeTimer.stop();
+   props.getNode("/controls/is-recharging", 1).setValue(0);
+}
+
 
 
 var brakesABS = func(){

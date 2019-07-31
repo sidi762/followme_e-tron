@@ -137,6 +137,20 @@
 				<label>Follow me</label>
 				<enabled type="bool">true</enabled>	
 				<item>
+					<label>Show Options</label>
+					<binding>
+						<command>dialog-show</command>
+						<dialog-name>vehicle-dialog</dialog-name>
+					</binding>
+				</item>	
+				<item>
+					<label>Battery Management</label>
+					<binding>
+						<command>dialog-show</command>
+						<dialog-name>battery-management</dialog-name>
+					</binding>
+				</item>	
+				<item>
 					<label>Select Livery</label>
 					<binding>
 						<command>nasal</command>

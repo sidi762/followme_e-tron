@@ -473,5 +473,23 @@
  </condition>
 </animation>
 
+<!-- Fuel Truck -->
+
+<model>
+	<path>Aircraft/followme_e-tron/Models/Service-Truck/Service_Truck_Short_VolvoFM.xml</path>
+	<condition>
+	    <and>
+			<equals>
+				<property>services/service-truck/enable</property>
+				<value>1</value>
+			</equals>
+			<less-than>
+				<property>velocities/groundspeed-kt</property>
+				<value>1</value>
+			</less-than>
+		</and>
+	</condition>
+</model>
+
 </PropertyList>
  

@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+
+<!-- C182s Skylane
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2 of the
+ License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+-->
+
+<PropertyList>
+
+    <name>vehicle-dialog</name>
+    <layout>vbox</layout>
+    <resizable>false</resizable>
+    <modal>false</modal>
+    <draggable>true</draggable>
+
+
+    <group>
+        <layout>hbox</layout>
+
+        <empty><stretch>true</stretch></empty>
+        <text>
+            <label>Vehicle Options</label>
+        </text>
+        <empty><stretch>true</stretch></empty>
+
+        <button>
+            <legend/>
+            <key>Esc</key>
+            <pref-width>32</pref-width>
+            <pref-height>16</pref-height>
+            <binding>
+                <command>dialog-close</command>
+            </binding>
+	</button>
+	</group>
+	<hrule/>
+    
+  
+    
+	<group>
+	<layout>vbox</layout>
+	<padding>6</padding>
+    
+    <button>
+        <halign>left</halign>
+        <legend>Enable Performance Mode</legend>
+        <pref-width>150</pref-width>
+        <pref-height>28</pref-height>
+        <enable>
+            <and>
+                <not>
+                    <property>/sim/freeze/replay-state</property>
+                </not>
+        
+            </and>
+        </enable>
+        <binding>
+            <command>property-assign</command><!-- dialog-apply would apply values to all objects here - setlistener reacts on them in unfortunate way-->
+            <property>/controls/mode</property>
+            <value>1</value>
+        </binding>
+    </button>
+    
+    <button>
+        <halign>left</halign>
+        <legend>Enable Comfort Mode</legend>
+        <pref-width>150</pref-width>
+        <pref-height>28</pref-height>
+        <enable>
+            <and>
+                <not>
+                    <property>/sim/freeze/replay-state</property>
+                </not>
+        
+            </and>
+        </enable>
+        <binding>
+            <command>property-assign</command><!-- dialog-apply would apply values to all objects here - setlistener reacts on them in unfortunate way-->
+            <property>/controls/mode</property>
+            <value>0.65</value>
+        </binding>
+    </button>
+    
+           
+        </group>
+        
+      
+        <hrule/>
+        
+        <group>
+        <layout>vbox</layout>
+        <padding>6</padding>
+        <text><label>Welcome message</label></text>
+        <button>
+            <halign>middle</halign>
+            <legend>Disable welcome message</legend>
+            <pref-width>160</pref-width>
+            <pref-height>28</pref-height>
+            <enable>
+                <or>
+                    <equals>
+                        <property>systems/welcome-message</property>
+                        <value>1</value>
+                    </equals>
+                    <equals>
+                        <property>systems/welcome-message</property>
+                        <value>2</value>
+                    </equals>
+                </or>
+            </enable>
+            <binding>
+    			<command>property-assign</command>
+    			<property>systems/welcome-message</property>
+                <value>0</value>
+            </binding>
+        </button>
+      </group>
+      <group>
+          <layout>hbox</layout>
+          <padding>2</padding>
+          <button>
+              <halign>right</halign>
+              <legend>Enable Chinese</legend>
+              <pref-width>100</pref-width>
+              <pref-height>28</pref-height>
+              <enable>
+                  <or>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>0</value>
+                      </equals>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>2</value>
+                      </equals>
+                  </or>
+              </enable>
+              <binding>
+      			<command>property-assign</command>
+      			<property>systems/welcome-message</property>
+                  <value>1</value>
+              </binding>
+          </button>
+          <button>
+              <halign>right</halign>
+              <legend>Enable English</legend>
+              <pref-width>100</pref-width>
+              <pref-height>28</pref-height>
+              <enable>
+                  <or>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>0</value>
+                      </equals>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>1</value>
+                      </equals>
+                  </or>
+              </enable>
+              <binding>
+      			<command>property-assign</command>
+      			<property>systems/welcome-message</property>
+                  <value>2</value>
+              </binding>
+          </button>
+        </group>
+        
+        <hrule/>
+
+        <group>
+            <layout>hbox</layout>
+
+            <button>
+                <halign>right</halign>
+                <legend>Quick Recharge</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <and>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                        <less-than>
+                            <property>velocities/groundspeed-kt</property>
+                            <value>1.0</value>
+                        </less-than>
+                        <not>
+                            <property>/controls/engines/engine/started</property>
+                        </not>
+                    </and>
+                </enable>
+                <binding>
+        			<command>property-assign</command>
+        			<property>/systems/electrical/e-tron/battery-kWs</property>
+                    <value>288000</value>
+                </binding>
+            </button>
+        </group>
+
+        <hrule/>
+
+	
+        <hrule/>
+
+</PropertyList>

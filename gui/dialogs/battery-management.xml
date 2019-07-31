@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+
+<!-- C182s Skylane
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2 of the
+ License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+-->
+
+<PropertyList>
+
+    <name>battery-management</name>
+    <layout>vbox</layout>
+    <resizable>false</resizable>
+    <modal>false</modal>
+    <draggable>true</draggable>
+
+
+    <group>
+        <layout>hbox</layout>
+
+        <empty><stretch>true</stretch></empty>
+        <text>
+            <label>Battery status</label>
+        </text>
+        <empty><stretch>true</stretch></empty>
+
+        <button>
+            <legend/>
+            <key>Esc</key>
+            <pref-width>16</pref-width>
+            <pref-height>16</pref-height>
+            <binding>
+                <command>dialog-close</command>
+            </binding>
+	</button>
+	</group>
+	<hrule/>
+    
+	<group>
+	    <layout>vbox</layout>
+	    <padding>6</padding>
+        <text>
+            <label>Battery remaining</label>
+        </text>
+        <text>
+            <label>Remaining</label>
+            <halign>left</halign>
+            <live>true</live>
+            <property>/systems/electrical/e-tron/battery-remaining-percent</property>
+        </text>
+    </group>
+    <hrule/>
+    <group>
+	    <layout>vbox</layout>
+	    <padding>6</padding>
+	    <checkbox>
+                <halign>left</halign>
+                <label>Service Tank Trailer</label>
+                <live>true</live>
+		        <property>services/service-truck/enable</property>
+	            <enable>
+                    <less-than>
+                        <property>velocities/groundspeed-kt</property>
+                        <value>0.1</value>
+                    </less-than>
+			        </enable>
+                    <binding>
+                        <command>property-toggle</command>
+		                <property>services/service-truck/enable</property>
+                     </binding>
+	                 <binding>
+                         <command>dialog-update</command>
+                    </binding>
+	      </checkbox>
+    </group>
+    <group>
+	    <layout>vbox</layout>
+	    <padding>6</padding>
+	    <checkbox>
+                <halign>left</halign>
+                <label>Connect cable</label>
+                <live>true</live>
+		        <property>services/service-truck/connect</property>
+	            <enable>
+                    <and>
+                        <equals>
+                            <property>services/service-truck/enable</property>
+                            <value>1</value>
+                        </equals>
+                        <less-than>
+                            <property>velocities/groundspeed-kt</property>
+                            <value>0.1</value>
+                        </less-than>
+                    </and>
+			    </enable>
+                    <binding>
+                        <command>property-toggle</command>
+		                <property>services/service-truck/connect</property>
+                     </binding>
+	                 <binding>
+                         <command>dialog-update</command>
+                    </binding>
+	      </checkbox>
+    </group>
+    <hrule/>
+    <group>
+        <layout>hbox</layout>
+
+        <button>
+            <halign>right</halign>
+            <legend>Recharge</legend>
+            <pref-width>120</pref-width>
+            <pref-height>28</pref-height>
+            <enable>
+                <and>
+                    <not>
+                        <property>/sim/freeze/replay-state</property>
+                    </not>
+                    <less-than>
+                        <property>velocities/groundspeed-kt</property>
+                        <value>1.0</value>
+                    </less-than>
+                </and>
+            </enable>
+            <binding>
+    			<command>nasal</command>
+    			<script>followme.chargeBatteryStart()</script>
+            </binding>
+        </button>
+    </group>
+</PropertyList>
