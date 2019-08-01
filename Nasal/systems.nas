@@ -236,15 +236,25 @@ var IndicatorController = {
     },
     
     falseLightOn : func(){
-        print("falseLight turned on");
         me.falseLight = 1;
-        me.setMode(3);
+        if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
+           print("falseLight mode on");
+        }else{
+            me.setMode(3);
+            print("falseLight turned on");
+        }
+        
     },
     
     falseLightOff : func(){
-        print("falseLight turned off");
         me.falseLight = 0;
-        me.setMode(0);
+        
+        if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
+           print("falseLight mode off");
+        }else{
+            me.setMode(0);
+            print("falseLight turned off");
+        }
     },
     
     false_light_toggle : func(){
@@ -276,7 +286,7 @@ var chargeBatteryStart = func(){
         if(props.getNode("/",1).getValue("services/service-truck/connect") == 1 and props.getNode("/",1).getValue("/controls/engines/engine/started") == 0){
             var deltaBattery = 288000-props.getNode("/systems/electrical/e-tron/battery-kWs").getValue();
             var remainingTime = sprintf("%.0f", (deltaBattery / 240) / 60);      #Based on 20 mins from 0 to full
-            #screen.log.write("Recharging. About "~remainingTime~" mins remaining.", 0, 0.584, 1);
+            screen.log.write("Recharging. About "~remainingTime~" mins remaining.", 0, 0.584, 1);
             setprop("/sim/sound/voices/pilot", "Recharging. About "~remainingTime~" mins remaining.");
             chargeTimer.start();
             props.getNode("/controls/is-recharging", 1).setValue(1);

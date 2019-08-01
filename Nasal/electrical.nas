@@ -45,6 +45,8 @@ var electric_update = func(){
     }else{
         props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V-max",0);
         props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",0);
+        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V-max",0);
+        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
     }
     
    
