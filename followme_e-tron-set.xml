@@ -4,8 +4,129 @@
 <sim>
 
 	<description>Follow Me e-tron</description>
-	<author>Gijs de Rooy, Weihao Li, Sidi Liang, Qiyuan Luo</author>
+	<author>Gijs de Rooy, 李维昊（Weihao Li）, 梁思地（Sidi Liang）, 罗启元（Qiyuan Luo）</author>
 	<status>early production</status>
+    <long-description>
+        An electronic, High-Performance version of a follow me car with Chinese characteristics. 
+    </long-description>
+    
+    <gui><style><colors>
+        <splash-font>
+            <red>1.0</red>  
+            <green>1.00</green>
+            <blue>1.00</blue>                               
+        </splash-font>                                  
+        <splash-screen>
+            <red>0.117</red>    
+            <green>0.19</green>
+            <blue>0.227</blue>
+        </splash-screen>                                
+    </colors></style></gui>
+    
+        <previews>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/01.png</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/02.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/03.jpg</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/04.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/05.jpg</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/06.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>interior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/07.jpg</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/08.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/09.jpg</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/10.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/11.jpg</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/12.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/13.jpg</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/14.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/15.jpg</path>
+            </preview>
+
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/16.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/17.jpg</path>
+            </preview>
+        </previews>
+            
 	<rating>
 		<FDM type="int">4</FDM>
 		<systems type="int">2</systems>

@@ -22,7 +22,7 @@
 </effect>
 
 <effect>
-    <inherits-from>Effects/needle-light</inherits-from>
+    <inherits-from>needle-light</inherits-from>
     <object-name>needle</object-name>
 </effect>
 
@@ -38,7 +38,7 @@
      </less-than>
  </condition>
  <property>velocities/groundspeed-kt</property>
- <factor>4.167</factor>
+ <factor>3.08667</factor>
  <center>
   <x-m>0.0</x-m>
   <y-m>0.0</y-m>
@@ -62,12 +62,12 @@
           </greater-than>
           <less-than>
             <property>velocities/groundspeed-kt</property>
-            <value type="double">43.196</value>
+            <value type="double">64.795</value>
           </less-than>
       </and>
   </condition>
   <property>velocities/groundspeed-kt</property>
-  <factor>-1.389</factor>
+  <factor>-0.61733</factor>
   <center>
    <x-m>0.0</x-m>
    <y-m>0.0</y-m>
@@ -86,11 +86,11 @@
   <condition>
       <less-than>
         <property>velocities/groundspeed-kt</property>
-        <value type="double">151.187</value>
+        <value type="double">161.987</value>
       </less-than>
   </condition>
   <property>velocities/groundspeed-kt</property>
-  <factor>-1.389</factor>
+  <factor>-1.23467</factor>
   <center>
    <x-m>0.0</x-m>
    <y-m>0.0</y-m>
@@ -109,10 +109,10 @@
   <condition>
       <greater-than>
         <property>velocities/groundspeed-kt</property>
-        <value type="double">151.187</value>
+        <value type="double">161.987</value>
       </greater-than>
   </condition>
-  <value>-278.611</value>
+  <value>-300</value>
   <center>
    <x-m>0.0</x-m>
    <y-m>0.0</y-m>

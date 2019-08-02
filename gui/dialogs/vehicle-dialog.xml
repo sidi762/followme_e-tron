@@ -88,6 +88,26 @@
         </binding>
     </button>
     
+    <button>
+        <halign>left</halign>
+        <legend>Enable Low Power Mode</legend>
+        <pref-width>150</pref-width>
+        <pref-height>28</pref-height>
+        <enable>
+            <and>
+                <not>
+                    <property>/sim/freeze/replay-state</property>
+                </not>
+        
+            </and>
+        </enable>
+        <binding>
+            <command>property-assign</command><!-- dialog-apply would apply values to all objects here - setlistener reacts on them in unfortunate way-->
+            <property>/controls/mode</property>
+            <value>0.4</value>
+        </binding>
+    </button>
+    
            
         </group>
         
@@ -177,7 +197,7 @@
         <text><label>Speedometer Type</label></text>
         <group>
             <layout>hbox</layout>
-            <button>
+            <!--<button>
                 <halign>left</halign>
                 <legend>Type A</legend>
                 <pref-width>120</pref-width>
@@ -209,7 +229,24 @@
         			<property>systems/speedometer/type</property>
                     <value>1</value>
                 </binding>
-            </button>
+            </button>-->
+            
+            <combo>
+                <name>speedType</name>
+                <row>1</row>
+                <col>6</col>
+                <pref-width>120</pref-width>
+                <halign>left</halign>
+                <name>Speedometer Type</name>
+                <property>/systems/speedometer/type</property>
+                <value>Type_A</value>
+                <value>Type_M</value>
+                <value>Type_O</value>
+                <binding>
+        			<command>dialog-apply</command>
+        			<object-name>speedType</object-name>
+                </binding>
+            </combo>
         </group>
         
         <hrule/>

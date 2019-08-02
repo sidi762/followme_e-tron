@@ -47,7 +47,7 @@ props.getNode("/",1).setValue("services/service-truck/enable", 0);
 props.getNode("/controls/is-recharging", 1).setValue(0);
 props.getNode("systems/welcome-message", 1).setValue(0);
 props.getNode("systems/display-speed", 1).setValue(0);
-props.getNode("systems/speedometer/type", 1).setValue(0);
+props.getNode("systems/speedometer/type", 1).setValue("Type_A");
 props.getNode("controls/lighting/headlight-als", 1).setValue(0);
 props.getNode("controls/lighting/highBeam", 1).setValue(0);
 
