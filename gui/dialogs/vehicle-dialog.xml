@@ -174,7 +174,45 @@
         </group>
         
         <hrule/>
-
+        <text><label>Speedometer Type</label></text>
+        <group>
+            <layout>hbox</layout>
+            <button>
+                <halign>left</halign>
+                <legend>Type A</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <property>systems/speedometer/type</property>
+                    <value>1</value>
+                </enable>
+                <binding>
+        			<command>property-assign</command>
+        			<property>systems/speedometer/type</property>
+                    <value>0</value>
+                </binding>
+            </button>
+            
+            <button>
+                <halign>left</halign>
+                <legend>Type O</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <not>
+                        <property>systems/speedometer/type</property>
+                        <value>1</value>
+                    </not>
+                </enable>
+                <binding>
+        			<command>property-assign</command>
+        			<property>systems/speedometer/type</property>
+                    <value>1</value>
+                </binding>
+            </button>
+        </group>
+        
+        <hrule/>
         <group>
             <layout>hbox</layout>
 

@@ -46,7 +46,10 @@ props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
 props.getNode("/",1).setValue("services/service-truck/enable", 0);
 props.getNode("/controls/is-recharging", 1).setValue(0);
 props.getNode("systems/welcome-message", 1).setValue(0);
-
+props.getNode("systems/display-speed", 1).setValue(0);
+props.getNode("systems/speedometer/type", 1).setValue(0);
+props.getNode("controls/lighting/headlight-als", 1).setValue(0);
+props.getNode("controls/lighting/highBeam", 1).setValue(0);
 
 #var Led = {
 #    
@@ -308,6 +311,32 @@ var chargeBatteryStop = func(){
    setprop("/sim/sound/voices/pilot", "Recharge Stopped. Have a nice ride!");
    props.getNode("/controls/is-recharging", 1).setValue(0);
 }
+
+
+
+var calculateSpeed = func(){
+    var gs = props.getNode("velocities/groundspeed-kt", 1).getValue();
+    var speedKmh = 1.852 * gs;
+    var calculated = 0;
+    var output = 0;
+    if(speedKmh <= 0){
+        calculated = speedKmh * -1;
+    }else if(speedKmh < 280){
+        calculated = speedKmh;
+    }else if(speedKmh >= 280){
+        calculated = 280;
+    }
+   
+    if(calculated <= 120){
+        output = calculated * 3/2;
+    }else if(calculated > 120){
+        output = calculated * 3/4;
+    }
+    
+    props.getNode("systems/display-speed", 1).setValue(output);
+}
+var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
+
 
 
 

@@ -4,7 +4,7 @@
 <sim>
 
 	<description>Follow Me e-tron</description>
-	<author>Gijs de Rooy, Weihao Li, Sidi Liang</author>
+	<author>Gijs de Rooy, Weihao Li, Sidi Liang, Qiyuan Luo</author>
 	<status>early production</status>
 	<rating>
 		<FDM type="int">4</FDM>
@@ -374,10 +374,55 @@
             <repeatable>false</repeatable>
             <binding>
                 <command>property-cycle</command>
+                <property>/controls/lighting/headlight-als</property>
+                <value type="double">0</value>
+                <value type="double">1</value>
+                <value type="double">2</value>
+            </binding>
+        </key>
+        <key n="107">
+            <name>k</name>
+            <desc>high-beam</desc>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>property-cycle</command>
+                <property>/controls/lighting/highBeam</property>
+                <value type="double">0</value>
+                <value type="double">1</value>
+            </binding>
+            <binding>
+                <command>property-cycle</command>
+                <property>/controls/lighting/headlight</property>
+                <value type="double">0</value>
+                <value type="double">1</value>
+            </binding>
+        </key>
+        <key n="106">
+            <name>j</name>
+            <desc>high-beam-flash</desc>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>property-assign</command>
+                <property>/controls/lighting/highBeam</property>
+                <value type="double">1</value>
+            </binding>
+            <binding>
+                <command>property-assign</command>
                 <property>/controls/lighting/headlight</property>
                 <value type="double">1</value>
-                <value type="double">0</value>
             </binding>
+            <mod-up>
+                <binding>
+                    <command>property-assign</command>
+                    <property>/controls/lighting/highBeam</property>
+                    <value type="double">0</value>
+                </binding>
+                <binding>
+                    <command>property-assign</command>
+                    <property>/controls/lighting/headlight</property>
+                    <value type="double">0</value>
+                </binding>
+            </mod-up>
         </key>
 	</keyboard>
 </input>
@@ -392,6 +437,9 @@
     <electrical>
         <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
     </electrical>
+    <light>
+        <file>Aircraft/followme_e-tron/Nasal/light-manager.nas</file>
+    </light>
 </nasal>
 
 </PropertyList>

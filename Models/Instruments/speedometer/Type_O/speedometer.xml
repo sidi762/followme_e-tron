@@ -11,7 +11,7 @@
 
 
 <effect>
-    <inherits-from>../../Models/Effect/light</inherits-from>
+    <inherits-from>light</inherits-from>
     <object-name>digit.1</object-name>
     <object-name>digit.2</object-name>
     <object-name>digit.3</object-name>

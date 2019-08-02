@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PropertyList>
-        <name>light</name>
+        <name>fuelgauge-light</name>
         <inherits-from>/Effects/model-combined-deferred</inherits-from>
         <parameters>
                 <!-- Light Map -->
                 <lightmap-enabled type="int"><use>controls/lighting/headlight</use></lightmap-enabled>
                 <lightmap-multi type="int">1</lightmap-multi>
                 <texture n="3">
-                  <image>../../Models/Effect/speedometer_LIT.png</image>
+                  <image>fuelgauge_LIT.png</image>
                   <wrap-s>repeat</wrap-s>
                   <wrap-t>repeat</wrap-t>
                 </texture>

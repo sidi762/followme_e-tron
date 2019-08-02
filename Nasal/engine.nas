@@ -114,6 +114,7 @@ var startEngine = func(){
         }else if(props.getNode("systems/welcome-message", 1).getValue() == 2){
             props.getNode("/sim/messages/copilot", 1).setValue("This is a reminder from The Third District Traffic Commission of Beijing. There are thousands of roads, and the safety is the first. If you drive recklessly, your loved ones will be filled with tears.");
         }
+        #followme.calculateSpeedTimer.start();
         print("Engine started");
     }else if(followme.chargeTimer.isRunning()){
         #screen.log.write("Battery is recharging, cannot start engine.", 0, 0.584, 1);

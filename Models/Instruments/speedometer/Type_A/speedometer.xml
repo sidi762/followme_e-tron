@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+	
+	<!--back-->
+	<!--right -->
+	<!--up -->
+		
+
+<path>speedometer.ac</path>
+
+
+<effect>
+    <inherits-from>face-light</inherits-from>
+    <object-name>digit.1</object-name>
+    <object-name>digit.2</object-name>
+    <object-name>digit.3</object-name>
+    <object-name>digit.4</object-name>
+    <object-name>digit.5</object-name>
+    <object-name>digit.6</object-name>
+    <object-name>face</object-name>
+</effect>
+
+<effect>
+    <inherits-from>Effects/needle-light</inherits-from>
+    <object-name>needle</object-name>
+</effect>
+
+
+
+<animation>
+ <type>rotate</type>
+ <object-name>needle</object-name>
+ <condition>
+     <less-than>
+       <property>velocities/groundspeed-kt</property>
+       <value type="double">0</value>
+     </less-than>
+ </condition>
+ <property>velocities/groundspeed-kt</property>
+ <factor>2.778</factor>
+ <center>
+  <x-m>0.0</x-m>
+  <y-m>0.0</y-m>
+  <z-m>0.0</z-m>
+ </center>
+ <axis>
+  <x>1.0</x>
+  <y>0.0</y>
+  <z>0.0</z>
+ </axis>
+</animation>
+
+ <animation>
+  <type>rotate</type>
+  <object-name>needle</object-name>
+  <condition>
+      <and>
+          <greater-than>
+            <property>velocities/groundspeed-kt</property>
+            <value type="double">0</value>
+          </greater-than>
+          <less-than>
+            <property>velocities/groundspeed-kt</property>
+            <value type="double">43.196</value>
+          </less-than>
+      </and>
+  </condition>
+  <property>velocities/groundspeed-kt</property>
+  <factor>-1.389</factor>
+  <center>
+   <x-m>0.0</x-m>
+   <y-m>0.0</y-m>
+   <z-m>0.0</z-m>
+  </center>
+  <axis>
+   <x>1.0</x>
+   <y>0.0</y>
+   <z>0.0</z>
+  </axis>
+ </animation>
+ 
+ <animation>
+  <type>rotate</type>
+  <object-name>needle</object-name>
+  <condition>
+      <less-than>
+        <property>velocities/groundspeed-kt</property>
+        <value type="double">151.187</value>
+      </less-than>
+  </condition>
+  <property>velocities/groundspeed-kt</property>
+  <factor>-1.389</factor>
+  <center>
+   <x-m>0.0</x-m>
+   <y-m>0.0</y-m>
+   <z-m>0.0</z-m>
+  </center>
+  <axis>
+   <x>1.0</x>
+   <y>0.0</y>
+   <z>0.0</z>
+  </axis>
+ </animation>
+ 
+ <animation>
+  <type>rotate</type>
+  <object-name>needle</object-name>
+  <condition>
+      <greater-than>
+        <property>velocities/groundspeed-kt</property>
+        <value type="double">151.187</value>
+      </greater-than>
+  </condition>
+  <value>-278.611</value>
+  <center>
+   <x-m>0.0</x-m>
+   <y-m>0.0</y-m>
+   <z-m>0.0</z-m>
+  </center>
+  <axis>
+   <x>1.0</x>
+   <y>0.0</y>
+   <z>0.0</z>
+  </axis>
+ </animation>
+
+ 
+</PropertyList>
