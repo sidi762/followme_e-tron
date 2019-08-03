@@ -54,7 +54,58 @@
 <!-- INSTRUMENTS -->
 
 <model> 
- <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/fuelgauge.xml</path>
+	<condition>
+		<equals>
+			<property>systems/battery-gauge/type</property>
+			<value>Type_A</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_A/fuelgauge.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.25</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
+
+<model> 
+	<condition>
+		<equals>
+			<property>systems/battery-gauge/type</property>
+			<value>Type_M</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.25</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
+
+<model> 
+	<condition>
+		<equals>
+			<property>systems/battery-gauge/type</property>
+			<value>Original</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.25</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
+
+<model> 
+	<condition>
+		<equals>
+			<property>systems/battery-gauge/type</property>
+			<value>Concept</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
  <offsets> 
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
@@ -81,7 +132,7 @@
 	<condition>
 		<equals>
 			<property>systems/speedometer/type</property>
-			<value>Type_O</value>
+			<value>Original</value>
 		</equals>
 	</condition> 
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_O/speedometer.xml</path>
@@ -100,6 +151,21 @@
 		</equals>
 	</condition> 
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_M/speedometer.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.38</y-m>
+  <z-m>1.03</z-m>
+ </offsets>
+</model>
+
+<model> 
+	<condition>
+		<equals>
+			<property>systems/speedometer/type</property>
+			<value>Concept</value>
+		</equals>
+	</condition> 
+    <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Concept/speedometer.xml</path>
  <offsets> 
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>

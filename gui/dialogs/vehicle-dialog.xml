@@ -194,7 +194,7 @@
         </group>
         
         <hrule/>
-        <text><label>Speedometer Type</label></text>
+        <text><label>Configuration</label></text>
         <group>
             <layout>hbox</layout>
             <!--<button>
@@ -230,23 +230,50 @@
                     <value>1</value>
                 </binding>
             </button>-->
+            <group>
+                <layout>vbox</layout>
+                <text><label>Speedometer type</label></text>
+                <combo>
+                    <name>speedType</name>
+                    <row>1</row>
+                    <col>6</col>
+                    <pref-width>120</pref-width>
+                    <halign>left</halign>
+                    <name>Speedometer Type</name>
+                    <property>/systems/speedometer/type</property>
+                    <value>Type_A</value>
+                    <value>Type_M</value>
+                    <value>Concept</value>
+                    <value>Original</value>
+                    <binding>
+            			<command>dialog-apply</command>
+            			<object-name>speedType</object-name>
+                    </binding>
+                </combo>
+            </group>
             
-            <combo>
-                <name>speedType</name>
-                <row>1</row>
-                <col>6</col>
-                <pref-width>120</pref-width>
-                <halign>left</halign>
-                <name>Speedometer Type</name>
-                <property>/systems/speedometer/type</property>
-                <value>Type_A</value>
-                <value>Type_M</value>
-                <value>Type_O</value>
-                <binding>
-        			<command>dialog-apply</command>
-        			<object-name>speedType</object-name>
-                </binding>
-            </combo>
+            <group>
+                <layout>vbox</layout>
+                <text><label>Battery gauge type</label></text>
+                <combo>
+                    <name>batteryType</name>
+                    <row>1</row>
+                    <col>6</col>
+                    <pref-width>120</pref-width>
+                    <halign>left</halign>
+                    <name>Battery gauge Type</name>
+                    <property>/systems/battery-gauge/type</property>
+                    <value>Type_A</value>
+                    <value>Type_M</value>
+                    <value>Concept</value>
+                    <value>Original</value>
+                    <binding>
+            			<command>dialog-apply</command>
+            			<object-name>batteryType</object-name>
+                    </binding>
+                </combo>
+            </group>
+            
         </group>
         
         <hrule/>
