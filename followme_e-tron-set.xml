@@ -45,7 +45,7 @@
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/04.jpg</path>
+                <path>Splash/04.png</path>
             </preview>
             
             <preview>
@@ -124,6 +124,24 @@
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/17.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>interior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/18.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>interior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/19.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/20.jpg</path>
             </preview>
         </previews>
             
