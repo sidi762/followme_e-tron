@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--####################################################################
+Lake of Constance Hangar
+Boeing 707 for Flightgear
+Copyright (C) 2013 M.Kraus
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Every software has a developer, also free software. 
+As a gesture of courtesy and respect, I would be delighted 
+if you contacted me before making any changes to this software. 
+<info (at) marc-kraus.de> April, 2017
+########################################################################-->
+<PropertyList>
+
+  <sim n="0">
+    <description>Follow Me e-tron Passenger</description>
+    <author>Sidi Liang</author>
+    <flight-model>null</flight-model>
+	
+	<variant-of>followme_e-tron</variant-of>
+
+    <model>
+      <path archive="y">Aircraft/followme_e-tron/Models/followme-PAX.xml</path>
+    </model>
+
+    <remote>
+     <pilot-callsign type="string"/>
+    </remote>
+
+    <sound>
+		<path>Aircraft/followme_e-tron/followme-sound.xml</path>
+    </sound>
+
+    <previews>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/01.png</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/02.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/03.jpg</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/04.png</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/05.jpg</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/06.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>interior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/07.jpg</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/08.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/09.jpg</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/10.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/11.jpg</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/12.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/13.jpg</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/14.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/15.jpg</path>
+        </preview>
+
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/16.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/17.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>interior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/18.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>interior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/19.jpg</path>
+        </preview>
+        
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/20.jpg</path>
+        </preview>
+    </previews>
+        
+
+    <menubar>
+     <default>
+      <menu n="100">
+      <label>FM e-tron PAX</label>
+      <enabled type="bool">true</enabled>
+      <item>
+       <label>Select driver in range</label>
+       <binding>
+        <command>nasal</command>
+        <script>
+         dual_control_tools.copilot_dialog.show(aircraft_dual_control.pilot_type);
+        </script>
+       </binding>
+      </item>
+      </menu>
+     </default>
+    </menubar>
+	
+    <view>
+     <internal archive="y">true</internal>
+      <enabled type="bool">false</enabled>
+     <config>
+       <limits>
+          <enabled archive="y" type="bool">false</enabled>
+       </limits>
+       <!-- x/y/z == right/up/back -->
+  		 <x-offset-m archive="y">-0.46</x-offset-m>
+  		 <y-offset-m archive="y">1.19</y-offset-m>
+  		 <z-offset-m archive="y">-18.2</z-offset-m>
+  		 <pitch-offset-deg archive="y">-16.0</pitch-offset-deg>
+  		 <default-field-of-view-deg type="double">72</default-field-of-view-deg>
+     </config>
+    </view>
+    <view n="1">
+      <enabled type="bool">true</enabled>
+     <config>
+       <!-- big plane, so extend chase view offset a bit -->
+       <z-offset-m type="double"  archive="y">-50.0</z-offset-m>
+     </config>
+    </view>
+    <view n="2">
+      <enabled type="bool">false</enabled>
+    </view>
+    <view n="3">
+      <enabled type="bool">false</enabled>
+    </view>
+    <view n="4">
+      <enabled type="bool">false</enabled>
+    </view>
+    <view n="5">
+      <enabled type="bool">true</enabled>
+    </view>
+    <view n="6">
+      <enabled type="bool">false</enabled>
+    </view>
+    <view n="7">
+      <enabled type="bool">true</enabled>
+    </view>
+	<view n="100">
+		<name>Copilot View</name>
+        <internal archive="y">true</internal>
+        <type>lookfrom</type>
+		<config>
+            <from-model type="bool">true</from-model>
+            <from-model-idx type="int">0</from-model-idx>
+            <dynamic-view type="bool">true</dynamic-view>
+			<x-offset-m archive="y" type="double">0.35</x-offset-m>
+			<y-offset-m archive="y" type="double">1.35</y-offset-m>
+			<z-offset-m archive="y" type="double">1.88</z-offset-m>
+			<pitch-offset-deg>-10.0</pitch-offset-deg>
+			<field-of-view>65</field-of-view>
+		</config>
+	</view>
+    
+	
+		
+    <chase-distance-m>-45</chase-distance-m>
+
+  </sim>
+
+  <nasal>
+	<followme>		
+		<file>Aircraft/followme_e-tron/Nasal/DualControl/followme_e-tron-PAX.nas</file>
+    </followme> 
+    <!-- Dual control. -->
+    <dual_control_tools>
+     <file>Aircraft/followme_e-tron/Nasal/DualControl/dual-control-tools.nas</file>
+    </dual_control_tools>
+    <aircraft_dual_control>
+     <file>Aircraft/followme_e-tron/Nasal/DualControl/followme-dual-control.nas</file>
+    </aircraft_dual_control>
+    <dual_control>
+     <file>Aircraft/followme_e-tron/Nasal/DualControl/copilot-dual-control.nas</file>
+    </dual_control>
+  </nasal>
+
+  <!-- Dual control depend on this value -->
+  <dual-control>
+    <active type="bool">0</active>
+  </dual-control>
+
+</PropertyList>

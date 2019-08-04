@@ -220,6 +220,21 @@
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
+	<view n="100">
+		<name>Copilot View</name>
+        <internal archive="y">true</internal>
+        <type>lookfrom</type>
+		<config>
+            <from-model type="bool">true</from-model>
+            <from-model-idx type="int">0</from-model-idx>
+            <dynamic-view type="bool">true</dynamic-view>
+			<x-offset-m archive="y" type="double">0.35</x-offset-m>
+			<y-offset-m archive="y" type="double">1.35</y-offset-m>
+			<z-offset-m archive="y" type="double">1.88</z-offset-m>
+			<pitch-offset-deg>-10.0</pitch-offset-deg>
+			<field-of-view>65</field-of-view>
+		</config>
+	</view>
 
 	<hud>
 		<enable3d>false</enable3d>
@@ -317,6 +332,15 @@
 						<script>engine.stopEngine()</script>
 					</binding>
 				</item>	
+		        <item>
+		         <label>Select Passenger</label>
+		         <binding>
+		          <command>nasal</command>
+		          <script>
+		            dual_control_tools.copilot_dialog.show(aircraft_dual_control.copilot_type);
+		           </script>
+		          </binding>
+		         </item>
 			</menu>
 		</default>
 	</menubar>
@@ -579,6 +603,15 @@
     <light>
         <file>Aircraft/followme_e-tron/Nasal/light-manager.nas</file>
     </light>
+    <dual_control_tools>
+     <file>Aircraft/followme_e-tron/Nasal/DualControl/dual-control-tools.nas</file>
+    </dual_control_tools>
+    <aircraft_dual_control>
+     <file>Aircraft/followme_e-tron/Nasal/DualControl/followme-dual-control.nas</file>
+    </aircraft_dual_control>
+    <dual_control>
+     <file>Aircraft/followme_e-tron/Nasal/DualControl/pilot-dual-control.nas</file>
+    </dual_control>
 </nasal>
 
 </PropertyList>
