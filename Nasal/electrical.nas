@@ -49,6 +49,19 @@ var electric_update = func(){
         props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
     }
     
+    
+    if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-fwd-eng") == 1){
+        props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",380);
+    }else{
+        props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",0);
+    }
+    
+    if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-bwd-eng") == 1){
+        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",380);
+    }else{
+        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",0);
+    }
+   
    
     #battery consume
     
