@@ -70,7 +70,7 @@ var Engine = {
         rpm = rps*60;
     
         me.rpm = rpm;
-        
+        props.getNode("/",1).setValue("/controls/engines/engine/rpm1",rpm);
         me.angularSpeed = angularSpeed;
     
         return rpm;
@@ -140,6 +140,7 @@ var Engine = {
     startEngine: func(){
         me.createTimer();
         me.runningState = 1;
+        props.getNode("/",1).setValue("/controls/engines/engine/started",1);
         me.engineTimer.simulatedTime = 1;
         me.rpm = 100;
         me.engineTimer.start();
@@ -152,6 +153,7 @@ var Engine = {
         me.outputForce = 0;
         me.power = 0;
         me.runningState = 0;
+        props.getNode("/",1).setValue("/controls/engines/engine/started",0);
         me.engineTimer.stop();
     },
     
