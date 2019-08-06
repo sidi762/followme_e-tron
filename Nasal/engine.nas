@@ -70,7 +70,7 @@ var Engine = {
         rpm = rps*60;
     
         me.rpm = rpm;
-        props.getNode("/",1).setValue("/controls/engines/engine/rpm1",rpm);
+        props.getNode("/",1).setValue("/controls/engines/engine/rpma",rpm);
         me.angularSpeed = angularSpeed;
     
         return rpm;
