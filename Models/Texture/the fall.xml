@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">the fall</name>
+			<texture-fuse>Texture/the fall.png</texture-fuse>
+		</livery>
+	</model>
+</sim>
+</PropertyList>

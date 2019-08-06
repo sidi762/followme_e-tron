@@ -14,6 +14,13 @@ var Engine = {
     setDirection: func(dir){
         me.direction = dir;
     },
+    toggleDirection: func(){
+        if(me.direction == 1){
+            me.direction = -1;
+        }else{
+            me.direction = 1;
+        }
+    },
     getDirection: func(){
         return me.direction;
     },
@@ -82,6 +89,14 @@ var Engine = {
         var throttle = props.getNode("/",1).getValue("/controls/engines/engine/throttle");
         var direction = me.direction;
         var mode = props.getNode("/",1).getValue("/controls/mode");
+        var volt = me.elecNodeV.getValue();
+        
+        if(!volt){
+            me.rpm = 0;
+            props.getNode("/",1).setValue("/controls/engines/engine/rpma", 0);
+            outputForce(0);
+            return 0;
+        }
 
         throttle = throttle * mode;
         #print("throttle:" ~throttle);

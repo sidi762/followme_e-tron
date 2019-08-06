@@ -430,10 +430,8 @@
 			<name>m</name>
 			<desc>Toggle direction</desc>
 			<binding> 
-				<command>property-cycle</command>
-				<property>controls/engines/engine/direction</property>
-				<value type="double">-1</value>
-				<value type="double">1</value>
+				<command>nasal</command>
+				<script>engine.engine_1.toggleDirection();</script>
 			</binding>
 		</key>
 	    <key n="119">

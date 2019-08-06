@@ -5,9 +5,7 @@ var electric_init = func(){  #Initialize
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-bwd-eng",0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V-max",0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V-max",0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A",0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",0);
     props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A",0);
@@ -26,19 +24,19 @@ var electric_update = func(){
         
         
         if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-fwd-eng") == 1){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V-max",380);
             props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",747);
+            props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",380);
         }else if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-fwd-eng") == 0){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V-max",0);
             props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",0);
+             props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",0);
         }
     
         if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-bwd-eng") == 1){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V-max",380);
+            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",380);
             props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",747);
         }else if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-bwd-eng") == 0){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V-max",0);
             props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
+            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",0);
         }
         
         
@@ -47,21 +45,12 @@ var electric_update = func(){
         props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",0);
         props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V-max",0);
         props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
-    }
-    
-    
-    if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-fwd-eng") == 1){
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",380);
-    }else{
         props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",0);
-    }
-    
-    if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-bwd-eng") == 1){
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",380);
-    }else{
         props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",0);
     }
-   
+    
+    
+    
    
     #battery consume
     
