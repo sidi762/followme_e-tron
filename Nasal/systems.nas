@@ -49,8 +49,10 @@ props.getNode("systems/welcome-message", 1).setValue(0);
 props.getNode("systems/display-speed", 1).setValue(0);
 props.getNode("systems/speedometer/type", 1).setValue("Type_A");
 props.getNode("systems/battery-gauge/type", 1).setValue("Type_A");
+props.getNode("systems/plate", 1).setValue("NONE");
 props.getNode("controls/lighting/headlight-als", 1).setValue(0);
 props.getNode("sim/remote/pilot-callsign", 1).setValue("");
+
 
 #var Led = {
 #    

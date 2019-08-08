@@ -119,7 +119,7 @@
         <padding>6</padding>
         <text><label>Welcome message</label></text>
         <button>
-            <halign>middle</halign>
+            <halign>left</halign>
             <legend>Disable welcome message</legend>
             <pref-width>160</pref-width>
             <pref-height>28</pref-height>
@@ -146,7 +146,7 @@
           <layout>hbox</layout>
           <padding>2</padding>
           <button>
-              <halign>right</halign>
+              <halign>left</halign>
               <legend>Enable Chinese</legend>
               <pref-width>100</pref-width>
               <pref-height>28</pref-height>
@@ -169,7 +169,7 @@
               </binding>
           </button>
           <button>
-              <halign>right</halign>
+              <halign>left</halign>
               <legend>Enable English</legend>
               <pref-width>100</pref-width>
               <pref-height>28</pref-height>
@@ -275,10 +275,56 @@
             </group>
             
         </group>
+        <group>
+            <layout>vbox</layout>
+            <text><label>Plate</label></text>
+            <combo>
+                <name>plateSelection</name>
+                <row>1</row>
+                <col>6</col>
+                <pref-width>120</pref-width>
+                <halign>left</halign>
+                <name>Plate Selection</name>
+                <property>/systems/plate</property>
+                <value>NONE</value>
+                <value>JAD00762</value>
+                <value>YBD00404</value>
+                <value>JLH0762</value>
+                <binding>
+        			<command>dialog-apply</command>
+        			<object-name>plateSelection</object-name>
+                </binding>
+            </combo>
+        </group>
         
         <hrule/>
         <group>
             <layout>hbox</layout>
+            <text>
+                <label>Rescue</label>
+            </text>
+            <button>
+                <halign>right</halign>
+                <legend>Flip Vehicle</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <and>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                        <less-than>
+                            <property>velocities/groundspeed-kt</property>
+                            <value>1.0</value>
+                        </less-than>
+                    </and>
+                </enable>
+                <binding>
+        			<command>property-assign</command>
+        			<property>/orientation/roll-deg</property>
+                    <value>0</value>
+                </binding>
+            </button>
 
             <button>
                 <halign>right</halign>
@@ -305,6 +351,7 @@
                     <value>288000</value>
                 </binding>
             </button>
+            
         </group>
 
         <hrule/>

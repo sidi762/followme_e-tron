@@ -51,7 +51,39 @@
  </offsets>
 </model>
 
+<!-- PLATE -->
+<model> 
+	<condition>
+	    <not>
+			<equals>
+				<property>sim/multiplay/generic/string[0]</property>
+				<value>NONE</value>
+			</equals>
+        </not>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/plate/plate.xml</path>
+    <offsets> 
+     <x-m> 0.01</x-m>
+     <y-m> 0.0</y-m>
+     <z-m> 0.39</z-m>
+    </offsets>
+</model>
+
 <!-- INSTRUMENTS -->
+<animation>
+ <type>select</type>
+ <object-name>screen</object-name>
+ <object-name>frame</object-name>
+ <condition>
+    
+     <equals>
+         <property>sim/multiplay/generic/int[300]</property>
+         <value>1</value>
+     </equals>
+    
+ </condition>
+</animation>
+
 
 <model> 
 	<condition>

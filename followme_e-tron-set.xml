@@ -93,7 +93,7 @@
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/12.jpg</path>
+                <path>Splash/12.png</path>
             </preview>
             
             <preview>
@@ -142,6 +142,12 @@
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/20.jpg</path>
+            </preview>
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/4.jpg</path>
             </preview>
         </previews>
             
@@ -372,6 +378,8 @@
         
         <float n="12" alias="/gear/gear[3]/compression-norm"/>
         <float n="13" alias="/gear/gear[3]/rollspeed-ms"/>
+        
+        <string n="0" alias="/systems/plate"/>
       </generic>
     </multiplay>
 </sim>
@@ -592,6 +600,9 @@
 	<followme>
 		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>        
 	</followme>
+	<!--<screen>		
+		<file>Aircraft/followme_e-tron/Nasal/SmartScreen.nas</file>
+    </screen> -->
     <engine>
         <file>Aircraft/followme_e-tron/Nasal/engine.nas</file>
     </engine>
