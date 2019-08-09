@@ -229,7 +229,7 @@ var startEngine = func(){
         if(signal){
             print("Engine started");
         }
-    }else if(followme.chargeTimer.isRunning()){
+    }else if(followme.chargeTimer.isRunning){
         #screen.log.write("Battery is recharging, cannot start engine.", 0, 0.584, 1);
         setprop("/sim/sound/voices/pilot", "Battery is recharging, cannot start engine.");
     }
