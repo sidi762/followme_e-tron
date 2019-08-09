@@ -144,10 +144,31 @@
                 <path>Splash/20.jpg</path>
             </preview>
             
+            
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/0.jpg</path>
+            </preview>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/1.jpg</path>
+            </preview>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/2.jpg</path>
+            </preview>
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/4.jpg</path>
+            </preview>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/5.jpg</path>
             </preview>
         </previews>
             
