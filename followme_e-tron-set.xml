@@ -4,7 +4,7 @@
 <sim>
 
 	<description>Follow Me e-tron</description>
-	<author>Gijs de Rooy, 李维昊（Weihao Li）, 梁思地（Sidi Liang）, 罗启元（Qiyuan Luo）</author>
+	<author>Gijs de Rooy, 李维昊（Weihao Li）, 梁思地（Sidi Liang）, 罗启元（Qiyuan Luo），ValKmjolnir</author>
 	<status>early production</status>
     <long-description>
         An electronic, High-Performance version of a follow me car with Chinese characteristics. 
@@ -289,7 +289,7 @@
 			<desc>Steer right 50%</desc>
 		</key>
 		<key>
-			<name>h</name>
+			<name>space</name>
 			<desc>Horn</desc>
 		</key>
 		<key>
@@ -303,6 +303,10 @@
 		<key>
 			<name>]</name>
 			<desc>Toggle right indicator light</desc>
+		</key>
+        <key>
+			<name>c</name>
+			<desc>Toggle auto-pilot system</desc>
 		</key>
 		<text>
 		You can select the message to be displayed on the bar, through the "Follow Me > Select message" menu.
@@ -524,6 +528,15 @@
                 </binding>
             </mod-up>
         </key>
+        <key n="99">
+            <name>c</name>
+            <desc>toggle_auto_pilot</desc>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>autopilot.toggle_auto_pilot();</script>
+            </binding>
+        </key>
         <key n="100">
             <name>d</name>
             <desc>rudder-right</desc>
@@ -642,6 +655,9 @@
     <dual_control>
      <file>Aircraft/followme_e-tron/Nasal/DualControl/pilot-dual-control.nas</file>
     </dual_control>
+    <autopilot>
+     <file>Aircraft/followme_e-tron/Nasal/auto_crash.nas</file>
+    </autopilot>
 </nasal>
 
 </PropertyList>
