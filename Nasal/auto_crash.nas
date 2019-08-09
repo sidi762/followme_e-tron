@@ -13,10 +13,11 @@ var road_check_func = func(){
     var lat = getprop("/position/latitude-deg");
     var lon = getprop("/position/longitude-deg");
     var position_info = geodinfo(lat,lon);
-    var now_friction_factor = position_info[1].friction_factor;
+    var position_names = position_info[1].names;
     # the friction_factor of freeway runway and road is 1
 
-    if(now_friction_factor==1){
+    if((position_names[0]=="Freeway") or (position_names[0]=="Road"))
+    {
         var car_heading = 0;
         var lat_change  = 0;
         var lon_change  = 0;
@@ -25,40 +26,40 @@ var road_check_func = func(){
         
         for(var i=0;i>-0.00005;i-=0.000001)
         {
-            car_heading=getprop("/orientation/heading-deg");
-            lat_change=math.sin(math.pi*car_heading/180);
-            lon_change=-math.cos(math.pi*car_heading/180);
-            lat=getprop("/position/latitude-deg")+0.0001*math.cos(math.pi*car_heading/180);
-            lon=getprop("/position/longitude-deg")+0.0001*math.sin(math.pi*car_heading/180);
-            var other_position_info=geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
-            var other_friction_factor=other_position_info[1].friction_factor;
-            if(other_friction_factor==1)
-                right_range+=1;
+            car_heading = getprop("/orientation/heading-deg");
+            lat_change  = math.sin(math.pi*car_heading/180);
+            lon_change  = -math.cos(math.pi*car_heading/180);
+            lat = getprop("/position/latitude-deg")+0.0001*math.cos(math.pi*car_heading/180);
+            lon = getprop("/position/longitude-deg")+0.0001*math.sin(math.pi*car_heading/180);
+            var other_position_info = geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
+            var other_names = other_position_info[1].names;
+            if((other_names[0]=="Freeway") or (other_names[0]=="Road"))
+                right_range += 1;
             else
                 break;
         }
         for(var i=0;i<0.00005;i+=0.000001)
         {
-            car_heading=getprop("/orientation/heading-deg");
-            lat_change=math.sin(math.pi*car_heading/180);
-            lon_change=-math.cos(math.pi*car_heading/180);
-            lat=getprop("/position/latitude-deg")+0.0001*math.cos(math.pi*car_heading/180);
-            lon=getprop("/position/longitude-deg")+0.0001*math.sin(math.pi*car_heading/180);
-            var other_position_info=geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
-            var other_friction_factor=other_position_info[1].friction_factor;
-            if(other_friction_factor==1)
+            car_heading = getprop("/orientation/heading-deg");
+            lat_change  = math.sin(math.pi*car_heading/180);
+            lon_change  = -math.cos(math.pi*car_heading/180);
+            lat = getprop("/position/latitude-deg")+0.0001*math.cos(math.pi*car_heading/180);
+            lon = getprop("/position/longitude-deg")+0.0001*math.sin(math.pi*car_heading/180);
+            var other_position_info = geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
+            var other_names = other_position_info[1].names;
+            if((other_names[0]=="Freeway") or (other_names[0]=="Road"))
                 left_range+=1;
             else
                 break;
         }
         if(left_range>right_range)
         {
-            setprop("/controls/flight/rudder",-0.05);
+            setprop("/controls/flight/rudder",(right_range-left_range)/200);
             #print("right ",right_range);
         }
         else if(left_range<right_range)
         {
-            setprop("/controls/flight/rudder",0.05);
+            setprop("/controls/flight/rudder",(right_range-left_range)/200);
             #print("left ",left_range);
         }
         else
