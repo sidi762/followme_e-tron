@@ -309,7 +309,10 @@
 			<desc>Toggle auto-pilot system</desc>
 		</key>
 		<text>
-		You can select the message to be displayed on the bar, through the "Follow Me > Select message" menu.
+		You can select the message to be displayed on the bar, through the "Follow Me E > Select message" menu.
+		</text>
+		<text>
+		For more options, see "Follow Me E > Show Options" menu.
 		</text>
 		<text>
             e-tron Brought to you by FGPRC.
@@ -319,7 +322,7 @@
 	<menubar>
 		<default>
 			<menu n="10">
-				<label>Follow me</label>
+				<label>Follow Me E</label>
 				<enabled type="bool">true</enabled>	
 				<item>
 					<label>Show Options</label>
