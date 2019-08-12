@@ -53,22 +53,22 @@ var road_check_func = func(){
             else
                 break;
         }
-        #if(left_range>right_range)
-        #{
-        #    setprop("/controls/flight/rudder",-(right_range-left_range)*(right_range-left_range)/10000);
-        #    print("right ",right_range);
-        #}
-        #else if(left_range<right_range)
-        #{
-        #    setprop("/controls/flight/rudder",(right_range-left_range)*(right_range-left_range)/10000);
-        #    print("left ",left_range);
-        #}
-        #else
-        #    setprop("/controls/flight/rudder",0);
-        props.getNode("/controls/flight/rudder",1).setValue((right_range-left_range)/200);
+        if(left_range>right_range)
+        {
+            props.getNode("/", 1).setValue("/controls/flight/rudder",-(right_range-left_range)*(right_range-left_range)/900);
+            print("right ",right_range);
+        }
+        else if(left_range<right_range)
+        {
+            props.getNode("/", 1).setValue("/controls/flight/rudder",(right_range-left_range)*(right_range-left_range)/900);
+            print("left ",left_range);
+        }
+        else
+            props.getNode("/", 1).setValue("/controls/flight/rudder",0);
+        #props.getNode("/controls/flight/rudder",1).setValue((right_range-left_range)/200);
     }
 };
-var road_check_timer = maketimer(0.1,road_check_func);
+var road_check_timer = maketimer(0.01,road_check_func);
 var toggle_auto_pilot = func(){
     if(!road_check_timer.isRunning)
     {
