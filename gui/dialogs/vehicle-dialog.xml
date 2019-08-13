@@ -297,6 +297,18 @@
             </combo>
         </group>
         
+        <group>
+            <layout>vbox</layout>
+            <checkbox>
+                <halign>left</halign>
+                <label>  Enable Co-driver Model</label>
+                <property>/systems/codriver-enable</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
+        </group>
         <hrule/>
         <group>
             <layout>hbox</layout>

@@ -51,6 +51,24 @@
  </offsets>
 </model>
 
+
+
+<!-- People -->
+<model> 
+ <condition>
+	<equals>
+		<property>systems/codriver-enable</property>
+		<value>1</value>
+	</equals>
+ </condition>
+ <path>Aircraft/followme_e-tron/Models/people/people.ac</path>
+ <offsets> 
+  <x-m> 1.9</x-m>
+  <y-m> 0</y-m>
+  <z-m> 1.25</z-m>
+ </offsets>
+</model>
+
 <!-- PLATE -->
 <model> 
 	<condition>
