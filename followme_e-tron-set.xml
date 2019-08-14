@@ -163,12 +163,22 @@
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/3.jpg</path>
+            </preview>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/4.jpg</path>
             </preview>
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/5.jpg</path>
+            </preview>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/6.jpg</path>
             </preview>
         </previews>
             

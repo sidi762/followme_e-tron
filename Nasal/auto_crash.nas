@@ -53,6 +53,7 @@ var road_check_func = func(){
             else
                 break;
         }
+        
         if(left_range>right_range)
         {
             props.getNode("/", 1).setValue("/controls/flight/rudder",-(right_range-left_range)*(right_range-left_range)/900);
