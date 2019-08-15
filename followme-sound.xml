@@ -42,12 +42,7 @@
 	<name>horn</name>
 	<mode>looped</mode>
 	<path>Aircraft/followme_e-tron/Sounds/horn.wav</path>
-	<condition>
-  	<equals>
-			<property>sim/multiplay/generic/int[2]</property>
-			<value>1</value>
-		</equals>
-	</condition>
+    <property>sim/multiplay/generic/int[2]</property>
 	<volume>
         <property>sim/multiplay/generic/int[2]</property>
 		<factor>5</factor>
