@@ -6,7 +6,7 @@ var smartScreen = canvas.new({
   "mipmapping": 1       # Enable mipmapping (optional)
 });
 
-smartScreen.addPlacement({"node": "screen", "texture": "screen.jpeg"});
+#smartScreen.addPlacement({"node": "screen", "texture": "screen.jpeg"});
 var group = smartScreen.createGroup();
 
 # Create a text element and set some values
