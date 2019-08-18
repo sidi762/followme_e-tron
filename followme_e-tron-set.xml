@@ -202,7 +202,7 @@
 	<aero>followme_e-tron</aero>
 
 	<model>
-		<path>Aircraft/followme_e-tron/Models/followme.xml</path>
+		<path>Aircraft/followme_e-tron/Models/followmeEV.xml</path>
 		<livery>
 			<file type="string"/>
 		</livery>
@@ -322,7 +322,7 @@
 		You can select the message to be displayed on the bar, through the "Follow Me E > Select message" menu.
 		</text>
 		<text>
-		For more options, see "Follow Me E > Show Options" menu.
+		For more options, see "Follow Me EV > Show Options" menu.
 		</text>
 		<text>
             e-tron Brought to you by FGPRC.
@@ -332,7 +332,7 @@
 	<menubar>
 		<default>
 			<menu n="10">
-				<label>Follow Me E</label>
+				<label>Follow Me EV</label>
 				<enabled type="bool">true</enabled>	
 				<item>
 					<label>Show Options</label>
