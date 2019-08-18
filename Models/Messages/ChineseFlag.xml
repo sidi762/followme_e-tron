@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">Chinese Flag</name>
+			<texture>Messages/ChineseFlag.png</texture>
+		</livery>
+	</model>
+</sim>
+</PropertyList>

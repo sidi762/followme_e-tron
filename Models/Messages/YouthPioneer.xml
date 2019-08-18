@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">Youth Pioneers</name>
+			<texture>Messages/YouthPioneer.png</texture>
+		</livery>
+	</model>
+</sim>
+</PropertyList>

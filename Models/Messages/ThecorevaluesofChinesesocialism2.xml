@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">The core values of Chinese socialism 2</name>
+			<texture>Messages/ThecorevaluesofChinesesocialism2.png</texture>
+		</livery>
+	</model>
+</sim>
+</PropertyList>

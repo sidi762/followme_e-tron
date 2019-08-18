@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">HK China</name>
+			<texture>Messages/hkisapartofChina.png</texture>
+		</livery>
+	</model>
+</sim>
+</PropertyList>
