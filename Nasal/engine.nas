@@ -44,7 +44,7 @@ var Engine = {
     power: 0, #kW
     outputForce: 0, #N
     
-    debugMode: 0,
+    debugMode: 1,
     
     elecNodeI: nil,
     elecNodeV: nil,
@@ -61,16 +61,28 @@ var Engine = {
         var angularDecelaeration = frictionTorque/0.625;
         #print(angularAcceleration);
         #print("de"~angularDecelaeration);
-        if(angularDecelaeration > 0){
-            angularDecelaeration *= -1;
-        }
+        
+        
+        
+        angularDecelaeration = math.abs(angularDecelaeration) * me.getDirection() * -1;
+
+        
+        
         var totalAcceleration = angularAcceleration + angularDecelaeration;
    
-        if(angularSpeed + totalAcceleration * 0.1 > 10){
-            angularSpeed = angularSpeed + totalAcceleration * 0.1;
-        }else if(angularSpeed + totalAcceleration * 0.1 < 10){
-            #print("angularSpeed + totalAcceleration * 0.1 < 10");
-            angularSpeed = angularSpeed + angularAcceleration * 0.1;
+        if(me.getDirection() == 1){
+            if(angularSpeed + totalAcceleration * 0.1 > 10){
+                angularSpeed = angularSpeed + totalAcceleration * 0.1;
+            }else if(angularSpeed + totalAcceleration * 0.1 < 10){
+                #print("angularSpeed + totalAcceleration * 0.1 < 10");
+                angularSpeed = angularSpeed + angularAcceleration * 0.1;
+            }
+        }else if(me.getDirection() == -1){
+            if(angularSpeed + totalAcceleration * 0.1 < -10){
+                angularSpeed = angularSpeed + totalAcceleration * 0.1;
+            }else if(angularSpeed + totalAcceleration * 0.1 > -10){
+                angularSpeed = angularSpeed + angularAcceleration * 0.1;
+            }
         }
    
         rps = angularSpeed / 6.2831853;
@@ -87,7 +99,7 @@ var Engine = {
     
     update_engine: func(){
         var throttle = props.getNode("/",1).getValue("/controls/engines/engine/throttle");
-        var direction = me.direction;
+        var direction = me.getDirection();
         var mode = props.getNode("/",1).getValue("/controls/mode");
         var volt = me.elecNodeV.getValue();
         
@@ -106,26 +118,25 @@ var Engine = {
         
         var cmdPower = throttle * me.maxPower;
         #print("cmdPower: "~cmdPower);
-        me.power = me.rpm * me.torque / 10824;
+        me.power = math.abs(me.rpm * me.torque / 10824);
        
-        if(me.rpm < cmdRpm){
+        if(math.abs(me.rpm) < cmdRpm){
             #print("me.rpm < cmdRpm");
-            me.torque = throttle * me.maxTorque;
-            #print("torque "~ me.torque);
+            me.torque = throttle * me.maxTorque * direction;
             var angularAcceleration = me.torque / 0.175; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
         }else if(throttle == 0){
             me.torque = 0;
-            var angularAcceleration = me.torque / 0.175; #rad/s^2
+            var angularAcceleration = direction * math.abs(me.torque) / 0.175; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
         }else{
             me.power = cmdPower;
-            var angularAcceleration = me.torque / 0.175; #rad/s^2
+            var angularAcceleration = direction * math.abs(me.torque) / 0.175; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
-            me.torque = me.power / me.rpm * 10824;
+            me.torque = direction * math.abs(me.power / me.rpm * 10824);
         }
     
-        var force = 3.33 * direction * me.torque * me.gear;
+        var force = 3.33 * me.torque * me.gear;
     
         me.outputForce = force;
         
@@ -157,7 +168,7 @@ var Engine = {
         me.runningState = 1;
         props.getNode("/",1).setValue("/controls/engines/engine/started",1);
         me.engineTimer.simulatedTime = 1;
-        me.rpm = 100;
+        me.rpm = 100 * me.getDirection();
         me.engineTimer.start();
         return 1;
     },
