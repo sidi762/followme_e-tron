@@ -9,7 +9,7 @@
  </effect>
  
  <effect>
-     <inherits-from>neddle-light</inherits-from>
+     <inherits-from>needle-light</inherits-from>
      <object-name>needle</object-name>
  </effect>
  
