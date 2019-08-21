@@ -6,7 +6,6 @@
  <effect>
      <inherits-from>fuelgauge-light</inherits-from>
      <object-name>face</object-name>
-     <object-name>needle</object-name>
  </effect>
  
  <effect>
