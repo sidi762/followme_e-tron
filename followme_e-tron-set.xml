@@ -397,6 +397,7 @@
         <int n="3" alias="/controls/lighting/headlight"/>
         <int n="4" alias="/controls/gear/brake-left"/>
         <int n="5" alias="/services/service-truck/enable"/>
+        <int n="6" alias="/systems/screen-enable"/>
         
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>
@@ -417,7 +418,16 @@
         <float n="12" alias="/gear/gear[3]/compression-norm"/>
         <float n="13" alias="/gear/gear[3]/rollspeed-ms"/>
         
+        <float n="14" alias="/controls/flight/aileron"/>
+        
+        <float n="15" alias="/velocities/groundspeed-kt"/>
+        
+        <float n="16" alias="/systems/electrical/e-tron/battery-kWh"/>
+        
         <string n="0" alias="/systems/plate"/>
+        <string n="1" alias="/systems/battery-gauge/type"/>
+        <string n="2" alias="/systems/speedometer/type"/>
+        
       </generic>
     </multiplay>
 </sim>

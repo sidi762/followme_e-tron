@@ -25,7 +25,7 @@
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>
-  <property>velocities/groundspeed-kt</property>
+  <property>sim/multiplay/generic/float[15]</property>
   <factor>-4.23</factor>
   <center>
    <x-m>0.0</x-m>

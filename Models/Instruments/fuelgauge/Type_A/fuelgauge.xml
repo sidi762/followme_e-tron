@@ -8,10 +8,16 @@
      <object-name>face</object-name>
      <object-name>needle</object-name>
  </effect>
+ 
+ <effect>
+     <inherits-from>neddle-light</inherits-from>
+     <object-name>needle</object-name>
+ </effect>
+ 
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>
-  <property>systems/electrical/e-tron/battery-kWh</property>
+  <property>sim/multiplay/generic/float[16]</property>
   <factor>-1.125</factor>
   <offset>22.5</offset>
   <center>

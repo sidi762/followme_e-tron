@@ -110,7 +110,7 @@
  <condition>
     
      <equals>
-         <property>systems/screen-enable</property>
+         <property>sim/multiplay/generic/int[6]</property>
          <value>1</value>
      </equals>
     
@@ -121,7 +121,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/battery-gauge/type</property>
+			<property>sim/multiplay/generic/string[1]</property>
 			<value>Type_A</value>
 		</equals>
 	</condition>
@@ -136,7 +136,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/battery-gauge/type</property>
+			<property>sim/multiplay/generic/string[1]</property>
 			<value>Type_M</value>
 		</equals>
 	</condition>
@@ -151,7 +151,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/battery-gauge/type</property>
+			<property>sim/multiplay/generic/string[1]</property>
 			<value>Original</value>
 		</equals>
 	</condition>
@@ -166,7 +166,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/battery-gauge/type</property>
+			<property>sim/multiplay/generic/string[1]</property>
 			<value>Concept</value>
 		</equals>
 	</condition>
@@ -181,7 +181,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/speedometer/type</property>
+			<property>sim/multiplay/generic/string[2]</property>
 			<value>Type_A</value>
 		</equals>
 	</condition>
@@ -196,7 +196,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/speedometer/type</property>
+			<property>sim/multiplay/generic/string[2]</property>
 			<value>Original</value>
 		</equals>
 	</condition> 
@@ -211,7 +211,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/speedometer/type</property>
+			<property>sim/multiplay/generic/string[2]</property>
 			<value>Type_M</value>
 		</equals>
 	</condition> 
@@ -226,7 +226,7 @@
 <model> 
 	<condition>
 		<equals>
-			<property>systems/speedometer/type</property>
+			<property>sim/multiplay/generic/string[2]</property>
 			<value>Concept</value>
 		</equals>
 	</condition> 
@@ -243,7 +243,7 @@
 <animation>  
  <type>rotate</type>  
  <object-name>steeringwheel</object-name>
- <property>controls/flight/aileron</property>
+ <property>sim/multiplay/generic/float[14]</property>
  <factor>-100</factor>
  <center>
   <x-m> 1.50</x-m>

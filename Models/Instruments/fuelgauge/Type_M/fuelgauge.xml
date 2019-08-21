@@ -11,7 +11,7 @@
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>
-  <property>systems/electrical/e-tron/battery-kWh</property>
+  <property>sim/multiplay/generic/float[16]</property>
   <factor>-1.125</factor>
   <offset>22.5</offset>
   <center>

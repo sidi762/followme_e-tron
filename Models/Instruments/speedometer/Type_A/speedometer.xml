@@ -33,11 +33,11 @@
  <object-name>needle</object-name>
  <condition>
      <less-than>
-       <property>velocities/groundspeed-kt</property>
+       <property>sim/multiplay/generic/float[15]</property>
        <value type="double">0</value>
      </less-than>
  </condition>
- <property>velocities/groundspeed-kt</property>
+ <property>sim/multiplay/generic/float[15]</property>
  <factor>4.167</factor>
  <center>
   <x-m>0.0</x-m>
@@ -57,16 +57,16 @@
   <condition>
       <and>
           <greater-than>
-            <property>velocities/groundspeed-kt</property>
+            <property>sim/multiplay/generic/float[15]</property>
             <value type="double">0</value>
           </greater-than>
           <less-than>
-            <property>velocities/groundspeed-kt</property>
+            <property>sim/multiplay/generic/float[15]</property>
             <value type="double">43.196</value>
           </less-than>
       </and>
   </condition>
-  <property>velocities/groundspeed-kt</property>
+  <property>sim/multiplay/generic/float[15]</property>
   <factor>-1.389</factor>
   <center>
    <x-m>0.0</x-m>
@@ -85,11 +85,11 @@
   <object-name>needle</object-name>
   <condition>
       <less-than>
-        <property>velocities/groundspeed-kt</property>
+        <property>sim/multiplay/generic/float[15]</property>
         <value type="double">151.187</value>
       </less-than>
   </condition>
-  <property>velocities/groundspeed-kt</property>
+  <property>sim/multiplay/generic/float[15]</property>
   <factor>-1.389</factor>
   <center>
    <x-m>0.0</x-m>
@@ -108,7 +108,7 @@
   <object-name>needle</object-name>
   <condition>
       <greater-than>
-        <property>velocities/groundspeed-kt</property>
+        <property>sim/multiplay/generic/float[15]</property>
         <value type="double">151.187</value>
       </greater-than>
   </condition>
