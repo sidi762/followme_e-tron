@@ -44,7 +44,7 @@ var Engine = {
     power: 0, #kW
     outputForce: 0, #N
     
-    debugMode: 1,
+    debugMode: 0,
     
     elecNodeI: nil,
     elecNodeV: nil,
