@@ -1,11 +1,19 @@
+
+var kWh2kWs = func(kWh){
+    return kWh * 3600;
+}
+var kWs2kWh = func(kWs){
+    return kWs / 3600;
+}
+
 var Series = {
     #//Class for any series connection
     new: func() {
-        return { parents:[Circuit] };
+        return { parents:[Series] };
     },
     units: [],
     addUnit: func(unit){
-        me.units.append(unit);
+        append(me.units, unit);
     },
     
     
@@ -20,7 +28,7 @@ var Series = {
     totalPower: func(){
         var total = 0;
         foreach(elem; units){
-            total += elem.power;
+            total += elem.power();
         }
         return total;
     },
@@ -31,15 +39,23 @@ var Series = {
     },
     
     
-    #/*calculateVoltage: func(){
-    #    foreach(elem; units){
-    #        elem.voltage
-    #    }
-    #},*/
+    calculateSeriesVoltage: func(){
+        var tR = me.totalResistance();
+        foreach(elem; units){
+            elem.voltage = (elem.resistance/tR) * me.voltage;
+        }
+    },
+    
+    calculateSeriesCurrent: func(){
+        foreach(elem; units){
+            elem.current = me.current();
+        }
+    },
 };
 
 var Circuit = {
     #//Class for any circuit
+    #//Currently must be initalized with a source
     #//Currently only support one current source in a circuit
     new: func(cSource) {
         var new_circuit = { parents:[Circuit] };
@@ -60,7 +76,7 @@ var Circuit = {
     },
     
     addParallel: func(units){
-      me.parallelConnection.append(units);  
+      append(me.parallelConnection, units);  
     },
     
     current: 0, #//Ampere
@@ -70,17 +86,43 @@ var Circuit = {
     
     calculateParallelVoltage: func(){
         foreach(elem; parallelConnection){
-            elem.voltage = me.voltage;
+            elem.voltage = me.voltage();
         }
     }, #//Volt
     
-    totalParalleCurrent: func(){
+    calculateSeriesVoltage: func(){
+        foreach(elem; parallelConnection){
+            elem.calculateSeriesVoltage();
+        }
+    }, #//Volt
+    
+    calculateTotalParalleCurrent: func(){
         var total = 0;
         foreach(elem; parallelConnection){
-            total += elem.current;
+            total += elem.current();
         }
+        me.current = total;
         return total;
     }, #//Ampere
+    
+    calculateTotalPower: func(){
+      var total = 0;
+      foreach(elem; parallelConnection){
+          total += elem.totalPower();
+      }  
+    },
+    
+    updateInterval: 0.1, #//Seconds between each update
+    
+    update: func(){
+        me.calculateParallelVoltage();
+        me.calculateSeriesVoltage();
+        foreach(elem; parallelConnection){
+            elem.calculateSeriesCurrent();
+        }
+        me.calculateTotalParalleCurrent();
+        parallelConnection[0].units[0].remaining -= me.calculateTotalPower() * me.updateInterval; #
+    },
     
     
 };
@@ -91,10 +133,21 @@ var Appliance = {
         return { parents:[Appliance] }; 
     },
     
+    ratedPower: 0, #//rate power , Watt, 0 if isResistor
+    
+    
     resistance: 0, #//electric resistance, Ωμέγα
     voltage: 0, #//electric voltage, Volt
     current: 0, #//electric current, Ampere
-    power: 0, #//electric power, Watt
+    activePower: 0, #//Output Power
+    heatingPower: func(){
+        return me.current * me.current * me.resistance;
+    },#//heating Power
+    power: func(){
+      return activePower + heatingPower;  
+    },
+    
+    
     isResistor: 0,
     
     applianceName: "Appliance",
@@ -109,31 +162,33 @@ var Appliance = {
     setResistance: func(r){
         me.resistance = r;
     },
-    calculatePower: func(){
-        me.power = me.voltage * me.current;
-        return me.power;
-    },
-    
 };
 
 var CurrentSource = {
     #//Class for any current source
-    new: func() {
-        return { parents:[Appliance], applianceName: "CurrentSource" };
+    new: func(eR, eF, eC, name = "CurrentSource") {
+        var newCS = { parents:[CurrentSource, Appliance.new()], applianceName: name, resistance: eR, electromotiveForce:eF, electricalCapacity:eC };
+        newCS.resetRemainingToFull();
+        return newCS;
     },
 
     electromotiveForce: 0, #//Volt
+    electricalCapacity: 0, #//kWs
+    remaining: 0, #//kWs
+    
+    resetRemainingToFull: func(){
+        me.remaining = me.electricalCapacity;
+    },
+    getRemainingPercentage: func(){
+        return sprintf("%.0f", me.remaining/2880)~"%";
+    },
     
 };
 
 
 
-var cSource = CurrentSource.new();
-cSource.name = "Battery";
-cSource.resistance = 13.6 * 0.001;
-cSource.electromotiveForce = 760;
-
-
+var cSource = CurrentSource.new((13.6*0.001), 760, kWh2kWs(80), "Battery");
+var circuit_1 = Circuit.new(cSource);
 
 
 
