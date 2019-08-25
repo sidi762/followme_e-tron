@@ -19,35 +19,48 @@ var Series = {
     
     totalResistance: func(){
         var total = 0;
-        foreach(elem; units){
+        foreach(elem; me.units){
             total += elem.resistance;
+        }
+        return total;
+    },
+    
+    totalActivePower: func(){
+        var total = 0;
+        foreach(elem; me.units){
+            total += elem.activePower;
         }
         return total;
     },
     
     totalPower: func(){
         var total = 0;
-        foreach(elem; units){
+        foreach(elem; me.units){
             total += elem.power();
         }
         return total;
     },
     
+    
     voltage: 0, #//Volt
     current: func(){
-        return (me.voltage + math.sqrt(me.voltage * me.voltage - 4 * me.totalResistance * me.totalPower)) / 2 * me.totalResistance; #//Ampere
+        var a = me.totalResistance();
+        var b = me.voltage;
+        var c = math.sqrt(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
+        var d = b + c;
+        return d / (2 * a); #//Ampere
     },
     
     
     calculateSeriesVoltage: func(){
         var tR = me.totalResistance();
-        foreach(elem; units){
+        foreach(elem; me.units){
             elem.voltage = (elem.resistance/tR) * me.voltage;
         }
     },
     
     calculateSeriesCurrent: func(){
-        foreach(elem; units){
+        foreach(elem; me.units){
             elem.current = me.current();
         }
     },
@@ -75,30 +88,36 @@ var Circuit = {
         return newSeries;
     },
     
+    
+    addUnitToSeries: func(seriesNum, unit){
+        me.parallelConnection[seriesNum].addUnit(unit);
+    },
+    
     addParallel: func(units){
       append(me.parallelConnection, units);  
     },
     
+    
     current: 0, #//Ampere
     voltage: func(){
-        return parallelConnection[0].units[0].electromotiveForce;
+        return me.parallelConnection[0].units[0].electromotiveForce;
     }, #//Volt
     
     calculateParallelVoltage: func(){
-        foreach(elem; parallelConnection){
+        foreach(elem; me.parallelConnection){
             elem.voltage = me.voltage();
         }
     }, #//Volt
     
     calculateSeriesVoltage: func(){
-        foreach(elem; parallelConnection){
+        foreach(elem; me.parallelConnection){
             elem.calculateSeriesVoltage();
         }
     }, #//Volt
     
     calculateTotalParalleCurrent: func(){
         var total = 0;
-        foreach(elem; parallelConnection){
+        foreach(elem; me.parallelConnection){
             total += elem.current();
         }
         me.current = total;
@@ -107,21 +126,42 @@ var Circuit = {
     
     calculateTotalPower: func(){
       var total = 0;
-      foreach(elem; parallelConnection){
+      foreach(elem; me.parallelConnection){
           total += elem.totalPower();
       }  
+      return total;
     },
     
     updateInterval: 0.1, #//Seconds between each update
     
+    debugMode: 0,
+    
+    loopCount: 0,
+    
     update: func(){
+        if(me.debugMode) print("Loop Count: "~me.loopCount);
+        
         me.calculateParallelVoltage();
+        if(me.debugMode) print("Parallel Voltage Calculated");
+        
         me.calculateSeriesVoltage();
-        foreach(elem; parallelConnection){
+        if(me.debugMode) print("Series Voltage Calculated");
+        
+        foreach(elem; me.parallelConnection){
             elem.calculateSeriesCurrent();
         }
+        if(me.debugMode) print("Series Current Calculated");
+        
         me.calculateTotalParalleCurrent();
-        parallelConnection[0].units[0].remaining -= me.calculateTotalPower() * me.updateInterval; #
+        if(me.debugMode) print("Parallel Current Calculated");
+        
+        me.parallelConnection[0].units[0].remaining -= me.calculateTotalPower() * me.updateInterval; #
+        if(me.debugMode) print("Power Calculated");
+        
+        print("current: "~me.current);
+        print("voltage: "~me.voltage());
+        
+        me.loopCount += 1;
     },
     
     
@@ -137,6 +177,7 @@ var Appliance = {
     
     
     resistance: 0, #//electric resistance, Ωμέγα
+    resistivity: 0,#//Ω·m
     voltage: 0, #//electric voltage, Volt
     current: 0, #//electric current, Ampere
     activePower: 0, #//Output Power
@@ -144,7 +185,7 @@ var Appliance = {
         return me.current * me.current * me.resistance;
     },#//heating Power
     power: func(){
-      return activePower + heatingPower;  
+      return me.activePower + me.heatingPower();  
     },
     
     
@@ -166,8 +207,9 @@ var Appliance = {
 
 var CurrentSource = {
     #//Class for any current source
+    #//eR: Internal resistance of the source, eF: Electromotive force of the source, eC: Electrical capacity of the source, name: Name of the source.
     new: func(eR, eF, eC, name = "CurrentSource") {
-        var newCS = { parents:[CurrentSource, Appliance.new()], applianceName: name, resistance: eR, electromotiveForce:eF, electricalCapacity:eC };
+        var newCS = { parents:[CurrentSource, Appliance.new()], resistance: eR, electromotiveForce:eF, electricalCapacity:eC, applianceName: name };
         newCS.resetRemainingToFull();
         return newCS;
     },
@@ -185,17 +227,34 @@ var CurrentSource = {
     
 };
 
+var Cable = {
+    #//Class for any copper electrical cable
+    new: func(l = 0, s = 0.008) { 
+        var newCable = { parents:[Cable, Appliance.new()], resistivity: 1.75 * 0.00000001, length: l, crossSection: s};
+        print("Created Cable with resistance of " ~ newCable.setResistance());
+        return newCable; 
+    },
+    length: 0,#//Meter
+    crossSection: 0,#//Meter^2
+    setResistance: func(){
+        me.resistance = (me.resistivity * me.length) / me.crossSection;
+        return me.resistance;
+    }
+};
 
-
-var cSource = CurrentSource.new((13.6*0.001), 760, kWh2kWs(80), "Battery");
+var cSource = CurrentSource.new(0.0136, 760, kWh2kWs(80), "Battery");
 var circuit_1 = Circuit.new(cSource);
+circuit_1.addUnitToSeries(0, Cable.new(100, 0.008));
 
 
 
 
 
+var electricTimer1 = maketimer(1, func circuit_1.update());
 
-
+var L = setlistener("/sim/signals/fdm-initialized", func{
+    electricTimer1.start();
+});
 
 
 
