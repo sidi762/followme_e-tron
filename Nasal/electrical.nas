@@ -15,7 +15,9 @@ var Series = {
     addUnit: func(unit){
         append(me.units, unit);
     },
-    
+    isSwitch: func(){
+        return 0;
+    },
     
     totalResistance: func(){
         var total = 0;
@@ -44,6 +46,13 @@ var Series = {
     
     voltage: 0, #//Volt
     current: func(){
+        foreach(elem; me.units){
+            if(elem.isSwitch()){
+                if(!elem.isConnected()){
+                    return 0;
+                }
+            }
+        }
         var a = me.totalResistance();
         var b = me.voltage;
         var c = math.sqrt(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
@@ -55,6 +64,11 @@ var Series = {
     calculateSeriesVoltage: func(){
         var tR = me.totalResistance();
         foreach(elem; me.units){
+            if(elem.isSwitch()){
+                if(!elem.isConnected()){
+                    me.voltage = 0;
+                }
+            }
             elem.voltage = (elem.resistance/tR) * me.voltage;
         }
     },
@@ -104,8 +118,14 @@ var Circuit = {
     }, #//Volt
     
     calculateParallelVoltage: func(){
+        var setVoltage = me.voltage();
         foreach(elem; me.parallelConnection){
-            elem.voltage = me.voltage();
+            if(elem.isSwitch()){
+                if(!elem.isConnected()){
+                    setVoltage = 0;
+                }
+            }
+            elem.voltage = setVoltage;
         }
     }, #//Volt
     
@@ -118,6 +138,12 @@ var Circuit = {
     calculateTotalParalleCurrent: func(){
         var total = 0;
         foreach(elem; me.parallelConnection){
+            if(elem.isSwitch()){
+                if(!elem.isConnected()){
+                    me.current = 0;
+                    return 0;
+                }
+            }
             total += elem.current();
         }
         me.current = total;
@@ -175,6 +201,9 @@ var Appliance = {
     
     ratedPower: 0, #//rate power , Watt, 0 if isResistor
     
+    isSwitch: func(){
+        return 0;
+    },
     
     resistance: 0, #//electric resistance, Ωμέγα
     resistivity: 0,#//Ω·m
@@ -227,6 +256,51 @@ var CurrentSource = {
     
 };
 
+var Switch = {
+    #//Class for any switches
+    #//Type 0 for appliance switch. type 1 for series switch
+    #//switchToggle: Return 1 if connected, return 0 if disconnected
+    new: func(type, name = "Switch") {
+        if(type == 0){
+            var newCS = { parents:[Switch, Appliance.new()], applianceName: name };
+            return newCS;
+        }else if(type == 1){
+            var newCS = { parents:[Switch, Series.new()]};
+            return newCS;
+        }
+    },
+    isSwitch: func(){
+        return 1;
+    },
+    
+    switchState: 1, #//0 for disconnect, 1 for connect
+    
+    isConnected: func(){
+        if(me.switchState){
+            return 1;
+        }else if(!me.switchState){
+            return 0;
+        }
+    },
+    
+    switchConnect: func(){
+        me.switchState = 1;
+        return 1;
+    },
+    switchDisconnect: func(){
+        me.switchState = 0;
+        return 0;
+    },
+    switchToggle: func(){
+        if(me.isConnected()){
+            return me.switchDisconnect();
+        }else if(!me.isConnected()){
+            return me.switchConnect();
+        }
+    },
+    
+};
+
 var Cable = {
     #//Class for any copper electrical cable
     new: func(l = 0, s = 0.008) { 
@@ -245,6 +319,8 @@ var Cable = {
 var cSource = CurrentSource.new(0.0136, 760, kWh2kWs(80), "Battery");
 var circuit_1 = Circuit.new(cSource);
 circuit_1.addUnitToSeries(0, Cable.new(100, 0.008));
+circuit_1.addUnitToSeries(0, Switch.new(0));
+circuit_1.addParallel(Switch.new(1));
 
 
 
