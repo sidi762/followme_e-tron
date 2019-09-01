@@ -1,5 +1,6 @@
 ####    Follow Me   ####
-####    Gijs de Rooy    ####
+####    Gijs de Rooy (Original)    ####
+####    Sidi Liang    ####
 
 var liveryFuse = {
 	init: func(dir, nameprop = "sim/model/livery/name", sortprop = nil) {
@@ -279,19 +280,27 @@ var indicatorController = IndicatorController.new();
 
 
 var chargeBatterySec = func(){
-    var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
-    var currentBattery = battery.getValue();
-    if(currentBattery >= 288000){
+    #//var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
+    #//var currentBattery = battery.getValue();
+    var batteryRemaining = circuit_1.parallelConnection[0].units[0].remaining;
+    if(batteryRemaining >= 288000){
         screen.log.write("Battery is Successfully recharged!", 0, 0.584, 1);
         chargeBatteryStop();
     }
-    battery.setValue(currentBattery+240);
+    #//battery.setValue(currentBattery+240);
+    #//batteryRemaining += 240;
+    circuit_1.parallelConnection[0].units[0].addToBattery(240);
 }
 var chargeTimer = maketimer(1, chargeBatterySec);
 var chargeBatteryStart = func(){
+    var battery = circuit_1.parallelConnection[0].units[0];
+    var batteryRemaining = battery.remaining;
+    var batteryTotal = battery.electricalCapacity;
+    var batteryElecForce = battery.electromotiveForce;
     if(!props.getNode("/controls/is-recharging", 1).getValue()){
         if(props.getNode("/",1).getValue("services/service-truck/connect") == 1 and props.getNode("/",1).getValue("/controls/engines/engine/started") == 0){
-            var deltaBattery = 288000-props.getNode("/systems/electrical/e-tron/battery-kWs").getValue();
+            var deltaBattery = batteryTotal - batteryRemaining;
+            battery.electromotiveForce = 0;
             var remainingTime = sprintf("%.0f", (deltaBattery / 240) / 60);      #Based on 20 mins from 0 to full
             screen.log.write("Recharging. About "~remainingTime~" mins remaining.", 0, 0.584, 1);
             setprop("/sim/sound/voices/pilot", "Recharging. About "~remainingTime~" mins remaining.");
@@ -305,12 +314,13 @@ var chargeBatteryStart = func(){
             setprop("/sim/sound/voices/pilot", "Cannot recharge. Shut down the engine first.");
         }
     }else if(props.getNode("/controls/is-recharging", 1).getValue()){
-        chargeBatteryStop();
+        chargeBatteryStop(batteryElecForce);
     }
 }
 
-var chargeBatteryStop = func(){
+var chargeBatteryStop = func(bef){
    chargeTimer.stop();
+   circuit_1.parallelConnection[0].units[0].electromotiveForce = bef;
    screen.log.write("Recharge Stopped", 0, 0.584, 1);
    setprop("/sim/sound/voices/pilot", "Recharge Stopped. Have a nice ride!");
    props.getNode("/controls/is-recharging", 1).setValue(0);
@@ -360,7 +370,7 @@ var brakesABS = func(){
 
 var absTimer = maketimer(0.001, brakesABS);
 
-var brakeWithABS = func(){# Seems to have bugs
+var brakeWithABS = func(){ #//Doesn't seems to work as it seems that jsbsim wheels never overbrake?
     var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-cmd");
     if(brakeCmd){
         absTimer.start();

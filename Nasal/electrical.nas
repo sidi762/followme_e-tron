@@ -31,7 +31,9 @@ var Series = {
         var total = 0;
         foreach(elem; me.units){
             total += elem.activePower;
+            total += elem.activePower_kW * 1000;
         }
+        #print("totalAP: "~total);
         return total;
     },
     
@@ -56,7 +58,7 @@ var Series = {
         var a = me.totalResistance();
         var b = me.voltage;
         var c = math.sqrt(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
-        var d = b + c;
+        var d = b - c;
         return d / (2 * a); #//Ampere
     },
     
@@ -158,7 +160,7 @@ var Circuit = {
       return total;
     },
     
-    updateInterval: 0.1, #//Seconds between each update
+    updateInterval: 1, #//Seconds between each update
     
     debugMode: 0,
     
@@ -181,11 +183,15 @@ var Circuit = {
         me.calculateTotalParalleCurrent();
         if(me.debugMode) print("Parallel Current Calculated");
         
-        me.parallelConnection[0].units[0].remaining -= me.calculateTotalPower() * me.updateInterval; #
+        me.parallelConnection[0].units[0].remaining -= me.calculateTotalPower() * 0.001 * me.updateInterval; #
         if(me.debugMode) print("Power Calculated");
         
-        print("current: "~me.current);
-        print("voltage: "~me.voltage());
+        props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
+        props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
+        
+        if(me.debugMode) print("current: "~me.current);
+        if(me.debugMode) print("voltage: "~me.voltage());
+        if(me.debugMode) print("Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
         
         me.loopCount += 1;
     },
@@ -209,12 +215,13 @@ var Appliance = {
     resistivity: 0,#//Ω·m
     voltage: 0, #//electric voltage, Volt
     current: 0, #//electric current, Ampere
-    activePower: 0, #//Output Power
+    activePower: 0, #//Output Power, Watt
+    activePower_kW: 0, #//Output Power, kWatt, independence of activePower
     heatingPower: func(){
         return me.current * me.current * me.resistance;
     },#//heating Power
     power: func(){
-      return me.activePower + me.heatingPower();  
+      return me.activePower + me.activePower_kW*1000 + me.heatingPower();  
     },
     
     
@@ -252,6 +259,12 @@ var CurrentSource = {
     },
     getRemainingPercentage: func(){
         return sprintf("%.0f", me.remaining/2880)~"%";
+    },
+    getRemainingInkWh: func(){
+        return me.remaining/3600;
+    },
+    addToBattery: func(num){
+        me.remaining += num;
     },
     
 };
@@ -318,11 +331,9 @@ var Cable = {
 
 var cSource = CurrentSource.new(0.0136, 760, kWh2kWs(80), "Battery");
 var circuit_1 = Circuit.new(cSource);
-circuit_1.addUnitToSeries(0, Cable.new(100, 0.008));
-circuit_1.addUnitToSeries(0, Switch.new(0));
-circuit_1.addParallel(Switch.new(1));
-
-
+#circuit_1.addUnitToSeries(0, Cable.new(10, 0.008));
+#circuit_1.addUnitToSeries(0, Switch.new(0));
+#circuit_1.addParallel(Switch.new(1));
 
 
 
@@ -330,104 +341,4 @@ var electricTimer1 = maketimer(1, func circuit_1.update());
 
 var L = setlistener("/sim/signals/fdm-initialized", func{
     electricTimer1.start();
-});
-
-
-
-
-
-
-
-
-
-
-
-
-var electric_init = func(){  #Initialize
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-kWh",80);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-kWs",288000);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-U-V",760);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-bwd-eng",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
-    props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue("0%");
-    print("Electrical system initiallized!");
-}
-
-var electric_update = func(){
-    
-    var currentBattery_kWs = props.getNode("/systems/electrical/e-tron/battery-kWs",1);
-    var currentBattery_kWh = props.getNode("/systems/electrical/e-tron/battery-kWh",1);
-    var currentBattery_percent = props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1);
-    
-    if(currentBattery_kWs.getValue() >= 0.1){
-        
-        
-        if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-fwd-eng") == 1){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",747);
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",380);
-        }else if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-fwd-eng") == 0){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",0);
-             props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",0);
-        }
-    
-        if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-bwd-eng") == 1){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",380);
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",747);
-        }else if(props.getNode("/",1).getValue("/systems/electrical/e-tron/switch/bat-bwd-eng") == 0){
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
-            props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",0);
-        }
-        
-        
-    }else{
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V-max",0);
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-I-A-max",0);
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V-max",0);
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-I-A-max",0);
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/fwd-eng-U-V",0);
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/bwd-eng-U-V",0);
-    }
-    
-    
-    
-   
-    #battery consume
-    
-    var currentFwdEngConsume = props.getNode("/systems/electrical/e-tron/fwd-eng-U-V",1).getValue() * props.getNode("/systems/electrical/e-tron/fwd-eng-I-A",1).getValue() * 0.001;
-    var currentBwdEngConsume = props.getNode("/systems/electrical/e-tron/bwd-eng-U-V",1).getValue() * props.getNode("/systems/electrical/e-tron/bwd-eng-I-A",1).getValue() * 0.001;
-    var currentTotalConsume = currentFwdEngConsume+currentBwdEngConsume;
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/battery-kWs", currentBattery_kWs.getValue() - currentTotalConsume);
-    
-    currentBattery_kWh.setValue(currentBattery_kWs.getValue()/3600);
-    currentBattery_percent.setValue(sprintf("%.0f", currentBattery_kWs.getValue()/2880)~"%");
-}
-
-var electricTimer = maketimer(1, electric_update);
-
-var startElectricalSystemUpdate = func(){
-    electricTimer.start();
-    print("Electrical system update started!");
-}
-var stopElectricalSystemUpdate = func(){
-    electricTimer.stop();
-    print("Electrical system update stopped!");
-}
-
-var resetElectricalSystemUpdate = func(){
-    electricTimer.stop();
-    electric_init();
-    electricTimer.start();
-    print("Electrical system update reseted!");
-}
-
-var L = setlistener("/sim/signals/fdm-initialized", func{
-    electric_init();
-    electricTimer.start();
-    removelistener(L);
 });

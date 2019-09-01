@@ -655,6 +655,7 @@
 
 <nasal>
 	<followme>
+        <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
 		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>        
 	</followme>
 	<!--<screen>		
@@ -663,9 +664,6 @@
     <engine>
         <file>Aircraft/followme_e-tron/Nasal/engine.nas</file>
     </engine>
-    <electrical>
-        <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
-    </electrical>
     <light>
         <file>Aircraft/followme_e-tron/Nasal/light-manager.nas</file>
     </light>

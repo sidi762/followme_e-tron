@@ -1,10 +1,17 @@
 var Engine = {
+    #//Class for any electric engine
+    #//mTorque: Max torque, mPower: Max Power, rpmAtMPower: RPM at max power
+    #//For this vehicle: maxPower: 375kW
     
-    new: func(mTorque, mPower, rpmAtMPower, elecI, elecV) { 
-        return { parents:[Engine], maxTorque: mTorque, maxPower:mPower, rpmAtMaxPower:rpmAtMPower, elecNodeI:elecI, elecNodeV:elecV }; 
+    new: func(mTorque, mPower, rpmAtMPower) {
+        return { parents:[Engine, followme.Appliance.new()], maxTorque: mTorque, ratedPower:mPower, rpmAtMaxPower:rpmAtMPower }; 
     },
     
+    resistance: 0.1, #//No datasource, based on guess
+    
     runningState: 0,
+    
+    engineSwitch: followme.Switch.new(0),
     
     isRunning: func(){
         return me.runningState;
@@ -36,18 +43,14 @@ var Engine = {
     rpm: 0,
     
     maxTorque: 460, #Nm
-    maxPower: 375, #kW
+    
     rpmAtMaxPower: 6150, #rpm
     
     angularSpeed: 0, #rad/s
     torque: 0, #Nm
-    power: 0, #kW
     outputForce: 0, #N
     
     debugMode: 0,
-    
-    elecNodeI: nil,
-    elecNodeV: nil,
     
     rpm_calculate: func(angularAcceleration){
    
@@ -95,13 +98,11 @@ var Engine = {
         return rpm;
     },
     
-    
-    
     update_engine: func(){
         var throttle = props.getNode("/",1).getValue("/controls/engines/engine/throttle");
         var direction = me.getDirection();
         var mode = props.getNode("/",1).getValue("/controls/mode");
-        var volt = me.elecNodeV.getValue();
+        var volt = me.voltage;
         
         if(!volt){
             me.rpm = 0;
@@ -116,9 +117,9 @@ var Engine = {
         var cmdRpm = throttle * me.rpmAtMaxPower;
         #print("cmdRpm: "~cmdRpm);
         
-        var cmdPower = throttle * me.maxPower;
+        var cmdPower = throttle * me.ratedPower;
         #print("cmdPower: "~cmdPower);
-        me.power = math.abs(me.rpm * me.torque / 10824);
+        me.activePower_kW = math.abs(me.rpm * me.torque / 10824);
        
         if(math.abs(me.rpm) < cmdRpm){
             #print("me.rpm < cmdRpm");
@@ -126,14 +127,15 @@ var Engine = {
             var angularAcceleration = me.torque / 0.175; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
         }else if(throttle == 0){
+            me.activePower_kW = 0;
             me.torque = 0;
             var angularAcceleration = direction * math.abs(me.torque) / 0.175; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
         }else{
-            me.power = cmdPower;
+            me.activePower_kW = cmdPower;
             var angularAcceleration = direction * math.abs(me.torque) / 0.175; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
-            me.torque = direction * math.abs(me.power / me.rpm * 10824);
+            me.torque = direction * math.abs(me.activePower_kW / me.rpm * 10824);
         }
     
         var force = 3.33 * me.torque * me.gear;
@@ -144,9 +146,6 @@ var Engine = {
             me.debugPrint();
         }
         
-        if(me.elecNodeV.getValue()){
-            me.elecNodeI.setValue(me.power*1000/me.elecNodeV.getValue());
-        }
         
         outputForce(me.outputForce);
    
@@ -165,6 +164,7 @@ var Engine = {
     
     startEngine: func(){
         me.createTimer();
+        me.engineSwitch.switchConnect();
         me.runningState = 1;
         props.getNode("/",1).setValue("/controls/engines/engine/started",1);
         me.engineTimer.simulatedTime = 1;
@@ -177,8 +177,9 @@ var Engine = {
         me.rpm = 0;
         me.torque = 0;
         me.outputForce = 0;
-        me.power = 0;
+        me.activePower_kW = 0;
         me.runningState = 0;
+        me.engineSwitch.switchDisconnect();
         props.getNode("/",1).setValue("/controls/engines/engine/started",0);
         me.engineTimer.stop();
     },
@@ -186,17 +187,19 @@ var Engine = {
     debugPrint: func(){
         print("rpm: "~me.rpm);
         print("torque: "~me.torque);
-        print("power: "~me.power);
+        print("power: "~me.activePower_kW);
         print("______________________________________________");
     },
     
 };
 
 
-var elecNodeI = props.getNode("/systems/electrical/e-tron/fwd-eng-I-A", 1);
-var elecNodeV = props.getNode("/systems/electrical/e-tron/fwd-eng-U-V", 1);
-
-var engine_1 = Engine.new(460, 375, 6150, elecNodeI, elecNodeV);
+var engine_1 = Engine.new(460, 375, 6150);
+followme.circuit_1.addUnitToSeries(0, followme.Cable.new(5, 0.008));
+followme.circuit_1.addUnitToSeries(0, engine_1);
+followme.circuit_1.addUnitToSeries(0, engine_1.engineSwitch);
+engine_1.engineSwitch.switchDisconnect();
+followme.circuit_1.addUnitToSeries(0, followme.Cable.new(5, 0.008));
 
 var outputForce = func(force){
     if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
@@ -227,8 +230,6 @@ var outputForce = func(force){
 
 var startEngine = func(){
     if(!props.getNode("/controls/is-recharging").getValue()){
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",1);
-        props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-bwd-eng",1);
         
         if(props.getNode("systems/welcome-message", 1).getValue() == 1){
             props.getNode("/sim/messages/copilot", 1).setValue("Beijing di san tsui jiao tong wei ti xing nin, Dao lu tsian wan tiao, ann tsuan di yi tiao, xing che bull gui fun, tsin ren liang hang lei");
@@ -247,9 +248,6 @@ var startEngine = func(){
 }
 
 var stopEngine = func(){
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-fwd-eng",0);
-    props.getNode("/",1).setValue("/systems/electrical/e-tron/switch/bat-bwd-eng",0);
-
     engine_1.stopEngine();
     print("Engine stopped");
 }

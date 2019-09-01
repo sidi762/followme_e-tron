@@ -296,7 +296,29 @@
                 </binding>
             </combo>
         </group>
-        
+        <group>
+            <layout>vbox</layout>
+            <button>
+                <halign>left</halign>
+                <legend>Select Livery</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+				<binding>
+					<command>nasal</command>
+					<script>followme.liveryFuse.dialog.toggle()</script>
+				</binding>
+            </button>
+            <button>
+                <halign>left</halign>
+                <legend>Select Message</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+				<binding>
+						<command>nasal</command>
+						<script>aircraft.livery.dialog.toggle()</script>
+				</binding>
+            </button>
+        </group>
         <group>
             <layout>vbox</layout>
             <checkbox>
@@ -369,17 +391,48 @@
                         </not>
                     </and>
                 </enable>
-                <binding>
-        			<command>property-assign</command>
-        			<property>/systems/electrical/e-tron/battery-kWs</property>
-                    <value>288000</value>
-                </binding>
+				<binding>
+					<command>nasal</command>
+					<script>followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull()</script>
+				</binding>
             </button>
+        
             
         </group>
+       
 
         <hrule/>
-
+        <group>
+            <layout>hbox</layout>
+            <button>
+                <halign>right</halign>
+                <legend>Start Engine</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <not>
+                        <property>/controls/engines/engine/started</property>
+                    </not>
+                </enable>
+				<binding>
+					<command>nasal</command>
+					<script>engine.startEngine()</script>
+				</binding>
+            </button>
+            <button>
+                <halign>right</halign>
+                <legend>Stop Engine</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                   <property>/controls/engines/engine/started</property>
+                </enable>
+				<binding>
+					<command>nasal</command>
+					<script>engine.stopEngine()</script>
+				</binding>
+            </button>
+        </group>
 	
         <hrule/>
 
