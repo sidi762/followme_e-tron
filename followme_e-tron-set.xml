@@ -423,6 +423,7 @@
         <float n="15" alias="/velocities/groundspeed-kt"/>
         
         <float n="16" alias="/systems/electrical/e-tron/battery-kWh"/>
+        <float n="17" alias="/systems/electrical/e-tron/battery-remaining-percent"/>
         
         <string n="0" alias="/systems/plate"/>
         <string n="1" alias="/systems/battery-gauge/type"/>

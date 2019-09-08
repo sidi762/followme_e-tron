@@ -16,8 +16,8 @@
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>
-  <property>sim/multiplay/generic/float[16]</property>
-  <factor>-1.125</factor>
+  <property>sim/multiplay/generic/float[17]</property>
+  <factor>-0.9</factor>
   <offset>22.5</offset>
   <center>
    <x-m>0.0</x-m>

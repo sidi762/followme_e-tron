@@ -88,8 +88,7 @@ var Circuit = {
     #//Currently only support one current source in a circuit
     new: func(cSource) {
         var new_circuit = { parents:[Circuit] };
-        var new_series = new_circuit.newSeriesWithUnits(cSource);
-        new_circuit.addParallel(new_series);
+        new_circuit.addNewSeriesWithUnitToParallel(cSource);
         return new_circuit;
     },
     
@@ -111,6 +110,11 @@ var Circuit = {
     
     addParallel: func(units){
       append(me.parallelConnection, units);  
+    },
+    
+    addNewSeriesWithUnitToParallel: func(units){
+        var new_series = me.newSeriesWithUnits(units);
+        me.addParallel(new_series);
     },
     
     
@@ -162,7 +166,7 @@ var Circuit = {
     
     updateInterval: 1, #//Seconds between each update
     
-    debugMode: 0,
+    debugMode: 1,
     
     loopCount: 0,
     
@@ -170,28 +174,35 @@ var Circuit = {
         if(me.debugMode) print("Loop Count: "~me.loopCount);
         
         me.calculateParallelVoltage();
-        if(me.debugMode) print("Parallel Voltage Calculated");
+        if(me.debugMode == 2) print("Parallel Voltage Calculated");
         
         me.calculateSeriesVoltage();
-        if(me.debugMode) print("Series Voltage Calculated");
+        if(me.debugMode == 2) print("Series Voltage Calculated");
         
         foreach(elem; me.parallelConnection){
             elem.calculateSeriesCurrent();
         }
-        if(me.debugMode) print("Series Current Calculated");
+        if(me.debugMode == 2) print("Series Current Calculated");
         
         me.calculateTotalParalleCurrent();
-        if(me.debugMode) print("Parallel Current Calculated");
+        if(me.debugMode == 2) print("Parallel Current Calculated");
         
-        me.parallelConnection[0].units[0].remaining -= me.calculateTotalPower() * 0.001 * me.updateInterval; #
-        if(me.debugMode) print("Power Calculated");
+        foreach(elem; me.parallelConnection){
+            foreach(unit; elem.units){
+                if(unit.isCurrentSource()) unit.currentSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Pass in negetive power for charging
+            }
+        }
+        if(me.debugMode == 2) print("Power Calculated");
+        if(me.debugMode) print("Power: "~me.calculateTotalPower());
         
         props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
         
         if(me.debugMode) print("current: "~me.current);
         if(me.debugMode) print("voltage: "~me.voltage());
-        if(me.debugMode) print("Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
+        if(me.debugMode) print("Main Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
+        #//if(me.debugMode) 
+        #//print("Secondery Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
         
         me.loopCount += 1;
     },
@@ -203,6 +214,10 @@ var Appliance = {
     #//Class for any electrical appliance
     new: func() { 
         return { parents:[Appliance] }; 
+    },
+    
+    isCurrentSource: func(){
+        return 0;
     },
     
     ratedPower: 0, #//rate power , Watt, 0 if isResistor
@@ -245,17 +260,34 @@ var CurrentSource = {
     #//Class for any current source
     #//eR: Internal resistance of the source, eF: Electromotive force of the source, eC: Electrical capacity of the source, name: Name of the source.
     new: func(eR, eF, eC, name = "CurrentSource") {
-        var newCS = { parents:[CurrentSource, Appliance.new()], resistance: eR, electromotiveForce:eF, electricalCapacity:eC, applianceName: name };
+        var newCS = { parents:[CurrentSource, Appliance.new()], resistance: eR, ratedElectromotiveForce:eF, electromotiveForce:eF, electricalCapacity:eC, applianceName: name };
         newCS.resetRemainingToFull();
         return newCS;
     },
+    
+    isCurrentSource: func(){
+        return 1;
+    },
 
+    ratedElectromotiveForce: 0, #//Volt
     electromotiveForce: 0, #//Volt
     electricalCapacity: 0, #//kWs
     remaining: 0, #//kWs
     
+    
+    currentSourceUpdate: func(power, interval){
+        me.remaining -= power * 0.001 * interval; #//Pass in negetive power for charging
+        if(me.remaining <= 0){
+            me.electromotiveForce = 0;
+        }else{
+            me.electromotiveForce = me.ratedElectromotiveForce;
+        }
+    },
     resetRemainingToFull: func(){
         me.remaining = me.electricalCapacity;
+    },
+    resetRemainingToZero: func(){
+        me.remaining = 0;
     },
     getRemainingPercentage: func(){
         return sprintf("%.0f", me.remaining/2880)~"%";
@@ -329,15 +361,21 @@ var Cable = {
     }
 };
 
-var cSource = CurrentSource.new(0.0136, 760, kWh2kWs(80), "Battery");
-var circuit_1 = Circuit.new(cSource);
+var cSource = CurrentSource.new(0.0136, 760, kWh2kWs(100), "Battery");#//Battery for engine, 100kWh, 760V
+var circuit_1 = Circuit.new(cSource);#//Engine circuit
+
+var cSource_small = CurrentSource.new(0.0136, 12, kWh2kWs(0.72), "Battery");#//Battery for other systems, 60Ah, 12V
+cSource_small.resetRemainingToZero();
+#circuit_1.addNewSeriesWithUnitToParallel(cSource_small);
+
+
 #circuit_1.addUnitToSeries(0, Cable.new(10, 0.008));
 #circuit_1.addUnitToSeries(0, Switch.new(0));
 #circuit_1.addParallel(Switch.new(1));
 
 
 
-var electricTimer1 = maketimer(1, func circuit_1.update());
+var electricTimer1 = maketimer(circuit_1.updateInterval, func circuit_1.update());
 
 var L = setlistener("/sim/signals/fdm-initialized", func{
     electricTimer1.start();
