@@ -197,6 +197,7 @@ var Circuit = {
         
         props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
+        props.getNode("/systems/electrical/e-tron/battery-remaining-percent-float", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentageFloat());
         
         if(me.debugMode) print("current: "~me.current);
         if(me.debugMode) print("voltage: "~me.voltage());
@@ -290,7 +291,10 @@ var CurrentSource = {
         me.remaining = 0;
     },
     getRemainingPercentage: func(){
-        return sprintf("%.0f", me.remaining/2880)~"%";
+        return sprintf("%.0f", 100 * me.remaining / me.electricalCapacity)~"%";
+    },
+    getRemainingPercentageFloat: func(){
+        return sprintf("%.0f", 100 * me.remaining / me.electricalCapacity);
     },
     getRemainingInkWh: func(){
         return me.remaining/3600;
