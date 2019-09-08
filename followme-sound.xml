@@ -76,6 +76,53 @@
 	</volume>
   </indicator>
   
+  <indicatorStart>
+	<name>indicatorStartLeft</name>
+	<mode>once</mode>
+	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
+	<property>controls/lighting/indicator-left</property>
+	<volume>
+        <value>0.001</value>
+	</volume>
+  </indicatorStart>
+  <indicatorStart>
+	<name>indicatorStartRight</name>
+	<mode>once</mode>
+	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
+	<property>controls/lighting/indicator-right</property>
+	<volume>
+        <value>0.001</value>
+	</volume>
+  </indicatorStart>
+  <indicatorEnd>
+	<name>indicatorEndLeft</name>
+	<mode>once</mode>
+	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
+	<condition>
+        <equals>
+            <property>controls/lighting/indicator-left</property>
+            <value>0</value>
+        </equals>
+    </condition>
+	<volume>
+        <value>0.001</value>
+	</volume>
+  </indicatorEnd>
+  <indicatorEnd>
+	<name>indicatorEndRight</name>
+	<mode>once</mode>
+	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
+	<condition>
+        <equals>
+            <property>controls/lighting/indicator-right</property>
+            <value>0</value>
+        </equals>
+    </condition>
+	<volume>
+        <value>0.001</value>
+	</volume>
+  </indicatorEnd>
+  
 
 </fx>
  
