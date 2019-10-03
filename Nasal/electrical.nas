@@ -166,7 +166,7 @@ var Circuit = {
     
     updateInterval: 1, #//Seconds between each update
     
-    debugMode: 1,
+    debugMode: 0,
     
     loopCount: 0,
     
@@ -269,7 +269,8 @@ var CurrentSource = {
     isCurrentSource: func(){
         return 1;
     },
-
+        
+    direction: 1, #//1 means it is connected in the current direction, -1 means the opposite
     ratedElectromotiveForce: 0, #//Volt
     electromotiveForce: 0, #//Volt
     electricalCapacity: 0, #//kWs
