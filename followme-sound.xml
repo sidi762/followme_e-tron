@@ -22,7 +22,8 @@
    </pitch>
   </engine>
   
-  <safety>
+  <!-- Removed due to copyright issues
+    <safety>
 	<name>safety</name>
 	<mode>once</mode>
 	<path>Aircraft/followme_e-tron/Sounds/Safety.wav</path>
@@ -36,7 +37,7 @@
         <property>/controls/engines/engine/started</property>
 		<factor>5</factor>
 	</volume>
-  </safety>
+  </safety>-->
   
   <horn>
 	<name>horn</name>
