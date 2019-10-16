@@ -7,4 +7,4 @@ ValKmjolnir(FGPRC-0818): 'Auto Crash' System
 Weihao Lee(FGPRC-0405): Models, Textures, Effects    
 Qiyuan Luo(FGPRC-0404): Instruments, Textures
   
-http://wiki.flightgear.org/images/5/51/Preview-etron.png
+![Preview]http://wiki.flightgear.org/images/5/51/Preview-etron.png
