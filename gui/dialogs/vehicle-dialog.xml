@@ -243,6 +243,7 @@
                     <property>/systems/speedometer/type</property>
                     <value>Type_A</value>
                     <value>Type_M</value>
+                    <value>Type_B</value>
                     <value>Concept</value>
                     <value>Original</value>
                     <binding>

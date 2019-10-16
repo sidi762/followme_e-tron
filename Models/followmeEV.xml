@@ -114,7 +114,7 @@
          <value>1</value>
      </equals>
     
- </condition>
+ </condition>-
 </animation>
 
 
@@ -216,6 +216,21 @@
 		</equals>
 	</condition> 
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_M/speedometer.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.38</y-m>
+  <z-m>1.03</z-m>
+ </offsets>
+</model>
+
+<model> 
+	<condition>
+		<equals>
+			<property>sim/multiplay/generic/string[2]</property>
+			<value>Type_B</value>
+		</equals>
+	</condition> 
+    <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_B/speedometer.xml</path>
  <offsets> 
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>

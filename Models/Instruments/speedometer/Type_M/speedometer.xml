@@ -22,7 +22,7 @@
 </effect>
 
 <effect>
-    <inherits-from>needle-light</inherits-from>
+    <inherits-from>Effects/needle-light</inherits-from>
     <object-name>needle</object-name>
 </effect>
 
