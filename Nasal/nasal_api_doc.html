@@ -1,0 +1,518 @@
+<html><head>	<title>Nasal API</title>	<style>
+	a.main_module_link {margin-left:30px;display:block;float:left;}	div.container {background-color:#eee;clear:left;margin-top:20px;}	h2.namespace_title {padding-left:20px;color:#fff;background-color:#8888AC}	h4.class_function {padding-left:20px;background-color:#eee;color:#000033}	h4.class_definition {padding-left:20px;background-color:#eee;color:#000033}	h4.function {padding-left:20px;background-color:#eee;color:#000033}	hr {margin-left:30px;margin-right:30px;}	div.comments {padding-left:40px;display:inline;font-size:12px;}	</style>
+	</head><body style="width:1024px;"><h1 style="padding-left:20px;display:block;color:#fff;background-color:#555588;">	Followme EV Nasal Documentation<br/><span style="font-size:12px;">Flightgear version: 2018.3 or later	<br/>This file is generated automatically by scripts/python/nasal_api_doc.py	</span></h1>	<br/>
+<div style="float:right;">&nbsp;<h2 style="font-size:14px;height:450px;width:250px;overflow:scroll;display:block;position:fixed;top:20px;right:20px;background-color:#8888AC;border:1px solid black;">
+<a class="main_module_link" style="color:0000cc" href="#SmartScreen">SmartScreen</a>&nbsp;<br/>
+<a class="main_module_link" style="color:0000cc" href="#auto_crash">auto_crash</a>&nbsp;<br/>
+<a class="main_module_link" style="color:0000cc" href="#bug_engine">bug_engine</a>&nbsp;<br/>
+<a class="main_module_link" style="color:0000cc" href="#electrical">electrical</a>&nbsp;<br/>
+<a class="main_module_link" style="color:0000cc" href="#electrical_old">electrical_old</a>&nbsp;<br/>
+<a class="main_module_link" style="color:0000cc" href="#engine">engine</a>&nbsp;<br/>
+<a class="main_module_link" style="color:0000cc" href="#light-manager">light-manager</a>&nbsp;<br/>
+<a class="main_module_link" style="color:0000cc" href="#systems">systems</a>&nbsp;<br/>
+<a class="main_module_link" style="color:cc0000" href="#DualControl">DualControl</a>&nbsp;<br/>
+</h2></div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="SmartScreen">SmartScreen</a></h2>
+<div><h4 class="function"><b>SmartScreen</b>.<b>showOnlineMap</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>SmartScreen</b>.<b>showOfflineMap</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>SmartScreen</b>.<b>r</b> ( <font color="#cc0000">name,vis=1,zindex=nil</font> )</h4>
+</div>
+<div><h4 class="function"><b>SmartScreen</b>.<b>changeZoom</b> ( <font color="#cc0000">d</font> )</h4>
+</div>
+<div><h4 class="function"><b>SmartScreen</b>.<b>updateTiles</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="auto_crash">auto_crash</a></h2>
+<div><h4 class="function"><b>auto_crash</b>.<b>position_change</b> ( <font color="#cc0000">position_val,value</font> )</h4>
+<div class="comments"> Road check and auto pilot(??) by ValKmjolnir</div><br/>
+</div>
+<div><h4 class="function"><b>auto_crash</b>.<b>road_check_func</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>auto_crash</b>.<b>toggle_auto_pilot</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="bug_engine">bug_engine</a></h2>
+<div><h4 class="function"><b>bug_engine</b>.<b>update_engine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>bug_engine</b>.<b>rpm_calculate</b> ( <font color="#cc0000">rpm_rate</font> )</h4>
+</div>
+<div><h4 class="function"><b>bug_engine</b>.<b>startEngine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>bug_engine</b>.<b>stopEngine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="electrical">electrical</a></h2>
+<div><h4 class="function"><b>electrical</b>.<b>kWh2kWs</b> ( <font color="#cc0000">kWh</font> )</h4>
+</div>
+<div><h4 class="function"><b>electrical</b>.<b>kWs2kWh</b> ( <font color="#cc0000">kWs</font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>electrical</b>.<b><i><u><font color="#000000">Series</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.new</b> ( <font color="#cc0000"></font> )</h4>
+<div class="comments">    //Class for any series connection</div><br/>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.addUnit</b> ( <font color="#cc0000">unit</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.isSwitch</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.totalResistance</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.totalActivePower</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.totalPower</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.current</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.calculateSeriesVoltage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Series</i></b><b>.calculateSeriesCurrent</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>electrical</b>.<b><i><u><font color="#000000">Circuit</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.new</b> ( <font color="#cc0000">cSource</font> )</h4>
+<div class="comments">    //Class for any circuit</div><br/>
+<div class="comments">    //Currently must be initalized with a source</div><br/>
+<div class="comments">    //Currently only support one current source in a circuit</div><br/>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.newSeriesWithUnits</b> ( <font color="#cc0000">addedUnits...</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.addUnitToSeries</b> ( <font color="#cc0000">seriesNum, unit</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.addParallel</b> ( <font color="#cc0000">units</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.addNewSeriesWithUnitToParallel</b> ( <font color="#cc0000">units</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.voltage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.calculateParallelVoltage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.calculateSeriesVoltage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.calculateTotalParalleCurrent</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.calculateTotalPower</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Circuit</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>electrical</b>.<b><i><u><font color="#000000">Appliance</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.new</b> ( <font color="#cc0000"></font> )</h4>
+<div class="comments">    //Class for any electrical appliance</div><br/>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.isCurrentSource</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.isSwitch</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.heatingPower</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.power</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.setName</b> ( <font color="#cc0000">text</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.setDescription</b> ( <font color="#cc0000">text</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Appliance</i></b><b>.setResistance</b> ( <font color="#cc0000">r</font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>electrical</b>.<b><i><u><font color="#000000">CurrentSource</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.new</b> ( <font color="#cc0000">eR, eF, eC, name = </font> )</h4>
+<div class="comments">    //Class for any current source</div><br/>
+<div class="comments">    //eR: Internal resistance of the source, eF: Electromotive force of the source, eC: Electrical capacity of the source, name: Name of the source.</div><br/>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.isCurrentSource</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.currentSourceUpdate</b> ( <font color="#cc0000">power, interval</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.resetRemainingToFull</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.resetRemainingToZero</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.getRemainingPercentage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.getRemainingPercentageFloat</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.getRemainingInkWh</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>CurrentSource</i></b><b>.addToBattery</b> ( <font color="#cc0000">num</font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>electrical</b>.<b><i><u><font color="#000000">Switch</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Switch</i></b><b>.new</b> ( <font color="#cc0000">type, name = </font> )</h4>
+<div class="comments">    //Class for any switches</div><br/>
+<div class="comments">    //Type 0 for appliance switch. type 1 for series switch</div><br/>
+<div class="comments">    //switchToggle: Return 1 if connected, return 0 if disconnected</div><br/>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Switch</i></b><b>.isSwitch</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Switch</i></b><b>.isConnected</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Switch</i></b><b>.switchConnect</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Switch</i></b><b>.switchDisconnect</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Switch</i></b><b>.switchToggle</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>electrical</b>.<b><i><u><font color="#000000">Cable</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Cable</i></b><b>.new</b> ( <font color="#cc0000">l = 0, s = 0.008</font> )</h4>
+<div class="comments">    //Class for any copper electrical cable</div><br/>
+</div>
+<div><h4 class="class_function"><b>electrical</b>.<b><i>Cable</i></b><b>.setResistance</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="electrical_old">electrical_old</a></h2>
+<div><h4 class="function"><b>electrical_old</b>.<b>electric_init</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>electrical_old</b>.<b>electric_update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>electrical_old</b>.<b>startElectricalSystemUpdate</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>electrical_old</b>.<b>stopElectricalSystemUpdate</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>electrical_old</b>.<b>resetElectricalSystemUpdate</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="engine">engine</a></h2>
+<div><h4 class="class_definition"><b>engine</b>.<b><i><u><font color="#000000">Engine</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.new</b> ( <font color="#cc0000">mTorque, mPower, rpmAtMPower</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.isRunning</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.setDirection</b> ( <font color="#cc0000">dir</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.toggleDirection</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.getDirection</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.setGear</b> ( <font color="#cc0000">g</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.getGear</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.rpm_calculate</b> ( <font color="#cc0000">angularAcceleration</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.update_engine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.createTimer</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.startEngine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.stopEngine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>engine</b>.<b><i>Engine</i></b><b>.debugPrint</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>engine</b>.<b>outputForce</b> ( <font color="#cc0000">force</font> )</h4>
+</div>
+<div><h4 class="function"><b>engine</b>.<b>startEngine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>engine</b>.<b>stopEngine</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="light-manager">light-manager</a></h2>
+<div><h4 class="class_definition"><b>light-manager</b>.<b><i><u><font color="#000000">light_manager</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.init</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.start</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.stop</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light1_on</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light1_off</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light1_setSize</b> ( <font color="#cc0000">size</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light2_on</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light2_off</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light2_setSize</b> ( <font color="#cc0000">size</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light3_on</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light3_off</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light4_on</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light4_off</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light5_on</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>light-manager</b>.<b><i>light_manager</i></b><b>.light5_off</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="systems">systems</a></h2>
+<div><h4 class="class_definition"><b>systems</b>.<b><i><u><font color="#000000">liveryFuse</font></u></i></b></h4>
+<div class="comments">    Follow Me   </div><br/>
+<div class="comments">    Gijs de Rooy (Original)    </div><br/>
+<div class="comments">    Sidi Liang    </div><br/>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>liveryFuse</i></b><b>.init</b> ( <font color="#cc0000">dir, nameprop = </font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>systems</b>.<b><i><u><font color="#000000">liveryFuse_update</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>liveryFuse_update</i></b><b>.new</b> ( <font color="#cc0000">liveriesdir, interval = 10.01, callback = nil</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>liveryFuse_update</i></b><b>.stop</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>systems</b>.<b><i><u><font color="#000000">Indicator</font></u></i></b></h4>
+<div class="comments">var Led = {</div><br/>
+<div class="comments">    new: func() { return { parents:[Led] },</div><br/>
+<div class="comments">    node: props.getNode("/sim/model/livery/texture",1),</div><br/>
+<div class="comments">    blankTexture: "Messages/blanco.png",</div><br/>
+<div class="comments">    currentMessage: "",</div><br/>
+<div class="comments">    messageHistory : [],</div><br/>
+<div class="comments">    display: func(content){</div><br/>
+<div class="comments">        me.node.setValue(content);</div><br/>
+<div class="comments">    },</div><br/>
+<div class="comments">};</div><br/>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>Indicator</i></b><b>.new</b> ( <font color="#cc0000">type</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>Indicator</i></b><b>.switchOn</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>Indicator</i></b><b>.switchOff</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>Indicator</i></b><b>.isOn</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>Indicator</i></b><b>.isOff</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>systems</b>.<b><i><u><font color="#000000">IndicatorController</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.new</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.saveLedMessage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.getSavedMessage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.clearSavedMessage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.setLedMessage</b> ( <font color="#cc0000">content</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.resumeLedMessage</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.getMode</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.setMode</b> ( <font color="#cc0000">targetMode</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.right_indicator_toggle</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.left_indicator_toggle</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.falseLightOn</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.falseLightOff</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>systems</b>.<b><i>IndicatorController</i></b><b>.false_light_toggle</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>systems</b>.<b>chargeBatterySec</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>systems</b>.<b>chargeBatteryStart</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>systems</b>.<b>chargeBatteryStop</b> ( <font color="#cc0000">bef</font> )</h4>
+</div>
+<div><h4 class="function"><b>systems</b>.<b>calculateSpeed</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>systems</b>.<b>brakesABS</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>systems</b>.<b>brakeWithABS</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div class="container" style="">
+<h2 class="namespace_title"><a name="DualControl">DualControl</a></h2>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">Translator</font></u></i></b></h4>
+<div class="comments"> Utility classes</div><br/>
+<div class="comments"> Translate a property into another.</div><br/>
+<div class="comments">  Factor and offsets are only used for numeric values.</div><br/>
+<div class="comments">   src    - source      : property node</div><br/>
+<div class="comments">   dest   - destination : property node</div><br/>
+<div class="comments">   factor -             : double</div><br/>
+<div class="comments">   offset -             : double</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>Translator</i></b><b>.new</b> ( <font color="#cc0000">src = nil, dest = nil, factor = 1, offset = 0</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>Translator</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">EdgeTrigger</font></u></i></b></h4>
+<div class="comments"> Detects flanks on two insignals encoded in a property.</div><br/>
+<div class="comments"> - positive signal up/down flank</div><br/>
+<div class="comments"> - negative signal up/down flank</div><br/>
+<div class="comments">   n                 - source : property node</div><br/>
+<div class="comments">   on_positive_flank - action : func (v)</div><br/>
+<div class="comments">   on_negative_flank - action : func (v)</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>EdgeTrigger</i></b><b>.new</b> ( <font color="#cc0000">n, on_positive_flank, on_negative_flank</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>EdgeTrigger</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">StableTrigger</font></u></i></b></h4>
+<div class="comments"> StableTrigger: Triggers an action when a MPP property</div><br/>
+<div class="comments">                becomes stable (i.e. doesn't change for</div><br/>
+<div class="comments">                MIN_STABLE seconds).</div><br/>
+<div class="comments">   src     - MP prop : property node</div><br/>
+<div class="comments">   action  - action to take when the value becomes stable : [func(v)]</div><br/>
+<div class="comments"> An action is triggered when value has stabilized.</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>StableTrigger</i></b><b>.new</b> ( <font color="#cc0000">src, action</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>StableTrigger</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">MostRecentSelector</font></u></i></b></h4>
+<div class="comments"> Selects the most recent value of two properties.</div><br/>
+<div class="comments">   src1      -  : property node</div><br/>
+<div class="comments">   src2      -  : property node</div><br/>
+<div class="comments">   dest      -  : property node</div><br/>
+<div class="comments">   threshold -  : double</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>MostRecentSelector</i></b><b>.new</b> ( <font color="#cc0000">src1, src2, dest, threshold</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>MostRecentSelector</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">Adder</font></u></i></b></h4>
+<div class="comments"> Adds two input properties.</div><br/>
+<div class="comments">   src1      -  : property node</div><br/>
+<div class="comments">   src2      -  : property node</div><br/>
+<div class="comments">   dest      -  : property node</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>Adder</i></b><b>.new</b> ( <font color="#cc0000">src1, src2, dest</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>Adder</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">DeltaAdder</font></u></i></b></h4>
+<div class="comments"> Adds the delta of src to dest.</div><br/>
+<div class="comments">   src       -  : property node</div><br/>
+<div class="comments">   dest      -  : property node</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>DeltaAdder</i></b><b>.new</b> ( <font color="#cc0000">src, dest</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>DeltaAdder</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">SwitchEncoder</font></u></i></b></h4>
+<div class="comments"> Switch encoder: Encodes upto 32 boolean properties in one</div><br/>
+<div class="comments"> int property.</div><br/>
+<div class="comments">   inputs    - list of property nodes</div><br/>
+<div class="comments">   dest      - where the bitmask is stored : property node</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>SwitchEncoder</i></b><b>.new</b> ( <font color="#cc0000">inputs, dest</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>SwitchEncoder</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">SwitchDecoder</font></u></i></b></h4>
+<div class="comments"> Switch decoder: Decodes a bitmask in an int property.</div><br/>
+<div class="comments">   src     -                 : property node</div><br/>
+<div class="comments">   actions - list of actions : [func(b)]</div><br/>
+<div class="comments"> Actions are triggered when their input bit change.</div><br/>
+<div class="comments"> Due to interpolation the decoder needs to wait for a</div><br/>
+<div class="comments"> stable input value.</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>SwitchDecoder</i></b><b>.new</b> ( <font color="#cc0000">src, actions</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>SwitchDecoder</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">TDMEncoder</font></u></i></b></h4>
+<div class="comments"> Time division multiplexing encoder: Transmits a list of</div><br/>
+<div class="comments"> properties over a MP enabled string property.</div><br/>
+<div class="comments">   inputs  - input properties : [property node]</div><br/>
+<div class="comments">   dest    - MP string prop   : property node</div><br/>
+<div class="comments"> Note: TDM can have high latency so it is best used for</div><br/>
+<div class="comments"> non-time critical properties.</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>TDMEncoder</i></b><b>.new</b> ( <font color="#cc0000">inputs, dest</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>TDMEncoder</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">TDMDecoder</font></u></i></b></h4>
+<div class="comments"> Time division multiplexing decoder: Receives a list of</div><br/>
+<div class="comments"> properties over a MP enabled string property.</div><br/>
+<div class="comments">   src     - MP string prop  : property node</div><br/>
+<div class="comments">   actions - list of actions : [func(v)]</div><br/>
+<div class="comments"> An action is triggered when its value is received.</div><br/>
+<div class="comments"> Note: TDM can have high latency so it is best used for</div><br/>
+<div class="comments"> non-time critical properties.</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>TDMDecoder</i></b><b>.new</b> ( <font color="#cc0000">src, actions</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>TDMDecoder</i></b><b>.process</b> ( <font color="#cc0000">msg</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>TDMDecoder</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>is_num</b> ( <font color="#cc0000">v</font> )</h4>
+<div class="comments"> Internal utility functions</div><br/>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>fail</b> ( <font color="#cc0000"></font> )</h4>
+<div class="comments"> fail causes a Nasal runtime error so we get a backtrace.</div><br/>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">copilot_dialog</font></u></i></b></h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.init</b> ( <font color="#cc0000">copilot_type, x = nil, y = nil</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.create</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.close</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.destroy</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.show</b> ( <font color="#cc0000">copilot_type</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.<font color="#0000cc">_redraw_</font></b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.<font color="#0000cc">_update_</font></b> ( <font color="#cc0000">id</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.select_action</b> ( <font color="#cc0000">n</font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>copilot_dialog</i></b><b>.find_copilot_players</b> ( <font color="#cc0000"></font> )</h4>
+<div class="comments"> Return a list containing all nearby copilot players of the right type.</div><br/>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>pilot_connect_copilot</b> ( <font color="#cc0000">copilot</font> )</h4>
+<div class="comments"> Used by dual_control to set up the mappings for the pilot </div><br/>
+<div class="comments"> PILOT TO COPILOT </div><br/>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>pilot_disconnect_copilot</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>copilot_connect_pilot</b> ( <font color="#cc0000">pilot</font> )</h4>
+<div class="comments"> Used by dual_control to set up the mappings for the copilot </div><br/>
+<div class="comments"> COPILOT TO PILOT </div><br/>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>copilot_disconnect_pilot</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>connect</b> ( <font color="#cc0000">copilot</font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">main</font></u></i></b></h4>
+<div class="comments"> Main loop singleton class.</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.init</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.reset</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.activate</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.<font color="#0000cc">_loop_</font></b> ( <font color="#cc0000">id</font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">views</font></u></i></b></h4>
+<div class="comments"> Default external views to slave to the MP pilot.</div><br/>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>connect</b> ( <font color="#cc0000">pilot</font> )</h4>
+</div>
+<div><h4 class="function"><b>DualControl</b>.<b>disconnect</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_definition"><b>DualControl</b>.<b><i><u><font color="#000000">main</font></u></i></b></h4>
+<div class="comments"> Main loop singleton class.</div><br/>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.init</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.reset</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.activate</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.update</b> ( <font color="#cc0000"></font> )</h4>
+</div>
+<div><h4 class="class_function"><b>DualControl</b>.<b><i>main</i></b><b>.<font color="#0000cc">_loop_</font></b> ( <font color="#cc0000">id</font> )</h4>
+</div>
+</body></html>
