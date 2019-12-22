@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PropertyList>
-        <name>face-light</name>
-        <inherits-from>/Effects/model-combined-deferred</inherits-from>
+        <name>fuelgauge-light</name>
+        <inherits-from>Effects/model-interior-display</inherits-from>
         <parameters>
                 <!-- Light Map -->
                 <lightmap-enabled type="int"><use>controls/lighting/headlight</use></lightmap-enabled>
                 <lightmap-multi type="int">1</lightmap-multi>
                 <texture n="3">
-                  <image>speedometer_LIT.png</image>
+                  <image>fuelgauge_LIT.png</image>
                   <wrap-s>repeat</wrap-s>
                   <wrap-t>repeat</wrap-t>
                 </texture>
@@ -18,5 +18,18 @@
                 <lightmap-color type="vec3d" n="1"> 0. 1. 0. </lightmap-color>
                 <lightmap-color type="vec3d" n="2"> 0. 0. 1. </lightmap-color>
                 <lightmap-factor type="float" n="3">0</lightmap-factor>
+                
+                <!-- Dust -->
+        		<texture n="5">
+        			<type>2d</type>
+        			<filter>linear-mipmap-linear</filter>
+        			<wrap-s>clamp</wrap-s>
+        			<wrap-t>clamp</wrap-t>
+        			<internal-format>normalized</internal-format>
+        			<image>Aircraft/Generic/Effects/dust-effect-overlay.png</image>
+        		</texture>
+        		<sample-res>0.0007</sample-res>
+        		<dirt-factor>3</dirt-factor>
+        		<contrast>0.75</contrast>
         </parameters>
 </PropertyList>

@@ -51,17 +51,19 @@ var Engine = {
     outputForce: 0, #N
     
     debugMode: 0,
-    
+  
     rpm_calculate: func(angularAcceleration){
-   
+        
         var rpm = me.rpm;
-        var rps = rpm / 60;
-        var angularSpeed = rps * 2 * 3.1415926;
+        #//var rps = rpm / 60;
+        
+        
+        var angularSpeed = rpm * 0.10471975; #//rps * 2 * 3.1415926
     
         var friction_lbs = props.getNode("/",1).getValue("fdm/jsbsim/forces/fbx-gear-lbs");
         var friction = 4.4492 * friction_lbs;
-        var frictionTorque = friction * 0.15 * 0.3;
-        var angularDecelaeration = frictionTorque/0.625;
+        #//var frictionTorque = friction * 0.045; 
+        var angularDecelaeration = friction * 0.072; #//frictionTorque = friction * 0.15 * 0.3, angularDecelaeration = frictionTorque/0.625;
         #print(angularAcceleration);
         #print("de"~angularDecelaeration);
         
@@ -88,8 +90,8 @@ var Engine = {
             }
         }
    
-        rps = angularSpeed / 6.2831853;
-        rpm = rps*60;
+        #//rps = angularSpeed / 6.2831853;
+        rpm = angularSpeed * 9.5492966; #//rps * 60
     
         me.rpm = rpm;
         props.getNode("/",1).setValue("/controls/engines/engine/rpma",rpm);

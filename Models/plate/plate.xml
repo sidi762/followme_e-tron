@@ -5,6 +5,12 @@
 
 <path>plate.ac</path>
 
+<effect>
+    <inherits-from>plate</inherits-from>
+    <object-name>face</object-name>
+    <object-name>back</object-name>
+</effect>
+
 <animation>
  <type>material</type>
  <object-name>face</object-name>

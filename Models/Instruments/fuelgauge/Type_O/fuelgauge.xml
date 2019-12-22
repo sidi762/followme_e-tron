@@ -4,10 +4,11 @@
 	
  <path>fuelgauge.ac</path>
  <effect>
-     <inherits-from>fuelgauge-light</inherits-from>
+     <inherits-from>fuelgauge</inherits-from>
      <object-name>face</object-name>
      <object-name>needle</object-name>
  </effect>
+
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>

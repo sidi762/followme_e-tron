@@ -10,8 +10,9 @@
 <path>speedometer.ac</path>
 
 
+
 <effect>
-    <inherits-from>face-light</inherits-from>
+    <inherits-from>Effects/face-effects</inherits-from>
     <object-name>digit.1</object-name>
     <object-name>digit.2</object-name>
     <object-name>digit.3</object-name>
