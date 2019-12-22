@@ -215,7 +215,7 @@
 		<internal archive="y">true</internal>
 		<config>
 			<x-offset-m archive="y" type="double">-0.35</x-offset-m>
-			<y-offset-m archive="y" type="double">1.35</y-offset-m>
+			<y-offset-m archive="y" type="double">1.21</y-offset-m>
 			<z-offset-m archive="y" type="double">1.88</z-offset-m>
 			<pitch-offset-deg>-10.0</pitch-offset-deg>
 			<field-of-view>65</field-of-view>
@@ -680,6 +680,9 @@
     <autopilot>
      <file>Aircraft/followme_e-tron/Nasal/auto_crash.nas</file>
     </autopilot>
+    <musicplayer>
+     <file>Aircraft/followme_e-tron/MusicPlayer/musicplayer.nas</file>
+    </musicplayer>
 </nasal>
 
 </PropertyList>
