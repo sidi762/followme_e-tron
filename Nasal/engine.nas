@@ -1,3 +1,4 @@
+#//Followme EV electric engine by Sidi Liang
 var Engine = {
     #//Class for any electric engine
     #//mTorque: Max torque, mPower: Max Power, rpmAtMPower: RPM at max power

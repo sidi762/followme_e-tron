@@ -1,4 +1,4 @@
-
+#//Followme EV electrical system by Sidi Liang
 var kWh2kWs = func(kWh){
     return kWh * 3600;
 }
