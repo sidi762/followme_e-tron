@@ -318,9 +318,11 @@
                 <name>Plate Selection</name>
                 <property>/systems/plate</property>
                 <value>NONE</value>
+                <value>JLH0762</value>
                 <value>JAD00762</value>
                 <value>YBD00404</value>
-                <value>JLH0762</value>
+                <value>YAD07749</value>
+               
                 <binding>
         			<command>dialog-apply</command>
         			<object-name>plateSelection</object-name>

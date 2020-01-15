@@ -46,5 +46,17 @@
  </condition>
  <texture>texture/YBD00404.png</texture>
 </animation>
+
+<animation>
+ <type>material</type>
+ <object-name>face</object-name>
+ <condition>
+	<equals>
+		<property>sim/multiplay/generic/string[0]</property>
+		<value>YAD07749</value>
+	</equals>
+ </condition>
+ <texture>texture/YAD07749.png</texture>
+</animation>
  
 </PropertyList>
