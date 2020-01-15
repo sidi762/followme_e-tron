@@ -124,6 +124,22 @@
 	</volume>
   </indicatorEnd>
   
+  
+  <music>
+	<name>music</name>
+	<mode>once</mode>
+	<path>Aircraft/followme_e-tron/MusicPlayer/Music/Example/Inspiration_mono.wav</path>
+	<condition>
+  	    <equals>
+			<property>/controls/music_player/control</property>
+			<value>1</value>
+		</equals>
+	</condition>
+	<volume>
+        <property>/controls/music_player/volume</property>
+	</volume>
+  </music>
+  
 
 </fx>
  

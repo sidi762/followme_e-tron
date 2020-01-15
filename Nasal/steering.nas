@@ -1,0 +1,115 @@
+#//Followme EV steering system by Sidi Liang
+var Steering = {
+    
+    new: func() {
+        print("Steering system initialized!");
+        return {parents:[Steering]}; 
+    },
+    
+    mode: 0, #//0: direct; 1: advanced
+    
+    debugMode: 0,
+    
+    input: 0, #//-1: left, 1:right, 0: none
+    command: 0, #//Steering command, range from -1 to 1
+    steeringAngle: 0, #//in rad
+    steeringAngleDeg: 0, #//in degrees
+    
+    steeringLimit: 15.707963, #// 5 * 3.1415926
+    steeringStep : func(rad){
+        return 0.1 * math.pow(math.abs(rad), 0.5)+0.05;
+    },
+    neutralStep : func(rad){
+        var speed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]");
+        return 0.01 * math.pow(math.abs(speed), 0.5) * math.abs(rad);
+    },
+    
+    mainLoop: func(){
+        if(math.abs(me.steeringAngle) < 0.1 and me.input == 0) me.steeringAngle = 0;
+        if(me.input == 0 and me.steeringAngle == 0){
+            me.stopTimer();
+            return 0;
+        }else if(me.input == 0 and me.steeringAngle > 0.1){
+            me.steeringAngle -= me.neutralStep(me.steeringAngle);
+        }else if(me.input == 0 and me.steeringAngle < 0.1){
+            me.steeringAngle += me.neutralStep(me.steeringAngle);
+        }else if(me.input == 1 and me.steeringAngle < me.steeringLimit){
+            me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
+        }else if(me.input == -1 and me.steeringAngle > me.steeringLimit * -1){
+            me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
+        }
+        
+        me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
+        me.steeringAngleDeg = me.steeringAngle * R2D;
+        props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
+        props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+        if(me.debugMode) print("Steering system command:" ~ me.command);
+        if(me.debugMode) print("Steering system angle rad:" ~ me.steeringAngle);
+        if(me.debugMode) print("Steering system angle degrees:" ~ me.steeringAngleDeg);
+    },
+    
+    inputLeft: func(){
+        me.input = -1;
+        if(!me.mode){
+            me.command = -0.5; 
+            me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
+            props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
+            props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+        }else if(me.mode and !me.timerStarted){
+            me.startTimer();
+        }
+    },
+    inputRight: func(){
+        me.input = 1;
+        if(!me.mode){
+            me.command = 0.5;
+            me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
+            props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
+            props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+        }else if(me.mode and !me.timerStarted){
+            me.startTimer();
+        }
+    },
+    neutral: func(){
+        me.input = 0;
+        if(!me.mode){
+            me.command = 0;
+            me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
+            props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
+            props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+        }else if(me.mode and !me.timerStarted){
+            me.startTimer();
+        }
+    },
+    
+    steeringTimer: nil,
+    timerCreated: 0,
+    timerStarted: 0,
+    startTimer: func(){
+        if(!me.timerCreated){
+            me.steeringTimer = maketimer(0.01, func me.mainLoop());
+            me.timerCreated = 1;
+            me.steeringTimer.simulatedTime = 1;
+            if(me.debugMode) print("Steering system timer created!");
+        }
+        me.steeringTimer.start();
+        me.timerStarted = 1;
+        if(me.debugMode) print("Steering system timer started!");
+    },
+    stopTimer: func(){
+        me.steeringTimer.stop();
+        me.timerStarted = 0;
+        if(me.debugMode) print("Steering system timer stopped!");
+    },
+};
+
+
+var steeringAssistance = Steering.new();
+addcommand("enableAdvancedSteering", func() {
+    steeringAssistance.mode = 1;
+    print("Advanced Steering Enabled");
+});
+addcommand("disableAdvancedSteering", func() {
+    steeringAssistance.mode = 0;
+    print("Advanced Steering Disabled");
+});

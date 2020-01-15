@@ -292,11 +292,11 @@
 		</key>
 		<key>
 			<name>a</name>
-			<desc>Steer left 50%</desc>
+			<desc>Steer left</desc>
 		</key>
 		<key>
 			<name>d</name>
-			<desc>Steer right 50%</desc>
+			<desc>Steer right</desc>
 		</key>
 		<key>
 			<name>space</name>
@@ -425,6 +425,8 @@
         <float n="16" alias="/systems/electrical/e-tron/battery-kWh"/>
         <float n="17" alias="/systems/electrical/e-tron/battery-remaining-percent-float"/>
         
+        <float n="18" alias="/controls/steering_wheel"/>
+        
         <string n="0" alias="/systems/plate"/>
         <string n="1" alias="/systems/battery-gauge/type"/>
         <string n="2" alias="/systems/speedometer/type"/>
@@ -539,17 +541,15 @@
             <name>a</name>
             <desc>rudder-left</desc>
             <repeatable>false</repeatable>
-            <binding>
-                <command>property-assign</command>
-                <property>/controls/flight/rudder</property>
-                <value>-0.5</value>
-            </binding>
+			<binding> 
+				<command>nasal</command>
+                <script>followme.steeringAssistance.inputLeft();</script>
+			</binding>
             <mod-up>
-                <binding>
-                    <command>property-assign</command>
-                    <property>/controls/flight/rudder</property>
-                    <value>0</value>
-                </binding>
+    			<binding> 
+    				<command>nasal</command>
+                    <script>followme.steeringAssistance.neutral();</script>
+    			</binding>
             </mod-up>
         </key>
         <key n="99">
@@ -565,17 +565,15 @@
             <name>d</name>
             <desc>rudder-right</desc>
             <repeatable>false</repeatable>
-            <binding>
-                <command>property-assign</command>
-                <property>/controls/flight/rudder</property>
-                <value>0.5</value>
-            </binding>
+			<binding> 
+				<command>nasal</command>
+                <script>followme.steeringAssistance.inputRight();</script>
+			</binding>
             <mod-up>
-                <binding>
-                    <command>property-assign</command>
-                    <property>/controls/flight/rudder</property>
-                    <value>0</value>
-                </binding>
+    			<binding> 
+    				<command>nasal</command>
+                    <script>followme.steeringAssistance.neutral();</script>
+    			</binding>
             </mod-up>
         </key>
         <key n="32">
@@ -657,7 +655,8 @@
 <nasal>
 	<followme>
         <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
-		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>        
+		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/steering.nas</file>                
 	</followme>
 	<!--<screen>		
 		<file>Aircraft/followme_e-tron/Nasal/SmartScreen.nas</file>
@@ -683,6 +682,9 @@
     <musicplayer>
      <file>Aircraft/followme_e-tron/MusicPlayer/musicplayer.nas</file>
     </musicplayer>
+    <dialogs>
+     <file>Aircraft/followme_e-tron/gui/dialogs/config.nas</file>
+    </dialogs>
 </nasal>
 
 </PropertyList>
