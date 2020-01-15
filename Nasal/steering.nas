@@ -17,7 +17,7 @@ var Steering = {
     
     steeringLimit: 15.707963, #// 5 * 3.1415926
     steeringStep : func(rad){
-        return 0.1 * math.pow(math.abs(rad), 0.5)+0.05;
+        return 0.1 * math.pow(math.abs(rad), 0.5)+0.04;
     },
     neutralStep : func(rad){
         var speed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]");
@@ -25,18 +25,20 @@ var Steering = {
     },
     
     mainLoop: func(){
-        if(math.abs(me.steeringAngle) < 0.1 and me.input == 0) me.steeringAngle = 0;
+        if(math.abs(me.steeringAngle) < 0.05 and me.input == 0) me.steeringAngle = 0;
         if(me.input == 0 and me.steeringAngle == 0){
             me.stopTimer();
             return 0;
-        }else if(me.input == 0 and me.steeringAngle > 0.1){
+        }else if(me.input == 0 and me.steeringAngle > 0.05){
             me.steeringAngle -= me.neutralStep(me.steeringAngle);
-        }else if(me.input == 0 and me.steeringAngle < 0.1){
+        }else if(me.input == 0 and me.steeringAngle < -0.05){
             me.steeringAngle += me.neutralStep(me.steeringAngle);
         }else if(me.input == 1 and me.steeringAngle < me.steeringLimit){
             me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
+            if(me.steeringAngle < 0) me.steeringAngle += me.neutralStep(me.steeringAngle);
         }else if(me.input == -1 and me.steeringAngle > me.steeringLimit * -1){
             me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
+            if(me.steeringAngle > 0) me.steeringAngle -= me.neutralStep(me.steeringAngle);
         }
         
         me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
