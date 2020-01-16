@@ -1,4 +1,25 @@
 #//Followme EV steering system by Sidi Liang
+var cache = {
+    new: func return { parents:[cache] };
+};
+
+var memoize = { callback:nil };
+
+memoize.new = func(code) {
+    return { parents:[memoize], callback:code, cache:cache.new() };
+}
+
+memoize._save = func(value) me.cache[value] = me.callback(value);
+memoize.lookup = func(value) {
+    var found = me.cache[value];
+    if (found) {
+        #//print("cached:",found,"\n");
+        return found;
+    }
+    #//print("Calculated:", value);
+    return me._save(value);
+}
+
 var Steering = {
     
     new: func() {
@@ -16,16 +37,26 @@ var Steering = {
     steeringAngleDeg: 0, #//in degrees
     
     steeringLimit: 15.707963, #// 5 * 3.1415926
-    steeringStep : func(rad){
-        return 0.1 * math.pow(math.abs(rad), 0.5)+0.04;
+    
+    
+    powPointThree: memoize.new( func(value){
+        return math.pow(value, 0.3);
+    }),
+    
+    powPointOne: memoize.new( func(value){
+        return math.pow(value, 0.1);
+    }),
+    
+    steeringStep:func(rad){
+        return 0.1 * me.powPointOne.lookup(sprintf("%.1f", math.abs(rad))) + 0.04;
     },
-    neutralStep : func(rad){
+    neutralStep: func(rad){
         var speed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]");
-        return 0.01 * math.pow(math.abs(speed), 0.5) * math.abs(rad);
+        return 0.01 * me.powPointThree.lookup(sprintf("%.1f", math.abs(speed))) * math.abs(rad);
     },
     
     mainLoop: func(){
-        if(math.abs(me.steeringAngle) < 0.05 and me.input == 0) me.steeringAngle = 0;
+        if(math.abs(me.steeringAngle) < 0.2 and me.input == 0) me.steeringAngle = 0;
         if(me.input == 0 and me.steeringAngle == 0){
             me.stopTimer();
             return 0;
@@ -115,3 +146,4 @@ addcommand("disableAdvancedSteering", func() {
     steeringAssistance.mode = 0;
     print("Advanced Steering Disabled");
 });
+
