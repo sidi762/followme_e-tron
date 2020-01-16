@@ -56,7 +56,7 @@ var Steering = {
     },
     
     mainLoop: func(){
-        if(math.abs(me.steeringAngle) < 0.2 and me.input == 0) me.steeringAngle = 0;
+        if(math.abs(me.steeringAngle) <= 0.2 and me.input == 0) me.steeringAngle = 0;
         if(me.input == 0 and me.steeringAngle == 0){
             me.stopTimer();
             return 0;
@@ -65,11 +65,19 @@ var Steering = {
         }else if(me.input == 0 and me.steeringAngle < -0.05){
             me.steeringAngle += me.neutralStep(me.steeringAngle);
         }else if(me.input == 1 and me.steeringAngle < me.steeringLimit){
-            me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
-            if(me.steeringAngle < 0) me.steeringAngle += me.neutralStep(me.steeringAngle);
+            if(me.steeringAngle < 0){
+                me.steeringAngle += me.neutralStep(me.steeringAngle);
+                me.steeringAngle += 0.2 * me.input;
+            }else{
+                me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
+            }
         }else if(me.input == -1 and me.steeringAngle > me.steeringLimit * -1){
-            me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
-            if(me.steeringAngle > 0) me.steeringAngle -= me.neutralStep(me.steeringAngle);
+            if(me.steeringAngle > 0){
+                me.steeringAngle -= me.neutralStep(me.steeringAngle);
+                me.steeringAngle += 0.2 * me.input;
+            }else{
+                me.steeringAngle += me.steeringStep(me.steeringAngle) * me.input;
+            }
         }
         
         me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
