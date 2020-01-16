@@ -196,7 +196,7 @@ if you contacted me before making any changes to this software.
   		 <y-offset-m archive="y">1.19</y-offset-m>
   		 <z-offset-m archive="y">-18.2</z-offset-m>
   		 <pitch-offset-deg archive="y">-16.0</pitch-offset-deg>
-  		 <default-field-of-view-deg type="double">72</default-field-of-view-deg>
+  		 <default-field-of-view-deg type="double">81</default-field-of-view-deg>
      </config>
     </view>
     <view n="1">
