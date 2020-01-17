@@ -60,14 +60,17 @@ var Steering = {
         {
             if(math.abs(me.steeringAngle) <=0.2)
                 me.steeringAngle = 0;
+                me.steeringAngleDeg = me.steeringAngle * R2D;
+                props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
+                props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
             if(me.steeringAngle == 0)
             {
                 me.stopTimer();
                 return 0;
             }
-            else if(me.steeringAngle > 0.05)
+            else if(me.steeringAngle >= 0.05)
                 me.steeringAngle -= me.neutralStep(me.steeringAngle);
-            else if(me.steeringAngle < -0.05)
+            else if(me.steeringAngle =< -0.05)
                 me.steeringAngle += me.neutralStep(me.steeringAngle);
         }
         else if(me.input == 1 and me.steeringAngle < me.steeringLimit)
