@@ -59,10 +59,12 @@ var Steering = {
         if(me.input == 0)
         {
             if(math.abs(me.steeringAngle) <=0.2)
+            {
                 me.steeringAngle = 0;
                 me.steeringAngleDeg = me.steeringAngle * R2D;
                 props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
                 props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+            }
             if(me.steeringAngle == 0)
             {
                 me.stopTimer();
