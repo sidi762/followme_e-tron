@@ -72,7 +72,7 @@ var Steering = {
             }
             else if(me.steeringAngle >= 0.05)
                 me.steeringAngle -= me.neutralStep(me.steeringAngle);
-            else if(me.steeringAngle =< -0.05)
+            else if(me.steeringAngle <= -0.05)
                 me.steeringAngle += me.neutralStep(me.steeringAngle);
         }
         else if(me.input == 1 and me.steeringAngle < me.steeringLimit)
