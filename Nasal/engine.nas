@@ -85,7 +85,7 @@ var Engine = {
             if(angularSpeed + totalAcceleration * 0.1 > 10){
                 angularSpeed = angularSpeed + totalAcceleration * 0.1;
             }else if(angularSpeed + totalAcceleration * 0.1 < 10){
-                #print("angularSpeed + totalAcceleration * 0.01 < 10");
+                #print("angularSpeed + totalAcceleration * 0.1 < 10");
                 angularSpeed = angularSpeed + angularAcceleration * 0.1;
             }
         }else if(me.getDirection() == -1){

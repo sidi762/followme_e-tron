@@ -315,8 +315,12 @@
 			<desc>Toggle right indicator light</desc>
 		</key>
         <key>
-			<name>c</name>
+			<name>e</name>
 			<desc>Toggle auto-pilot system</desc>
+		</key>
+        <key>
+			<name>c</name>
+			<desc>Toggle auto-cruise system</desc>
 		</key>
 		<text>
 		You can select the message to be displayed on the bar, through the "Follow Me E > Select message" menu.
@@ -554,6 +558,15 @@
         </key>
         <key n="99">
             <name>c</name>
+            <desc>toggleSpeedHold</desc>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>autospeed.toggleSpeedHold();</script>
+            </binding>
+        </key>
+        <key n="101">
+            <name>e</name>
             <desc>toggle_auto_pilot</desc>
             <repeatable>false</repeatable>
             <binding>
@@ -679,9 +692,12 @@
     <autopilot>
      <file>Aircraft/followme_e-tron/Nasal/auto_crash.nas</file>
     </autopilot>
-    <musicplayer>
+    <autospeed>
+     <file>Aircraft/followme_e-tron/Nasal/auto_speed.nas</file>
+    </autospeed>
+    <!--<musicplayer>
      <file>Aircraft/followme_e-tron/MusicPlayer/musicplayer.nas</file>
-    </musicplayer>
+    </musicplayer> -->
     <dialogs>
      <file>Aircraft/followme_e-tron/gui/dialogs/config.nas</file>
     </dialogs>
