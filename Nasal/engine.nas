@@ -1,4 +1,5 @@
 #//Followme EV electric engine by Sidi Liang
+var N2LBS = 0.2248089;
 var Engine = {
     #//Class for any electric engine
     #//mTorque: Max torque, mPower: Max Power, rpmAtMPower: RPM at max power
@@ -17,7 +18,7 @@ var Engine = {
     isRunning: func(){
         return me.runningState;
     },
-    
+
     direction: 1,
     setDirection: func(dir){
         me.direction = dir;
@@ -40,6 +41,10 @@ var Engine = {
     getGear: func(){
         return me.gear;
     },
+    
+    rotor_moi: 2.5,
+    wheel_moi: 0.7688,
+    wheel_radius: 0.31, #//M
     
     rpm: 0,
     
@@ -64,7 +69,7 @@ var Engine = {
         var friction_lbs = props.getNode("/",1).getValue("fdm/jsbsim/forces/fbx-gear-lbs");
         var friction = 4.4492 * friction_lbs;
         #//var frictionTorque = friction * 0.045; 
-        var angularDecelaeration = friction * 0.072; #//frictionTorque = friction * 0.15 * 0.3, angularDecelaeration = frictionTorque/0.625;
+        var angularDecelaeration = friction * me.wheel_radius * (1/me.wheel_moi) * 0.25; #//frictionTorque = friction * wheel_radius, angularDecelaeration = frictionTorque/wheel_moi; 
         #print(angularAcceleration);
         #print("de"~angularDecelaeration);
         
@@ -80,7 +85,7 @@ var Engine = {
             if(angularSpeed + totalAcceleration * 0.1 > 10){
                 angularSpeed = angularSpeed + totalAcceleration * 0.1;
             }else if(angularSpeed + totalAcceleration * 0.1 < 10){
-                #print("angularSpeed + totalAcceleration * 0.1 < 10");
+                #print("angularSpeed + totalAcceleration * 0.01 < 10");
                 angularSpeed = angularSpeed + angularAcceleration * 0.1;
             }
         }else if(me.getDirection() == -1){
@@ -122,26 +127,26 @@ var Engine = {
         
         var cmdPower = throttle * me.ratedPower;
         #print("cmdPower: "~cmdPower);
-        me.activePower_kW = math.abs(me.rpm * me.torque / 10824);
+        me.activePower_kW = math.abs(me.rpm * me.torque / 9549);
        
         if(math.abs(me.rpm) < cmdRpm){
             #print("me.rpm < cmdRpm");
             me.torque = throttle * me.maxTorque * direction;
-            var angularAcceleration = me.torque / 0.175; #rad/s^2
+            var angularAcceleration = me.torque / me.rotor_moi; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
         }else if(throttle == 0){
             me.activePower_kW = 0;
             me.torque = 0;
-            var angularAcceleration = direction * math.abs(me.torque) / 0.175; #rad/s^2
+            var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
         }else{
             me.activePower_kW = cmdPower;
-            var angularAcceleration = direction * math.abs(me.torque) / 0.175; #rad/s^2
+            var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
-            me.torque = direction * math.abs(me.activePower_kW / me.rpm * 10824);
+            me.torque = direction * math.abs((9549 * me.activePower_kW) / me.rpm);
         }
     
-        var force = 3.33 * me.torque * me.gear;
+        var force = (1/me.wheel_radius) * me.torque * me.gear;#//unit: N
     
         me.outputForce = force;
         
@@ -150,7 +155,7 @@ var Engine = {
         }
         
         
-        outputForce(me.outputForce);
+        outputForce(me.outputForce * N2LBS);
    
     },
     
@@ -254,4 +259,3 @@ var stopEngine = func(){
     engine_1.stopEngine();
     print("Engine stopped");
 }
-
