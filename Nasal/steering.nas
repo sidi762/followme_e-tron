@@ -67,14 +67,14 @@ var Steering = {
         }else if(me.input == 1 and me.steeringAngle < me.steeringLimit){
             if(me.steeringAngle < 0){
                 me.steeringAngle += me.neutralStep(me.steeringAngle);
-                me.steeringAngle += 0.2 * me.input;
+                me.steeringAngle += 0.35 * me.input;
             }else{
                 me.steeringAngle += me.steeringStep(me.steeringAngle);
             }
         }else if(me.input == -1 and me.steeringAngle > 0 - me.steeringLimit){
             if(me.steeringAngle > 0){
                 me.steeringAngle -= me.neutralStep(me.steeringAngle);
-                me.steeringAngle -= 0.2;
+                me.steeringAngle -= 0.35;
             }else{
                 me.steeringAngle -= me.steeringStep(me.steeringAngle);
             }
