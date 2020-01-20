@@ -7,7 +7,7 @@
 	<author>Gijs de Rooy, 李维昊（Weihao Li）, 梁思地（Sidi Liang）, 罗启元（Qiyuan Luo），ValKmjolnir</author>
 	<status>early production</status>
     <long-description>
-        An electronic, High-Performance version of a follow me car with Chinese characteristics. 
+        An electronic, High-Performance version of a follow me car (Renault Kangoo I) with Chinese characteristics. 
     </long-description>
     
     <gui><style><colors>
@@ -23,7 +23,7 @@
         </splash-screen>                                
     </colors></style></gui>
     
-        <previews>
+    <previews>
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -191,11 +191,10 @@
 
 	<tags>
 		<tag>groundvehicle</tag>
-		<tag>1970s</tag>
-		<tag>1980s</tag>
 		<tag>1990s</tag>
 		<tag>2000s</tag>
 		<tag>2010s</tag>
+        <tag>2020s</tag>
 	</tags>
 	
 	<flight-model>jsb</flight-model>
@@ -211,6 +210,7 @@
         <path>Aircraft/followme_e-tron/followme-sound.xml</path>
         <switch type = "bool"></switch>
     </sound>
+    
 	<view n="/0">
 		<internal archive="y">true</internal>
 		<config>
@@ -221,37 +221,31 @@
 			<default-field-of-view-deg type="double">90</default-field-of-view-deg>
 		</config>
 	</view>
-
 	<view n="1">
 		<config>
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
-	
 	<view n="2">
 		<config>
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
-	
 	<view n="3">
 		<config>
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
-	
 	<view n="4">
 		<config>
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
-	
 	<view n="5">
 		<config>
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
-	
 	<view n="6">
 		<config>
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
@@ -304,7 +298,7 @@
 		</key>
 		<key>
 			<name>f</name>
-			<desc>Toggle false indicator light</desc>
+			<desc>Toggle fault indicator light</desc>
 		</key>
 		<key>
 			<name>[</name>
@@ -323,7 +317,7 @@
 			<desc>Toggle auto-cruise system</desc>
 		</key>
 		<text>
-		You can select the message to be displayed on the bar, through the "Follow Me E > Select message" menu.
+		You can select the message to be displayed on the bar, through the "Follow Me EV > Select message" menu.
 		</text>
 		<text>
 		For more options, see "Follow Me EV > Show Options" menu.
@@ -332,8 +326,14 @@
             e-tron Brought to you by FGPRC.
 		</text>
 	</help>
-	
-	<menubar>
+    
+    <systems>
+       <autopilot>
+           <serviceable>0</serviceable>
+       </autopilot>
+    </systems>
+      
+    <menubar>
 		<default>
 			<menu n="10">
 				<label>Follow Me EV</label>
@@ -459,8 +459,6 @@
 		<warning>1</warning>
 	</lighting>
 </controls>
-
-
 
 <input>
 	<keyboard>
