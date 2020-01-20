@@ -29,10 +29,33 @@ aircraft.livery.select("Blanco");
 props.getNode("/",1).setValue("/systems/horn", 0);
 props.getNode("/",1).setValue("/controls/mode", 1);
 
+var Sound = { 
+    new: func(filename, volume = 1, path=nil) {
+        var m = props.Node.new({
+            path : path,
+            file : filename,
+            volume : volume,
+        });
+        return m;
+     },
+}; 
+
+
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
 var rearleft_door = aircraft.door.new("/controls/doors/rearleft", 1);
 var rearright_door = aircraft.door.new("/controls/doors/rearright", 1);
+aircraft.door.toggle = func(){
+    var pos = me.getpos();
+    if(pos == 0){
+        me.open();
+        fgcommand("play-audio-sample", Sound.new(filename: 'door_open.wav', volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
+    }
+    if(pos == 1){
+        me.close();
+        fgcommand("play-audio-sample", Sound.new(filename: 'door_shut.wav', volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
+    }
+}
 
 beacon_switch = props.globals.getNode("controls/switches/warninglight", 2);
 var beacon = aircraft.light.new( "/sim/model/lights/warning", [0.5, 0.5], "/controls/lighting/warning" );
