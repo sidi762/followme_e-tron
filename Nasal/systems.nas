@@ -305,10 +305,12 @@ var indicatorController = IndicatorController.new();
 var chargeBatterySec = func(){
     #//var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
     #//var currentBattery = battery.getValue();
-    var batteryRemaining = circuit_1.parallelConnection[0].units[0].remaining;
-    if(batteryRemaining >= 288000){
+    var battery = circuit_1.parallelConnection[0].units[0];
+    var batteryRemaining = battery.remaining;
+    var batteryElecForce = battery.ratedElectromotiveForce;
+    if(batteryRemaining >= battery.electricalCapacity){
         screen.log.write("Battery is Successfully recharged!", 0, 0.584, 1);
-        chargeBatteryStop();
+        chargeBatteryStop(batteryElecForce);
     }
     #//battery.setValue(currentBattery+240);
     #//batteryRemaining += 240;
