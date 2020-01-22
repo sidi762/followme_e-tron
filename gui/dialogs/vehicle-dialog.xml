@@ -190,6 +190,10 @@
                           <property>systems/welcome-message</property>
                           <value>2</value>
                       </equals>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>3</value>
+                      </equals>
                   </or>
               </enable>
               <binding>
@@ -213,12 +217,43 @@
                           <property>systems/welcome-message</property>
                           <value>1</value>
                       </equals>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>3</value>
+                      </equals>
                   </or>
               </enable>
               <binding>
       			<command>property-assign</command>
       			<property>systems/welcome-message</property>
                   <value>2</value>
+              </binding>
+          </button>
+          <button>
+              <halign>left</halign>
+              <legend>Enable Special</legend>
+              <pref-width>100</pref-width>
+              <pref-height>28</pref-height>
+              <enable>
+                  <or>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>0</value>
+                      </equals>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>1</value>
+                      </equals>
+                      <equals>
+                          <property>systems/welcome-message</property>
+                          <value>2</value>
+                      </equals>
+                  </or>
+              </enable>
+              <binding>
+      			<command>property-assign</command>
+      			<property>systems/welcome-message</property>
+                  <value>3</value>
               </binding>
           </button>
         </group>

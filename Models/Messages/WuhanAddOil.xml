@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">Wuhan Add Oil</name>
+			<texture>Messages/WuhanAddOil.png</texture>
+		</livery>
+	</model>
+</sim>
+</PropertyList>

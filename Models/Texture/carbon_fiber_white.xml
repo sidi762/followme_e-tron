@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">Carbon fiber White</name>
+			<texture-fuse>Texture/carbon_fiber_white.png</texture-fuse>
+		</livery>
+	</model>
+</sim>
+</PropertyList>

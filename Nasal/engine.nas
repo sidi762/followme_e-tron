@@ -235,7 +235,7 @@ var outputForce = func(force){
     }
 }
 
-
+props.getNode("systems/welcome-message", 1).setValue(3);
 var startEngine = func(){
     if(!props.getNode("/controls/is-recharging").getValue()){
         
@@ -243,6 +243,8 @@ var startEngine = func(){
             props.getNode("/sim/messages/copilot", 1).setValue("Beijing di san tsui jiao tong wei ti xing nin, Dao lu tsian wan tiao, ann tsuan di yi tiao, xing che bull gui fun, tsin ren liang hang lei");
         }else if(props.getNode("systems/welcome-message", 1).getValue() == 2){
             props.getNode("/sim/messages/copilot", 1).setValue("This is a reminder from The Third District Traffic Commission of Beijing. There are thousands of roads, and the safety is the first. If you drive recklessly, your loved ones will be filled with tears.");
+        }else if(props.getNode("systems/welcome-message", 1).getValue() == 3){
+            props.getNode("/sim/messages/copilot", 1).setValue("Ben chea yee xeao do. This vehicle is disinfected.");
         }
         
         var signal = engine_1.startEngine();
