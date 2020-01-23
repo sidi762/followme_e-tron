@@ -248,7 +248,8 @@ if you contacted me before making any changes to this software.
 
   <nasal>
 	<followme>		
-		<file>Aircraft/followme_e-tron/Nasal/DualControl/followme_e-tron-PAX.nas</file>
+		<file>Aircraft/followme_e-tron/Nasal/DualControl/followme-PAX.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/systems.nas</file>
     </followme> 
     <!-- Dual control. -->
     <dual_control_tools>

@@ -11,7 +11,7 @@
 var DCT = dual_control_tools;
 
 ## Pilot/copilot aircraft identifiers. Used by dual_control.
-var pilot_type   = "Aircraft/followme_e-tron/Models/followme.xml";
+var pilot_type   = "Aircraft/followme_e-tron/Models/followmeEV.xml";
 var copilot_type = "Aircraft/followme_e-tron/Models/followme-PAX.xml";
 
 ############################ PROPERTIES MP ###########################
