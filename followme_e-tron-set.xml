@@ -180,6 +180,16 @@
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/6.jpg</path>
             </preview>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/7.jpg</path>
+            </preview>
+            <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/8.jpg</path>
+            </preview>
         </previews>
             
 	<rating>
