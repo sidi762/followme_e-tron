@@ -285,6 +285,8 @@ var CurrentSource = {
             me.electromotiveForce = me.ratedElectromotiveForce;
         }
     },
+    
+    #//Usage: followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull();
     resetRemainingToFull: func(){
         me.remaining = me.electricalCapacity;
     },

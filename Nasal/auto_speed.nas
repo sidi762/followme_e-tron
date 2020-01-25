@@ -6,9 +6,11 @@ var mode = 1;#//1:Hold 2:Auto Speed
 var leftBrakes = props.getNode("/controls/gear/brake-left",1);
 var rightBrakes = props.getNode("/controls/gear/brake-right",1);
 var throttleNode = props.getNode("/controls/engines/engine/throttle",1);
+var lastDeltaSpeed = 0;
 
 var autoSpeedMainLoop = func(){
     if(leftBrakes.getValue() == 1 or rightBrakes.getValue() == 1 or throttleNode.getValue() == 1){  #//Stop if full brakes or full throttle are manually applied
+        throttleNode.setValue(0);
         stopAutoSpeed();
     }
     var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]");
@@ -16,7 +18,7 @@ var autoSpeedMainLoop = func(){
     var throttle = 0;
     var brakes = 0; #//range from 0 to 1;
     if(deltaSpeed > 0){
-        throttle = deltaSpeed/targetSpeed - 0.05; #// Max throttle 0.95
+        throttle = (deltaSpeed / targetSpeed) - 0.05; #// Max throttle 0.95
     }else if(deltaSpeed <= -1.852){
         throttle = 0;
         brakes = ((0 - deltaSpeed) / targetSpeed) - 0.2; #// Max brake 0.8
@@ -26,6 +28,7 @@ var autoSpeedMainLoop = func(){
     throttleNode.setValue(throttle);
     leftBrakes.setValue(brakes);
     rightBrakes.setValue(brakes);
+    lastDeltaSpeed = deltaSpeed;
 }
 
 var autoSpeedTimer = maketimer(0.05,autoSpeedMainLoop);

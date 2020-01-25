@@ -270,11 +270,11 @@ var BatteryWidget = {
 		#//}else{
 		#//	m._nLevelPct 	= props.globals.initNode("/systems/electrical/battery-charge-percent-back",0.0,"DOUBLE");
 		#//}
-		m._nLevelPct 	= props.globals.initNode("/systems/electrical/e-tron/battery-remaining-percent",0.0,"DOUBLE");
+		m._nLevelPct 	= props.getNode("/systems/electrical/e-tron/battery-remaining-percent");
         
         
-		m._fraction	= m._nLevelPct.getValue();
-		m._capacity	= 100; #100 kWh (per pack)
+		m._fraction	= followme.circuit_1.parallelConnection[0].units[0].getRemainingPercentageFloat();
+		m._capacity	= 80; #80 kWh (per pack)
 			
 		m._cFrame 	= m._group.getElementById(m._name~"_Frame");
 		m._cFrameV 	= m._group.getElementById(m._name~"_Frame_Vis");
@@ -282,8 +282,8 @@ var BatteryWidget = {
 		m._cDataLevel 	= m._group.getElementById(m._name~"_Data_Level");
 		m._cDataAbs 	= m._group.getElementById(m._name~"_Data_Abs");
 				
-		m._cDataLevel.setText(sprintf("%3d",m._fraction*100)~" %");
-		m._cDataAbs.setText(sprintf("%3.1f",m._fraction*m._capacity)~" kWh");
+		m._cDataLevel.setText(sprintf("%3d",m._fraction)~" %");
+		m._cDataAbs.setText(sprintf("%3.1f",m._fraction*m._capacity*0.01)~" kWh");
 		
 		m._left		= m._cFrame.get("coord[0]");
 		m._right	= m._cFrame.get("coord[2]");
@@ -291,7 +291,7 @@ var BatteryWidget = {
 		return m;
 	},
 	setListeners : func(instance) {
-		append(me._listeners, setlistener(me._nLevelPct,func(n){me._onChargeLevelChange(n);},1,0) );
+		append(me._listeners, setlistener(me._nLevelPct,func(){me._onChargeLevelChange();},1,0) );
 		
 		me._cFrameV.addEventListener("drag",func(e){me._onChargeInputChange(e);});
 		me._cLevel.addEventListener("drag",func(e){me._onChargeInputChange(e);});
@@ -304,11 +304,11 @@ var BatteryWidget = {
 	deinit : func(){
 		me.removeListeners();	
 	},
-	_onChargeLevelChange : func(n){
-		me._fraction	= n.getValue();
-		
-		me._cDataLevel.setText(sprintf("%3d",me._fraction*100)~" %");
-		me._cDataAbs.setText(sprintf("%3.1f",me._fraction*me._capacity)~" kWh");
+	_onChargeLevelChange : func(){
+		me._fraction	= followme.circuit_1.parallelConnection[0].units[0].getRemainingPercentageFloat();
+        
+		me._cDataLevel.setText(sprintf("%3d",me._fraction)~" %");
+		me._cDataAbs.setText(sprintf("%3.1f",me._fraction*me._capacity*0.01)~" kWh");
 		
 		me._cLevel.set("coord[2]", me._left + (me._width * me._fraction));
 			
@@ -321,205 +321,8 @@ var BatteryWidget = {
 			newFraction = me._fraction + (e.deltaX/me._width);
 		}
 		newFraction = clamp(newFraction,0.0,1.0);
-		me._nLevelPct.setValue(newFraction);
+		followme.circuit_1.parallelConnection[0].units[0].remaining = newFraction * m._capacity;
 		
-	},
-};
-
-
-var WeightWidget = {
-	new: func(dialog,canvasGroup,name,widgets){
-		var m = {parents:[WeightWidget,SvgWidget.new(dialog,canvasGroup,name)]};
-		m._class = "WeightWidget";
-		m._widget = {};
-		
-		foreach(w;keys(widgets)){
-			if(widgets[w] != nil){
-				if(widgets[w]._class == "PayloadWidget"){
-					m._widget[w] = widgets[w];
-				}
-			}
-		}
-		
-		m._cWeightGrossKg 		= m._group.getElementById("Weight_Gross_Kg");
-		m._cWeightGrossLbs 		= m._group.getElementById("Weight_Gross_Lbs");
-		m._cWeightWarning	 	= m._group.getElementById("Weight_Warning");
-		m._cWeightPilotKg		 = m._group.getElementById("Weight_Pilot_Kg");
-		m._cWeightPilotLbs		 = m._group.getElementById("Weight_Pilot_Lbs");
-		m._cWeightCopilotKg		 = m._group.getElementById("Weight_Copilot_Kg");
-		m._cWeightCopilotLbs		 = m._group.getElementById("Weight_Copilot_Lbs");
-		m._cWeightBaggageKg	 	= m._group.getElementById("Weight_Baggage_Kg");
-		m._cWeightBaggageLbs	 	= m._group.getElementById("Weight_Baggage_Lbs");
-		
-		m._cCenterGravityX	 	= m._group.getElementById("Center_Gravity_X");
-		m._cCenterGravityXWarning 	= m._group.getElementById("Center_Gravity_Warn");
-		
-		m._nCGx		= props.globals.initNode("/fdm/jsbsim/inertia/cg-x-mm-rp",0.0,"DOUBLE"); #calculated CG distance to reference point, set via system in Systems/dialogs.xml
-		m._nGross 	= props.globals.initNode("/fdm/jsbsim/inertia/weight-lbs");
-		m._nPilot 	= props.globals.initNode("/payload/weight[0]/weight-lb");
-		m._nCopilot 	= props.globals.initNode("/payload/weight[1]/weight-lb");
-		m._nBaggage 	= props.globals.initNode("/payload/weight[2]/weight-lb");
-		m._nTakeoff 	= props.globals.initNode("/limits/mtow-lbs");
-		
-		
-		m._cgX  	= 0;
-		m._pilot 	= 0;
-		m._copilot 	= 0;
-		m._baggage 	= 0;
-		m._gross 	= 0;
-		m._takeoff  	= 0;
-		
-		m._takeoff = m._nTakeoff.getValue();
-		
-		return m;
-	},
-	setListeners : func(instance) {
-		append(me._listeners, setlistener(batteryPayload._nGrossWeight,func(n){me._onGrossWeightChange(n);},1,0) );
-		append(me._listeners, setlistener(me._nCGx,func(n){me._onCGChange(n);},1,0) );
-		
-	},
-	init : func(instance=me){
-		me.setListeners(instance);
-	},
-	deinit : func(){
-		me.removeListeners();	
-	},
-	_onGrossWeightChange : func(n){
-		
-		me._gross = me._nGross.getValue();
-		me._cWeightGrossKg.setText(sprintf("%5d",me._gross/KG2LB));
-		me._cWeightGrossLbs.setText(sprintf("%4d",me._gross));
-		
-		me._pilot = me._nPilot.getValue();
-		me._cWeightPilotKg.setText(sprintf("%5d",me._pilot/KG2LB));
-		me._cWeightPilotLbs.setText(sprintf("%4d",me._pilot));
-		
-		me._copilot = me._nCopilot.getValue();
-		me._cWeightCopilotKg.setText(sprintf("%5d",me._copilot/KG2LB));
-		me._cWeightCopilotLbs.setText(sprintf("%4d",me._copilot));
-		
-		me._baggage = me._nBaggage.getValue();
-		me._cWeightBaggageKg.setText(sprintf("%5d",me._baggage/KG2LB));
-		me._cWeightBaggageLbs.setText(sprintf("%4d",me._baggage));
-		
-		
-		if (me._gross > me._takeoff){
-			me._cWeightWarning.show();
-			me._cWeightGrossKg.setColor(COLOR["Red"]);
-			me._cWeightGrossLbs.setColor(COLOR["Red"]);
-		}else{
-			me._cWeightWarning.hide();
-			me._cWeightGrossKg.setColor(COLOR["Black"]);
-			me._cWeightGrossLbs.setColor(COLOR["Black"]);
-		}
-		
-		
-	},
-	_onCGChange : func(n){
-		
-		me._cgX = me._nCGx.getValue();
-		
- 		me._cCenterGravityX.setTranslation((me._cgX-200),0);
- 		
- 		if(me._cgX>195 and me._cgX<368){
-			me._cCenterGravityXWarning.hide();
-		}else{
-			me._cCenterGravityXWarning.show();
-		}
-		
-	},
-	
-	
-	
-};
-
-var PayloadWidget = {
-	new: func(dialog,canvasGroup,name,index){
-		var m = {parents:[PayloadWidget,SvgWidget.new(dialog,canvasGroup,name)]};
-		m._class = "PayloadWidget";
-		m._index 	= index;
-		
-		#debug.dump(m._listCategoryKeys);
-		
-		m._nRoot	= props.globals.getNode("/payload/weight["~m._index~"]");
-		m._nLable 	= m._nRoot.initNode("name","","STRING");
-		
-		### HACK : listener on /payload/weight[0]/weight-lb not working
-		###	   two props one for fdm(weight-lb) one for dialog(nt-weight-lb) listener
-		m._nWeightFdm 	= m._nRoot.initNode("weight-lb",0.0,"DOUBLE");
-		m._weight	= m._nWeightFdm.getValue(); # lbs
-		m._nWeight 	= m._nRoot.initNode("nt-weight-lb",m._weight,"DOUBLE");
-		
-		m._nCapacity 	= m._nRoot.initNode("max-lb",0.0,"DOUBLE");
-		
-		m._capacity	= m._nCapacity.getValue();
-		m._fraction	= m._weight / m._capacity;
-		
-		m._cFrame 	= m._group.getElementById(m._name~"_Frame");
-		m._cFrame_Pick 	= m._group.getElementById(m._name~"_Frame_Pick");
-		m._cLevel 	= m._group.getElementById(m._name~"_Level");
-		m._cLBS 	= m._group.getElementById(m._name~"_Lbs");
-		m._cKG		= m._group.getElementById(m._name~"_Kg");
-	
-		m._cLBS.setText(sprintf("%3.0f",m._weight));
-		m._cKG.setText(sprintf("%3.0f",m._weight));
-				
-		
-		m._left		= m._cFrame.get("coord[0]");
-		m._right	= m._cFrame.get("coord[2]");
-		m._width	= m._right - m._left;
-		
-		return m;
-	},
-	setListeners : func(instance) {
-		### FIXME : use one property remove the HACK
-		append(me._listeners, setlistener(me._nWeight,func(n){me._onWeightChange(n);},1,0) );
-		
-		me._cFrame_Pick.addEventListener("drag",func(e){me._onInputChange(e);});
-		me._cLevel.addEventListener("drag",func(e){me._onInputChange(e);});
-		me._cFrame_Pick.addEventListener("wheel",func(e){me._onInputChange(e);});
-		me._cLevel.addEventListener("wheel",func(e){me._onInputChange(e);});
-		
-			
-		
-	},
-	init : func(instance=me){
-		me.setListeners(instance);
-	},
-	deinit : func(){
-		me.removeListeners();	
-	},
-	setWeight : func(weight){
-		me._weight = weight;
-		
-		### HACK : set two props 
-		me._nWeight.setValue(me._weight);
-		me._nWeightFdm.setValue(me._weight);
-		
-	},
-	_onWeightChange : func(n){
-		me._weight	= me._nWeight.getValue();
-		#print("PayloadWidget._onWeightChange() ... "~me._weight);
-		
-		me._fraction	= me._weight / me._capacity;
-		
-		me._cLBS.setText(sprintf("%3.0f",me._weight));
-		me._cKG.setText(sprintf("%3.0f",me._weight/KG2LB));
-		
-		me._cLevel.set("coord[2]", me._left + (me._width * me._fraction));
-	},
-	_onInputChange : func(e){
-		var newFraction =0;
-		if(e.type == "wheel"){
-			newFraction = me._fraction + (e.deltaY/me._width);
-		}else{
-			newFraction = me._fraction + (e.deltaX/me._width);
-		}
-		newFraction = clamp(newFraction,0.0,1.0);
-		me._weight = me._capacity * newFraction;
-		
-		me.setWeight(me._weight);
-
 	},
 };
 
@@ -527,17 +330,10 @@ var PayloadWidget = {
 var BatteryPayloadClass = {
 	new : func(){
 		var m = {parents:[BatteryPayloadClass]};
-		m._nRoot 	= props.globals.initNode("/alphaelectro/dialog/config");
-		
-		m._nGrossWeight	= props.globals.initNode("/fdm/jsbsim/inertia/nt-weight-lbs",0.0,"DOUBLE"); #listener on weight-lbs not possible, set via system in Systems/fuelpayload.xml
+		m._nRoot 	= props.globals.initNode("/e-tron/dialog/config");
 		
 		m._name  = "Battery and Systems";
 		m._title = "Battery and Systems Settings";
-		m._fdmdata = {
-			grosswgt : "/fdm/jsbsim/inertia/weight-lbs",
-			payload  : "/payload",
-			cg       : "/fdm/jsbsim/inertia/cg-x-in",
-		};
 		
 		
 		m._listeners = [];
@@ -623,9 +419,7 @@ var BatteryPayloadClass = {
 		canvas.parsesvg(me._group, "Aircraft/followme_e-tron/gui/dialogs/config.svg",{"font-mapper": font_mapper});
 		
 		
-		
-		me._widget.Front 		= BatteryWidget.new(me,me._group,"Front");
-		me._widget.Rear 		= BatteryWidget.new(me,me._group,"Rear");
+		me._widget.Front = BatteryWidget.new(me,me._group,"Front");
 
 
 		
