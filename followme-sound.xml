@@ -96,7 +96,8 @@
 	</volume>
   </indicator>
   
-  <indicatorStart>
+  <!-- Switched to nasal to prevent bug
+    <indicatorStart>
 	<name>indicatorStartLeft</name>
 	<mode>once</mode>
 	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
@@ -166,7 +167,7 @@
         <value>0.001</value>
 	</volume>
   </indicatorEnd>
-  
+  -->
   
   <!--<music>
 	<name>music</name>
