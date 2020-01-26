@@ -4,23 +4,42 @@
 
  <fx>
  
-  <engine>
-   <name>rumble</name>
+  <!--<engine>
+   <name>motor</name>
    <mode>looped</mode>
-   <path>Sounds/rumble.wav</path>
+   <path>Sounds/avionics-400Hz.wav</path>
    <property>/controls/engines/engine/rpma</property>
    <volume>
     <property>/controls/engines/engine/rpma</property>
-    <factor>0.00007</factor>
+    <factor>0.0001</factor>
+    <min>0.0</min>
+    <max>0.6</max>
+    <offset>-0.01</offset>
+   </volume>
+   <pitch>
+    <property>/controls/engines/engine/rpma</property>
+    <factor>0.00002</factor>
+    <offset>0.7</offset>
+   </pitch>
+  </engine>
+  -->
+  <wind>
+   <name>rumble</name>
+   <mode>looped</mode>
+   <path>Sounds/rumble.wav</path>
+   <property>sim/multiplay/generic/float[15]</property>
+   <volume>
+    <property>sim/multiplay/generic/float[15]</property>
+    <factor>0.0008</factor>
     <min>0.0</min>
     <max>0.0</max>
    </volume>
    <pitch>
-    <property>/controls/engines/engine/rpma</property>
+    <property>sim/multiplay/generic/float[15]</property>
     <factor>0.005</factor>
     <offset>1.5</offset>
    </pitch>
-  </engine>
+  </wind>
   
   <!-- Removed due to copyright issues
     <safety>
@@ -81,6 +100,12 @@
 	<name>indicatorStartLeft</name>
 	<mode>once</mode>
 	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
+	<condition>
+      	<equals>
+    			<property>sim/current-view/internal</property>
+    			<value>1</value>
+    	</equals>
+	</condition>
 	<property>controls/lighting/indicator-left</property>
 	<volume>
         <value>0.001</value>
@@ -90,6 +115,12 @@
 	<name>indicatorStartRight</name>
 	<mode>once</mode>
 	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
+	<condition>
+      	<equals>
+    			<property>sim/current-view/internal</property>
+    			<value>1</value>
+    	</equals>
+	</condition>
 	<property>controls/lighting/indicator-right</property>
 	<volume>
         <value>0.001</value>
@@ -100,10 +131,16 @@
 	<mode>once</mode>
 	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
 	<condition>
-        <equals>
-            <property>controls/lighting/indicator-left</property>
-            <value>0</value>
-        </equals>
+        <and>
+            <equals>
+                <property>controls/lighting/indicator-left</property>
+                <value>0</value>
+            </equals>
+          	<equals>
+        			<property>sim/current-view/internal</property>
+        			<value>1</value>
+        	</equals>
+        </and>
     </condition>
 	<volume>
         <value>0.001</value>
@@ -114,10 +151,16 @@
 	<mode>once</mode>
 	<path>Aircraft/followme_e-tron/Sounds/IndicatorEnd.wav</path>
 	<condition>
-        <equals>
-            <property>controls/lighting/indicator-right</property>
-            <value>0</value>
-        </equals>
+        <and>
+            <equals>
+                <property>controls/lighting/indicator-right</property>
+                <value>0</value>
+            </equals>
+          	<equals>
+        			<property>sim/current-view/internal</property>
+        			<value>1</value>
+        	</equals>
+        </and>
     </condition>
 	<volume>
         <value>0.001</value>
