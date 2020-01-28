@@ -38,7 +38,7 @@
      </less-than>
  </condition>
  <property>sim/multiplay/generic/float[15]</property>
- <factor>4.167</factor>
+ <factor>1.1112</factor>
  <center>
   <x-m>0.0</x-m>
   <y-m>0.0</y-m>
@@ -62,35 +62,12 @@
           </greater-than>
           <less-than>
             <property>sim/multiplay/generic/float[15]</property>
-            <value type="double">43.196</value>
+            <value type="double">269.9784</value>
           </less-than>
       </and>
   </condition>
   <property>sim/multiplay/generic/float[15]</property>
-  <factor>-1.389</factor>
-  <center>
-   <x-m>0.0</x-m>
-   <y-m>0.0</y-m>
-   <z-m>0.0</z-m>
-  </center>
-  <axis>
-   <x>1.0</x>
-   <y>0.0</y>
-   <z>0.0</z>
-  </axis>
- </animation>
- 
- <animation>
-  <type>rotate</type>
-  <object-name>needle</object-name>
-  <condition>
-      <less-than>
-        <property>sim/multiplay/generic/float[15]</property>
-        <value type="double">151.187</value>
-      </less-than>
-  </condition>
-  <property>sim/multiplay/generic/float[15]</property>
-  <factor>-1.389</factor>
+  <factor>-1.1112</factor>
   <center>
    <x-m>0.0</x-m>
    <y-m>0.0</y-m>
@@ -109,10 +86,10 @@
   <condition>
       <greater-than>
         <property>sim/multiplay/generic/float[15]</property>
-        <value type="double">151.187</value>
+        <value type="double">269.9784</value>
       </greater-than>
   </condition>
-  <value>-278.611</value>
+  <value>-330</value>
   <center>
    <x-m>0.0</x-m>
    <y-m>0.0</y-m>

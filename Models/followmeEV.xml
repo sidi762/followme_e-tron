@@ -112,7 +112,7 @@
          <value>1</value>
      </equals>
     
- </condition>-
+ </condition>
 </animation>
 
 
@@ -139,6 +139,21 @@
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.25</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
+
+<model> 
+	<condition>
+		<equals>
+			<property>sim/multiplay/generic/string[1]</property>
+			<value>Type_BT</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
  <offsets> 
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
@@ -229,6 +244,21 @@
 		</equals>
 	</condition> 
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_B/speedometer.xml</path>
+ <offsets> 
+  <x-m>1.31</x-m>
+  <y-m>-0.38</y-m>
+  <z-m>1.03</z-m>
+ </offsets>
+</model>
+
+<model> 
+	<condition>
+		<equals>
+			<property>sim/multiplay/generic/string[2]</property>
+			<value>Type_BT</value>
+		</equals>
+	</condition> 
+    <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_BT/speedometer.xml</path>
  <offsets> 
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>

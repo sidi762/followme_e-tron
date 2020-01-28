@@ -309,6 +309,7 @@
                     <value>Type_A</value>
                     <value>Type_M</value>
                     <value>Type_B</value>
+                    <value>Type_BT</value>
                     <value>Concept</value>
                     <value>Original</value>
                     <binding>
@@ -331,6 +332,7 @@
                     <property>/systems/battery-gauge/type</property>
                     <value>Type_A</value>
                     <value>Type_M</value>
+                    <value>Type_BT</value>
                     <value>Concept</value>
                     <value>Original</value>
                     <binding>

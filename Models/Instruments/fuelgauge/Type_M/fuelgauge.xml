@@ -6,8 +6,13 @@
  <effect>
      <inherits-from>fuelgauge-light</inherits-from>
      <object-name>face</object-name>
+ </effect>
+ 
+ <effect>
+     <inherits-from>needle-light</inherits-from>
      <object-name>needle</object-name>
  </effect>
+ 
  <animation>
   <type>rotate</type>
   <object-name>needle</object-name>
