@@ -29,6 +29,11 @@ aircraft.livery.select("Blanco");
 props.getNode("/",1).setValue("/systems/horn", 0);
 props.getNode("/",1).setValue("/controls/mode", 1);
 
+
+var isInternalView = func(){ #// return 1 if is in internal view, otherwise return 0.
+    return props.getNode("sim/current-view/internal", 1).getValue();
+}
+
 var Sound = { 
     new: func(filename, volume = 1, path=nil) {
         var m = props.Node.new({
@@ -40,6 +45,9 @@ var Sound = {
      },
 }; 
 
+var playAudio = func(file){
+    fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
+}
 
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
@@ -49,11 +57,11 @@ aircraft.door.toggle = func(){
     var pos = me.getpos();
     if(pos == 0){
         me.open();
-        fgcommand("play-audio-sample", Sound.new(filename: 'door_open.wav', volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
+        playAudio('door_open.wav');
     }
     if(pos == 1){
         me.close();
-        fgcommand("play-audio-sample", Sound.new(filename: 'door_shut.wav', volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
+        playAudio('door_shut.wav');
     }
 }
 
@@ -95,7 +103,6 @@ props.getNode("systems/screen-enable", 1).setValue(0);
 #};
 
 
-
 var Indicator = {
     
     #     Usage:                                        #
@@ -126,9 +133,6 @@ var Indicator = {
     },
 };
 
-
-
-
 var IndicatorController = {
     
     #
@@ -149,8 +153,6 @@ var IndicatorController = {
     #
     #
     
-    
-    
     new: func() { return { parents:[IndicatorController]}; },
     
     leftIndicator : Indicator.new("left"),
@@ -165,25 +167,20 @@ var IndicatorController = {
     currentMessage: "",
     
     textureRight: "Messages/right.png",
-    
     textureLeft: "Messages/left.png",
     
     saveLedMessage: func(){
         me.currentMessage = me.ledMessage.getValue();
     },
-    
     getSavedMessage: func(){
         return me.currentMessage;
     },
-    
     clearSavedMessage: func(){
         me.currentMessage = "";
     },
-    
     setLedMessage: func(content){
         me.ledMessage.setValue(content);
     },
-    
     resumeLedMessage: func(){
         if(me.getSavedMessage()){
             me.setLedMessage(me.getSavedMessage());
@@ -194,7 +191,6 @@ var IndicatorController = {
     getMode: func(){
         return me.mode;
     },
-    
     setMode: func(targetMode){
         if(targetMode == 0){
             me.resumeLedMessage();
@@ -251,14 +247,15 @@ var IndicatorController = {
     },
     
     right_indicator_toggle : func(){
+        if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.getMode() != 4){
             me.setMode(4);
         }else if(me.getMode() == 4){
             me.setMode(0);
         }
     },
-    
     left_indicator_toggle : func(){
+        if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.getMode() != 5){
             me.setMode(5);
         }else if(me.getMode() == 5){
@@ -276,10 +273,8 @@ var IndicatorController = {
         }
         
     },
-    
     falseLightOff : func(){
         me.falseLight = 0;
-        
         if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
            print("falseLight mode off");
         }else{
@@ -287,19 +282,27 @@ var IndicatorController = {
             print("falseLight turned off");
         }
     },
-    
     false_light_toggle : func(){
+        if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.falseLight == 0){
             me.falseLightOn();
         }else if(me.falseLight == 1){
             me.falseLightOff();
         }
     },
-    
 };
 
 var indicatorController = IndicatorController.new();
 
+var toggleHandBrake = func(){
+    if(isInternalView()) playAudio("electric_handbrake.wav");
+    var handBrake = props.getNode("/controls/gear/brake-parking", 1);
+    if(!handBrake.getValue()){
+        handBrake.setValue(1);
+    }else{
+        handBrake.setValue(0);
+    }
+}
 
 
 var chargeBatterySec = func(){
@@ -342,7 +345,6 @@ var chargeBatteryStart = func(){
         chargeBatteryStop(batteryElecForce);
     }
 }
-
 var chargeBatteryStop = func(bef){
    chargeTimer.stop();
    circuit_1.parallelConnection[0].units[0].electromotiveForce = bef;
