@@ -230,9 +230,6 @@
 		<livery>
 			<file type="string"/>
 		</livery>
-        <sound>
-            <path>Aircraft/followme_e-tron/followme-sound.xml</path>
-        </sound>
 	</model> 
     <sound>
         <path>Aircraft/followme_e-tron/followme-sound.xml</path>
