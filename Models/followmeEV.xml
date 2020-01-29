@@ -420,6 +420,23 @@
 <!-- REAR WHEEL LEFT -->
 
 <animation>
+ <type>rotate</type>
+ <object-name>Tyre3</object-name>
+ <property>gear/gear[2]/steering-norm</property>
+ <factor>5</factor>
+ <center>
+  <x-m> 3.17</x-m>
+  <y-m> -0.557</y-m>
+  <z-m> 0.289</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
+
+<animation>
  <type>translate</type>
  <object-name>Tyre3</object-name>
  <property>sim/multiplay/generic/float[10]</property>
@@ -458,6 +475,23 @@
 </animation>
  
 <!-- REAR WHEEL RIGHT -->
+
+<animation>
+ <type>rotate</type>
+ <object-name>Tyre4</object-name>
+ <property>gear/gear[3]/steering-norm</property>
+ <factor>5</factor>
+ <center>
+  <x-m> 3.15</x-m>
+  <y-m> 0.557</y-m>
+  <z-m> 0.289</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>0.0</y>
+  <z>1.0</z>
+ </axis>
+</animation>
 
 <animation>
  <type>translate</type>
