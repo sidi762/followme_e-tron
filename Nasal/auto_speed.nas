@@ -18,7 +18,7 @@ var autoSpeedMainLoop = func(){
     var throttle = 0;
     var brakes = 0; #//range from 0 to 1;
     if(deltaSpeed > 0){
-        throttle = (deltaSpeed / targetSpeed) - 0.05; #// Max throttle 0.95
+        throttle = calculateThrottle(deltaSpeed / targetSpeed); #// Max throttle 0.9
     }else if(deltaSpeed <= -1.852){
         throttle = 0;
         brakes = ((0 - deltaSpeed) / targetSpeed) - 0.2; #// Max brake 0.8
@@ -29,6 +29,10 @@ var autoSpeedMainLoop = func(){
     leftBrakes.setValue(brakes);
     rightBrakes.setValue(brakes);
     lastDeltaSpeed = deltaSpeed;
+}
+
+var calculateThrottle = func(x){
+    return x/(x+0.1);
 }
 
 var autoSpeedTimer = maketimer(0.05,autoSpeedMainLoop);
