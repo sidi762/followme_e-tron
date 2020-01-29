@@ -205,7 +205,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/11.jpg</path>
             </preview>
-        </previews>
+    </previews>
             
 	<rating>
 		<FDM type="int">4</FDM>
@@ -230,11 +230,15 @@
 		<livery>
 			<file type="string"/>
 		</livery>
+        <sound>
+            <path>Aircraft/followme_e-tron/followme-sound.xml</path>
+        </sound>
 	</model> 
     <sound>
         <path>Aircraft/followme_e-tron/followme-sound.xml</path>
         <switch type = "bool"></switch>
     </sound>
+    
     
 	<view n="/0">
 		<internal archive="y">true</internal>
