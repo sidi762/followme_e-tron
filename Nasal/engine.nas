@@ -42,9 +42,9 @@ var Engine = {
         return me.gear;
     },
     
-    rotor_moi: 2.5,
-    wheel_moi: 0.7688,
-    wheel_radius: 0.31, #//M
+    rotor_moi: 2.3,
+    wheel_moi: 0.9,
+    wheel_radius: 0.31,#//M
     
     rpm: 0,
     
@@ -67,9 +67,8 @@ var Engine = {
         var angularSpeed = rpm * 0.10471975; #//rps * 2 * 3.1415926
     
         var friction_lbs = props.getNode("/",1).getValue("fdm/jsbsim/forces/fbx-gear-lbs");
-        var friction = 4.4492 * friction_lbs;
-        #//var frictionTorque = friction * 0.045; 
-        var angularDecelaeration = friction * me.wheel_radius * (1/me.wheel_moi) * 0.25; #//frictionTorque = friction * wheel_radius, angularDecelaeration = frictionTorque/wheel_moi; 
+        var friction = 4.4492 * friction_lbs * 0.25;#//0.25: single wheel
+        var angularDecelaeration = friction * me.wheel_radius * (1/me.wheel_moi); #//frictionTorque = friction * wheel_radius, angularDecelaeration = frictionTorque/wheel_moi; 
         #print(angularAcceleration);
         #print("de"~angularDecelaeration);
         
