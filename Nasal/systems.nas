@@ -45,7 +45,7 @@ var Sound = {
      },
 }; 
 
-var playAudio = func(file){
+var playAudio = func(file){ #//Plays audio files in Aircrafts/Sounds
     fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
 }
 

@@ -160,22 +160,14 @@ var Engine = {
     
     engineTimer: nil,
     
-    timerCreated: 0,
-    
-    createTimer: func(){
-        if(!me.timerCreated){
-            me.engineTimer = maketimer(0.1, func me.update_engine());
-            me.timerCreated = 1;
-        }
-    },
-    
     startEngine: func(){
-        me.createTimer();
+        if(me.engineTimer == nil) me.engineTimer = maketimer(0.1, func me.update_engine());
         me.engineSwitch.switchConnect();
         me.runningState = 1;
         props.getNode("/",1).setValue("/controls/engines/engine/started",1);
         me.engineTimer.simulatedTime = 1;
         me.rpm = 100 * me.getDirection();
+        followme.playAudio("starter.wav");
         me.engineTimer.start();
         return 1;
     },
