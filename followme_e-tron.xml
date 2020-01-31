@@ -56,7 +56,7 @@
                 <z>-0.02</z>
             </location>
             <static_friction> 1.7 </static_friction>
-            <dynamic_friction> 0.70 </dynamic_friction>
+            <dynamic_friction> 1.0 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
@@ -71,7 +71,7 @@
                 <z>-0.02</z>
             </location>
             <static_friction> 1.7 </static_friction>
-            <dynamic_friction> 0.70 </dynamic_friction>
+            <dynamic_friction> 1.0 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
@@ -86,7 +86,7 @@
                 <z>-0.03</z>
             </location>
             <static_friction> 1.7 </static_friction>
-            <dynamic_friction> 0.70 </dynamic_friction>
+            <dynamic_friction> 1.5 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
@@ -101,7 +101,7 @@
                 <z>-0.03</z>
             </location>
             <static_friction> 1.7 </static_friction>
-            <dynamic_friction> 0.70 </dynamic_friction>
+            <dynamic_friction> 1.5 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
