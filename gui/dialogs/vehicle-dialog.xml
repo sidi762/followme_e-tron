@@ -163,6 +163,10 @@
                         <property>systems/welcome-message</property>
                         <value>2</value>
                     </equals>
+                    <equals>
+                        <property>systems/welcome-message</property>
+                        <value>3</value>
+                    </equals>
                 </or>
             </enable>
             <binding>
