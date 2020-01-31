@@ -4,25 +4,25 @@
 
  <fx>
  
-  <!--<engine>
+  <engine>
    <name>motor</name>
    <mode>looped</mode>
-   <path>Sounds/avionics-400Hz.wav</path>
-   <property>/controls/engines/engine/rpma</property>
+   <path>Sounds/motor.wav</path>
+   <property>sim/multiplay/generic/float[15]</property>
    <volume>
-    <property>/controls/engines/engine/rpma</property>
-    <factor>0.0001</factor>
-    <min>0.0</min>
-    <max>0.6</max>
-    <offset>-0.01</offset>
+    <property>sim/multiplay/generic/float[15]</property>
+    <factor>0.1</factor>
+    <min>1</min>
+    <max>2</max>
+    <offset>1</offset>
    </volume>
    <pitch>
-    <property>/controls/engines/engine/rpma</property>
-    <factor>0.00002</factor>
-    <offset>0.7</offset>
+    <property>sim/multiplay/generic/float[15]</property>
+    <factor>0.01</factor>
+    <offset>0.1</offset>
    </pitch>
   </engine>
-  -->
+ 
   <wind>
    <name>rumble</name>
    <mode>looped</mode>
@@ -32,7 +32,7 @@
     <property>sim/multiplay/generic/float[15]</property>
     <factor>0.0008</factor>
     <min>0.0</min>
-    <max>0.0</max>
+    <max>1.0</max>
    </volume>
    <pitch>
     <property>sim/multiplay/generic/float[15]</property>
