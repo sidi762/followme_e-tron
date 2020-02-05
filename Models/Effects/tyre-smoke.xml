@@ -62,7 +62,7 @@
 		<counter>
 			<particles-per-sec>
 				<value>50</value>
-				<spread>0</spread>
+				<spread>10</spread>
 			</particles-per-sec>
 		</counter>
 
@@ -111,7 +111,7 @@
 				<value>1</value>
 			</life-sec>
 			<mass-kg>0.075</mass-kg>
-			<radius-m>0.1</radius-m>
+			<radius-m>0.01</radius-m>
 		</particle>
 
 		<program>
