@@ -26,6 +26,12 @@ liveryFuse.init("Aircraft/followme_e-tron/Models/Texture");
 
 aircraft.livery.select("Blanco");
 
+var tyreSmoke_0 = aircraft.tyresmoke.new(0, auto = 1, diff_norm = 0.4, check_vspeed = 0);
+var tyreSmoke_1 = aircraft.tyresmoke.new(1, auto = 1, diff_norm = 0.4, check_vspeed = 0);
+var tyreSmoke_2 = aircraft.tyresmoke.new(2, auto = 1, diff_norm = 0.4, check_vspeed = 0);
+var tyreSmoke_3 = aircraft.tyresmoke.new(3, auto = 1, diff_norm = 0.4, check_vspeed = 0);
+
+
 props.getNode("/",1).setValue("/systems/horn", 0);
 props.getNode("/",1).setValue("/controls/mode", 1);
 
@@ -34,7 +40,7 @@ var isInternalView = func(){ #// return 1 if is in internal view, otherwise retu
     return props.getNode("sim/current-view/internal", 1).getValue();
 }
 
-var Sound = { 
+var Sound = {
     new: func(filename, volume = 1, path=nil) {
         var m = props.Node.new({
             path : path,
@@ -43,7 +49,7 @@ var Sound = {
         });
         return m;
      },
-}; 
+};
 
 var playAudio = func(file){ #//Plays audio files in Aircrafts/Sounds
     fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
@@ -88,28 +94,28 @@ props.getNode("/systems/codriver-enable", 1).setValue(0);
 props.getNode("systems/screen-enable", 1).setValue(0);
 
 #var Led = {
-#    
+#
 #    new: func() { return { parents:[Led] },
 #    node: props.getNode("/sim/model/livery/texture",1),
 #    blankTexture: "Messages/blanco.png",
 #    currentMessage: "",
 #    messageHistory : [],
-#    
+#
 #    display: func(content){
 #        me.node.setValue(content);
 #    },
-#    
-#    
+#
+#
 #};
 
 
 var Indicator = {
-    
+
     #     Usage:                                        #
     #  var leftIndicator = Indicator.new("left");       #
     #  var rightIndicator = Indicator.new("right");     #
     #                                                   #
-    
+
     type: "",
     new: func(type) { return { parents:[Indicator], type: type}; },
     state: 0,
@@ -134,7 +140,7 @@ var Indicator = {
 };
 
 var IndicatorController = {
-    
+
     #
     #   Usage:
     #       mode:
@@ -152,23 +158,23 @@ var IndicatorController = {
     #
     #
     #
-    
+
     new: func() { return { parents:[IndicatorController]}; },
-    
+
     leftIndicator : Indicator.new("left"),
     rightIndicator : Indicator.new("right"),
-    
+
     mode:0,
-    
+
     falseLight: 0,
-    
+
     ledMessage: props.getNode("/sim/model/livery/texture",1),
-    
+
     currentMessage: "",
-    
+
     textureRight: "Messages/right.png",
     textureLeft: "Messages/left.png",
-    
+
     saveLedMessage: func(){
         me.currentMessage = me.ledMessage.getValue();
     },
@@ -187,7 +193,7 @@ var IndicatorController = {
             me.clearSavedMessage();
         }
     },
-    
+
     getMode: func(){
         return me.mode;
     },
@@ -197,11 +203,11 @@ var IndicatorController = {
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
-            
+
             if(me.falseLight == 1){
                 me.setMode(3);
             }
-            
+
         }else if(targetMode == 1){
             me.resumeLedMessage();
             me.rightIndicator.switchOn();
@@ -218,26 +224,26 @@ var IndicatorController = {
             me.leftIndicator.switchOn();
             me.mode = targetMode;
         }else if(targetMode == 4){
-            
+
             me.resumeLedMessage();
             me.saveLedMessage();
-            
+
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOff();
-            
+
             me.setLedMessage(me.textureRight);
-            
+
             me.mode = targetMode;
         }else if(targetMode == 5){
-            
+
             me.resumeLedMessage();
             me.saveLedMessage();
-            
+
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
-            
+
             me.setLedMessage(me.textureLeft);
-            
+
             me.mode = targetMode;
         }else if(targetMode == 6){
             me.mode = targetMode;
@@ -245,7 +251,7 @@ var IndicatorController = {
             return 0;
         }
     },
-    
+
     right_indicator_toggle : func(){
         if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.getMode() != 4){
@@ -262,7 +268,7 @@ var IndicatorController = {
             me.setMode(0);
         }
     },
-    
+
     falseLightOn : func(){
         me.falseLight = 1;
         if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
@@ -271,7 +277,7 @@ var IndicatorController = {
             me.setMode(3);
             print("falseLight turned on");
         }
-        
+
     },
     falseLightOff : func(){
         me.falseLight = 0;
@@ -367,13 +373,13 @@ var calculateSpeed = func(){
     }else if(speedKmh >= 280){
         calculated = 280;
     }
-   
+
     if(calculated <= 120){
         output = calculated * 3/2;
     }else if(calculated > 120){
         output = calculated * 3/4;
     }
-    
+
     props.getNode("systems/display-speed", 1).setValue(output);
 }
 var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
@@ -407,5 +413,3 @@ var brakeWithABS = func(){ #//Doesn't seems to work as it seems that jsbsim whee
 }
 
 #setlistener("/controls/gear/brake-cmd", brakeWithABS);
-
-

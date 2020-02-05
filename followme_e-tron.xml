@@ -420,7 +420,7 @@
     </propulsion>
 
     <flight_control name="Truck">
-        
+
         <channel name="Steer">
             <summer name="Steer Sum">
                 <input>fcs/rudder-cmd-norm</input>
@@ -456,7 +456,7 @@
             <z>-0.02</z>
         </location>
         <direction>
-          <x>1</x> 
+          <x>1</x>
           <y>0</y>
           <z>0</z>
         </direction>
@@ -468,7 +468,7 @@
               <z>-0.02</z>
           </location>
         <direction>
-          <x>1</x> 
+          <x>1</x>
           <y>0</y>
           <z>0</z>
         </direction>
@@ -480,7 +480,7 @@
             <z>-0.03</z>
         </location>
         <direction>
-          <x>1</x> 
+          <x>1</x>
           <y>0</y>
           <z>0</z>
         </direction>
@@ -492,11 +492,10 @@
             <z>-0.03</z>
         </location>
         <direction>
-          <x>1</x> 
+          <x>1</x>
           <y>0</y>
           <z>0</z>
         </direction>
       </force>
     </external_reactions>
 </fdm_config>
-

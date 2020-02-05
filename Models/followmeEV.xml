@@ -1,16 +1,16 @@
 <PropertyList>
- 
+
 <path>followme.ac</path>
 
 <nasal>
  <load>
  var livery_update = aircraft.livery_update.new("Aircraft/followme_e-tron/Models/Messages");
  var liveryFuse_update = followme.liveryFuse_update.new("Aircraft/followme_e-tron/Models/Texture");
- </load>   
+ </load>
  <unload>
  livery_update.stop();
  livery2_update.stop();
- </unload>   
+ </unload>
 </nasal>
 
 <animation>
@@ -33,18 +33,18 @@
  <texture>followmeoutside.png</texture>
 </animation>
 
-<model> 
+<model>
  <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
- <offsets> 
+ <offsets>
   <x-m> 3.4</x-m>
   <y-m>-0.4</y-m>
   <z-m> 1.7</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
  <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
- <offsets> 
+ <offsets>
   <x-m> 3.4</x-m>
   <y-m> 0.4</y-m>
   <z-m> 1.7</z-m>
@@ -52,7 +52,7 @@
 </model>
 
 <!-- People -->
-<model> 
+<model>
  <condition>
 	<equals>
 		<property>systems/codriver-enable</property>
@@ -60,14 +60,14 @@
 	</equals>
  </condition>
  <path>Aircraft/followme_e-tron/Models/people/people.ac</path>
- <offsets> 
+ <offsets>
   <x-m> 2.6</x-m>
   <y-m> 0</y-m>
   <z-m> 1.255</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
  <condition>
 	<equals>
 		<property>systems/codriver-enable</property>
@@ -75,7 +75,7 @@
 	</equals>
  </condition>
  <path>Aircraft/followme_e-tron/Models/people/people2.ac</path>
- <offsets> 
+ <offsets>
   <x-m> 1.9</x-m>
   <y-m> 0</y-m>
   <z-m> 1.255</z-m>
@@ -83,7 +83,7 @@
 </model>
 
 <!-- PLATE -->
-<model> 
+<model>
 	<condition>
 	    <not>
 			<equals>
@@ -93,7 +93,7 @@
         </not>
 	</condition>
     <path>Aircraft/followme_e-tron/Models/plate/plate.xml</path>
-    <offsets> 
+    <offsets>
      <x-m> 0.01</x-m>
      <y-m> 0.0</y-m>
      <z-m> 0.39</z-m>
@@ -106,17 +106,17 @@
  <object-name>screen</object-name>
  <object-name>frame</object-name>
  <condition>
-    
+
      <equals>
          <property>sim/multiplay/generic/int[6]</property>
          <value>1</value>
      </equals>
-    
+
  </condition>
 </animation>
 
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
@@ -124,14 +124,14 @@
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_A/fuelgauge.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
@@ -139,14 +139,14 @@
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
@@ -154,14 +154,14 @@
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
@@ -169,14 +169,14 @@
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
@@ -184,14 +184,14 @@
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[2]</property>
@@ -199,92 +199,92 @@
 		</equals>
 	</condition>
      <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_A/speedometer.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[2]</property>
 			<value>Original</value>
 		</equals>
-	</condition> 
+	</condition>
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_O/speedometer.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[2]</property>
 			<value>Type_M</value>
 		</equals>
-	</condition> 
+	</condition>
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_M/speedometer.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[2]</property>
 			<value>Type_B</value>
 		</equals>
-	</condition> 
+	</condition>
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_B/speedometer.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[2]</property>
 			<value>Type_BT</value>
 		</equals>
-	</condition> 
+	</condition>
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_BT/speedometer.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
 
-<model> 
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[2]</property>
 			<value>Concept</value>
 		</equals>
-	</condition> 
+	</condition>
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Concept/speedometer.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.38</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
-	  
+
 <!-- STEERINGWHEEL -->
 
-<animation>  
- <type>rotate</type>  
+<animation>
+ <type>rotate</type>
  <object-name>steeringwheel</object-name>
  <property>sim/multiplay/generic/float[18]</property>
  <factor>-1</factor>
@@ -328,21 +328,21 @@
  <property>sim/multiplay/generic/float[5]</property>
  <interpolation>
   <entry>
-   <ind>0.0</ind>	
+   <ind>0.0</ind>
    <dep>0</dep>
   </entry>
-  <entry>	
+  <entry>
 	<ind>1.00</ind>
 	<dep>0.2</dep>
-  </entry>  
+  </entry>
  </interpolation>
  <axis>
-  <x>0</x>	
+  <x>0</x>
   <y>0</y>
-  <z>1</z>	
+  <z>1</z>
  </axis>
 </animation>
- 
+
 <animation>
  <type>spin</type>
  <object-name>Tyre1</object-name>
@@ -399,10 +399,10 @@
   <z>1</z>
  </axis>
 </animation>
- 
+
 <animation>
  <type>spin</type>
- <object-name>Tyre2</object-name> 
+ <object-name>Tyre2</object-name>
  <property>sim/multiplay/generic/float[9]</property>
  <factor>-15</factor>
  <center>
@@ -416,7 +416,7 @@
   <z>0.0</z>
  </axis>
 </animation>
- 
+
 <!-- REAR WHEEL LEFT -->
 
 <animation>
@@ -456,8 +456,8 @@
   <z>1</z>
  </axis>
 </animation>
- 
-<animation>  
+
+<animation>
  <type>spin</type>
  <object-name>Tyre3</object-name>
  <property>sim/multiplay/generic/float[11]</property>
@@ -473,7 +473,7 @@
   <z>0.0</z>
  </axis>
 </animation>
- 
+
 <!-- REAR WHEEL RIGHT -->
 
 <animation>
@@ -540,14 +540,14 @@
  <object-name>ldoor</object-name>
  <action>
   <button>0</button>
-  <repeatable>false</repeatable>  
+  <repeatable>false</repeatable>
   <binding>
    <command>nasal</command>
    <script>followme.frontleft_door.toggle()</script>
   </binding>
  </action>
 </animation>
- 
+
 <animation>
  <type>rotate</type>
  <object-name>ldoor</object-name>
@@ -572,7 +572,7 @@
  <object-name>rdoor</object-name>
  <action>
   <button>0</button>
-  <repeatable>false</repeatable>  
+  <repeatable>false</repeatable>
   <binding>
    <command>nasal</command>
    <script>followme.frontright_door.toggle()</script>
@@ -596,7 +596,7 @@
   <z>1.0</z>
  </axis>
 </animation>
-	
+
 <!--LEFT REAR DOOR -->
 
 <animation>
@@ -604,7 +604,7 @@
  <object-name>door.rl</object-name>
  <action>
   <button>0</button>
-  <repeatable>false</repeatable>  
+  <repeatable>false</repeatable>
   <binding>
    <command>nasal</command>
    <script>followme.rearleft_door.toggle()</script>
@@ -637,7 +637,7 @@
  <object-name>door.rr</object-name>
  <action>
   <button>0</button>
-  <repeatable>false</repeatable>  
+  <repeatable>false</repeatable>
   <binding>
    <command>nasal</command>
    <script>followme.rearright_door.toggle()</script>
@@ -676,7 +676,7 @@
  <object-name>Cone-texture</object-name>
  <condition>
      <and>
-         <not>  
+         <not>
              <equals>
                  <property>sim/rendering/shaders/skydome</property>
                  <value>1</value>
@@ -730,7 +730,6 @@
 </animation>
 
 
-
 <!-- Fuel Truck -->
 
 <model>
@@ -749,5 +748,44 @@
 	</condition>
 </model>
 
+<!-- Tyre smoke -->
+<model>
+  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke.xml</path>
+  <name>tyre-smoke-n</name>
+  <offsets>
+      <x-m>0.682</x-m>
+      <y-m>0.627</y-m>
+      <z-m>0.291</z-m>
+  </offsets>
+</model>
+<model>
+  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-1.xml</path>
+  <name>tyre-smoke-n</name>
+  <offsets>
+      <x-m>0.682</x-m>
+      <y-m>-0.627</y-m>
+      <z-m>0.291</z-m>
+  </offsets>
+</model>
+<model>
+  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-2.xml</path>
+  <name>tyre-smoke-n</name>
+  <offsets>
+      <x-m>3.17</x-m>
+      <y-m>0.625</y-m>
+      <z-m>0.282</z-m>
+  </offsets>
+</model>
+<model>
+  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-3.xml</path>
+  <name>tyre-smoke-n</name>
+  <offsets>
+      <x-m>3.17</x-m>
+      <y-m>-0.625</y-m>
+      <z-m>0.282</z-m>
+  </offsets>
+</model>
+
+
+
 </PropertyList>
- 
