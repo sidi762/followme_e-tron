@@ -747,7 +747,20 @@
 		</and>
 	</condition>
 </model>
-
+<!-- Hand brake -->
+<animation>
+		<type>pick</type>
+		<object-name>handbrake</object-name>
+		<object-name>handbrake.001</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>property-toggle</command>
+				<property>controls/gear/brake-parking</property>
+			</binding>
+		</action>
+	</animation>
 <!-- Tyre smoke -->
 <model>
   <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke.xml</path>
