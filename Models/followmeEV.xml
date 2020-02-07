@@ -785,7 +785,17 @@
       <z-m>0.282</z-m>
   </offsets>
 </model>
+<!--  Engine Starter  -->
 
+<model> 
+ <path>Aircraft/followme_e-tron/Models/Starter/starter.xml</path>
+ <offsets> 
+  <x-m>1.299</x-m>
+  <y-m>-0.19</y-m>
+  <z-m>0.90</z-m>
+  <pitch-deg>18.0</pitch-deg>
+ </offsets>
+</model>
 
 
 </PropertyList>
