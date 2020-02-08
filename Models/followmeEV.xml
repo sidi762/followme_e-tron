@@ -797,5 +797,18 @@
       <z-m>0.282</z-m>
   </offsets>
 </model>
-
+<!-- Hand brake -->
+<animation>
+		<type>pick</type>
+		<object-name>handbrake</object-name>
+		<object-name>handbrake.001</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>nasal</command>
+				<script>toggleHandBrake()</script>
+			</binding>
+		</action>
+	</animation>
 </PropertyList>
