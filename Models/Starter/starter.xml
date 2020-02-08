@@ -2,19 +2,6 @@
 <!-- experimental starter. Still does not work. Need help from people who initially created this car. -->
 <PropertyList>
  <path>starter.ac</path>
-<!--External panel lighting-->
-<animation>
-  <type>material</type>
-  <object-name>base</object-name>
-  <object-name>button</object-name>
-  <emission>
-      <factor-prop>controls/switches/gauge-light</factor-prop>
-      <red>   0.21 </red>
-      <green> 0.21 </green>
-      <blue>  0.21 </blue>
-    </emission>
-</animation>
-
 <!--Control-->
 <animation>
   <type>pick</type>
