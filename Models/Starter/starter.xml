@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- experimental starter -->
+<PropertyList>
+ <path>starter.ac</path>
+<!--Control-->
+<animation>
+  <type>pick</type>
+  <object-name>button</object-name>
+  <visible>true</visible>
+  <action>
+    <button>0</button>
+    <repeatable>false</repeatable>
+    <binding>
+      <command>nasal</command>
+      <script>engine.startEngine()</script>
+    </binding>
+  </action>
+</animation>
+
+
+
+</PropertyList>
