@@ -807,7 +807,7 @@
 			<repeatable>false</repeatable>
 			<binding>
 				<command>nasal</command>
-				<script>toggleHandBrake()</script>
+				<script>followme.toggleHandBrake()</script>
 			</binding>
 		</action>
 	</animation>
