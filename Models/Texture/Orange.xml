@@ -6,7 +6,7 @@
     <model>
         <livery>
             <name type="string">Orange</name>
-            <texture>Liveries/Orange.png</texture>
+            <texture>Texture/Orange.png</texture>
         </livery>
     </model>    
 </sim>
