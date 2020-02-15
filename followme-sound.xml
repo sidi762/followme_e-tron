@@ -1,28 +1,40 @@
 <?xml version="1.0"?>
- 
+
 <PropertyList>
 
  <fx>
- 
+
   <engine>
    <name>motor</name>
    <mode>looped</mode>
    <path>Sounds/motor.wav</path>
    <property>sim/multiplay/generic/float[15]</property>
+   <!--><condition>
+   	<equals>
+ 			<property>sim/current-view/internal</property>
+ 			<value>1</value>
+ 	</equals>
+   </condition>-->
+   <condition>
+   	<equals>
+ 			<property>/controls/engines/engine/started</property>
+ 			<value>1</value>
+ 		</equals>
+ 	 </condition>
    <volume>
     <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.08</factor>
+    <factor>0.01</factor>
     <min>0</min>
-    <max>1.2</max>
+    <max>2</max>
     <offset>0</offset>
    </volume>
    <pitch>
     <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.01</factor>
-    <offset>0.5</offset>
+    <factor>0.015</factor>
+    <offset>0.45</offset>
    </pitch>
   </engine>
- 
+
   <wind>
    <name>rumble</name>
    <mode>looped</mode>
@@ -40,7 +52,7 @@
     <offset>1.5</offset>
    </pitch>
   </wind>
-  
+
   <!-- Removed due to copyright issues
     <safety>
 	<name>safety</name>
@@ -57,7 +69,7 @@
 		<factor>5</factor>
 	</volume>
   </safety>-->
-  
+
   <horn>
 	<name>horn</name>
 	<mode>looped</mode>
@@ -68,7 +80,7 @@
 		<factor>5</factor>
 	</volume>
   </horn>
-  
+
   <indicator>
 	<name>indicator</name>
 	<mode>looped</mode>
@@ -95,7 +107,7 @@
         <value>3</value>
 	</volume>
   </indicator>
-  
+
   <!-- Switched to nasal to prevent bug
     <indicatorStart>
 	<name>indicatorStartLeft</name>
@@ -168,7 +180,7 @@
 	</volume>
   </indicatorEnd>
   -->
-  
+
   <!--<music>
 	<name>music</name>
 	<mode>once</mode>
@@ -183,8 +195,8 @@
         <property>/controls/music_player/volume</property>
 	</volume>
   </music>-->
-  
+
 
 </fx>
- 
+
 </PropertyList>

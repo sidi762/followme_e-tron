@@ -4,25 +4,25 @@
 <sim>
 
 	<description>Follow Me e-tron</description>
-	<author>Gijs de Rooy, 李维昊（Weihao Li）, 梁思地（Sidi Liang）, 罗启元（Qiyuan Luo），ValKmjolnir</author>
+	<author>Gijs de Rooy, 李维昊 (Weihao Li), 梁思地 (Sidi Liang), 罗启元 (Qiyuan Luo), ValKmjolnir, Marsdolphin</author>
 	<status>early production</status>
     <long-description>
-        An electronic, High-Performance version of a follow me car (Renault Kangoo I) with Chinese characteristics. 
+        An electronic, High-Performance version of a follow me car (Renault Kangoo I) with Chinese characteristics.
     </long-description>
-    
+
     <gui><style><colors>
         <splash-font>
-            <red>1.0</red>  
+            <red>1.0</red>
             <green>1.00</green>
-            <blue>1.00</blue>                               
-        </splash-font>                                  
+            <blue>1.00</blue>
+        </splash-font>
         <splash-screen>
-            <red>0.117</red>    
+            <red>0.117</red>
             <green>0.19</green>
             <blue>0.227</blue>
-        </splash-screen>                                
+        </splash-screen>
     </colors></style></gui>
-    
+
     <previews>
             <preview>
                 <type>exterior</type>
@@ -35,7 +35,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/02.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -47,7 +47,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/04.png</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -59,7 +59,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/06.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>interior</type>
                 <splash type="bool">true</splash>
@@ -71,7 +71,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/08.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -83,7 +83,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/10.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -95,7 +95,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/12.png</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -107,7 +107,7 @@
                 <splash type="bool">true</splash>
                 <path>Splash/14.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -119,32 +119,32 @@
                 <splash type="bool">true</splash>
                 <path>Splash/16.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/17.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>interior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/18.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>interior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/19.jpg</path>
             </preview>
-            
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/20.jpg</path>
             </preview>
-            
-            
+
+
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -206,7 +206,7 @@
                 <path>Splash/G4_Tour/11.jpg</path>
             </preview>
     </previews>
-            
+
 	<rating>
 		<FDM type="int">4</FDM>
 		<systems type="int">2</systems>
@@ -221,7 +221,7 @@
 		<tag>2010s</tag>
         <tag>2020s</tag>
 	</tags>
-	
+
 	<flight-model>jsb</flight-model>
 	<aero>followme_e-tron</aero>
 
@@ -230,13 +230,13 @@
 		<livery>
 			<file type="string"/>
 		</livery>
-	</model> 
+	</model>
     <sound>
         <path>Aircraft/followme_e-tron/followme-sound.xml</path>
         <switch type = "bool"></switch>
     </sound>
-    
-    
+
+
 	<view n="/0">
 		<internal archive="y">true</internal>
 		<config>
@@ -352,60 +352,60 @@
             e-tron Brought to you by FGPRC.
 		</text>
 	</help>
-    
+
     <systems>
        <autopilot>
            <serviceable>0</serviceable>
        </autopilot>
     </systems>
-      
+
     <menubar>
 		<default>
 			<menu n="10">
 				<label>Follow Me EV</label>
-				<enabled type="bool">true</enabled>	
+				<enabled type="bool">true</enabled>
 				<item>
 					<label>Show Options</label>
 					<binding>
 						<command>dialog-show</command>
 						<dialog-name>vehicle-dialog</dialog-name>
 					</binding>
-				</item>	
+				</item>
 				<item>
 					<label>Battery Management</label>
 					<binding>
 						<command>dialog-show</command>
 						<dialog-name>battery-management</dialog-name>
 					</binding>
-				</item>	
+				</item>
 				<item>
 					<label>Select Livery</label>
 					<binding>
 						<command>nasal</command>
 						<script>followme.liveryFuse.dialog.toggle()</script>
 					</binding>
-				</item>	
+				</item>
 				<item>
 					<label>Select Message</label>
 					<binding>
 						<command>nasal</command>
 						<script>aircraft.livery.dialog.toggle()</script>
 					</binding>
-				</item>	
+				</item>
 				<item>
 					<label>Start Engine</label>
 					<binding>
 						<command>nasal</command>
 						<script>engine.startEngine()</script>
 					</binding>
-				</item>	
+				</item>
 				<item>
 					<label>Stop Engine</label>
 					<binding>
 						<command>nasal</command>
 						<script>engine.stopEngine()</script>
 					</binding>
-				</item>	
+				</item>
 		        <item>
 		         <label>Select Passenger</label>
 		         <binding>
@@ -418,7 +418,7 @@
 			</menu>
 		</default>
 	</menubar>
-    
+
     <multiplay>
       <generic>
         <int n="0" alias="/sim/model/lights/indicator-left/state"/>
@@ -428,39 +428,39 @@
         <int n="4" alias="/controls/gear/brake-left"/>
         <int n="5" alias="/services/service-truck/enable"/>
         <int n="6" alias="/systems/screen-enable"/>
-        
+
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>
         <float n="2" alias="/controls/doors/frontright/position-norm"/>
         <float n="3" alias="/controls/doors/frontleft/position-norm"/>
-        
+
         <float n="4" alias="/gear/gear[0]/steering-norm"/>
         <float n="5" alias="/gear/gear[0]/compression-norm"/>
         <float n="6" alias="/gear/gear[0]/rollspeed-ms"/>
-        
+
         <float n="7" alias="/gear/gear[1]/steering-norm"/>
         <float n="8" alias="/gear/gear[1]/compression-norm"/>
         <float n="9" alias="/gear/gear[1]/rollspeed-ms"/>
-        
+
         <float n="10" alias="/gear/gear[2]/compression-norm"/>
         <float n="11" alias="/gear/gear[2]/rollspeed-ms"/>
-        
+
         <float n="12" alias="/gear/gear[3]/compression-norm"/>
         <float n="13" alias="/gear/gear[3]/rollspeed-ms"/>
-        
+
         <float n="14" alias="/controls/flight/aileron"/>
-        
+
         <float n="15" alias="/velocities/groundspeed-kt"/>
-        
+
         <float n="16" alias="/systems/electrical/e-tron/battery-kWh"/>
         <float n="17" alias="/systems/electrical/e-tron/battery-remaining-percent-float"/>
-        
+
         <float n="18" alias="/controls/steering_wheel"/>
-        
+
         <string n="0" alias="/systems/plate"/>
         <string n="1" alias="/systems/battery-gauge/type"/>
         <string n="2" alias="/systems/speedometer/type"/>
-        
+
       </generic>
     </multiplay>
 </sim>
@@ -488,18 +488,18 @@
 
 <input>
 	<keyboard>
-		<key n="91"> 
+		<key n="91">
 			<name>[</name>
 			<desc>Toggle left indicator lights</desc>
-			<binding> 
+			<binding>
 				<command>nasal</command>
                 <script>followme.indicatorController.left_indicator_toggle();</script>
 			</binding>
 		</key>
-		<key n="93"> 
+		<key n="93">
 			<name>]</name>
 			<desc>Toggle right indicator lights</desc>
-			<binding> 
+			<binding>
 				<command>nasal</command>
                 <script>followme.indicatorController.right_indicator_toggle();</script>
 			</binding>
@@ -508,15 +508,15 @@
             <name>f</name>
             <desc>false-light</desc>
             <repeatable>false</repeatable>
-			<binding> 
+			<binding>
 				<command>nasal</command>
                 <script>followme.indicatorController.false_light_toggle();</script>
 			</binding>
         </key>
-		<key n="109"> 
+		<key n="109">
 			<name>m</name>
 			<desc>Toggle direction</desc>
-			<binding> 
+			<binding>
 				<command>nasal</command>
 				<script>engine.engine_1.toggleDirection();</script>
 			</binding>
@@ -525,13 +525,13 @@
 	      <name>w</name>
 	      <desc>gas pedal</desc>
 	      <repeatable>false</repeatable>
-		<binding> 
+		<binding>
 			<command>property-assign</command>
 			<property>/controls/engines/engine/throttle</property>
 			<value>1</value>
 		</binding>
 	      <mod-up>
-	  		<binding> 
+	  		<binding>
 	  			<command>property-assign</command>
 	  			<property>/controls/engines/engine/throttle</property>
 	  			<value>0</value>
@@ -569,12 +569,12 @@
             <name>a</name>
             <desc>rudder-left</desc>
             <repeatable>false</repeatable>
-			<binding> 
+			<binding>
 				<command>nasal</command>
                 <script>followme.steeringAssistance.inputLeft();</script>
 			</binding>
             <mod-up>
-    			<binding> 
+    			<binding>
     				<command>nasal</command>
                     <script>followme.steeringAssistance.neutral();</script>
     			</binding>
@@ -602,12 +602,12 @@
             <name>d</name>
             <desc>rudder-right</desc>
             <repeatable>false</repeatable>
-			<binding> 
+			<binding>
 				<command>nasal</command>
                 <script>followme.steeringAssistance.inputRight();</script>
 			</binding>
             <mod-up>
-    			<binding> 
+    			<binding>
     				<command>nasal</command>
                     <script>followme.steeringAssistance.neutral();</script>
     			</binding>
@@ -701,9 +701,9 @@
 	<followme>
         <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
 		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>
-        <file>Aircraft/followme_e-tron/Nasal/steering.nas</file>                
+        <file>Aircraft/followme_e-tron/Nasal/steering.nas</file>
 	</followme>
-	<!--<screen>		
+	<!--<screen>
 		<file>Aircraft/followme_e-tron/Nasal/SmartScreen.nas</file>
     </screen> -->
     <engine>
@@ -736,7 +736,3 @@
 </nasal>
 
 </PropertyList>
-
-
-
-
