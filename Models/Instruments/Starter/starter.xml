@@ -12,7 +12,7 @@
     <repeatable>false</repeatable>
     <binding>
       <command>nasal</command>
-      <script>engine.startEngine()</script>
+      <script>engine.toggleEngine(engine.engine_1)</script>
     </binding>
   </action>
 </animation>

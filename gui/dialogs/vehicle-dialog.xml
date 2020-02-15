@@ -29,13 +29,13 @@
 	</button>
 	</group>
 	<hrule/>
-    
-  
-    
+
+
+
 	<group>
 	<layout>vbox</layout>
 	<padding>6</padding>
-    
+
     <button>
         <halign>left</halign>
         <legend>Enable Performance Mode</legend>
@@ -46,7 +46,7 @@
                 <not>
                     <property>/sim/freeze/replay-state</property>
                 </not>
-        
+
             </and>
         </enable>
         <binding>
@@ -55,7 +55,7 @@
             <value>1</value>
         </binding>
     </button>
-    
+
     <button>
         <halign>left</halign>
         <legend>Enable Comfort Mode</legend>
@@ -66,7 +66,7 @@
                 <not>
                     <property>/sim/freeze/replay-state</property>
                 </not>
-        
+
             </and>
         </enable>
         <binding>
@@ -75,7 +75,7 @@
             <value>0.65</value>
         </binding>
     </button>
-    
+
     <button>
         <halign>left</halign>
         <legend>Enable Low Power Mode</legend>
@@ -86,7 +86,7 @@
                 <not>
                     <property>/sim/freeze/replay-state</property>
                 </not>
-        
+
             </and>
         </enable>
         <binding>
@@ -95,8 +95,8 @@
             <value>0.4</value>
         </binding>
     </button>
-    
-           
+
+
         </group>
         <text>
             <label>Advanced Steering</label>
@@ -116,7 +116,7 @@
                         <not>
                             <property>/sim/freeze/replay-state</property>
                         </not>
-                        
+
                     </and>
                 </enable>
                 <binding>
@@ -133,7 +133,7 @@
                         <not>
                             <property>/sim/freeze/replay-state</property>
                         </not>
-        
+
                     </and>
                 </enable>
                 <binding>
@@ -141,9 +141,9 @@
                 </binding>
             </button>
         </group>
-      
+
         <hrule/>
-        
+
         <group>
         <layout>vbox</layout>
         <padding>6</padding>
@@ -261,7 +261,7 @@
               </binding>
           </button>
         </group>
-        
+
         <hrule/>
         <text><label>Configuration</label></text>
         <group>
@@ -281,7 +281,7 @@
                     <value>0</value>
                 </binding>
             </button>
-            
+
             <button>
                 <halign>left</halign>
                 <legend>Type O</legend>
@@ -322,7 +322,7 @@
                     </binding>
                 </combo>
             </group>
-            
+
             <group>
                 <layout>vbox</layout>
                 <text><label>Battery gauge type</label></text>
@@ -345,7 +345,7 @@
                     </binding>
                 </combo>
             </group>
-            
+
         </group>
         <group>
             <layout>vbox</layout>
@@ -470,10 +470,10 @@
 					<script>followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull()</script>
 				</binding>
             </button>
-        
-            
+
+
         </group>
-       
+
 
         <hrule/>
         <group>
@@ -490,7 +490,7 @@
                 </enable>
 				<binding>
 					<command>nasal</command>
-					<script>engine.startEngine()</script>
+					<script>engine.startEngine(engine.engine_1)</script>
 				</binding>
             </button>
             <button>
@@ -503,11 +503,11 @@
                 </enable>
 				<binding>
 					<command>nasal</command>
-					<script>engine.stopEngine()</script>
+					<script>engine.stopEngine(engine.engine_1)</script>
 				</binding>
             </button>
         </group>
-	
+
         <hrule/>
 
 </PropertyList>
