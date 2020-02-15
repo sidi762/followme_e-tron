@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- experimental starter -->
+<!-- Car Starter by Mars and sidi762. -->
 <PropertyList>
  <path>starter.ac</path>
 <!--Control-->
@@ -16,7 +16,4 @@
     </binding>
   </action>
 </animation>
-
-
-
 </PropertyList>
