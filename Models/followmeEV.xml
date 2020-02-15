@@ -33,6 +33,16 @@
  <texture>followmeoutside.png</texture>
 </animation>
 
+
+
+<effect>
+    <inherits-from>Aircraft/followme_e-tron/Models/Effects/interior</inherits-from>
+    <object-name>Mesh63</object-name>
+    <object-name>Mesh64</object-name>
+    <object-name>Mesh68</object-name>
+    <object-name>Mesh69</object-name>
+</effect>
+
 <model>
  <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
  <offsets>
