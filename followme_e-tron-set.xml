@@ -428,6 +428,10 @@
         <int n="4" alias="/controls/gear/brake-left"/>
         <int n="5" alias="/services/service-truck/enable"/>
         <int n="6" alias="/systems/screen-enable"/>
+        <int n="7" alias="/gear/gear[0]/tyre-smoke"/>
+        <int n="8" alias="/gear/gear[1]/tyre-smoke"/>
+        <int n="9" alias="/gear/gear[2]/tyre-smoke"/>
+        <int n="10" alias="/gear/gear[3]/tyre-smoke"/>
 
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>
@@ -456,6 +460,8 @@
         <float n="17" alias="/systems/electrical/e-tron/battery-remaining-percent-float"/>
 
         <float n="18" alias="/controls/steering_wheel"/>
+
+        <float n="19" alias="/controls/gear/brake-parking"/>
 
         <string n="0" alias="/systems/plate"/>
         <string n="1" alias="/systems/battery-gauge/type"/>

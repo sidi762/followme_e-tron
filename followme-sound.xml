@@ -70,6 +70,28 @@
 	</volume>
   </safety>-->
 
+
+
+    <brake>
+      <name>brake</name>
+      <mode>once</mode>
+      <path>Aircraft/followme/Sounds/Renault4-brake.wav</path>
+      <condition>
+          <and>
+              <greater-than>
+                  <property>sim/multiplay/generic/float[15]</property>
+                  <value>7</value>
+              </greater-than>
+              <property>sim/multiplay/generic/float[20]</property>
+         </and>
+      </condition>
+      <volume>
+  		  <factor>0.5</factor>
+  	  </volume>
+      <reference-dist>100</reference-dist>
+      <max-dist>1000</max-dist>
+    </brake>
+
   <horn>
 	<name>horn</name>
 	<mode>looped</mode>
