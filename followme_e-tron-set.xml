@@ -708,6 +708,7 @@
         <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
 		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>
         <file>Aircraft/followme_e-tron/Nasal/steering.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/radar.nas</file>
 	</followme>
 	<!--<screen>
 		<file>Aircraft/followme_e-tron/Nasal/SmartScreen.nas</file>
