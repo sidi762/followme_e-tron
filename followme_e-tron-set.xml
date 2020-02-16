@@ -396,14 +396,14 @@
 					<label>Start Engine</label>
 					<binding>
 						<command>nasal</command>
-						<script>engine.startEngine()</script>
+						<script>engine.startEngine(engine.engine_1)</script>
 					</binding>
 				</item>
 				<item>
 					<label>Stop Engine</label>
 					<binding>
 						<command>nasal</command>
-						<script>engine.stopEngine()</script>
+						<script>engine.stopEngine(engine.engine_1)</script>
 					</binding>
 				</item>
 		        <item>
