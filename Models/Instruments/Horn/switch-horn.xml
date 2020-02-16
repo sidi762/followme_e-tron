@@ -3,7 +3,7 @@
 
   <path>switch-Horn.ac</path>
 
- <animation>
+ <!--<animation>
   <type>material</type>
   <object-name>fond</object-name>
   <object-name>button</object-name>
@@ -13,13 +13,13 @@
       <green> 0.21 </green>
       <blue>  0.21 </blue>
     </emission>
-</animation>
+</animation>-->
 
-  
+
 <animation>
   <type>translate</type>
   <object-name>button</object-name>
-  <property>/systems/horn</property>  
+  <property>/systems/horn</property>
   <factor>0.001</factor>
   <axis>
     <x>-1.0</x>
@@ -38,13 +38,13 @@
         <repeatable>false</repeatable>
       <binding>
         <command>property-assign</command>
-        <property>sim/multiplay/generic/int[18]</property>
+        <property>sim/multiplay/generic/int[2]</property>
         <value>1</value>
       </binding>
     <mod-up>
         <binding>
         <command>property-assign</command>
-        <property>sim/multiplay/generic/int[18]</property>
+        <property>sim/multiplay/generic/int[2]</property>
         <value>0</value>
         </binding>
     </mod-up>
