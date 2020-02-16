@@ -2,15 +2,15 @@
 var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection)
     #//height: height of installation above ground;installCoord: coord of installation; maxRange: max radar range
-    #//For this vehicle: height 0.3m; installCoord:3.78m; maxRange:7m; maxWidth:3m
+    #//For this vehicle: height 0.3m; installCoord:3.78m; maxRange:6m; maxWidth:2m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
     new: func(height, installCoord, maxRange, maxWidth) {
         return { parents:[Radar, followme.Appliance.new()], height: height, installCoord:installCoord, maxRange:maxRange, maxWidth:maxWidth};
     },
     height: 0.3, #METERS
-    installCoord:3.7, #METERS
-    maxRange:7, #METERS
+    installCoord:3.78, #METERS
+    maxRange:6, #METERS
     maxWidth:2, #METERS
     radarTimer: nil,
 
@@ -34,6 +34,13 @@ var Radar = {
     },
     stop: func(){
         me.radarTimer.stop();
+    },
+    toggle: func(){
+        if(me.radarTimer == nil or me.radarTimer.isRunning == 0){
+            me.init();
+        }else{
+            me.stop();
+        }
     },
 
     getCoord: func(){
@@ -122,4 +129,4 @@ var Radar = {
     },
 };
 
-var parkingRadar = Radar.new(0.3, 3.7, 7, 2);
+var parkingRadar = Radar.new(0.3, 3.78, 6, 2);

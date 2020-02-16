@@ -406,6 +406,13 @@
 						<script>engine.stopEngine(engine.engine_1)</script>
 					</binding>
 				</item>
+                <item>
+					<label>Toggle Parking Radar</label>
+					<binding>
+						<command>nasal</command>
+						<script>followme.parkingRadar.toggle()</script>
+					</binding>
+				</item>
 		        <item>
 		         <label>Select Passenger</label>
 		         <binding>
