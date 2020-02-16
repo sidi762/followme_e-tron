@@ -173,14 +173,15 @@ var Engine = {
     },
 
     stopEngine: func(){
+        me.engineTimer.stop();
         me.rpm = 0;
         me.torque = 0;
         me.outputForce = 0;
+        outputForce(0);
         me.activePower_kW = 0;
         me.runningState = 0;
         me.engineSwitch.switchDisconnect();
         props.getNode("/",1).setValue("/controls/engines/engine/started",0);
-        me.engineTimer.stop();
     },
 
     debugPrint: func(){
