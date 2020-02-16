@@ -821,4 +821,26 @@
 			</binding>
 		</action>
 	</animation>
+<!-- switch for horn -->
+<model> 
+ <path>Aircraft/followme_e-tron/Models/Instruments/Horn/switch-horn.xml</path>
+ <offsets> 
+  <x-m>1.405</x-m>
+  <y-m>-0.143</y-m>
+  <z-m>0.919</z-m>
+  <heading-deg>80.0</heading-deg>
+  <pitch-deg>-5.0</pitch-deg>
+ </offsets>
+</model>
+
+<!-- sign for horn -->
+<model> 
+ <path>Aircraft/followme_e-tron/Models/Instruments/Horn/horn.xml</path>
+ <offsets> 
+  <x-m>1.416</x-m>
+  <y-m>-0.17</y-m>
+  <z-m>0.905</z-m>
+  <pitch-deg>-18.0</pitch-deg>
+ </offsets>
+</model>
 </PropertyList>
