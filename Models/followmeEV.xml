@@ -917,10 +917,10 @@
     </condition>
     <path>Aircraft/followme_e-tron/Models/Instruments/CDU/boeing.xml</path>
     <offsets>
-        <x-m>1.31</x-m>
+        <x-m>1.65</x-m>
         <y-m>-0.00</y-m>
-        <z-m>0.8</z-m>
-        <pitch-deg>-4.0</pitch-deg>
+        <z-m>0.70</z-m>
+        <pitch-deg>-87</pitch-deg>
     </offsets>
 </model>
 
