@@ -16,9 +16,16 @@
 		<type>select</type>
 		<object-name>warninglight</object-name>
 		<condition>
+			<and>
 			<property>/sim/model/lights/warning/state</property>
+			<equals>
+			<property>warninglight/start</property>
+			<value>1</value>
+			</equals>
+			</and>
 		</condition>
 	</animation>
+
 
     <animation>
 	  <type>range</type>

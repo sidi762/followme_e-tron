@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<PropertyList>
+  
+  <path>wl.ac</path>
+  
+  <animation>
+    <type>material</type>
+    <object-name>face</object-name>
+  </animation>
+  
+  <animation> 
+    <type>material</type>
+    <emission> 
+      <factor-prop>controls/switches/gauge-light</factor-prop>
+      <red>0.5</red>
+      <green>0.25</green>
+      <blue>0.8</blue>
+    </emission>
+  </animation>
+  
+  </PropertyList>
