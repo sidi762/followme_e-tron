@@ -342,6 +342,10 @@
 			<name>c</name>
 			<desc>Toggle auto-cruise system</desc>
 		</key>
+        <key>
+			<name>r</name>
+			<desc>Toggle parking radar system</desc>
+		</key>
 		<text>
 		You can select the message to be displayed on the bar, through the "Follow Me EV > Select message" menu.
 		</text>
@@ -533,6 +537,14 @@
 				<command>nasal</command>
 				<script>engine.engine_1.toggleDirection();</script>
 			</binding>
+		</key>
+        <key n="114">
+			<name>r</name>
+			<desc>Toggle Parking Radar</desc>
+            <binding>
+                <command>nasal</command>
+                <script>followme.parkingRadar.toggle()</script>
+            </binding>
 		</key>
 	    <key n="119">
 	      <name>w</name>

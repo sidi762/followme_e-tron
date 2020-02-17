@@ -2,14 +2,14 @@
 var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection)
     #//height: height of installation above ground;installCoord: coord of installation; maxRange: max radar range
-    #//For this vehicle: height 0.3m; installCoord:3.78m; maxRange:6m; maxWidth:2m
+    #//For this vehicle: height 0.3m; installCoord:3.8m; maxRange:6m; maxWidth:2m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
     new: func(height, installCoord, maxRange, maxWidth) {
         return { parents:[Radar, followme.Appliance.new()], height: height, installCoord:installCoord, maxRange:maxRange, maxWidth:maxWidth};
     },
     height: 0.3, #METERS
-    installCoord:3.78, #METERS
+    installCoord:3.8, #METERS
     maxRange:6, #METERS
     maxWidth:2, #METERS
     radarTimer: nil,
@@ -23,6 +23,12 @@ var Radar = {
     widthLonRange:nil,
     widthLatRange:nil,
 
+    warningTimer: nil,
+    #warningFlag: 0,
+    warningInterval: 2,
+    warningSound: "parking_radar.wav",
+    lastDis: 0,
+
     init: func(){
         me.getCoord();
         me.backLatRange = me.calculateLatChange(me.maxRange);
@@ -30,9 +36,14 @@ var Radar = {
         me.widthLatRange = me.calculateLatChange(me.maxWidth);
         me.widthLonRange = me.calculateLonChange(me.maxWidth, me.coord);
         if(me.radarTimer == nil) me.radarTimer = maketimer(0.2, func me.update());
+        if(me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
         me.radarTimer.start();
+        print("Parking radar initialized!");
+        playAudio("parking_radar_init.wav");
     },
     stop: func(){
+        print("Parking radar stopped!");
+        me.warningTimer.stop();
         me.radarTimer.stop();
     },
     toggle: func(){
@@ -82,10 +93,27 @@ var Radar = {
             return 0;
         }
     },
-    warn: func(targetCoord){
-        var meters = me.coord.distance_to(targetCoord);
+    warn: func(){
+        me.warningTimer.restart(me.warningInterval);
+        playAudio(me.warningSound);
+    },
+    warnControl: func(meters){
+        if(meters == 10000){
+            me.warningTimer.stop();
+            return;
+        }
+        if(meters <= 0.5){
+            me.warningInterval = 0.2;
+            me.warningSound = "parking_radar_long.wav";
+            return;
+        }else{
+            me.warningSound = "parking_radar.wav";
+        }
+        if(!me.warningTimer.isRunning) me.warningTimer.start();
+        meters = sprintf("%.2f", meters);
+        if(meters != me.lastDis) me.warningInterval = (meters)/me.maxRange;
         print("Caution! something behind at approximatly "~meters~" meters");
-        var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord);
+        me.lastDis = meters;
     },
     sample: func(stepLat, stepLon, searchLat, searchLon){ # returns an elevtion
         var latChange  = math.sin(math.pi * me.vehicleHeading/180);
@@ -108,7 +136,9 @@ var Radar = {
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
-                    me.warn(targetCoord);
+                    var meters = me.coord.distance_to(targetCoord);
+                    me.warnControl(meters);
+                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord);
                     return;
                 }
             }
@@ -118,7 +148,9 @@ var Radar = {
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
-                    me.warn(targetCoord);
+                    var meters = me.coord.distance_to(targetCoord);
+                    me.warnControl(meters);
+                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord);
                     return;
                 }
             }
@@ -126,7 +158,8 @@ var Radar = {
             searchDis += searchStep;
         }
         print("All clear");
+        me.warnControl(10000);
     },
 };
 
-var parkingRadar = Radar.new(0.3, 3.78, 6, 2);
+var parkingRadar = Radar.new(0.3, 3.8, 6, 2);
