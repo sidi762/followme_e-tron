@@ -13,7 +13,7 @@ name "Bright_UprDisp.knob"
 loc 0.016473 0.004128 -0.046148
 data 19
 Bright_UprDisp.knob
-texture "../../Textures/Cockpit/APpanel_1.png"
+texture "Textures/Cockpit/APpanel_1.png"
 texrep 1.000000 1.000000
 crease 179.000000
 numvert 434
@@ -5177,7 +5177,7 @@ name "Btn.A"
 loc 0.006186 -0.028482 0.010503
 data 5
 Btn.A
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -5442,7 +5442,7 @@ name "Btn.B"
 loc 0.006186 -0.028482 -0.004874
 data 5
 Btn.B
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -5707,7 +5707,7 @@ name "Btn.C"
 loc 0.006186 -0.028482 -0.019448
 data 5
 Btn.C
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -5972,7 +5972,7 @@ name "Btn.D"
 loc 0.006186 -0.028482 -0.034245
 data 5
 Btn.D
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -6237,7 +6237,7 @@ name "Btn.E"
 loc 0.006186 -0.028482 -0.049415
 data 5
 Btn.E
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -6502,7 +6502,7 @@ name "Btn.F"
 loc 0.006186 -0.042614 0.010503
 data 5
 Btn.F
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -6767,7 +6767,7 @@ name "Btn.G"
 loc 0.006186 -0.042614 -0.004874
 data 5
 Btn.G
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -7032,7 +7032,7 @@ name "Btn.H"
 loc 0.006186 -0.042614 -0.019448
 data 5
 Btn.H
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -7297,7 +7297,7 @@ name "Btn.I"
 loc 0.006186 -0.042614 -0.034245
 data 5
 Btn.I
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -7562,7 +7562,7 @@ name "Btn.J"
 loc 0.006186 -0.042614 -0.049415
 data 5
 Btn.J
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -7827,7 +7827,7 @@ name "Btn.K"
 loc 0.006186 -0.056443 0.010503
 data 5
 Btn.K
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -8092,7 +8092,7 @@ name "Btn.L"
 loc 0.006186 -0.056443 -0.004874
 data 5
 Btn.L
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -8357,7 +8357,7 @@ name "Btn.M"
 loc 0.006186 -0.056443 -0.019448
 data 5
 Btn.M
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -8622,7 +8622,7 @@ name "Btn.N"
 loc 0.006186 -0.056443 -0.034245
 data 5
 Btn.N
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -8887,7 +8887,7 @@ name "Btn.O"
 loc 0.006186 -0.056443 -0.049415
 data 5
 Btn.O
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -9152,7 +9152,7 @@ name "Btn.P"
 loc 0.006186 -0.070548 0.010503
 data 5
 Btn.P
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -9417,7 +9417,7 @@ name "Btn.Q"
 loc 0.006186 -0.070548 -0.004874
 data 5
 Btn.Q
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -9682,7 +9682,7 @@ name "Btn.R"
 loc 0.006186 -0.070548 -0.019448
 data 5
 Btn.R
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -9947,7 +9947,7 @@ name "Btn.S"
 loc 0.006186 -0.070548 -0.034245
 data 5
 Btn.S
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -10212,7 +10212,7 @@ name "Btn.T"
 loc 0.006186 -0.070548 -0.049415
 data 5
 Btn.T
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -10477,7 +10477,7 @@ name "Btn.U"
 loc 0.006186 -0.084259 0.010503
 data 5
 Btn.U
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -10742,7 +10742,7 @@ name "Btn.V"
 loc 0.006186 -0.084259 -0.004874
 data 5
 Btn.V
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -11007,7 +11007,7 @@ name "Btn.W"
 loc 0.006186 -0.084259 -0.019448
 data 5
 Btn.W
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -11272,7 +11272,7 @@ name "Btn.X"
 loc 0.006186 -0.084259 -0.034245
 data 5
 Btn.X
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -11537,7 +11537,7 @@ name "Btn.Y"
 loc 0.006186 -0.084259 -0.049415
 data 5
 Btn.Y
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -11802,7 +11802,7 @@ name "Btn.Z"
 loc 0.006186 -0.098461 0.010503
 data 5
 Btn.Z
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -12067,7 +12067,7 @@ name "Btn.altn"
 loc 0.008557 0.001167 -0.00145
 data 8
 Btn.altn
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -12332,7 +12332,7 @@ name "Btn.clr"
 loc 0.006186 -0.098461 -0.049415
 data 7
 Btn.clr
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -12597,7 +12597,7 @@ name "Btn.del"
 loc 0.006186 -0.098461 -0.019448
 data 7
 Btn.del
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -12862,7 +12862,7 @@ name "Btn.dep-arr"
 loc 0.008557 0.001167 0.017672
 data 11
 Btn.dep-arr
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -13127,7 +13127,7 @@ name "Btn.exec"
 loc 0.008485 -0.01511 -0.046188
 data 8
 Btn.exec
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -13392,7 +13392,7 @@ name "Btn.fix"
 loc 0.008557 -0.014013 0.054677
 data 7
 Btn.fix
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -13657,7 +13657,7 @@ name "Btn.fmc-comm"
 loc 0.008557 -0.014013 -0.001431
 data 12
 Btn.fmc-comm
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -13922,7 +13922,7 @@ name "Btn.hold"
 loc 0.008557 -0.014013 0.017584
 data 8
 Btn.hold
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -14187,7 +14187,7 @@ name "Btn.init-ref"
 loc 0.008557 0.001167 0.054877
 data 12
 Btn.init-ref
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -14452,7 +14452,7 @@ name "Btn.legs"
 loc 0.008557 -0.014013 0.035661
 data 8
 Btn.legs
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -14717,7 +14717,7 @@ name "Btn.menu"
 loc 0.008557 -0.028119 0.054762
 data 8
 Btn.menu
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -14982,7 +14982,7 @@ name "Btn.nav-rad"
 loc 0.008557 -0.028119 0.035746
 data 11
 Btn.nav-rad
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -15247,7 +15247,7 @@ name "Btn.next-page"
 loc 0.008557 -0.042148 0.035746
 data 13
 Btn.next-page
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -15512,7 +15512,7 @@ name "Btn.num1"
 loc 0.005887 -0.056497 0.056154
 data 8
 Btn.num1
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -15777,7 +15777,7 @@ name "Btn.num2"
 loc 0.005887 -0.056497 0.041463
 data 8
 Btn.num2
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -16042,7 +16042,7 @@ name "Btn.num3"
 loc 0.005887 -0.056497 0.025681
 data 8
 Btn.num3
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -16307,7 +16307,7 @@ name "Btn.num4"
 loc 0.005887 -0.070775 0.056154
 data 8
 Btn.num4
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -16572,7 +16572,7 @@ name "Btn.num5"
 loc 0.005887 -0.070775 0.041463
 data 8
 Btn.num5
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -16837,7 +16837,7 @@ name "Btn.num6"
 loc 0.005887 -0.070775 0.025681
 data 8
 Btn.num6
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -17102,7 +17102,7 @@ name "Btn.num7"
 loc 0.005887 -0.084683 0.056154
 data 8
 Btn.num7
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -17367,7 +17367,7 @@ name "Btn.num8"
 loc 0.005887 -0.084683 0.041463
 data 8
 Btn.num8
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -17632,7 +17632,7 @@ name "Btn.num9"
 loc 0.005887 -0.084683 0.025681
 data 8
 Btn.num9
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -17897,7 +17897,7 @@ name "Btn.period"
 loc 0.005887 -0.098757 0.056154
 data 10
 Btn.period
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -18162,7 +18162,7 @@ name "Btn.plusminus"
 loc 0.005887 -0.098757 0.025681
 data 13
 Btn.plusminus
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -18427,7 +18427,7 @@ name "Btn.prev-page"
 loc 0.008557 -0.042148 0.054762
 data 13
 Btn.prev-page
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -18692,7 +18692,7 @@ name "Btn.prog"
 loc 0.008557 -0.014013 -0.019902
 data 8
 Btn.prog
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -18957,7 +18957,7 @@ name "Btn.rte"
 loc 0.008557 0.001167 0.035755
 data 7
 Btn.rte
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -19222,7 +19222,7 @@ name "Btn.side.l.1"
 loc 0.006239 0.072573 -0.000438
 data 12
 Btn.side.l.1
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -19487,7 +19487,7 @@ name "Btn.side.l.2"
 loc 0.006239 0.060638 -0.000429
 data 12
 Btn.side.l.2
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -19752,7 +19752,7 @@ name "Btn.side.l.3"
 loc 0.006239 0.060638 -0.000429
 data 12
 Btn.side.l.3
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -20017,7 +20017,7 @@ name "Btn.side.l.4"
 loc 0.006239 0.060638 -0.000429
 data 12
 Btn.side.l.4
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -20282,7 +20282,7 @@ name "Btn.side.l.5"
 loc 0.006239 0.060638 -0.000429
 data 12
 Btn.side.l.5
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -20547,7 +20547,7 @@ name "Btn.side.l.6"
 loc 0.006239 0.060638 -0.000429
 data 12
 Btn.side.l.6
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -20812,7 +20812,7 @@ name "Btn.side.r.1"
 loc 0.006239 0.060638 0.00004
 data 12
 Btn.side.r.1
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -21077,7 +21077,7 @@ name "Btn.side.r.2"
 loc 0.006239 0.060638 0.00004
 data 12
 Btn.side.r.2
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -21342,7 +21342,7 @@ name "Btn.side.r.3"
 loc 0.006239 0.060638 0.00004
 data 12
 Btn.side.r.3
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -21607,7 +21607,7 @@ name "Btn.side.r.4"
 loc 0.006239 0.060638 0.00004
 data 12
 Btn.side.r.4
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -21872,7 +21872,7 @@ name "Btn.side.r.5"
 loc 0.006239 0.060638 0.00004
 data 12
 Btn.side.r.5
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -22137,7 +22137,7 @@ name "Btn.side.r.6"
 loc 0.006239 0.060638 0.00004
 data 12
 Btn.side.r.6
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -22402,7 +22402,7 @@ name "Btn.slash"
 loc 0.006186 -0.098461 -0.034245
 data 9
 Btn.slash
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -22667,7 +22667,7 @@ name "Btn.sp"
 loc 0.006186 -0.098461 -0.004874
 data 6
 Btn.sp
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -22932,7 +22932,7 @@ name "Btn.vnav"
 loc 0.008557 0.001167 -0.019902
 data 8
 Btn.vnav
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -23197,7 +23197,7 @@ name "Btn.zero"
 loc 0.005887 -0.098757 0.041463
 data 8
 Btn.zero
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -23462,7 +23462,7 @@ name "CDU"
 loc 0.002522 0.002302 -0
 data 3
 CDU
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 350
@@ -27118,7 +27118,7 @@ name "CDuscreen"
 loc 0.002536 0.064848 -0.000108
 data 9
 CDuscreen
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 4
@@ -27140,7 +27140,7 @@ name "Lettering_Alpha"
 loc 0.006186 -0.028482 -0.049415
 data 15
 Lettering_Alpha
-texture "../../Textures/Lettering/Lettering_Cdu.png"
+texture "Textures/Lettering/Lettering_Cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 780
@@ -34771,7 +34771,7 @@ name "Lettering_Cdu"
 loc 0.0034 0.002302 -0.00039
 data 13
 Lettering_Cdu
-texture "../../Textures/Lettering/Lettering_Cdu.png"
+texture "Textures/Lettering/Lettering_Cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 350
@@ -38427,7 +38427,7 @@ name "Lettering_Commands"
 loc 0.008775 -0.042148 0.035746
 data 18
 Lettering_Commands
-texture "../../Textures/Lettering/Lettering_Cdu.png"
+texture "Textures/Lettering/Lettering_Cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 195
@@ -39713,7 +39713,7 @@ name "Lettering_Numbers"
 loc 0.0064 -0.098757 0.041463
 data 17
 Lettering_Numbers
-texture "../../Textures/Lettering/Lettering_Cdu.png"
+texture "Textures/Lettering/Lettering_Cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 156
@@ -40744,7 +40744,7 @@ name "Plane_Commands"
 loc 0.007202 -0.019771 -0.000896
 data 14
 Plane_Commands
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 179.000000
 numvert 16
@@ -40869,7 +40869,7 @@ name "Power.led"
 loc 0.005368 -0.007392 -0.04492
 data 9
 Power.led
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 26
@@ -41134,7 +41134,7 @@ name "Screw_Fixing"
 loc 0.003667 0.108802 0.07028
 data 12
 Screw_Fixing
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 489
@@ -46042,7 +46042,7 @@ name "Screw_Fixing.001"
 loc 0.003667 0.108802 -0.069502
 data 16
 Screw_Fixing.001
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 489
@@ -50950,7 +50950,7 @@ name "Screw_Fixing.002"
 loc 0.003667 0.001205 -0.068872
 data 16
 Screw_Fixing.002
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 489
@@ -55858,7 +55858,7 @@ name "Screw_Fixing.003"
 loc 0.003667 0.001205 0.069966
 data 16
 Screw_Fixing.003
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 489
@@ -60766,7 +60766,7 @@ name "Screw_Fixing.004"
 loc 0.003667 -0.098482 0.069966
 data 16
 Screw_Fixing.004
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 489
@@ -65674,7 +65674,7 @@ name "Screw_Fixing.005"
 loc 0.003667 -0.098482 -0.068872
 data 16
 Screw_Fixing.005
-texture "../../Textures/Cockpit/cdu.png"
+texture "Textures/Cockpit/cdu.png"
 texrep 1.000000 1.000000
 crease 45.000001
 numvert 489
