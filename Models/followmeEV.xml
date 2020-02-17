@@ -847,7 +847,7 @@
 <!--  Switch for indicator  -->
 <model> 
  <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/indicators.xml</path>
- <offsets> 
+  <offsets> 
   <x-m>1.306</x-m>
   <y-m>-0.52</y-m>
   <z-m>0.935</z-m>
