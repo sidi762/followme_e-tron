@@ -6,5 +6,6 @@ Sidi Liang(FGPRC-0762): FDM, Engine, Nasal, Systems, Instruments, Models, Textur
 ValKmjolnir(FGPRC-0818): 'Auto Crash' System, Nasal  
 Weihao Lee(FGPRC-0405): Models, Textures, Effects    
 Qiyuan Luo(FGPRC-0404): Instruments, Textures
+Marsdolphin(Mars006): Instruments, Lights, Textures. Engine, Models
   
 ![Preview](http://wiki.flightgear.org/images/5/51/Preview-etron.png)
