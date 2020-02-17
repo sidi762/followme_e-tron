@@ -911,7 +911,7 @@
 <model>
     <condition>
 		<equals>
-			<property>systems/instruments/enable_switches</property>
+			<property>systems/instruments/enable_cdu</property>
 			<value>1</value>
 		</equals>
     </condition>

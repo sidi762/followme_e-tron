@@ -35,7 +35,7 @@ var tyreSmoke_3 = aircraft.tyresmoke.new(3, auto = 1, diff_norm = 0.4, check_vsp
 props.getNode("/",1).setValue("/systems/horn", 0);
 props.getNode("/",1).setValue("/controls/mode", 1);
 props.getNode("/",1).setValue("/systems/instruments/enable_switches", 0);
-props.getNode("/",1).setValue("/instrumentation/cdu/serviceable", 1);
+props.getNode("/",1).setValue("/systems/instruments/enable_cdu", 0);
 props.getNode("/",1).setValue("/instrumentation/cdu/ident/model", "Follow me EV");
 props.getNode("/",1).setValue("/instrumentation/cdu/ident/engines", "EV Motor");
 

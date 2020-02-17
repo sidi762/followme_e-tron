@@ -134,7 +134,7 @@ var i = 0;
 
 var key = func(v) {
 		var cduDisplay   = getprop("/instrumentation/cdu/display");
-		var serviceable  = getprop("/instrumentation/cdu/serviceable");
+		var serviceable  = getprop("/systems/instruments/enable_cdu");
 		var eicasDisplay = getprop("/instrumentation/eicas/display");
 		var cduInput     = getprop("/instrumentation/cdu/input");
 		var msg          = getprop("/instrumentation/fmc/isMsg");
@@ -339,8 +339,8 @@ var key = func(v) {
 				if (cduDisplay == "POS_REF"){
 					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
 				}
-				if (cduDisplay == "THR_LIM"){
-					setprop("/instrumentation/fmc/THRLIM","TOGA");
+				if (cduDisplay == "DRIVING_MODE"){
+					setprop("/controls/mode","1");
 				}
 				if (cduDisplay == "FMC_COMM"){
 					cduDisplay = "ALTN";
@@ -410,9 +410,6 @@ var key = func(v) {
 					}else{cduInput = "INVALID ENTRY";msg = 1;}
 
 				}
-				else if(cduDisplay == "THR_LIM"){
-					setprop("/instrumentation/fmc/CLB_LIM","CLB");
-				}
 				else if (cduDisplay == "TO_REF"){
 					if(cduInput == ""){setprop("/instrumentation/fmc/VRchecked",1);}
 					else if(num(cduInput) != nil){
@@ -473,8 +470,8 @@ var key = func(v) {
 				if (cduDisplay == "POS_REF"){
 					cduInput = LatDMMunsignal(getprop("/position/latitude-deg"))~LonDmmUnsignal(getprop("/position/longitude-deg"));
 				}
-				if (cduDisplay == "THR_LIM"){
-					setprop("/instrumentation/fmc/THRLIM","TO-1");
+                if (cduDisplay == "DRIVING_MODE"){
+					setprop("/controls/mode","0.65");
 				}
 				if (cduDisplay == "FMC_COMM"){
 					cduDisplay = "PERF_INIT";
@@ -553,9 +550,6 @@ var key = func(v) {
 					}
 					cduInput = "";
 				}
-				if(cduDisplay == "THR_LIM"){
-					setprop("/instrumentation/fmc/CLB_LIM","CLB-1");
-				}
 				if (cduDisplay == "TO_REF"){
 					if(cduInput == ""){setprop("/instrumentation/fmc/V2checked",1);}
 					else if(num(cduInput) != nil){
@@ -589,7 +583,7 @@ var key = func(v) {
 					}
 				}
 				if (cduDisplay == "INIT_REF"){
-					cduDisplay = "THR_LIM";
+					cduDisplay = "DRIVING_MODE";
 				}
 				if (cduDisplay == "RTE1_LEGS"){
 					if (cduInput == "DELETE"){
@@ -609,8 +603,8 @@ var key = func(v) {
 					setprop("/instrumentation/cdu/RESERVES",cduInput);
 					cduInput = "";
 				}
-				if (cduDisplay == "THR_LIM"){
-					setprop("/instrumentation/fmc/THRLIM","TO-2");
+                if (cduDisplay == "DRIVING_MODE"){
+					setprop("/controls/mode","0.4");
 				}
 				if (cduDisplay == "FMC_COMM"){
 					cduDisplay = "TO_REF";
@@ -687,9 +681,6 @@ var key = func(v) {
 						setprop("/autopilot/route-manager/route/wp[4]/altitude-ft",substr(cduInput,2)*100);
 					}
 					cduInput = "";
-				}
-				if(cduDisplay == "THR_LIM"){
-					setprop("/instrumentation/fmc/CLB_LIM","CLB-2");
 				}
 				if (cduDisplay == "TO_REF"){
 					if(cduInput == ""){setprop("/instrumentation/fmc/V2checked",1);}
@@ -807,7 +798,7 @@ var key = func(v) {
 				}
 				if (cduDisplay == "INIT_REF"){
 					cduDisplay = "APP_REF";
-				}else if ((cduDisplay == "APP_REF") or (cduDisplay == "IDENT") or (cduDisplay == "MAINT") or (cduDisplay == "PERF_INIT") or (cduDisplay == "POS_INIT") or (cduDisplay == "POS_REF") or (cduDisplay == "THR_LIM") or (cduDisplay == "TO_REF") or (cduDisplay == "ALTN_LIST")){
+				}else if ((cduDisplay == "APP_REF") or (cduDisplay == "IDENT") or (cduDisplay == "MAINT") or (cduDisplay == "PERF_INIT") or (cduDisplay == "POS_INIT") or (cduDisplay == "POS_REF") or (cduDisplay == "DRIVING_MODE") or (cduDisplay == "TO_REF") or (cduDisplay == "ALTN_LIST")){
 					cduDisplay = "INIT_REF";
 				}else if (cduDisplay == "RTE1_DEP"){
 					if(getprop("/autopilot/route-manager/isChanged") != 0){
@@ -844,11 +835,8 @@ var key = func(v) {
 
 
 				}
-				if (cduDisplay == "THR_LIM"){
-					cduDisplay = "TO_REF";
-				}
 				else if (cduDisplay == "APP_REF"){
-					cduDisplay = "THR_LIM";
+					cduDisplay = "DRIVING_MODE";
 				}
 				else if ((cduDisplay == "RTE1_1") or (cduDisplay == "RTE1_LEGS")){
 					armChanges();
@@ -890,7 +878,7 @@ var key = func(v) {
 				}
 				else if (cduDisplay == "PERF_INIT")
 				{
-					cduDisplay = "THR_LIM";
+					cduDisplay = "DRIVING_MODE";
 				}
 			}
 		}
@@ -908,7 +896,7 @@ var cdu = func{
 
 		var display = getprop("/instrumentation/cdu/display");
 
-		var serviceable = getprop("/instrumentation/cdu/serviceable");
+		var serviceable = getprop("systems/instruments/enable_cdu");
 		title = "";		page = "";
 		line1l = "";	line2l = "";	line3l = "";	line4l = "";	line5l = "";	line6l = "";
 		line1lt = "";	line2lt = "";	line3lt = "";	line4lt = "";	line5lt = "";	line6lt = "";
@@ -1537,29 +1525,20 @@ var cdu = func{
 
 		}
 
-		if (display == "THR_LIM") {
+		if (display == "DRIVING_MODE") {
 
-			title = "THRUST LIM";
-			line1lt = "SEL";
-			line1ct = "OAT";
+			title = "DRIVING MODE";
 			line1c = sprintf("%2.0f", getprop("/environment/temperature-degc"))~"*c";
-			line1rt = "TO 1 N1";
-			line2l = "<TO";
-			line2r = "CLB>";
-			line3lt = "TO 1";
-			line3l = "<-10%";
-			line3r = "CLB 1>";
-			line4lt = "TO 2";
-			line4l = "<-20%";
-			line4r = "CLB 2>";
+			line2lt = "MODE";
+			line2l = "PERFORMANCE";
+			line3lt = "MODE";
+			line3l = "COMFORT";
+			line4lt = "MODE";
+			line4l = "LOW POWER";
 			line6l = "<INDEX";
-			line6r = "TAKEOFF>";
-			if (getprop("/instrumentation/fmc/THRLIM") == "TOGA"){line2cl = "<SEL>";}
-			else if (getprop("/instrumentation/fmc/THRLIM") == "TO-1"){line3cl = "<SEL>";}
-			else if (getprop("/instrumentation/fmc/THRLIM") == "TO-2"){line4cl = "<SEL>";}
-			if (getprop("/instrumentation/fmc/CLB_LIM") == "CLB"){line2cr = "<SEL>";}
-			else if (getprop("/instrumentation/fmc/CLB_LIM") == "CLB-1"){line3cr = "<SEL>";}
-			else if (getprop("/instrumentation/fmc/CLB_LIM") == "CLB-2"){line4cr = "<SEL>";}
+			if (getprop("/controls/mode") == "1"){line2cr = "<SEL>";}
+			else if (getprop("/controls/mode") == "0.65"){line3cr = "<SEL>";}
+			else if (getprop("/controls/mode") == "0.4"){line4cr = "<SEL>";}
 		}
 		if (display == "TO_REF") {
 
@@ -1745,14 +1724,14 @@ var cdu = func{
 
 var cduTimer = maketimer(0.2, cdu);
 var cduPowerOnOff = func(){
-	if(getprop("/instrumentation/cdu/serviceable") == 1){
+	if(getprop("systems/instruments/enable_cdu") == 1){
 		cduInitialize();
 		cduTimer.start();
 		print("CDU Powered ON");
 	}
 }
-cduPowerOnOff();
 
-setlistener("/instrumentation/cdu/serviceable", cduPowerOnOff);
+
+setlistener("/systems/instruments/enable_cdu", cduPowerOnOff);
 
 #_setlistener("/sim/signals/fdm-initialized", cdu);
