@@ -292,6 +292,22 @@
 			<field-of-view>65</field-of-view>
 		</config>
 	</view>
+	 <view n="101">
+		<name>Reverse Camera</name>
+        <internal archive="y">true</internal>
+        <type>lookfrom</type>
+		<config>
+            <from-model type="bool">true</from-model>
+            <from-model-idx type="int">0</from-model-idx>
+            <dynamic-view type="bool">true</dynamic-view>
+			<x-offset-m archive="y" type="double">0</x-offset-m>
+			<y-offset-m archive="y" type="double">2.1</y-offset-m>
+			<z-offset-m archive="y" type="double">3.52</z-offset-m>
+			<heading-offset-deg>180</heading-offset-deg>
+			<pitch-offset-deg>-10.0</pitch-offset-deg>
+			<field-of-view>90</field-of-view>
+		</config>
+	</view>
 
 	<hud>
 		<enable3d>false</enable3d>
