@@ -843,7 +843,6 @@
   <pitch-deg>-18.0</pitch-deg>
  </offsets>
 </model>
-<!-- Disabled for now
 <!--  Switch for indicator  -->
 <model> 
  <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/indicators.xml</path>
@@ -864,5 +863,24 @@
   <pitch-deg>-18.0</pitch-deg>
  </offsets>
 </model>
--->
+<!--  Switch for warning lights  -->
+<model> 
+ <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/s-warninglights.xml</path>
+  <offsets> 
+  <x-m>1.306</x-m>
+  <y-m>-0.498</y-m>
+  <z-m>0.935</z-m>
+  <pitch-deg>-18.0</pitch-deg>
+ </offsets>
+</model>
+<!--  Indicator warning lights  -->
+<model> 
+ <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/wl.xml</path>
+ <offsets> 
+  <x-m>1.306</x-m>
+  <y-m>-0.498</y-m>
+  <z-m>0.935</z-m>
+  <pitch-deg>-18.0</pitch-deg>
+ </offsets>
+</model>
 </PropertyList>
