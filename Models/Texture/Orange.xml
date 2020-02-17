@@ -1,12 +1,10 @@
 <?xml version="1.0"?>
-
-
 <PropertyList>
 <sim>
     <model>
         <livery>
             <name type="string">Orange</name>
-            <texture>Texture/Orange.png</texture>
+            <texture-fuse>Texture/Orange.png</texture-fuse>
         </livery>
     </model>    
 </sim>
