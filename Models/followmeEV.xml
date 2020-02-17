@@ -927,5 +927,24 @@
         <pitch-deg>-4.0</pitch-deg>
     </offsets>
 </model>
-
+<!--  MCDU  -->
+<model>
+    <condition>
+		<equals>
+			<property>systems/instruments/enable_mcdu</property>
+			<value>1</value>
+		</equals>
+		<not>
+			<property>systems/instruments/enable_cdu</property>
+			<value>1</value>
+		</not>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/mCDU/mCDU.xml</path>
+    <offsets>
+        <x-m>1.31</x-m>
+        <y-m>-0.00</y-m>
+        <z-m>0.8</z-m>
+        <pitch-deg>94.0</pitch-deg>	
+    </offsets>
+</model>
 </PropertyList>
