@@ -890,7 +890,7 @@
         <pitch-deg>-18.0</pitch-deg>
     </offsets>
 </model>
-<!--  Indicator warning lights  -->
+<!--  Warning lights sign  -->
 <model>
     <condition>
 		<equals>
