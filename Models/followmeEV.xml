@@ -691,7 +691,6 @@
  <object-name>Cone</object-name>
 </effect>
 
-
 <animation>
  <type>select</type>
  <object-name>Cone</object-name>
@@ -822,9 +821,9 @@
 		</action>
 	</animation>
 <!-- switch for horn -->
-<model> 
+<model>
  <path>Aircraft/followme_e-tron/Models/Instruments/Horn/switch-horn.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.405</x-m>
   <y-m>-0.143</y-m>
   <z-m>0.919</z-m>
@@ -834,9 +833,9 @@
 </model>
 
 <!-- sign for horn -->
-<model> 
+<model>
  <path>Aircraft/followme_e-tron/Models/Instruments/Horn/horn.xml</path>
- <offsets> 
+ <offsets>
   <x-m>1.416</x-m>
   <y-m>-0.17</y-m>
   <z-m>0.905</z-m>
@@ -844,43 +843,85 @@
  </offsets>
 </model>
 <!--  Switch for indicator  -->
-<model> 
- <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/indicators.xml</path>
-  <offsets> 
-  <x-m>1.306</x-m>
-  <y-m>-0.52</y-m>
-  <z-m>0.935</z-m>
-  <pitch-deg>-18.0</pitch-deg>
- </offsets>
+<model>
+    <condition>
+		<equals>
+			<property>systems/instruments/enable_switches</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/indicators.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.52</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
 </model>
 <!--  Indicator sign  -->
-<model> 
- <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/sign.xml</path>
- <offsets> 
-  <x-m>1.306</x-m>
-  <y-m>-0.52</y-m>
-  <z-m>0.935</z-m>
-  <pitch-deg>-18.0</pitch-deg>
- </offsets>
+<model>
+    <condition>
+		<equals>
+			<property>systems/instruments/enable_switches</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/sign.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.52</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
 </model>
 <!--  Switch for warning lights  -->
-<model> 
- <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/s-warninglights.xml</path>
-  <offsets> 
-  <x-m>1.306</x-m>
-  <y-m>-0.498</y-m>
-  <z-m>0.935</z-m>
-  <pitch-deg>-18.0</pitch-deg>
- </offsets>
+<model>
+    <condition>
+		<equals>
+			<property>systems/instruments/enable_switches</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/s-warninglights.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.498</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
 </model>
 <!--  Warning lights sign  -->
-<model> 
- <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/wl.xml</path>
- <offsets> 
-  <x-m>1.306</x-m>
-  <y-m>-0.498</y-m>
-  <z-m>0.935</z-m>
-  <pitch-deg>-18.0</pitch-deg>
- </offsets>
+<model>
+    <condition>
+		<equals>
+			<property>systems/instruments/enable_switches</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/wl.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.498</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
 </model>
+
+<!--  CDU  -->
+<model>
+    <condition>
+		<equals>
+			<property>systems/instruments/enable_cdu</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/CDU/boeing.xml</path>
+    <offsets>
+        <x-m>1.31</x-m>
+        <y-m>-0.00</y-m>
+        <z-m>0.8</z-m>
+        <pitch-deg>-4.0</pitch-deg>
+    </offsets>
+</model>
+
 </PropertyList>

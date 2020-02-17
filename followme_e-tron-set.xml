@@ -292,6 +292,22 @@
 			<field-of-view>65</field-of-view>
 		</config>
 	</view>
+	 <view n="101">
+		<name>Reverse Camera</name>
+        <internal archive="y">true</internal>
+        <type>lookfrom</type>
+		<config>
+            <from-model type="bool">true</from-model>
+            <from-model-idx type="int">0</from-model-idx>
+            <dynamic-view type="bool">true</dynamic-view>
+			<x-offset-m archive="y" type="double">0</x-offset-m>
+			<y-offset-m archive="y" type="double">2.1</y-offset-m>
+			<z-offset-m archive="y" type="double">3.52</z-offset-m>
+			<heading-offset-deg>180</heading-offset-deg>
+			<pitch-offset-deg>-10.0</pitch-offset-deg>
+			<field-of-view>90</field-of-view>
+		</config>
+	</view>
 
 	<hud>
 		<enable3d>false</enable3d>
@@ -739,25 +755,33 @@
         <file>Aircraft/followme_e-tron/Nasal/light-manager.nas</file>
     </light>
     <dual_control_tools>
-     <file>Aircraft/followme_e-tron/Nasal/DualControl/dual-control-tools.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/DualControl/dual-control-tools.nas</file>
     </dual_control_tools>
     <aircraft_dual_control>
-     <file>Aircraft/followme_e-tron/Nasal/DualControl/followme-dual-control.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/DualControl/followme-dual-control.nas</file>
     </aircraft_dual_control>
     <dual_control>
-     <file>Aircraft/followme_e-tron/Nasal/DualControl/pilot-dual-control.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/DualControl/pilot-dual-control.nas</file>
     </dual_control>
     <autopilot>
-     <file>Aircraft/followme_e-tron/Nasal/auto_crash.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/auto_crash.nas</file>
     </autopilot>
     <autospeed>
-     <file>Aircraft/followme_e-tron/Nasal/auto_speed.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/auto_speed.nas</file>
     </autospeed>
+    <cdu>
+         <file>Aircraft/followme_e-tron/Models/Instruments/CDU/boeing.nas</file>
+         <file>Aircraft/followme_e-tron/Models/Instruments/CDU/library.nas</file>
+         <file>Aircraft/followme_e-tron/Models/Instruments/CDU/functions.nas</file>
+    </cdu>
+    <datalink>
+        <file>Aircraft/followme_e-tron/Models/Instruments/CDU/datalink.nas</file>
+    </datalink>
     <!--<musicplayer>
      <file>Aircraft/followme_e-tron/MusicPlayer/musicplayer.nas</file>
     </musicplayer> -->
     <dialogs>
-     <file>Aircraft/followme_e-tron/gui/dialogs/config.nas</file>
+        <file>Aircraft/followme_e-tron/gui/dialogs/config.nas</file>
     </dialogs>
 </nasal>
 
