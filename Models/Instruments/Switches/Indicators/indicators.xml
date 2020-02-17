@@ -15,17 +15,23 @@
       <binding>
         <command>property-toggle</command>
         <property>controls/lighting/indicator-right</property>
-      </binding>  
+      </binding>
       <binding>
         <command>property-toggle</command>
         <property>controls/lighting/indicator-left</property>
-      </binding>     
+      </binding>
     </action>
   </animation>
 
   <animation>
     <type>rotate</type>
     <object-name>switch</object-name>
+    <condition>
+        <equals>
+            <property>controls/lighting/indicator-left</property>
+            <value>1</value>
+        </equals>
+    </condition>
     <property>controls/lighting/indicator-right</property>
     <factor> -50 </factor>
     <center>
