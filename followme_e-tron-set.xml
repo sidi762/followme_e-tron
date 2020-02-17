@@ -774,6 +774,18 @@
          <file>Aircraft/followme_e-tron/Models/Instruments/CDU/library.nas</file>
          <file>Aircraft/followme_e-tron/Models/Instruments/CDU/functions.nas</file>
     </cdu>
+    <mcdu>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/init_A.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/init_B.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/radios.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/select_SID.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/select_STAR.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/f-pln.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/lat_rev.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/common.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/loop.nas</file>
+			<file>Aircraft/followme_e-tron/Nasal/mCDU/parse_DB.nas</file>
+	</mcdu>
     <datalink>
         <file>Aircraft/followme_e-tron/Models/Instruments/CDU/datalink.nas</file>
     </datalink>
