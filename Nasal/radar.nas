@@ -1,18 +1,22 @@
 #Parking radar by Sidi Liang
 var Radar = {
-    #//Class for any Parking Radar (currently only support terrain detection)
-    #//height: height of installation above ground;installCoord: coord of installation; maxRange: max radar range
-    #//For this vehicle: height 0.3m; installCoord:3.8m; maxRange:6m; maxWidth:2m
+    #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
+    #//height: height of installation above ground;installCoordY: coord of installation; maxRange: max radar range
+    #//For this vehicle: height 0.3m; installCoordY:3.8m; maxRange:3m;maxWidth:3m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
-    new: func(height, installCoord, maxRange, maxWidth) {
-        return { parents:[Radar, followme.Appliance.new()], height: height, installCoord:installCoord, maxRange:maxRange, maxWidth:maxWidth};
+    new: func(height, installCoordX, installCoordY, maxRange, maxWidth) {
+        return { parents:[Radar, followme.Appliance.new()], height: height, installCoordX:installCoordX, installCoordY:installCoordY, maxRange:maxRange, maxWidth:maxWidth};
     },
     height: 0.3, #METERS
-    installCoord:3.8, #METERS
-    maxRange:6, #METERS
-    maxWidth:2, #METERS
+    installCoordX: 0, #METERS
+    installCoordY: 3.8, #METERS
+    maxRange: 3, #METERS
+    maxWidth: 3, #METERS
     radarTimer: nil,
+    updateInterval:0.25,#SEC
+    searchAngle: 0, #RAD, half of the search angle
+    tanSearchAngle: 0,
 
     vehiclePosition: nil,
     coord: nil,
@@ -30,12 +34,14 @@ var Radar = {
     lastDis: 0,
 
     init: func(){
+        me.searchAngle = math.acos(me.maxRange / math.sqrt((2/me.maxWidth)*(2/me.maxWidth) + me.maxRange*me.maxRange));
+        me.tanSearchAngle = math.tan(me.searchAngle);
         me.getCoord();
         me.backLatRange = me.calculateLatChange(me.maxRange);
         me.backLonRange = me.calculateLonChange(me.maxRange, me.coord);
         me.widthLatRange = me.calculateLatChange(me.maxWidth);
         me.widthLonRange = me.calculateLonChange(me.maxWidth, me.coord);
-        if(me.radarTimer == nil) me.radarTimer = maketimer(0.2, func me.update());
+        if(me.radarTimer == nil) me.radarTimer = maketimer(me.updateInterval, func me.update());
         if(me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
         me.radarTimer.start();
         print("Parking radar initialized!");
@@ -58,7 +64,8 @@ var Radar = {
         me.vehicleHeading = props.getNode("/orientation/heading-deg",1).getValue();
         me.vehiclePosition = geo.aircraft_position();
         me.coord = geo.Coord.new(me.vehiclePosition);
-        me.coord.apply_course_distance(me.vehicleHeading, -me.installCoord);
+        me.coord.apply_course_distance(geo.normdeg(me.vehicleHeading-90), me.installCoordX);
+        me.coord.apply_course_distance(me.vehicleHeading, -me.installCoordY);
         #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", me.coord);
     },
     calculateLonChange: func(meters, coord){
@@ -102,55 +109,61 @@ var Radar = {
             me.warningTimer.stop();
             return;
         }
+        if(!me.warningTimer.isRunning) me.warningTimer.start();
         if(meters <= 0.5){
             me.warningInterval = 0.2;
             me.warningSound = "parking_radar_long.wav";
+            print("Caution! Something behind at less than 0.5 meters!");
             return;
         }else{
             me.warningSound = "parking_radar.wav";
         }
-        if(!me.warningTimer.isRunning) me.warningTimer.start();
-        meters = sprintf("%.2f", meters);
+        meters = sprintf("%.3f", meters);
         if(meters != me.lastDis) me.warningInterval = (meters)/me.maxRange;
-        print("Caution! something behind at approximatly "~meters~" meters");
+        print("Caution! Something behind at approximatly "~meters~" meters");
         me.lastDis = meters;
     },
     sample: func(stepLat, stepLon, searchLat, searchLon){ # returns an elevtion
-        var latChange  = math.sin(math.pi * me.vehicleHeading/180);
-        var lonChange  = -math.cos(math.pi * me.vehicleHeading/180);
-        var coord = geo.Coord.new();
-        coord.set_latlon(me.position_change(searchLat,stepLat*latChange), me.position_change(searchLon,stepLon*lonChange));
-        return coord;
+        var latChange  = math.sin(me.vehicleHeading * D2R);
+        var lonChange  = -math.cos(me.vehicleHeading * D2R);
+        var sampleCoord = geo.Coord.new();
+        sampleCoord.set_latlon(me.position_change(searchLat,stepLat*latChange), me.position_change(searchLon,stepLon*lonChange));
+        #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", sampleCoord.lat(), sampleCoord.lon(), me.coord.alt());
+        return sampleCoord;
     },
     update: func(){
         me.getCoord();
         var searchDis = 0.01;#Meters
-        var searchStep = 0.1;#Meters
+        var searchStep = 0;#Meters
         while(searchDis <= me.maxRange){
+            var searchWidth = math.abs(searchDis * me.tanSearchAngle);
+            var searchWidthLat = me.calculateLatChange(searchWidth);
+            var searchWidthLon = me.calculateLonChange(searchWidth, me.coord);
             var searchCoord = geo.Coord.new();
             searchCoord.set_latlon(me.coord.lat(), me.coord.lon());
             searchCoord.apply_course_distance(me.vehicleHeading, 0-searchDis);
-            for(var i = 0; i > (0 - me.widthLatRange/2); i -= 0.000001){
-                var percentage = (0-i)/(me.widthLatRange/2); #use approximate value to reduce cost
-                var stepLon = 0 - me.widthLonRange * percentage;
+            for(var i = 0; i >= (0 - searchWidthLat); i -= searchWidthLat/1.5){
+                #print(me.widthLatRange/2);
+                var percentage = (0-i)/(searchWidthLat/2); #use approximate value to reduce cost
+                var stepLon = 0 - searchWidthLon * percentage;
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
+                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
                     me.warnControl(meters);
-                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord);
                     return;
                 }
             }
-            for(var i = 0; i < me.widthLatRange/2; i += 0.000001){
-                var percentage = i/(me.widthLatRange/2); #use approximate value to reduce cost
-                var stepLon = me.widthLonRange * percentage;
+            for(var i = 0; i <= searchWidthLat; i += searchWidthLat/1.5){
+                var percentage = i/(searchWidthLat/2); #use approximate value to reduce cost
+                var stepLon = searchWidthLon * percentage;
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
+                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
                     me.warnControl(meters);
-                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord);
                     return;
                 }
             }
@@ -162,4 +175,4 @@ var Radar = {
     },
 };
 
-var parkingRadar = Radar.new(0.3, 3.8, 6, 2);
+var parkingRadar = Radar.new(0.3, 0, 3.8, 3, 3);

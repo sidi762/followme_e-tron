@@ -10,7 +10,7 @@ var position_change = func(position_val,value){
     return position_val;
 }
 var road_check_func = func(){
-    
+
     var lat = props.getNode("/position/latitude-deg",1).getValue();
     var lon = props.getNode("/position/longitude-deg",1).getValue();
     var position_info = geodinfo(lat,lon);
@@ -24,14 +24,14 @@ var road_check_func = func(){
         var lon_change  = 0;
         var left_range  = 0;
         var right_range = 0;
-        
+
         for(var i=0;i>-0.00005;i-=0.000001)
         {
             car_heading = props.getNode("/orientation/heading-deg",1).getValue();
-            lat_change  = math.sin(math.pi*car_heading/180);
-            lon_change  = -math.cos(math.pi*car_heading/180);
-            lat = props.getNode("/position/latitude-deg",1).getValue()+0.0001*math.cos(math.pi*car_heading/180);
-            lon = props.getNode("/position/longitude-deg",1).getValue()+0.0001*math.sin(math.pi*car_heading/180);
+            lat_change  = math.sin(D2R*car_heading);
+            lon_change  = -math.cos(D2R*car_heading);
+            lat = props.getNode("/position/latitude-deg",1).getValue()+0.0001*math.cos(D2R*car_heading);
+            lon = props.getNode("/position/longitude-deg",1).getValue()+0.0001*math.sin(D2R*car_heading);
             var other_position_info = geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
             var other_names = other_position_info[1].names;
             if((other_names[0]=="Freeway") or (other_names[0]=="Road"))
@@ -42,10 +42,10 @@ var road_check_func = func(){
         for(var i=0;i<0.00005;i+=0.000001)
         {
             car_heading = props.getNode("/orientation/heading-deg",1).getValue();
-            lat_change  = math.sin(math.pi*car_heading/180);
-            lon_change  = -math.cos(math.pi*car_heading/180);
-            lat = props.getNode("/position/latitude-deg",1).getValue()+0.0001*math.cos(math.pi*car_heading/180);
-            lon = props.getNode("/position/longitude-deg",1).getValue()+0.0001*math.sin(math.pi*car_heading/180);
+            lat_change  = math.sin(D2R*car_heading);
+            lon_change  = -math.cos(D2R*car_heading);
+            lat = props.getNode("/position/latitude-deg",1).getValue()+0.0001*math.cos(D2R*car_heading);
+            lon = props.getNode("/position/longitude-deg",1).getValue()+0.0001*math.sin(D2R*car_heading);
             var other_position_info = geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
             var other_names = other_position_info[1].names;
             if((other_names[0]=="Freeway") or (other_names[0]=="Road"))
@@ -53,7 +53,7 @@ var road_check_func = func(){
             else
                 break;
         }
-        
+
         if(left_range>right_range)
         {
             props.getNode("/", 1).setValue("/controls/flight/rudder",-(right_range-left_range)*(right_range-left_range)/900);
