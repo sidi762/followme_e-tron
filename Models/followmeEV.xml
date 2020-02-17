@@ -843,6 +843,7 @@
   <pitch-deg>-18.0</pitch-deg>
  </offsets>
 </model>
+<!-- Disabled for now
 <!--  Switch for indicator  -->
 <model> 
  <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/indicators.xml</path>
@@ -864,3 +865,4 @@
  </offsets>
 </model>
 </PropertyList>
+-->
