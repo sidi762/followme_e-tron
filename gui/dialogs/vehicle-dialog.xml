@@ -416,6 +416,15 @@
                     <command>dialog-apply</command>
                 </binding>
             </checkbox>
+            <checkbox>
+                <halign>left</halign>
+                <label>  Enable Switches</label>
+                <property>systems/instruments/enable_switches</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
         </group>
         <hrule/>
         <group>
