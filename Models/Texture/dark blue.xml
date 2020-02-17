@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">Dark Blue</name>
+			<texture-fuse>Texture/dark blue.png</texture-fuse>
+		</livery>
+	</model>
+</sim>
+</PropertyList>
