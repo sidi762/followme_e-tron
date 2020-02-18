@@ -69,5 +69,16 @@
  </condition>
  <texture>texture/SAD00818.png</texture>
 </animation>
- 
+<animation>
+ <type>material</type>
+ <object-name>face</object-name>
+ <condition>
+	<equals>
+		<property>sim/multiplay/generic/string[0]</property>
+		<value>JAD00066</value>
+	</equals>
+ </condition>
+ <texture>texture/JAD00066.png</texture>
+</animation>
+
 </PropertyList>
