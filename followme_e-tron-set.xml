@@ -157,6 +157,12 @@
                 <path>Splash/22.jpg</path>
             </preview>
 	    
+	     <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/23.jpg</path>
+            </preview>
+	    
 	    <!-- Start sunrise splash -->
 	    
 	    <preview>
