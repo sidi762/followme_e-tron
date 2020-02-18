@@ -144,12 +144,21 @@
                 <path>Splash/20.jpg</path>
             </preview>
 	    
+	    <!-- Start sunrise splash -->
+	    
+	    <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/Sunrise/21.jpg</path>
+            </preview>
+	    
 	    <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/Sunrise/21.jpg</path>
             </preview>
 
+	    <!-- Start G4 Tour splash -->
 
             <preview>
                 <type>exterior</type>
