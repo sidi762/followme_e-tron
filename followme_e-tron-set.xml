@@ -24,6 +24,7 @@
     </colors></style></gui>
 
     <previews>
+	    <!-- Start splashes -->
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -206,7 +207,7 @@
                 <path>Splash/G4_Tour/11.jpg</path>
             </preview>
     </previews>
-
+	<!-- Splashes ends here -->
 	<rating>
 		<FDM type="int">4</FDM>
 		<systems type="int">2</systems>
