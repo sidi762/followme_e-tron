@@ -211,6 +211,11 @@
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/11.jpg</path>
             </preview>
+	     <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/12.jpg</path>
+            </preview>
     </previews>
 
 	<rating>
