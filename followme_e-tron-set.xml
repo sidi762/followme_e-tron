@@ -144,15 +144,15 @@
                 <splash type="bool">true</splash>
                 <path>Splash/20.jpg</path>
             </preview>
-	    
+
 	    <!-- Start sunrise splash -->
-	    
+
 	    <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/Sunrise/21.jpg</path>
             </preview>
-	    
+
 	    <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -298,6 +298,37 @@
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
+    <view n="98">
+       <name>Reverse Camera</name>
+       <internal archive="y">true</internal>
+       <type>lookfrom</type>
+       <config>
+           <from-model type="bool">true</from-model>
+           <from-model-idx type="int">0</from-model-idx>
+           <dynamic-view type="bool">true</dynamic-view>
+           <x-offset-m archive="y" type="double">0</x-offset-m>
+           <y-offset-m archive="y" type="double">2.1</y-offset-m>
+           <z-offset-m archive="y" type="double">3.52</z-offset-m>
+           <heading-offset-deg>180</heading-offset-deg>
+           <pitch-offset-deg>-10.0</pitch-offset-deg>
+           <field-of-view>90</field-of-view>
+       </config>
+	</view>
+    <view n="99">
+		<name>Back Rows</name>
+        <internal archive="y">true</internal>
+        <type>lookfrom</type>
+		<config>
+            <from-model type="bool">true</from-model>
+            <from-model-idx type="int">0</from-model-idx>
+            <dynamic-view type="bool">true</dynamic-view>
+            <x-offset-m archive="y" type="double">-0.35</x-offset-m>
+			<y-offset-m archive="y" type="double">1.21</y-offset-m>
+			<z-offset-m archive="y" type="double">2.6</z-offset-m>
+            <pitch-offset-deg>-10.0</pitch-offset-deg>
+			<default-field-of-view-deg type="double">90</default-field-of-view-deg>
+		</config>
+	</view>
 	<view n="100">
 		<name>Copilot View</name>
         <internal archive="y">true</internal>
@@ -307,28 +338,14 @@
             <from-model-idx type="int">0</from-model-idx>
             <dynamic-view type="bool">true</dynamic-view>
 			<x-offset-m archive="y" type="double">0.35</x-offset-m>
-			<y-offset-m archive="y" type="double">1.35</y-offset-m>
+			<y-offset-m archive="y" type="double">1.21</y-offset-m>
 			<z-offset-m archive="y" type="double">1.88</z-offset-m>
-			<pitch-offset-deg>-10.0</pitch-offset-deg>
-			<field-of-view>65</field-of-view>
+            <pitch-offset-deg>-10.0</pitch-offset-deg>
+			<default-field-of-view-deg type="double">90</default-field-of-view-deg>
 		</config>
 	</view>
-	 <view n="101">
-		<name>Reverse Camera</name>
-        <internal archive="y">true</internal>
-        <type>lookfrom</type>
-		<config>
-            <from-model type="bool">true</from-model>
-            <from-model-idx type="int">0</from-model-idx>
-            <dynamic-view type="bool">true</dynamic-view>
-			<x-offset-m archive="y" type="double">0</x-offset-m>
-			<y-offset-m archive="y" type="double">2.1</y-offset-m>
-			<z-offset-m archive="y" type="double">3.52</z-offset-m>
-			<heading-offset-deg>180</heading-offset-deg>
-			<pitch-offset-deg>-10.0</pitch-offset-deg>
-			<field-of-view>90</field-of-view>
-		</config>
-	</view>
+
+
 
 	<hud>
 		<enable3d>false</enable3d>
