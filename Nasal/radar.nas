@@ -1,8 +1,8 @@
 #Parking radar by Sidi Liang
 var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
-    #//height: height of installation above ground;installCoordY: coord of installation; maxRange: max radar range
-    #//For this vehicle: height 0.3m; installCoordY:3.8m; maxRange:3m;maxWidth:3m
+    #//height: height of installation above ground;installCoordX: X coord of installation; installCoordY: Y coord of installation; maxRange: max radar range; maxWidth: width of the sector
+    #//For follow me EV: height 0.3m; installCoordX:0m; installCoordY:3.8m; maxRange:3m;maxWidth:3m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
     new: func(height, installCoordX, installCoordY, maxRange, maxWidth) {
@@ -170,7 +170,7 @@ var Radar = {
             searchStep += 0.1;
             searchDis += searchStep;
         }
-        print("All clear");
+        #print("All clear");
         me.warnControl(10000);
     },
 };
