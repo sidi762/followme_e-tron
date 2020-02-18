@@ -24,11 +24,9 @@ var Engine = {
         me.direction = dir;
     },
     toggleDirection: func(){
-        if(me.direction == 1){
-            me.direction = -1;
-        }else{
-            me.direction = 1;
-        }
+        #//Toggle Direction, forward:1; barkward: -1
+        me.direction *= -1;
+        props.getNode("/",1).setValue("/controls/direction", me.direction);
     },
     getDirection: func(){
         return me.direction;

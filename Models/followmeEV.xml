@@ -806,6 +806,31 @@
       <z-m>0.282</z-m>
   </offsets>
 </model>
+
+<!-- GEAR HANDLE -->
+<animation>
+    <type>pick</type>
+    <object-name>gearhandle</object-name>
+    <action>
+      <button>0</button>
+      <binding>
+          <command>nasal</command>
+          <script>engine.engine_1.toggleDirection();</script>
+      </binding>
+    </action>
+</animation>
+<animation>
+  <type>translate</type>
+  <object-name>gearhandle</object-name>
+  <property>controls/direction</property>
+  <factor> -0.01 </factor>
+  <axis>
+    <x>  1 </x>
+    <y>  0 </y>
+    <z>  0 </z>
+  </axis>
+</animation>
+
 <!-- Hand brake -->
 <animation>
 		<type>pick</type>
