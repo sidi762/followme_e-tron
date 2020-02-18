@@ -807,6 +807,17 @@
   </offsets>
 </model>
 
+<!-- MUG -->
+<model>
+  <path>Aircraft/followme_e-tron/Models/Interior/mug/mug.ac</path>
+  <name>mug</name>
+  <offsets>
+      <x-m>1.58</x-m>
+      <y-m>0.00</y-m>
+      <z-m>0.75</z-m>
+  </offsets>
+</model>
+
 <!-- GEAR HANDLE -->
 <animation>
     <type>pick</type>
