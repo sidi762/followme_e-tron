@@ -24,6 +24,7 @@
     </colors></style></gui>
 
     <previews>
+	    <!-- Splash starts here -->
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
@@ -143,7 +144,22 @@
                 <splash type="bool">true</splash>
                 <path>Splash/20.jpg</path>
             </preview>
+	    
+	    <!-- Start sunrise splash -->
+	    
+	    <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/Sunrise/21.jpg</path>
+            </preview>
+	    
+	    <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/Sunrise/22.jpg</path>
+            </preview>
 
+	    <!-- Start G4 Tour splash -->
 
             <preview>
                 <type>exterior</type>
@@ -205,8 +221,13 @@
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/11.jpg</path>
             </preview>
+	     <preview>
+                <type>exterior</type>
+                <splash type="bool">true</splash>
+                <path>Splash/G4_Tour/12.jpg</path>
+            </preview>
     </previews>
-
+	<!-- Splah ends here -->
 	<rating>
 		<FDM type="int">4</FDM>
 		<systems type="int">2</systems>
