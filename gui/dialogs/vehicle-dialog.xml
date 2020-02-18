@@ -364,7 +364,7 @@
                 <value>YBD00404</value>
                 <value>YAD07749</value>
                 <value>SAD00818</value>
-		<value>JAD00066</value>
+                <value>JAD00066</value>
                 <binding>
         			<command>dialog-apply</command>
         			<object-name>plateSelection</object-name>
