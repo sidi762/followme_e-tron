@@ -398,6 +398,7 @@
 			<name>r</name>
 			<desc>Toggle parking radar system</desc>
 		</key>
+		<!-- Start text->
 		<text>
 		You can select the message to be displayed on the bar, through the "Follow Me EV > Select message" menu.
 		For more options, see "Follow Me EV > Show Options" menu.
