@@ -818,7 +818,7 @@
   <path>Aircraft/followme_e-tron/Models/Interior/mug/mug.ac</path>
   <name>mug</name>
   <offsets>
-      <x-m>1.58</x-m>
+      <x-m>1.61</x-m>
       <y-m>0.00</y-m>
       <z-m>0.75</z-m>
   </offsets>
@@ -849,9 +849,12 @@
 </animation>
 
 <!-- Hand brake -->
+<effect>
+    <inherits-from>/Effects/parkingbrake</inherits-from>
+    <object-name>handbrake.001</object-name>
+</effect>
 <animation>
 		<type>pick</type>
-		<object-name>handbrake</object-name>
 		<object-name>handbrake.001</object-name>
 		<action>
 			<button>0</button>
@@ -861,7 +864,30 @@
 				<script>followme.toggleHandBrake()</script>
 			</binding>
 		</action>
-	</animation>
+</animation>
+<animation>
+    <type>material</type>
+    <object-name>handbrake.001</object-name>
+    <condition>
+	       <equals>
+		             <property>sim/multiplay/generic/float[19]</property>
+	                 <value>1</value>
+	       </equals>
+    </condition>
+    <texture>Instruments/parkingbrake/parkingbrake_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>handbrake.001</object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/float[19]</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>Instruments/parkingbrake/parkingbrake.png</texture>
+</animation>
+
 <!-- switch for horn -->
 <model>
  <path>Aircraft/followme_e-tron/Models/Instruments/Horn/switch-horn.xml</path>
