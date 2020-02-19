@@ -809,6 +809,12 @@
 
 <!-- MUG -->
 <model>
+  <condition>
+		<equals>
+			<property>systems/interior/enable_mug</property>
+			<value>1</value>
+		</equals>
+    </condition>
   <path>Aircraft/followme_e-tron/Models/Interior/mug/mug.ac</path>
   <name>mug</name>
   <offsets>
