@@ -435,8 +435,9 @@
                     <command>dialog-apply</command>
                 </binding>
             </checkbox>
+	    <!-- Enable mug _->
 	    <checkbox>
-                <halign>left</halign>
+                <halign>right</halign>
                 <label>  Enable Mug</label>
                 <property>systems/interior/enable_mug</property>
                 <live>true</live>
