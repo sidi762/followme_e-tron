@@ -847,6 +847,21 @@
     <z>  0 </z>
   </axis>
 </animation>
+	
+<!-- Hand brake -->
+ <!--<animation>
+ 	<type>pick</type>
+ 	<object-name>handbrake</object-name>
+	<object-name>handbrake.001</object-name>
+	<action>
+ 		<button>0</button>
+ 		<repeatable>false</repeatable>
+ 		<binding>
+ 			<command>nasal</command>
+ 			<script>followme.toggleHandBrake()</script>
+ 		</binding>
+ 	</action>
+</animation>-->
 <!-- switch for horn -->
 <model>
  <path>Aircraft/followme_e-tron/Models/Instruments/Horn/switch-horn.xml</path>
