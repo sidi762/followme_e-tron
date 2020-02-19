@@ -426,7 +426,7 @@
                     <command>dialog-apply</command>
                 </binding>
             </checkbox>
-            <checkbox>
+            <!--<checkbox>
                 <halign>left</halign>
                 <label>  Enable CDU</label>
                 <property>systems/instruments/enable_cdu</property>
@@ -434,7 +434,7 @@
                 <binding>
                     <command>dialog-apply</command>
                 </binding>
-            </checkbox>
+            </checkbox>-->
 	    <!-- Enable mug -->
 	    <checkbox>
                 <halign>right</halign>
