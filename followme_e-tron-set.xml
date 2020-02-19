@@ -398,14 +398,11 @@
 			<name>r</name>
 			<desc>Toggle parking radar system</desc>
 		</key>
+		<!-- Start text -->
 		<text>
 		You can select the message to be displayed on the bar, through the "Follow Me EV > Select message" menu.
-		</text>
-		<text>
 		For more options, see "Follow Me EV > Show Options" menu.
-		</text>
-		<text>
-            e-tron Brought to you by FGPRC.
+		Follow me e-tron Brought to you by FGPRC.
 		</text>
 	</help>
 
