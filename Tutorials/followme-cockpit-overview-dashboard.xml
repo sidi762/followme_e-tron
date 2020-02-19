@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!-- Followme e-tron tutorial, ©(c) 2020 Marsdolphin
+Licensed under GNU GPL v2.0      -->
+<PropertyList>
+	<name>Introduction: Dashboard</name>
+	<description>Welcome to the follow e-tron!
+
+This tutorial walks you through the functions and details of the dashboard.
+</description>
+<step>
+	<message>Welcome aboard the follow e-tron!</message>
+</step>
+<step>
+	<message>Welcome to the dashboard driver's tutorial for the follow me e-tron!</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>Switches</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.45</x-offset-m>
+		<y-offset-m>1.1</y-offset-m>
+		<z-offset-m>1.7</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>You can enable switches at "Follow Me EV > Show Options" menu in the menubar.</message>
+        <set>
+		<property>systems/instruments/enable_switches</property>
+		<value>1</value>
+	</set>
+</step>
+<step>
+	<message>The left switch is used for starting the indicator lights.</message>
+</step>
+<step>
+	<message>The right switch is used for starting the warning lights.</message>
+</step>
+<step>
+	<message>When the switch is facing up, the lights are started.</message>
+</step>
+<step>
+	<message>That button is the starter. It starts the engine.</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.26</x-offset-m>
+		<y-offset-m>1.05</y-offset-m>
+		<z-offset-m>1.7</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>That button at the end of that shaft with a horn sign</message>
+</step>
+<step>
+	<message>Activates the horn when you click on it. Try it!</message>
+</step>
+<step>
+	<message>The left instrument is the speedometer. It tells you your speed.</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.75</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>You can check your speed by seeing where the needle is.</message>
+</step>
+<step>
+	<message>The right one is battery level. Make sure it isn't 0!</message>
+</step>
+<step>
+	<message>That's it for the dashboard.</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>Also check the other two tutorials for centre console and keyboard.</message>
+</step>
+<end></end>
+
+</PropertyList>

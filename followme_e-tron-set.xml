@@ -411,6 +411,9 @@
            <serviceable>0</serviceable>
        </autopilot>
     </systems>
+     <tutorials>
+            <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
+   </tutorials>
 
     <menubar>
 		<default>
