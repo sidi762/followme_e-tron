@@ -840,7 +840,7 @@
   <type>translate</type>
   <object-name>gearhandle</object-name>
   <property>controls/direction</property>
-  <factor> -0.01 </factor>
+  <factor> 0.01 </factor>
   <axis>
     <x>  1 </x>
     <y>  0 </y>
