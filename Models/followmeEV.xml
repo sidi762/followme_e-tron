@@ -71,7 +71,7 @@
  </condition>
  <path>Aircraft/followme_e-tron/Models/people/people.ac</path>
  <offsets>
-  <x-m> 2.6</x-m>
+  <x-m> 2.62</x-m>
   <y-m> 0</y-m>
   <z-m> 1.255</z-m>
  </offsets>
@@ -80,7 +80,7 @@
 <model>
  <condition>
 	<equals>
-		<property>systems/codriver-enable</property>
+		<property>sim/multiplay/generic/int[12]</property>
 		<value>1</value>
 	</equals>
  </condition>
@@ -444,7 +444,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre3</object-name>
- <property>gear/gear[2]/steering-norm</property>
+ <property>sim/multiplay/generic/float[20]</property>
  <factor>5</factor>
  <center>
   <x-m> 3.17</x-m>
@@ -501,7 +501,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre4</object-name>
- <property>gear/gear[3]/steering-norm</property>
+ <property>sim/multiplay/generic/float[21]</property>
  <factor>5</factor>
  <center>
   <x-m> 3.15</x-m>
@@ -839,7 +839,7 @@
 <animation>
   <type>translate</type>
   <object-name>gearhandle</object-name>
-  <property>controls/direction</property>
+  <property>sim/multiplay/generic/int[11]</property>
   <factor> 0.01 </factor>
   <axis>
     <x>  1 </x>

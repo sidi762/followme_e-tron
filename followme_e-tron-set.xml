@@ -495,6 +495,8 @@
         <int n="8" alias="/gear/gear[1]/tyre-smoke"/>
         <int n="9" alias="/gear/gear[2]/tyre-smoke"/>
         <int n="10" alias="/gear/gear[3]/tyre-smoke"/>
+        <int n="11" alias="/controls/direction"/>
+        <int n="12" alias="/systems/codriver-enable"/>
 
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>
@@ -509,9 +511,11 @@
         <float n="8" alias="/gear/gear[1]/compression-norm"/>
         <float n="9" alias="/gear/gear[1]/rollspeed-ms"/>
 
+        <float n="20" alias="/gear/gear[2]/steering-norm"/>
         <float n="10" alias="/gear/gear[2]/compression-norm"/>
         <float n="11" alias="/gear/gear[2]/rollspeed-ms"/>
 
+        <float n="21" alias="/gear/gear[3]/steering-norm"/>
         <float n="12" alias="/gear/gear[3]/compression-norm"/>
         <float n="13" alias="/gear/gear[3]/rollspeed-ms"/>
 
