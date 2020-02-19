@@ -849,7 +849,7 @@
 </animation>
 	
 <!-- Hand brake -->
- <!--<animation>
+ <animation>
  	<type>pick</type>
  	<object-name>handbrake</object-name>
 	<object-name>handbrake.001</object-name>
@@ -861,7 +861,7 @@
  			<script>followme.toggleHandBrake()</script>
  		</binding>
  	</action>
-</animation>-->
+</animation>
 <!-- switch for horn -->
 <model>
  <path>Aircraft/followme_e-tron/Models/Instruments/Horn/switch-horn.xml</path>
