@@ -965,5 +965,28 @@
         <pitch-deg>-87</pitch-deg>
     </offsets>
 </model>
-
+<!-- Accelerator -->
+<animation>
+  <type>translate</type>
+  <object-name>accelerator</object-name>
+  <property>/controls/engines/engine/throttle</property>
+  <factor> 0.05 </factor>
+  <axis>
+    <x>  -1 </x>
+    <y>  0 </y>
+    <z>  0 </z>
+  </axis>
+</animation>
+<!-- Brake pedal -->
+<animation>
+  <type>translate</type>
+  <object-name>brake</object-name>
+  <property>/controls/gear/brake-left</property>
+  <factor> 0.03 </factor>
+  <axis>
+    <x>  -1 </x>
+    <y>  0 </y>
+    <z>  0 </z>
+  </axis>
+</animation>
 </PropertyList>
