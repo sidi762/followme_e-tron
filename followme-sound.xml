@@ -88,7 +88,7 @@
               </equals>
          </and>
       </condition>
-      <volume> 
+      <volume>
           <property>sim/multiplay/generic/float[19]</property>
 		  <factor>0.5</factor>
      </volume>
@@ -100,11 +100,15 @@
 	<name>horn</name>
 	<mode>looped</mode>
 	<path>Aircraft/followme_e-tron/Sounds/horn.wav</path>
-    <property>sim/multiplay/generic/int[2]</property>
+    <condition>
+		<equals>
+		     <property>sim/multiplay/generic/int[2]</property>
+             <value>1</value>
+		</equals>
+	</condition>
 	<volume>
-        <property>sim/multiplay/generic/int[2]</property>
-		<factor>5</factor>
-	</volume>
+	  <factor>1</factor>
+    </volume>
   </horn>
 
   <indicator>
