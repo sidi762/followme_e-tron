@@ -411,10 +411,11 @@
            <serviceable>0</serviceable>
        </autopilot>
     </systems>
-     <tutorials>
+    <!-- Start tutorials -->
+   <tutorials>
             <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
    </tutorials>
-
+   <!-- Start Menubar -->
     <menubar>
 		<default>
 			<menu n="10">
