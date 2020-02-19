@@ -276,7 +276,7 @@
     </sound>
 
 
-	<view n="/0">
+	<view n="0">
 		<internal archive="y">true</internal>
 		<config>
 			<x-offset-m archive="y" type="double">-0.35</x-offset-m>
@@ -316,7 +316,7 @@
 			<target-y-offset-m archive="y" type="double">1.6</target-y-offset-m>
 		</config>
 	</view>
-    <view n="98">
+    <view n="100">
        <name>Reverse Camera</name>
        <internal archive="y">true</internal>
        <type>lookfrom</type>
@@ -332,7 +332,7 @@
            <field-of-view>90</field-of-view>
        </config>
 	</view>
-    <view n="99">
+    <view n="101">
 		<name>Back Rows</name>
         <internal archive="y">true</internal>
         <type>lookfrom</type>
@@ -347,7 +347,7 @@
 			<default-field-of-view-deg type="double">90</default-field-of-view-deg>
 		</config>
 	</view>
-	<view n="100">
+	<view n="102">
 		<name>Copilot View</name>
         <internal archive="y">true</internal>
         <type>lookfrom</type>
