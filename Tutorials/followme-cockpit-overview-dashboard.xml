@@ -11,7 +11,7 @@ This tutorial walks you through the functions and details of the dashboard.
 	<message>Welcome aboard the follow e-tron!</message>
 </step>
 <step>
-	<message>Welcome to the dashboard driver's tutorial for the follow me e-tron!</message>
+	<message>Welcome to the driver's tutorial for the follow me e-tron!</message>
 	<view>
 		<heading-offset-deg>0</heading-offset-deg>
 		<pitch-offset-deg>0</pitch-offset-deg>
@@ -21,6 +21,9 @@ This tutorial walks you through the functions and details of the dashboard.
 		<z-offset-m>1.88</z-offset-m>
 		<field-of-view>90.0</field-of-view>
 	</view>
+</step>
+<step>
+	<message>Episode 1: Dashboard</message>
 </step>
 <step>
 	<message>Switches</message>
