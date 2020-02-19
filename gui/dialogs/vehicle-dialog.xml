@@ -435,7 +435,7 @@
                     <command>dialog-apply</command>
                 </binding>
             </checkbox>
-	    <!-- Enable mug _->
+	    <!-- Enable mug -->
 	    <checkbox>
                 <halign>right</halign>
                 <label>  Enable Mug</label>
