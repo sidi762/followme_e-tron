@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PropertyList>
+        <name>needle-light</name>
+        <inherits-from>/Effects/model-combined-deferred</inherits-from>
+        <parameters>
+                <!-- Light Map -->
+                <lightmap-enabled type="int">1</lightmap-enabled>
+                <lightmap-multi type="int">1</lightmap-multi>
+                <texture n="3">
+                  <image>fuelgauge_LIT.png</image>
+                  <wrap-s>repeat</wrap-s>
+                  <wrap-t>repeat</wrap-t>
+                </texture>
+                <lightmap-factor type="float" n="0">1</lightmap-factor>
+                <lightmap-factor type="float" n="1">1</lightmap-factor>
+                <lightmap-factor type="float" n="2">1</lightmap-factor>
+                <lightmap-color type="vec3d" n="0"> 1. 0. 0. </lightmap-color>
+                <lightmap-color type="vec3d" n="1"> 0. 1. 0. </lightmap-color>
+                <lightmap-color type="vec3d" n="2"> 0. 0. 1. </lightmap-color>
+                <lightmap-factor type="float" n="3">0</lightmap-factor>
+        </parameters>
+</PropertyList>
