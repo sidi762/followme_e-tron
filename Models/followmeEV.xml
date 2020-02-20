@@ -125,7 +125,7 @@
  </condition>
 </animation>
 
-
+<!-- Start fuelgauge -->
 <model>
 	<condition>
 		<equals>
@@ -214,7 +214,7 @@
   <z-m>1.01</z-m>
  </offsets>
 </model>
-
+<!-- Start speedometer -->
 <model>
 	<condition>
 		<equals>
