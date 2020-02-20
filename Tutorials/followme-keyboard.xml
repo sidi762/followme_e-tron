@@ -13,7 +13,7 @@ This tutorial walks you through the useful keys.
 	<message>Welcome to the driver's tutorial for the follow me e-tron!</message>
 	<view>
 		<heading-offset-deg>0</heading-offset-deg>
-		<pitch-offset-deg>0</pitch-offset-deg>
+		<pitch-offset-deg>-20</pitch-offset-deg>
 		<roll-offset-deg>0</roll-offset-deg>
 		<x-offset-m>-0.35</x-offset-m>
 		<y-offset-m>1.21</y-offset-m>
@@ -23,18 +23,6 @@ This tutorial walks you through the useful keys.
 </step>
 <step>
 	<message>Episode 3: Keyboard</message>
-</step>
-<step>
-	<message>Keyboard</message>
-	<view>
-		<heading-offset-deg>0</heading-offset-deg>
-		<pitch-offset-deg>-10</pitch-offset-deg>
-		<roll-offset-deg>0</roll-offset-deg>
-		<x-offset-m>-0.45</x-offset-m>
-		<y-offset-m>1.1</y-offset-m>
-		<z-offset-m>1.7</z-offset-m>
-		<field-of-view>90.0</field-of-view>
-	</view>
 </step>
 <step>
 	<message>This tutorial will walk you through all the special keys.</message>
