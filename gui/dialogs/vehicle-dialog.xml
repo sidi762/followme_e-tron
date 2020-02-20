@@ -316,6 +316,7 @@
                     <value>Type_BT</value>
                     <value>Concept</value>
                     <value>Original</value>
+		    <value>Type_EV</value>
                     <binding>
             			<command>dialog-apply</command>
             			<object-name>speedType</object-name>
@@ -339,6 +340,7 @@
                     <value>Type_BT</value>
                     <value>Concept</value>
                     <value>Original</value>
+		    <value>Type_EV</value>
                     <binding>
             			<command>dialog-apply</command>
             			<object-name>batteryType</object-name>
