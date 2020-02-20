@@ -414,6 +414,7 @@
     <!-- Start tutorials -->
    <tutorials>
             <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
+	    <tutorial include="Tutorials/followme-keyboard.xml"/>
    </tutorials>
    <!-- Start Menubar -->
     <menubar>
