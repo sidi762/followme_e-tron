@@ -7,7 +7,7 @@ Licensed under GNU GPL v2.0      -->
 This tutorial walks you through the useful keys.
 </description>
 <step>
-	<message>Welcome aboard the follow e-tron!</message>
+	<message>Welcome aboard the follow me e-tron!</message>
 </step>
 <step>
 	<message>Welcome to the driver's tutorial for the follow me e-tron!</message>
@@ -28,13 +28,13 @@ This tutorial walks you through the useful keys.
 	<message>This tutorial will walk you through all the special keys.</message>
 </step>
 <step>
-	<message>Try the keys out!</message>
+	<message>Try these keys out!</message>
 </step>
 <step>
 	<message>Part 1: Driving keys</message>
 </step>
 <step>
-	<message>The key w is full pedal, it makes the car go forward</message>
+	<message>The key w is full gas pedal, it makes the car go forward only if the negine is started.</message>
 </step>
 <step>
 	<message>The key s is full brakes, it slows the car down.</message>
@@ -109,7 +109,7 @@ This tutorial walks you through the useful keys.
 	<message>Also take a look at Help > Common Aircraft Keys</message>
 </step>
 <step>
-	<message>Check the other two tutorials for centre console and dashboard for extra help</message>
+	<message>Check the other two tutorials for centre console and dashboard for extra help.</message>
 </step>
 <step>
 	<message>Enjoy driving!</message>
