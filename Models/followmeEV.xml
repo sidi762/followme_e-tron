@@ -65,7 +65,7 @@
 <model>
  <condition>
 	<equals>
-		<property>systems/codriver-enable</property>
+		<property>sim/multiplay/generic/int[12]</property>
 		<value>1</value>
 	</equals>
  </condition>
@@ -811,7 +811,7 @@
 <model>
    <condition>
 		<equals>
-			<property>interior/enable_mug</property>
+			<property>sim/multiplay/generic/int[13]</property>
 			<value>1</value>
 		</equals>
     </condition>

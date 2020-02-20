@@ -499,6 +499,7 @@
         <int n="10" alias="/gear/gear[3]/tyre-smoke"/>
         <int n="11" alias="/controls/direction"/>
         <int n="12" alias="/systems/codriver-enable"/>
+        <int n="13" alias="/interior/enable_mug"/>
 
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>
