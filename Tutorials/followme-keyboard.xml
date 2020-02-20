@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!-- Followme e-tron tutorial, ©(c) 2020 Marsdolphin
+Licensed under GNU GPL v2.0      -->
+<PropertyList>
+	<name>Introduction: Keyboard</name>
+	<description>Welcome to the follow e-tron!
+This tutorial walks you through the useful keys.
+</description>
+<step>
+	<message>Welcome aboard the follow e-tron!</message>
+</step>
+<step>
+	<message>Welcome to the driver's tutorial for the follow me e-tron!</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>Episode 3: Keyboard</message>
+</step>
+<step>
+	<message>Keyboard</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-10</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.45</x-offset-m>
+		<y-offset-m>1.1</y-offset-m>
+		<z-offset-m>1.7</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>This tutorial will walk you through all the special keys.</message>
+</step>
+<step>
+	<message>Try the keys out!</message>
+</step>
+<step>
+	<message>Part 1: Driving keys</message>
+</step>
+<step>
+	<message>The key w is full pedal, it makes the car go forward</message>
+</step>
+<step>
+	<message>The key s is full brakes, it slows the car down.</message>
+</step>
+<step>
+	<message>The key a is used to turn left, it can only be used if the car is at a certain speed.</message>
+</step>
+<step>
+	<message>The key d is used to turn right. It also has the same property as the 'a' key.</message>
+</step>
+<step>
+	<message>The key shift>b is used for activating the parking brake.</message>
+</step>
+<step>
+	<message>Part 2: Lights</message>
+</step>
+<step>
+	<message>The key [ is used to toggle the left indicator lights.</message>
+</step>
+<step>
+	<message>The key ] is used to toggle the right indicator lights.</message>
+</step>
+<step>
+	<message>The key f toggles the false lights</message>
+</step>
+<step>
+	<message>The key l walks you through the different powers of the headlight.</message>
+</step>
+<step>
+	<message>The key k toggles high beam lights</message>
+</step>
+<step>
+	<message>The key j flashes the high beam.</message>
+</step>
+<step>
+	<message>Part 3: Other commands</message>
+</step>
+<step>
+	<message>Space key activates the horn.</message>
+</step>
+<step>
+	<message>Part 4: Autodrive</message>
+</step>
+<step>
+	<message>The key c activates the auto speed lock system.</message>
+</step>
+<step>
+	<message>The key e activates the "auto crash" system and the autopilot system.</message>
+</step>
+<step>
+	<message>Part 5: Views</message>
+</step>
+<step>
+	<message>The key tab changes your viewpoint</message>
+</step>
+<step>
+	<message>The key x makes you zoom in.</message>
+</step>
+<step>
+	<message>The key shift>x makes you zoom out.</message>
+</step>
+<step>
+	<message>The key v cycles the viewpoints.</message>
+</step>
+<step>
+	<message>That's it for the keys.</message>
+</step>
+<step>
+	<message>If you need extra help on the keys, go to Help > Aircraft Help menu</message>
+</step>
+<step>
+	<message>Also take a look at Help > Common Aircraft Keys</message>
+</step>
+<step>
+	<message>Check the other two tutorials for centre console and dashboard for extra help</message>
+</step>
+<step>
+	<message>Enjoy driving!</message>
+</step>
+<end></end>
+
+</PropertyList>
