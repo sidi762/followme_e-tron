@@ -3,12 +3,12 @@
 Licensed under GNU GPL v2.0      -->
 <PropertyList>
 	<name>Introduction: Dashboard</name>
-	<description>Welcome to the follow e-tron!
+	<description>Welcome to the follow me e-tron!
 
 This tutorial walks you through the functions and details of the dashboard.
 </description>
 <step>
-	<message>Welcome aboard the follow e-tron!</message>
+	<message>Welcome aboard the follow me e-tron!</message>
 </step>
 <step>
 	<message>Welcome to the driver's tutorial for the follow me e-tron!</message>
@@ -54,7 +54,7 @@ This tutorial walks you through the functions and details of the dashboard.
 	<message>When the switch is facing up, the lights are started.</message>
 </step>
 <step>
-	<message>That button is the starter. It starts the engine.</message>
+	<message>That button farther away on the dashboard is the starter. It starts the engine.</message>
 	<view>
 		<heading-offset-deg>0</heading-offset-deg>
 		<pitch-offset-deg>0</pitch-offset-deg>
