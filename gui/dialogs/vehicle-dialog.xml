@@ -420,7 +420,7 @@
             <checkbox>
                 <halign>left</halign>
                 <label>  Enable Switches</label>
-                <property>systems/instruments/enable_switches</property>
+                <property>sim/multiplay/generic/int[15]</property>
                 <live>true</live>
                 <binding>
                     <command>dialog-apply</command>
@@ -430,7 +430,7 @@
 	    <checkbox>
                 <halign>left</halign>
                 <label>  Enable CDU</label>
-                <property>systems/instruments/enable_cdu</property>
+                <property>sim/multiplay/generic/int[14]</property>
                 <live>true</live>
                 <binding>
                     <command>dialog-apply</command>
