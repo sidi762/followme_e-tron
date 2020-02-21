@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!-- Followme e-tron tutorial, ©(c) 2020 Marsdolphin
+Licensed under GNU GPL v2.0      -->
+<PropertyList>
+	<name>Introduction: Center Console</name>
+	<description>Welcome to the follow e-tron!
+This tutorial walks you through the functions and details of the centre console.
+</description>
+<step>
+	<message>Welcome aboard the follow e-tron!</message>
+</step>
+<step>
+	<message>Welcome to the driver's tutorial for the follow me e-tron!</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-10</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>Episode 2: Center Console</message>
+</step>
+<step>
+	<message>Followme e-tron has a centre console, like a lot of aircraft.</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-10</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>There is a smart screen in the middle.</message>
+	<set>
+		<property>sim/multiplay/generic/int[6]</property>
+		<value>1</value>
+	</set>
+</step>
+<step>
+	<message>You can enable it by going to "Follow Me EV > Show Options" menu in the menubar.</message>
+</step>
+<step>
+	<message>There is also a CDU from the Boeing 777.</message>
+	<set>
+		<property>sim/multiplay/generic/int[14]</property>
+		<value>1</value>
+	</set>
+	<view>
+		<heading-offset-deg>-10</heading-offset-deg>
+		<pitch-offset-deg>-10</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>You can enable it by also going to "Follow Me EV > Show Options" menu in the menubar.</message>
+</step>
+<step>
+	<message>See the lever? It is the gear lever</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-50</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>When you press on it, it cycles between forward and reverse.</message>
+</step>
+<step>
+	<message>When the lever is to the back, the car will be going forward.</message>
+</step>
+<step>
+	<message>The black square button beside the gear lever is the hand brake.</message>
+</step>
+<step>
+	<message>Use it to toggle parking brakes.</message>
+</step>
+<step>
+	<message>When it is on, you would see a red illuminated light.</message>
+</step>
+<step>
+	<message>There is also a communist mug available.</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-60</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+	<set>
+		<property>sim/multiplay/generic/int[13]</property>
+		<value>1</value>
+	</set>
+</step>
+<step>
+	<message>Enable it at the same place as the smart screen and CDU.</message>
+</step>
+<step>
+	<message>That's it for the centre console.</message>
+</step>
+<step>
+	<message>Check the other two tutorials on keyboard and dashboard on extra help!</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-10</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>Enjoy driving!</message>
+</step>
+
+<end></end>
+
+</PropertyList>
