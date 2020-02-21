@@ -979,7 +979,7 @@
 <model>
     <condition>
 		<equals>
-			<property>systems/instruments/enable_cdu</property>
+			<property>sim/multiplay/generic/int[13]</property>
 			<value>1</value>
 		</equals>
     </condition>
