@@ -995,7 +995,7 @@
 <animation>
   <type>translate</type>
   <object-name>accelerator</object-name>
-  <property>/controls/engines/engine/throttle</property>
+  <property>sim/multiplay/generic/float[22]</property>
   <factor> 0.05 </factor>
   <axis>
     <x>  -1 </x>
@@ -1007,7 +1007,7 @@
 <animation>
   <type>translate</type>
   <object-name>brake</object-name>
-  <property>/controls/gear/brake-left</property>
+  <property>sim/multiplay/generic/int[4]</property>
   <factor> 0.03 </factor>
   <axis>
     <x>  -1 </x>
