@@ -253,8 +253,7 @@
 		</livery>
 	</model>
     <sound>
-        <path>Aircraft/followme_e-tron/followme-sound.xml</path>
-        <switch type = "bool"></switch>
+        <path>Aircraft/followme_e-tron/Sounds/followme-sound.xml</path>
     </sound>
 
 

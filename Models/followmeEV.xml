@@ -13,6 +13,10 @@
  </unload>
 </nasal>
 
+<sound>
+    <path>Aircraft/followme_e-tron/Sounds/followme-sound.xml</path>
+</sound>
+
 <animation>
  <type>material</type>
  <object-name>sign</object-name>
