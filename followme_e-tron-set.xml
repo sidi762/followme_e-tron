@@ -221,10 +221,15 @@
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/11.jpg</path>
             </preview>
-	     <preview>
+	        <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
                 <path>Splash/G4_Tour/12.jpg</path>
+            </preview>
+            <preview>
+                   <type>exterior</type>
+                   <splash type="bool">true</splash>
+                   <path>Splash/G4_Tour/13.jpg</path>
             </preview>
     </previews>
 	<!-- Splah ends here -->
