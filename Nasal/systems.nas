@@ -173,26 +173,50 @@ var IndicatorController = {
     falseLight: 0,
 
     ledMessage: props.getNode("/sim/model/livery/texture",1),
+    ledMessageFile: props.getNode("/sim/model/livery/file",1),
+    ledMessageName: props.getNode("/sim/model/livery/name",1),
 
-    currentMessage: "",
 
-    textureRight: "Messages/right.png",
-    textureLeft: "Messages/left.png",
+    savedMessage:{
+        texture: "",
+        file: "",
+        name: "",
+    },
+    
+    textureRight: {
+        texture:"Messages/right.png",
+        file: "right",
+        name: "Right",
+    },
+    textureLeft: {
+        texture:"Messages/left.png",
+        file: "left",
+        name: "Left",
+    },
+
+
+
 
     saveLedMessage: func(){
-        me.currentMessage = me.ledMessage.getValue();
+        me.savedMessage.texture = me.ledMessage.getValue();
+        me.savedMessage.file = me.ledMessageFile.getValue();
+        me.savedMessage.name = me.ledMessageName.getValue();
     },
     getSavedMessage: func(){
-        return me.currentMessage;
+        return me.savedMessage;
     },
     clearSavedMessage: func(){
-        me.currentMessage = "";
+        me.savedMessage.texture = "";
+        me.savedMessage.file = "";
+        me.savedMessage.name = "";
     },
     setLedMessage: func(content){
-        me.ledMessage.setValue(content);
+        me.ledMessage.setValue(content.texture);
+        me.ledMessageFile.setValue(content.file);
+        me.ledMessageName.setValue(content.name);
     },
     resumeLedMessage: func(){
-        if(me.getSavedMessage()){
+        if(me.getSavedMessage().texture != ""){
             me.setLedMessage(me.getSavedMessage());
             me.clearSavedMessage();
         }
