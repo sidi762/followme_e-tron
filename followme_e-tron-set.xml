@@ -418,6 +418,7 @@
     <!-- Start tutorials -->
    <tutorials>
             <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
+	    <tutorial include="Tutorials/followme-cockpit-overview-dashboard-zh.xml"/>
 	    <tutorial include="Tutorials/followme-cockpit-overview-center-console.xml"/>
 	    <tutorial include="Tutorials/followme-keyboard.xml"/>
    </tutorials>
