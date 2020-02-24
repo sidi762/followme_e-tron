@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!-- Followme e-tron tutorial, ©(c) 2020 Marsdolphin
+Licensed under GNU GPL v2.0      -->
+<PropertyList>
+	<name>Followme yi biao pan jian jie (Chinese Tutorial)</name>
+	<description>Welcome to the follow me e-tron!
+
+zhe ge jiao cheng gei ni duan zan de shuo ming yi bias pan de gong neng.
+</description>
+<step>
+	<message>huan ying show kan followme e-tron de jiao cheng</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-15</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>di 1 ji: yi biao pan</message>
+</step>
+<step>
+	<message>kai guan</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.45</x-offset-m>
+		<y-offset-m>1.1</y-offset-m>
+		<z-offset-m>1.7</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>xu yao xian shi kai guan shi, qing dao FollowmeEV > Show Options xiang mu lan zhong da gou</message>
+        <set>
+		<property>sim/multiplay/generic/int[14]</property>
+		<value>1</value>
+	</set>
+</step>
+<step>
+	<message>zuo bian de kai guan kong zhi zhi shi deng</message>
+</step>
+<step>
+	<message>you bean de kai guan kong zhi jing shi deng</message>
+</step>
+<step>
+	<message>dang kai guan chong shang shi, deng shi kai de</message>
+</step>
+<step>
+	<message>jiao yuan chu zai yi bias ban shang de an niu shi fa dong ji qi dong jian, ke yi qi dong fa dong ji.</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.26</x-offset-m>
+		<y-offset-m>1.05</y-offset-m>
+		<z-offset-m>1.7</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>zai qian jing li hui se de an niu shi qi di jian</message>
+</step>
+<step>
+	<message>ta ke yi rang qi che ming di, shi yi shi ta ba</message>
+</step>
+<step>
+	<message>zu bian de yi qi shi che su biao. Ta gao su ni ni de su du</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.75</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>zhi zhen zhi xiang de fang xiang shi ni de su du.</message>
+</step>
+<step>
+	<message>you bian de yi qi shi dian liang biao. Bu yao rang zhi zhen zhi Xiang 0!</message>
+</step>
+<step>
+	<message>yi biao pan jiu shi zhe yang le</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>0</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>ru xu yao geng duo bang zhu, qing cha kan qi ta liang ge jiao cheng.</message>
+</step>
+<end></end>
+
+</PropertyList>
