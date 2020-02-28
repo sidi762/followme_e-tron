@@ -3,7 +3,7 @@
 <sim>
 	<model>
 		<livery>
-			<name type="string">Prevent WH CoV</name>
+			<name type="string">Prevent CoVID-19</name>
 			<texture>Messages/MaskNeeded.png</texture>
 		</livery>
 	</model>

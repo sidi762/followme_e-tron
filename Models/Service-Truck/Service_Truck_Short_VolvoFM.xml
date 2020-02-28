@@ -26,12 +26,34 @@
 		</equals>
 	</condition>
 </animation>
+<animation>
+	<type>select</type>
+	<object-name>fuel_pipe</object-name>
+	<condition>
+		<equals>
+			<property>services/service-truck/connect</property>
+			<value>1</value>
+		</equals>
+	</condition>
+</animation>
+<animation>
+	<type>select</type>
+	<object-name>box</object-name>
+	<condition>
+		<equals>
+			<property>services/service-truck/connect</property>
+			<value>1</value>
+		</equals>
+	</condition>
+</animation>
 
 <animation>
 	<type>translate</type>
 	<object>fuel_pipe_disconnected</object>
 	<object>fuel_truck</object>
 	<object>handle</object>
+    <object-name>box</object-name>
+    <object-name>fuel_pipe</object-name>
 	<property>gear/gear[1]/compression-norm</property>
 	<interpolation>
 		<entry><ind>0.15</ind><dep>0.0</dep></entry>
