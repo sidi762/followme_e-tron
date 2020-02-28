@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!-- Followme e-tron tutorial, ©(c) 2020 Marsdolphin
+Licensed under GNU GPL v2.0      -->
+<PropertyList>
+	<name>Chinese: Keyboard</name>
+	<description>huan ying kai che
+zhe ge jiao cheng gei ni duan zan de shuo ming jian pan Shang yi xie jian de gong neng.
+</description>
+<step>
+	<message>huan ying show kan followme e-tron de jiao cheng</message>
+	<view>
+		<heading-offset-deg>0</heading-offset-deg>
+		<pitch-offset-deg>-20</pitch-offset-deg>
+		<roll-offset-deg>0</roll-offset-deg>
+		<x-offset-m>-0.35</x-offset-m>
+		<y-offset-m>1.21</y-offset-m>
+		<z-offset-m>1.88</z-offset-m>
+		<field-of-view>90.0</field-of-view>
+	</view>
+</step>
+<step>
+	<message>di 3 ji: jian pan</message>
+</step>
+<step>
+	<message>xing xi chu xian hou, qing shi yi shi an jian.</message>
+</step>
+<step>
+	<message>di yi bu fen: kai che yong jian</message>
+</step>
+<step>
+	<message>w jian shi you men, zai fa dong ji qi dong de qing kuang xia ke yi rang che zi qian jing</message>
+</step>
+<step>
+	<message>s jian shi sha che, ke yi rang che jian su huo ting zhi</message>
+</step>
+<step>
+	<message>a jian shi zuo zhuan, zhi you che liang zai yi ding su du de shi hou cai neng zhuan wan</message>
+</step>
+<step>
+	<message>d jian shi you zhuan, zhi you che liang zai yi ding su du de shi hou cai neng zhuan wan</message>
+</step>
+<step>
+	<message>shift>b jian shi shou sha kuai jie jian</message>
+</step>
+<step>
+	<message>di er bu fen: deng guang</message>
+</step>
+<step>
+	<message>[ jian shi yong yu da kai zuo zhi shi deng de</message>
+</step>
+<step>
+	<message>] jian shi yong yu da kai you zhi shi deng de</message>
+</step>
+<step>
+	<message>f jian shi yong yu da kai suo you zhi shi deng de</message>
+</step>
+<step>
+	<message>l jian shi yong yu da kai qian deng de, you san zhong gong lü ke gong xuan ze</message>
+</step>
+<step>
+	<message>k jian shi yong yu da kai yuan guang deng de</message>
+</step>
+<step>
+	<message>j jian shi yong yu shan yuan guang deng de</message>
+</step>
+<step>
+	<message>di san bu fen: qi ta gong neng</message>
+</step>
+<step>
+	<message>kong ge jan shi yong yu ming di de</message>
+</step>
+<step>
+	<message>di si bu fen: zi dong jia shi</message>
+</step>
+<step>
+	<message>c jian shi yong yu qi dong kai che chao su xi tong de</message>
+</step>
+<step>
+	<message>e jian she long yu qi dong zi dong sheng tian xi tong de</message>
+</step>
+<step>
+	<message>jian pan jiu shi zhe yang le</message>
+</step>
+<step>
+	<message>ru xu yao geng du bang zhu, qing cha kan Help > Aircraft Help menu</message>
+</step>
+<step>
+	<message>ni ye ke yi cha kan Help > Common Aircraft Keys</message>
+</step>
+<step>
+	<message>ru xu yao geng duo bang zhu, qing cha kan qi ta liang ge jiao cheng.</message>
+</step>
+<step>
+	<message>zhu ning jia shi yu kuai!</message>
+</step>
+<end></end>
+
+</PropertyList>
