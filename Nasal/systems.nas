@@ -182,7 +182,7 @@ var IndicatorController = {
         file: "",
         name: "",
     },
-    
+
     textureRight: {
         texture:"Messages/right.png",
         file: "right",
@@ -216,7 +216,7 @@ var IndicatorController = {
         me.ledMessageName.setValue(content.name);
     },
     resumeLedMessage: func(){
-        if(me.getSavedMessage().texture != ""){
+        if(me.getSavedMessage().name != ""){
             me.setLedMessage(me.getSavedMessage());
             me.clearSavedMessage();
         }
