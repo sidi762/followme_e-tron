@@ -508,6 +508,7 @@
         <int n="13" alias="/interior/enable_mug"/>
 	    <int n="14" alias="/systems/instruments/enable_cdu"/>
 	    <int n="15" alias="/systems/instruments/enable_switches"/>
+        <int n="16" alias="/warninglight/start"/>
 
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>

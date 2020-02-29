@@ -17,9 +17,9 @@
 		<object-name>warninglight</object-name>
 		<condition>
 			<and>
-			<property>/sim/model/lights/warning/state</property>
+			<property>sim/model/lights/warning/state</property>
 			<equals>
-			<property>warninglight/start</property>
+			<property>sim/multiplay/generic/int[16]</property>
 			<value>1</value>
 			</equals>
 			</and>
@@ -63,4 +63,3 @@
   </animation>
 
 </PropertyList>
-
