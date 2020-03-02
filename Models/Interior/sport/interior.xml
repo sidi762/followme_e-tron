@@ -1,0 +1,262 @@
+<PropertyList>
+
+<path>interior.ac</path>
+
+
+
+
+<effect>
+    <inherits-from>Aircraft/followme_e-tron/Models/Effects/interior</inherits-from>
+    <object-name>Mesh63</object-name>
+    <object-name>Mesh64</object-name>
+    <object-name>Mesh68</object-name>
+    <object-name>Mesh69</object-name>
+</effect>
+
+
+
+
+
+<!-- STEERINGWHEEL -->
+
+<animation>
+ <type>rotate</type>
+ <object-name>steeringwheel</object-name>
+ <property>sim/multiplay/generic/float[18]</property>
+ <factor>-1</factor>
+ <center>
+  <x-m> 1.50</x-m>
+  <y-m>-0.33</y-m>
+  <z-m> 0.97</z-m>
+ </center>
+ <axis>
+  <x1-m>0.98</x1-m>
+  <y1-m>-0.33</y1-m>
+  <z1-m>0.72</z1-m>
+  <x2-m>2.00</x2-m>
+  <y2-m>-0.33</y2-m>
+  <z2-m>1.20</z2-m>
+ </axis>
+</animation>
+
+<!--  Engine Starter  -->
+
+<model>
+  <path>Aircraft/followme_e-tron/Models/Instruments/starter/starter.xml</path>
+  <offsets>
+   <x-m>1.278</x-m>
+   <y-m>-0.18</y-m>
+   <z-m>0.91</z-m>
+   <pitch-deg>-10</pitch-deg>
+  </offsets>
+</model>
+
+<!-- MUG -->
+<model>
+   <condition>
+		<equals>
+			<property>sim/multiplay/generic/int[13]</property>
+			<value>1</value>
+		</equals>
+    </condition>
+  <path>Aircraft/followme_e-tron/Models/Interior/mug/mug.ac</path>
+  <name>mug</name>
+  <offsets>
+      <x-m>1.55</x-m>
+      <y-m>-0.027</y-m>
+      <z-m>0.735</z-m>
+  </offsets>
+</model>
+
+<!-- GEAR HANDLE -->
+<animation>
+    <type>pick</type>
+    <object-name>gearhandle</object-name>
+    <action>
+      <button>0</button>
+      <binding>
+          <command>nasal</command>
+          <script>engine.engine_1.toggleDirection();</script>
+      </binding>
+    </action>
+</animation>
+<animation>
+  <type>translate</type>
+  <object-name>gearhandle</object-name>
+  <property>sim/multiplay/generic/int[11]</property>
+  <factor> 0.01 </factor>
+  <axis>
+    <x>  1 </x>
+    <y>  0 </y>
+    <z>  0 </z>
+  </axis>
+</animation>
+
+<!-- Hand brake -->
+<effect>
+    <inherits-from>/Effects/parkingbrake</inherits-from>
+    <object-name>handbrake.001</object-name>
+</effect>
+<animation>
+		<type>pick</type>
+		<object-name>handbrake.001</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>nasal</command>
+				<script>followme.toggleHandBrake()</script>
+			</binding>
+		</action>
+</animation>
+<animation>
+    <type>material</type>
+    <object-name>handbrake.001</object-name>
+    <condition>
+	       <equals>
+		             <property>sim/multiplay/generic/float[19]</property>
+	                 <value>1</value>
+	       </equals>
+    </condition>
+    <texture>Aircraft/followme_e-tron/Models/Instruments/parkingbrake/parkingbrake_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>handbrake.001</object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/float[19]</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>Aircraft/followme_e-tron/Models/Instruments/parkingbrake/parkingbrake.png</texture>
+</animation>
+
+<!-- switch for horn -->
+<model>
+ <path>Aircraft/followme_e-tron/Models/Instruments/Horn/switch-horn.xml</path>
+ <offsets>
+  <x-m>1.405</x-m>
+  <y-m>-0.143</y-m>
+  <z-m>0.919</z-m>
+  <heading-deg>80.0</heading-deg>
+  <pitch-deg>-5.0</pitch-deg>
+ </offsets>
+</model>
+
+<!-- sign for horn -->
+<model>
+ <path>Aircraft/followme_e-tron/Models/Instruments/Horn/horn.xml</path>
+ <offsets>
+  <x-m>1.416</x-m>
+  <y-m>-0.17</y-m>
+  <z-m>0.905</z-m>
+  <pitch-deg>-18.0</pitch-deg>
+ </offsets>
+</model>
+<!--  Switch for indicator  -->
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/int[15]</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/indicators.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.52</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
+</model>
+<!--  Indicator sign  -->
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/int[15]</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/sign.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.52</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
+</model>
+<!--  Switch for warning lights  -->
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/int[15]</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/s-warninglights.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.498</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
+</model>
+<!--  Warning lights sign  -->
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/int[15]</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/wl.xml</path>
+    <offsets>
+        <x-m>1.306</x-m>
+        <y-m>-0.498</y-m>
+        <z-m>0.935</z-m>
+        <pitch-deg>-18.0</pitch-deg>
+    </offsets>
+</model>
+
+<!--  CDU  -->
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/int[14]</property>
+			<value>1</value>
+		</equals>
+    </condition>
+    <path>Aircraft/followme_e-tron/Models/Instruments/CDU/boeing.xml</path>
+    <offsets>
+         <x-m>1.35</x-m>
+        <y-m>0.25</y-m>
+        <z-m>0.9</z-m>
+        <pitch-deg>-4</pitch-deg>
+    </offsets>
+</model>
+<!-- Accelerator -->
+<animation>
+  <type>translate</type>
+  <object-name>accelerator</object-name>
+  <property>sim/multiplay/generic/float[22]</property>
+  <factor> 0.05 </factor>
+  <axis>
+    <x>  -1 </x>
+    <y>  0 </y>
+    <z>  0 </z>
+  </axis>
+</animation>
+<!-- Brake pedal -->
+<animation>
+  <type>translate</type>
+  <object-name>brake</object-name>
+  <property>sim/multiplay/generic/int[4]</property>
+  <factor> 0.03 </factor>
+  <axis>
+    <x>  -1 </x>
+    <y>  0 </y>
+    <z>  0 </z>
+  </axis>
+</animation>
+</PropertyList>

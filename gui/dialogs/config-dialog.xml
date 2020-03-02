@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+
+    <name>config-dialog</name>
+    <layout>vbox</layout>
+    <resizable>false</resizable>
+    <modal>false</modal>
+    <draggable>true</draggable>
+
+
+    <group>
+        <layout>hbox</layout>
+
+        <empty><stretch>true</stretch></empty>
+        <text>
+            <label>Vehicle Config</label>
+        </text>
+        <empty><stretch>true</stretch></empty>
+
+        <button>
+            <legend/>
+            <key>Esc</key>
+            <pref-width>32</pref-width>
+            <pref-height>16</pref-height>
+            <binding>
+                <command>dialog-close</command>
+            </binding>
+	</button>
+	</group>
+	<hrule/>
+    
+        <text><label>Configuration</label></text>
+        <group>
+            <layout>vbox</layout>
+            <text><label>Interior Style</label></text>
+            <combo>
+                <name>interiorStyle</name>
+                <row>1</row>
+                <col>2</col>
+                <pref-width>120</pref-width>
+                <halign>left</halign>
+                <name>Interior Style</name>
+                <property>/systems/interior/type</property>
+                <value>Default</value>
+                <value>Sport</value>
+                <binding>
+        			<command>dialog-apply</command>
+        			<object-name>interiorStyle</object-name>
+                </binding>
+            </combo>
+        </group>
+        
+        <group>
+            <layout>hbox</layout>
+           
+            <group>
+                <layout>vbox</layout>
+                <text><label>Speedometer type</label></text>
+                <combo>
+                    <name>speedType</name>
+                    <row>1</row>
+                    <col>6</col>
+                    <pref-width>120</pref-width>
+                    <halign>left</halign>
+                    <name>Speedometer Type</name>
+                    <property>/systems/speedometer/type</property>
+                    <value>Type_A</value>
+                    <value>Type_M</value>
+                    <value>Type_B</value>
+                    <value>Type_BT</value>
+                    <value>Concept</value>
+                    <value>Original</value>
+                    <binding>
+            			<command>dialog-apply</command>
+            			<object-name>speedType</object-name>
+                    </binding>
+                </combo>
+            </group>
+
+            <group>
+                <layout>vbox</layout>
+                <text><label>Battery gauge type</label></text>
+                <combo>
+                    <name>batteryType</name>
+                    <row>1</row>
+                    <col>6</col>
+                    <pref-width>120</pref-width>
+                    <halign>left</halign>
+                    <name>Battery gauge Type</name>
+                    <property>/systems/battery-gauge/type</property>
+                    <value>Type_A</value>
+                    <value>Type_M</value>
+                    <value>Type_BT</value>
+                    <value>Concept</value>
+                    <value>Original</value>
+                    <binding>
+            			<command>dialog-apply</command>
+            			<object-name>batteryType</object-name>
+                    </binding>
+                </combo>
+            </group>
+
+        </group>
+        <group>
+            <layout>vbox</layout>
+            <text><label>Plate</label></text>
+            <combo>
+                <name>plateSelection</name>
+                <row>1</row>
+                <col>6</col>
+                <pref-width>120</pref-width>
+                <halign>left</halign>
+                <name>Plate Selection</name>
+                <property>/systems/plate</property>
+                <value>NONE</value>
+                <value>JLH0762</value>
+                <value>JAD00762</value>
+                <value>YBD00404</value>
+                <value>YAD07749</value>
+                <value>SAD00818</value>
+                <value>JAD00066</value>
+                <binding>
+        			<command>dialog-apply</command>
+        			<object-name>plateSelection</object-name>
+                </binding>
+            </combo>
+        </group>
+        <group>
+            <layout>vbox</layout>
+            <button>
+                <halign>left</halign>
+                <legend>Select Livery</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+				<binding>
+					<command>nasal</command>
+					<script>followme.liveryFuse.dialog.toggle()</script>
+				</binding>
+            </button>
+            <button>
+                <halign>left</halign>
+                <legend>Select Message</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+				<binding>
+						<command>nasal</command>
+						<script>aircraft.livery.dialog.toggle()</script>
+				</binding>
+            </button>
+        </group>
+        <group>
+            <layout>vbox</layout>
+            <checkbox>
+                <halign>left</halign>
+                <label>  Enable Co-driver Model</label>
+                <property>/systems/codriver-enable</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
+        </group>
+        <group>
+            <layout>vbox</layout>
+            <checkbox>
+                <halign>left</halign>
+                <label>  Enable Smart Screen</label>
+                <property>/systems/screen-enable</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
+            <checkbox>
+                <halign>left</halign>
+                <label>  Enable Switches</label>
+                <property>sim/multiplay/generic/int[15]</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
+
+	    <!-- disable CDU for now
+            <checkbox>
+                <halign>left</halign>
+                <label>  Enable CDU</label>
+                <property>sim/multiplay/generic/int[14]</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
+        -->
+
+	        <checkbox>
+                <halign>left</halign>
+                <label>  Enable Mug</label>
+                <property>interior/enable_mug</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
+        </group>
+        <hrule/>
+       
+
+</PropertyList>
