@@ -29,7 +29,7 @@
 	</button>
 	</group>
 	<hrule/>
-    
+
         <text><label>Configuration</label></text>
         <group>
             <layout>vbox</layout>
@@ -50,10 +50,10 @@
                 </binding>
             </combo>
         </group>
-        
+
         <group>
             <layout>hbox</layout>
-           
+
             <group>
                 <layout>vbox</layout>
                 <text><label>Speedometer type</label></text>
@@ -114,6 +114,7 @@
                 <name>Plate Selection</name>
                 <property>/systems/plate</property>
                 <value>NONE</value>
+                <value>Airport0</value>
                 <value>JLH0762</value>
                 <value>JAD00762</value>
                 <value>YBD00404</value>
@@ -205,6 +206,6 @@
             </checkbox>
         </group>
         <hrule/>
-       
+
 
 </PropertyList>

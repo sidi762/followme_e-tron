@@ -80,5 +80,16 @@
  </condition>
  <texture>texture/JAD00066.png</texture>
 </animation>
+<animation>
+ <type>material</type>
+ <object-name>face</object-name>
+ <condition>
+	<equals>
+		<property>sim/multiplay/generic/string[0]</property>
+		<value>Airport0</value>
+	</equals>
+ </condition>
+ <texture>texture/Airport.png</texture>
+</animation>
 
 </PropertyList>
