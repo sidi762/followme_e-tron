@@ -265,7 +265,7 @@
 	<view n="/0">
 		<internal archive="y">true</internal>
 		<config>
-			<x-offset-m archive="y" type="double">-0.35</x-offset-m>
+			<x-offset-m archive="y" type="double">-0.33</x-offset-m>
 			<y-offset-m archive="y" type="double">1.21</y-offset-m>
 			<z-offset-m archive="y" type="double">1.88</z-offset-m>
 			<pitch-offset-deg>-10.0</pitch-offset-deg>
@@ -442,6 +442,13 @@
 						<dialog-name>battery-management</dialog-name>
 					</binding>
 				</item>
+                <item>
+					<label>Configuration</label>
+					<binding>
+						<command>dialog-show</command>
+						<dialog-name>config-dialog</dialog-name>
+					</binding>
+				</item>
 				<item>
 					<label>Select Livery</label>
 					<binding>
@@ -508,6 +515,7 @@
         <int n="13" alias="/interior/enable_mug"/>
 	    <int n="14" alias="/systems/instruments/enable_cdu"/>
 	    <int n="15" alias="/systems/instruments/enable_switches"/>
+        <int n="16" alias="/warninglight/start"/>
 
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>
@@ -545,6 +553,7 @@
         <string n="0" alias="/systems/plate"/>
         <string n="1" alias="/systems/battery-gauge/type"/>
         <string n="2" alias="/systems/speedometer/type"/>
+        <string n="3" alias="/systems/interior/type"/>
 
       </generic>
     </multiplay>

@@ -96,6 +96,7 @@ props.getNode("controls/lighting/headlight-als", 1).setValue(0);
 props.getNode("sim/remote/pilot-callsign", 1).setValue("");
 props.getNode("/systems/codriver-enable", 1).setValue(0);
 props.getNode("systems/screen-enable", 1).setValue(0);
+props.getNode("systems/interior/type", 1).setValue("Default");
 
 #var Led = {
 #
@@ -182,7 +183,7 @@ var IndicatorController = {
         file: "",
         name: "",
     },
-    
+
     textureRight: {
         texture:"Messages/right.png",
         file: "right",
@@ -216,7 +217,7 @@ var IndicatorController = {
         me.ledMessageName.setValue(content.name);
     },
     resumeLedMessage: func(){
-        if(me.getSavedMessage().texture != ""){
+        if(me.getSavedMessage().name != ""){
             me.setLedMessage(me.getSavedMessage());
             me.clearSavedMessage();
         }
