@@ -79,7 +79,7 @@ refs 4
 1 0 1
 kids 0
 OBJECT poly
-name "box"
+name "sr_switch1"
 loc 1.62116 1.58175 0.0022989
 texture "Instruments/Sunroof/Sunroof1.png"
 crease 45.000000
@@ -36991,7 +36991,7 @@ refs 4
 25 0 1
 kids 0
 OBJECT poly
-name "box"
+name "sr_switch2"
 loc 1.62116 1.58175 0.0022989
 texture "Instruments/Sunroof/Sunroof2.png"
 crease 45.000000
