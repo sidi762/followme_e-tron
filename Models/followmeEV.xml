@@ -199,7 +199,21 @@
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.25</y-m>
+  <y-m>-0.23</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
+	<model>
+	<condition>
+		<equals>
+			<property>sim/multiplay/generic/string[1]</property>
+			<value>Type_M</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
+ <offsets>
+  <x-m>1.31</x-m>
+  <y-m>-0.44</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
@@ -218,6 +232,20 @@
   <z-m>1.01</z-m>
  </offsets>
 </model>
+<model>
+	<condition>
+		<equals>
+			<property>sim/multiplay/generic/string[1]</property>
+			<value>Type_BT</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
+ <offsets>
+  <x-m>1.31</x-m>
+  <y-m>-0.44</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
 
 <model>
 	<condition>
@@ -233,6 +261,20 @@
   <z-m>1.01</z-m>
  </offsets>
 </model>
+<model>
+	<condition>
+		<equals>
+			<property>sim/multiplay/generic/string[1]</property>
+			<value>Type_O</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
+ <offsets>
+  <x-m>1.31</x-m>
+  <y-m>-0.44</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
 
 <model>
 	<condition>
@@ -245,6 +287,20 @@
  <offsets>
   <x-m>1.31</x-m>
   <y-m>-0.25</y-m>
+  <z-m>1.01</z-m>
+ </offsets>
+</model>
+<model>
+	<condition>
+		<equals>
+			<property>sim/multiplay/generic/string[1]</property>
+			<value>Concept</value>
+		</equals>
+	</condition>
+ <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
+ <offsets>
+  <x-m>1.31</x-m>
+  <y-m>-0.44</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
@@ -274,7 +330,7 @@
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_O/speedometer.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.38</y-m>
+  <y-m>-0.335</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
@@ -289,7 +345,7 @@
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_M/speedometer.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.38</y-m>
+  <y-m>-0.335</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
@@ -304,7 +360,7 @@
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_B/speedometer.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.38</y-m>
+  <y-m>-0.335</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
@@ -319,7 +375,7 @@
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Type_BT/speedometer.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.38</y-m>
+  <y-m>-0.335</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
@@ -334,7 +390,7 @@
     <path>Aircraft/followme_e-tron/Models/Instruments/speedometer/Concept/speedometer.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.38</y-m>
+  <y-m>-0.335</y-m>
   <z-m>1.03</z-m>
  </offsets>
 </model>
