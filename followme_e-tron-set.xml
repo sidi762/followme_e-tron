@@ -445,8 +445,8 @@
                 <item>
 					<label>Configuration</label>
 					<binding>
-						<command>dialog-show</command>
-						<dialog-name>config-dialog</dialog-name>
+						<command>nasal</command>
+						<script>followme.configDialog.open();</script>
 					</binding>
 				</item>
 				<item>
@@ -550,10 +550,12 @@
         <float n="22" alias="/controls/engines/engine/throttle"/>
 
 
-        <string n="0" alias="/systems/plate"/>
+        <!--<string n="0" alias="/systems/plate"/>-->
         <string n="1" alias="/systems/battery-gauge/type"/>
         <string n="2" alias="/systems/speedometer/type"/>
         <string n="3" alias="/systems/interior/type"/>
+        <string n="4" alias="/systems/plate/name"/>
+        <string n="5" alias="/systems/plate/file"/>
 
       </generic>
     </multiplay>
@@ -803,6 +805,7 @@
 	<followme>
         <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
 		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/plate.nas</file>
         <file>Aircraft/followme_e-tron/Nasal/steering.nas</file>
         <file>Aircraft/followme_e-tron/Nasal/radar.nas</file>
 	</followme>

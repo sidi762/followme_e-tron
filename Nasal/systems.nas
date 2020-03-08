@@ -2,6 +2,9 @@
 ####    Gijs de Rooy (Original)    ####
 ####    Sidi Liang    ####
 
+props.getNode("/sim/gui/dialogs/vehicle_config/dialog",1);
+var configDialog = gui.Dialog.new("/sim/gui/dialogs/vehicle_config/dialog", "Aircraft/followme_e-tron/gui/dialogs/config-dialog.xml");
+
 var liveryFuse = {
 	init: func(dir, nameprop = "sim/model/livery/name", sortprop = nil) {
 		me.parents = [gui.OverlaySelector.new("Select Livery", dir, nameprop,
@@ -91,7 +94,8 @@ props.getNode("systems/welcome-message", 1).setValue(0);
 props.getNode("systems/display-speed", 1).setValue(0);
 props.getNode("systems/speedometer/type", 1).setValue("Type_A");
 props.getNode("systems/battery-gauge/type", 1).setValue("Type_A");
-props.getNode("systems/plate", 1).setValue("NONE");
+props.getNode("systems/plate/file", 1).setValue("NONE");
+props.getNode("systems/plate/name", 1).setValue("NONE");
 props.getNode("controls/lighting/headlight-als", 1).setValue(0);
 props.getNode("sim/remote/pilot-callsign", 1).setValue("");
 props.getNode("/systems/codriver-enable", 1).setValue(0);
@@ -432,7 +436,7 @@ var brakesABS = func(){
 
 var absTimer = maketimer(0.001, brakesABS);
 
-var brakeWithABS = func(){ #//Doesn't seems to work as it seems that jsbsim wheels never overbrake?
+var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim wheels never overbrake?
     var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-cmd");
     if(brakeCmd){
         absTimer.start();
