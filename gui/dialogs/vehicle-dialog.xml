@@ -280,8 +280,8 @@
                 </and>
             </enable>
             <binding>
-                <command>dialog-show</command>
-                <dialog-name>config-dialog</dialog-name>>
+                <command>nasal</command>
+                <script>followme.configDialog.open();</script>
             </binding>
         </button>
         <hrule/>

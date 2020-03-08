@@ -8,6 +8,24 @@
     <modal>false</modal>
     <draggable>true</draggable>
 
+    <nasal>
+     <open>
+         followme.updateList();
+         #print(cmdarg().getPath());
+         var nameNode = props.getNode("systems/plate/name", 1);
+         var fileNode = props.getNode("systems/plate/file", 1);
+         var lis = setlistener(nameNode, func(){
+            if(nameNode.getValue() != "NONE"){
+                fileNode.setValue("texture/" ~ nameNode.getValue() ~ ".png");
+            }else{
+                fileNode.setValue(nameNode.getValue());
+            }
+         });
+     </open>
+     <close>
+         removelistener(lis);
+     </close>
+    </nasal>
 
     <group>
         <layout>hbox</layout>
@@ -112,15 +130,8 @@
                 <pref-width>120</pref-width>
                 <halign>left</halign>
                 <name>Plate Selection</name>
-                <property>/systems/plate</property>
-                <value>NONE</value>
-                <value>Airport0</value>
-                <value>JLH0762</value>
-                <value>JAD00762</value>
-                <value>YBD00404</value>
-                <value>YAD07749</value>
-                <value>SAD00818</value>
-                <value>JAD00066</value>
+                <property>/systems/plate/name</property>
+                <value>$value</value>
                 <binding>
         			<command>dialog-apply</command>
         			<object-name>plateSelection</object-name>
