@@ -561,7 +561,7 @@
     </multiplay>
 
  <!-- Start custom red/black out settings -->
-
+<!-- Temporarily disable those until we get an option
     <rendering>
             <redout>
                 <enabled type="bool" userarchive="y">true</enabled>
@@ -582,7 +582,7 @@
                 <enabled type="bool" userarchive="y">true</enabled>
             </headshake>
         </rendering>	
-	
+	-->
 </sim>
 
 <engines>
