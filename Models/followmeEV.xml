@@ -265,7 +265,7 @@
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_O</value>
+			<value>Original</value>
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
