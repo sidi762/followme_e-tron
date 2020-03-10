@@ -23,6 +23,7 @@
          });
      </open>
      <close>
+         followme.playAudio("repair.wav");
          removelistener(lis);
      </close>
     </nasal>
