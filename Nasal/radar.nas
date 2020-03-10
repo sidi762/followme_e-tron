@@ -113,14 +113,14 @@ var Radar = {
         if(meters <= 0.5){
             me.warningInterval = 0.2;
             me.warningSound = "parking_radar_long.wav";
-            print("Caution! Something behind at less than 0.5 meters!");
+            #print("Caution! Something behind at less than 0.5 meters!");
             return;
         }else{
             me.warningSound = "parking_radar.wav";
         }
         meters = sprintf("%.3f", meters);
         if(meters != me.lastDis) me.warningInterval = (meters)/me.maxRange;
-        print("Caution! Something behind at approximatly "~meters~" meters");
+        #print("Caution! Something behind at approximatly "~meters~" meters");
         me.lastDis = meters;
     },
     sample: func(stepLat, stepLon, searchLat, searchLon){ # returns an elevtion
