@@ -42,7 +42,7 @@
 <!--  Engine Starter  -->
 
 <model>
-  <path>Aircraft/followme_e-tron/Models/Instruments/starter/starter.xml</path>
+  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/starter/starter_sport.xml</path>
   <offsets>
    <x-m>1.278</x-m>
    <y-m>-0.18</y-m>
@@ -118,7 +118,7 @@
 	                 <value>1</value>
 	       </equals>
     </condition>
-    <texture>../../Instruments/parkingbrake/parkingbrake_LIT.png</texture>
+    <texture>../Instruments/parkingbrake/parkingbrake_LIT.png</texture>
 </animation>
 <animation>
      <type>material</type>
@@ -129,12 +129,12 @@
 	 	     <value>0</value>
 	     </equals>
      </condition>
-     <texture>../../Instruments/parkingbrake/parkingbrake.png</texture>
+     <texture>../Instruments/parkingbrake/parkingbrake.png</texture>
 </animation>
 
 <!-- switch for horn -->
 <model>
- <path>Aircraft/followme_e-tron/Models/Instruments/Horn/switch-horn.xml</path>
+ <path>Aircraft/followme_e-tron/Models/Interior/Instruments/Horn/switch-horn.xml</path>
  <offsets>
   <x-m>1.405</x-m>
   <y-m>-0.143</y-m>
@@ -146,7 +146,7 @@
 
 <!-- sign for horn -->
 <model>
- <path>Aircraft/followme_e-tron/Models/Instruments/Horn/horn.xml</path>
+ <path>Aircraft/followme_e-tron/Models/Interior/Instruments/Horn/horn.xml</path>
  <offsets>
   <x-m>1.416</x-m>
   <y-m>-0.17</y-m>
@@ -162,7 +162,7 @@
 			<value>1</value>
 		</equals>
     </condition>
-    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/indicators.xml</path>
+    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/Switches/Indicators/indicators.xml</path>
     <offsets>
         <x-m>1.306</x-m>
         <y-m>-0.52</y-m>
@@ -178,7 +178,7 @@
 			<value>1</value>
 		</equals>
     </condition>
-    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Indicators/sign.xml</path>
+    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/Switches/Indicators/sign.xml</path>
     <offsets>
         <x-m>1.306</x-m>
         <y-m>-0.52</y-m>
@@ -194,7 +194,7 @@
 			<value>1</value>
 		</equals>
     </condition>
-    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/s-warninglights.xml</path>
+    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/Switches/Warninglights/s-warninglights.xml</path>
     <offsets>
         <x-m>1.306</x-m>
         <y-m>-0.498</y-m>
@@ -210,7 +210,7 @@
 			<value>1</value>
 		</equals>
     </condition>
-    <path>Aircraft/followme_e-tron/Models/Instruments/Switches/Warninglights/wl.xml</path>
+    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/Switches/Warninglights/wl.xml</path>
     <offsets>
         <x-m>1.306</x-m>
         <y-m>-0.498</y-m>
@@ -227,7 +227,7 @@
 			<value>1</value>
 		</equals>
     </condition>
-    <path>Aircraft/followme_e-tron/Models/Instruments/CDU/boeing.xml</path>
+    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/boeing.xml</path>
     <offsets>
          <x-m>1.35</x-m>
         <y-m>0.25</y-m>
