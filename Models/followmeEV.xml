@@ -228,7 +228,7 @@
  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.25</y-m>
+  <y-m>-0.23</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
@@ -257,7 +257,7 @@
  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.25</y-m>
+  <y-m>-0.23</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
@@ -265,7 +265,7 @@
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_O</value>
+			<value>Original</value>
 		</equals>
 	</condition>
  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
@@ -286,7 +286,7 @@
  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
  <offsets>
   <x-m>1.31</x-m>
-  <y-m>-0.25</y-m>
+  <y-m>-0.23</y-m>
   <z-m>1.01</z-m>
  </offsets>
 </model>
