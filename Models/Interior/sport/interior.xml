@@ -15,7 +15,25 @@
 
 
 
+<!-- Decoration -->
+<animation>
+ <type>select</type>
+ <object-name>drink_back</object-name>
+ <object-name>drink_front</object-name>
+ <object-name>etc</object-name>
+ <object-name>card</object-name>
+ <object-name>straw</object-name>
+ <object-name>cuphloder_rear</object-name>
+ <object-name>cuphloder_rear2</object-name>
+ <condition>
 
+     <equals>
+         <property>sim/multiplay/generic/bool[0]</property>
+         <value>1</value>
+     </equals>
+
+ </condition>
+</animation>
 
 <!-- STEERINGWHEEL -->
 
@@ -55,7 +73,7 @@
 <model>
    <condition>
 		<equals>
-			<property>sim/multiplay/generic/int[13]</property>
+			<property>sim/multiplay/generic/bool[0]</property>
 			<value>1</value>
 		</equals>
     </condition>

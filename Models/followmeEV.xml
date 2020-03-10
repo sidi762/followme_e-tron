@@ -203,7 +203,7 @@
   <z-m>1.01</z-m>
  </offsets>
 </model>
-	<model>
+<model>
 	<condition>
 		<equals>
 			<property>sim/multiplay/generic/string[1]</property>
