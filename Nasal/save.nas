@@ -41,17 +41,17 @@ var mode = getprop("/controls/mode");
 var dir = getprop("/controls/direction");
     setprop("/save/controls/dir", dir);
 
-var ail = getprop("/controls/flight/aileron");
+var aileron = getprop("/controls/flight/aileron");
     setprop("/save/controls/ail", ail);
 
-var stw = getprop("/controls/steering_wheel");
+var steering_wheel = getprop("/controls/steering_wheel");
     setprop("/save/controls/stw", stw);
 
 
-var pm = getprop("/systems/plate/name");
+var platename = getprop("/systems/plate/name");
     setprop("/save/plate_name", pm);
 
-var pf = getprop("/systems/plate/file");
+var platefile = getprop("/systems/plate/file");
     setprop("/save/plate_file", pf);
 
 
@@ -102,19 +102,19 @@ var mode = getprop("/save/controls/mode");
 var dir = getprop("/save/controls/dir");
     setprop("/controls/direction", dir);
 
-var ail = getprop("/save/controls/ail");
+var aileron = getprop("/save/controls/ail");
     setprop("/controls/flight/aileron", ail);
 
-var stw = getprop("/save/controls/stw");
+var steering_wheel = getprop("/save/controls/stw");
     setprop("/controls/steering_wheel", stw);
 
 
 
 
-var pm = getprop("/save/plate_name");
+var platename = getprop("/save/plate_name");
     setprop("/systems/plate/name", pm);
 
-var pf = getprop("/save/plate_file");
+var platefile = getprop("/save/plate_file");
     setprop("/systems/plate/file", pf);
 
 
