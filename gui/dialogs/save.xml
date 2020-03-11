@@ -56,7 +56,16 @@
       			<command>nasal</command>
       			<script>save.resume()</script>
               </binding>
-
+	        <binding>
+        			<command>property-assign</command>
+        			<property>velocities/groundspeed-kt</property>
+                    <value>0</value>
+                </binding>
+		<binding>
+        			<command>property-assign</command>
+        			<property>/position/altitude-agl-ft</property>
+                    <value>0</value>
+                </binding>
           </button>
 
       
