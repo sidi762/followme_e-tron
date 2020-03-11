@@ -57,7 +57,7 @@ var save = func {
 
     var interior = getprop("/systems/interior/type");
     setprop("/save/type/int", interior);
-        print("State saved");
+    print("State saved");
 }
 
 
@@ -120,5 +120,5 @@ var resume = func {
 
     var interior = getprop("/save/type/int");
     setprop("/systems/interior/type", interior);
-        print("State resumed!");
+    print("State resumed!");
 }
