@@ -57,6 +57,7 @@ setprop("/save/plate_file", pf);
 
 var interior = getprop("/systems/interior/type");
 setprop("/save/type/int", interior);
+    print("State Saved!");
 }
 
 
@@ -119,4 +120,5 @@ setprop("/systems/plate/file", pf);
 
 var interior = getprop("/save/type/int");
 setprop("/systems/interior/type", interior);
+    print("State Resumed!");
 }
