@@ -103,19 +103,19 @@ var resume = func {
         setprop("/controls/direction", dir);
 
     var aileron = getprop("/save/controls/ail");
-        setprop("/controls/flight/aileron", ail);
+        setprop("/controls/flight/aileron", aileron);
 
     var steering_wheel = getprop("/save/controls/stw");
-        setprop("/controls/steering_wheel", stw);
+        setprop("/controls/steering_wheel", steering_wheel);
 
 
 
 
     var platename = getprop("/save/plate_name");
-        setprop("/systems/plate/name", pm);
+        setprop("/systems/plate/name", platename);
 
     var platefile = getprop("/save/plate_file");
-        setprop("/systems/plate/file", pf);
+        setprop("/systems/plate/file", platefile);
 
 
     var interior = getprop("/save/type/int");
