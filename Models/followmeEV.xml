@@ -105,15 +105,15 @@
 <model>
  <condition>
 	<equals>
-		<property>sim/multiplay/generic/int[12]</property>
+		<property>sim/multiplay/generic/bool[1]</property>
 		<value>1</value>
 	</equals>
  </condition>
  <path>Aircraft/followme_e-tron/Models/people/people2.ac</path>
  <offsets>
-  <x-m> 1.9</x-m>
-  <y-m> 0</y-m>
-  <z-m> 1.255</z-m>
+  <x-m> 1.71</x-m>
+  <y-m> -0.2</y-m>
+  <z-m> 0.8</z-m>
  </offsets>
 </model>
 

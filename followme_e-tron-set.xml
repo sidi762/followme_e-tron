@@ -311,8 +311,8 @@
             <from-model-idx type="int">0</from-model-idx>
             <dynamic-view type="bool">true</dynamic-view>
 			<x-offset-m archive="y" type="double">0.35</x-offset-m>
-			<y-offset-m archive="y" type="double">1.21</y-offset-m>
-			<z-offset-m archive="y" type="double">1.88</z-offset-m>
+			<y-offset-m archive="y" type="double">1.30</y-offset-m>
+			<z-offset-m archive="y" type="double">1.81</z-offset-m>
             <pitch-offset-deg>-10.0</pitch-offset-deg>
 			<default-field-of-view-deg type="double">90</default-field-of-view-deg>
 		</config>
@@ -500,6 +500,7 @@
     <multiplay>
       <generic>
         <bool n="0" alias="/systems/decorations-enable"/>
+        <bool n="1" alias="/systems/pmodel-enable"/>
 
         <int n="0" alias="/sim/model/lights/indicator-left/state"/>
         <int n="1" alias="/sim/model/lights/indicator-right/state"/>
