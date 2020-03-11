@@ -23,6 +23,7 @@
          });
      </open>
      <close>
+         followme.playAudio("repair.wav");
          removelistener(lis);
      </close>
     </nasal>
@@ -208,8 +209,8 @@
 
 	        <checkbox>
                 <halign>left</halign>
-                <label>  Enable Mug</label>
-                <property>interior/enable_mug</property>
+                <label>  Enable Decorations</label>
+                <property>systems/decorations-enable</property>
                 <live>true</live>
                 <binding>
                     <command>dialog-apply</command>

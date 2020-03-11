@@ -311,8 +311,8 @@
             <from-model-idx type="int">0</from-model-idx>
             <dynamic-view type="bool">true</dynamic-view>
 			<x-offset-m archive="y" type="double">0.35</x-offset-m>
-			<y-offset-m archive="y" type="double">1.21</y-offset-m>
-			<z-offset-m archive="y" type="double">1.88</z-offset-m>
+			<y-offset-m archive="y" type="double">1.30</y-offset-m>
+			<z-offset-m archive="y" type="double">1.81</z-offset-m>
             <pitch-offset-deg>-10.0</pitch-offset-deg>
 			<default-field-of-view-deg type="double">90</default-field-of-view-deg>
 		</config>
@@ -506,6 +506,9 @@
 
     <multiplay>
       <generic>
+        <bool n="0" alias="/systems/decorations-enable"/>
+        <bool n="1" alias="/systems/pmodel-enable"/>
+
         <int n="0" alias="/sim/model/lights/indicator-left/state"/>
         <int n="1" alias="/sim/model/lights/indicator-right/state"/>
         <int n="2" alias="/systems/horn"/>
@@ -519,7 +522,7 @@
         <int n="10" alias="/gear/gear[3]/tyre-smoke"/>
         <int n="11" alias="/controls/direction"/>
         <int n="12" alias="/systems/codriver-enable"/>
-        <int n="13" alias="/interior/enable_mug"/>
+        <!--<int n="13" alias="/interior/enable_mug"/>-->
 	    <int n="14" alias="/systems/instruments/enable_cdu"/>
 	    <int n="15" alias="/systems/instruments/enable_switches"/>
         <int n="16" alias="/warninglight/start"/>
@@ -588,7 +591,7 @@
             <headshake>
                 <enabled type="bool" userarchive="y">true</enabled>
             </headshake>
-        </rendering>	
+        </rendering>
 	-->
 </sim>
 
