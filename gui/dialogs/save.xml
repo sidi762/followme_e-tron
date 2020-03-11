@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+
+    <name>save_dialog</name>
+    <layout>vbox</layout>
+    <resizable>false</resizable>
+    <modal>false</modal>
+    <draggable>true</draggable>
+
+
+    <group>
+        <layout>hbox</layout>
+
+        <empty><stretch>true</stretch></empty>
+        <text>
+            <label>Save/Resume</label>
+        </text>
+        <empty><stretch>true</stretch></empty>
+
+        <button>
+            <legend/>
+            <key>Esc</key>
+            <pref-width>32</pref-width>
+            <pref-height>16</pref-height>
+            <binding>
+                <command>dialog-close</command>
+            </binding>
+	</button>
+	</group>
+	<hrule/>
+          <button>
+              <halign>left</halign>
+              <legend>Save</legend>
+              <pref-width>100</pref-width>
+              <pref-height>28</pref-height>
+	       <binding>
+      			<command>nasal</command>
+      			<script>followme.save()</script>
+              </binding>
+	       <binding>
+      			<command>nasal</command>
+      			<script>save.save()</script>
+              </binding>
+          </button>
+	   <button>
+              <halign>left</halign>
+              <legend>Resume</legend>
+              <pref-width>100</pref-width>
+              <pref-height>28</pref-height>
+	      <binding>
+      			<command>nasal</command>
+      			<script>followme.resume()</script>
+              </binding>
+	        <binding>
+      			<command>nasal</command>
+      			<script>save.resume()</script>
+              </binding>
+	        <binding>
+        			<command>property-assign</command>
+        			<property>velocities/groundspeed-kt</property>
+                    <value>0</value>
+                </binding>
+		<binding>
+        			<command>property-assign</command>
+        			<property>/position/altitude-agl-ft</property>
+                    <value>0</value>
+                </binding>
+          </button>
+
+      
+</PropertyList>

@@ -477,6 +477,13 @@
 						<script>engine.stopEngine(engine.engine_1)</script>
 					</binding>
 				</item>
+				<item>
+					<label>Save/Resume</label>
+					<binding>
+						<command>dialog-show</command>
+						<dialog-name>save_dialog</dialog-name>
+					</binding>
+				</item>
                 <item>
 					<label>Toggle Parking Radar</label>
 					<binding>
@@ -835,6 +842,7 @@
         <file>Aircraft/followme_e-tron/Nasal/plate.nas</file>
         <file>Aircraft/followme_e-tron/Nasal/steering.nas</file>
         <file>Aircraft/followme_e-tron/Nasal/radar.nas</file>
+	<file>Aircraft/followme_e-tron/Nasal/save.nas</file>
 	</followme>
 	<!--<screen>
 		<file>Aircraft/followme_e-tron/Nasal/SmartScreen.nas</file>
@@ -874,6 +882,9 @@
     <dialogs>
         <file>Aircraft/followme_e-tron/gui/dialogs/config.nas</file>
     </dialogs>
+    <save>
+	<file>Aircraft/followme_e-tron/Nasal/save.nas</file>
+   </save>
 </nasal>
 
 </PropertyList>
