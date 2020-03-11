@@ -477,6 +477,13 @@
 						<script>engine.stopEngine(engine.engine_1)</script>
 					</binding>
 				</item>
+				<item>
+					<label>Save/Resume</label>
+					<binding>
+						<command>dialog-show</command>
+						<dialog-name>save_dialog</dialog-name>
+					</binding>
+				</item>
                 <item>
 					<label>Toggle Parking Radar</label>
 					<binding>
