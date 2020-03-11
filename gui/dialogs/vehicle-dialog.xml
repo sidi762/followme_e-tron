@@ -273,10 +273,10 @@
                     <not>
                         <property>/sim/freeze/replay-state</property>
                     </not>
-                    <less-than>
+                    <!-- less-than>
                         <property>velocities/groundspeed-kt</property>
                         <value>1.0</value>
-                    </less-than>
+                    </less-than -->
                 </and>
             </enable>
             <binding>
