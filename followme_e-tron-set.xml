@@ -871,6 +871,9 @@
     <dialogs>
         <file>Aircraft/followme_e-tron/gui/dialogs/config.nas</file>
     </dialogs>
+    <save>
+	<file>Aircraft/followme_e-tron/Nasal/save.nas</file>
+   </save>
 </nasal>
 
 </PropertyList>
