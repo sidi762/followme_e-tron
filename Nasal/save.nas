@@ -42,17 +42,17 @@ var save = func {
         setprop("/save/controls/dir", dir);
 
     var aileron = getprop("/controls/flight/aileron");
-        setprop("/save/controls/ail", ail);
+        setprop("/save/controls/ail", aileron);
 
     var steering_wheel = getprop("/controls/steering_wheel");
-        setprop("/save/controls/stw", stw);
+        setprop("/save/controls/stw", steering_wheel);
 
 
     var platename = getprop("/systems/plate/name");
-        setprop("/save/plate_name", pm);
+        setprop("/save/plate_name", platename);
 
     var platefile = getprop("/systems/plate/file");
-        setprop("/save/plate_file", pf);
+        setprop("/save/plate_file", platefile);
 
 
     var interior = getprop("/systems/interior/type");
