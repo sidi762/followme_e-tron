@@ -55,7 +55,7 @@
 <model>
    <condition>
 		<equals>
-			<property>sim/multiplay/generic/int[13]</property>
+			<property>sim/multiplay/generic/bool[0]</property>
 			<value>1</value>
 		</equals>
     </condition>
