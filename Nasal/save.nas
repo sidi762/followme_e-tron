@@ -30,6 +30,9 @@ var save = func {
     var right_indicator = getprop("/sim/model/lights/indicator-right/state");
     setprop("/save/r/indicator", right_indicator);
 
+    var headlight = getprop("/controls/lighting/headlight");
+    setprop("/save/headlight", headlight);
+
 
     var horn = getprop("/systems/horn");
     setprop("/save/horn", horn);
@@ -57,6 +60,14 @@ var save = func {
 
     var interior = getprop("/systems/interior/type");
     setprop("/save/type/int", interior);
+
+    var dec = getprop("/systems/decorations-enable");
+    setprop("/save/int/dec", dec);
+
+    var pmodel = getprop("/systems/pmodel-enable");
+    setprop("/save/pmodel", pmodel);
+
+
     print("State saved");
 }
 
@@ -91,6 +102,9 @@ var resume = func {
     var right_indicator = getprop("/save/r/indicator");
     setprop("/sim/model/lights/indicator-right/state", right_indicator);
 
+    var headlight = getprop("/save/headlight");
+    setprop("/controls/lighting/headlight", headlight);
+
 
     var horn = getprop("/save/horn");
     setprop("/systems/horn", horn);
@@ -120,5 +134,13 @@ var resume = func {
 
     var interior = getprop("/save/type/int");
     setprop("/systems/interior/type", interior);
+
+    var dec = getprop("/save/int/dec");
+    setprop("/systems/decorations-enable", dec);
+
+    var pmodel = getprop("/save/pmodel");
+    setprop("/systems/pmodel-enable", pmodel);
+
+
     print("State resumed!");
 }
