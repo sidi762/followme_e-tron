@@ -66,6 +66,26 @@ var save = func {
 
     var pmodel = getprop("/systems/pmodel-enable");
     setprop("/save/pmodel", pmodel);
+    
+    
+    var drr = getprop("/controls/doors/rearright/position-norm");
+    setprop("/save/drr", drr);
+
+    var drl = getprop("/controls/doors/rearleft/position-norm");
+    setprop("/save/drl", drl);
+
+    var dfr = getprop("/controls/doors/frontright/position-norm");
+    setprop("/save/dfr", dfr);
+
+    var dfl = getprop("/controls/doors/frontleft/position-norm");
+    setprop("/save/dfl", dfl);
+
+
+    var bkwh = getprop("/systems/electrical/e-tron/battery-kWh");
+    setprop("/save/bkwh", bkwh);
+
+    var br = getprop("/systems/electrical/e-tron/battery-remaining-percent-float");
+    setprop("/save/br", br);
 
 
     print("State saved");
