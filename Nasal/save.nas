@@ -30,6 +30,9 @@ var save = func {
     var right_indicator = getprop("/sim/model/lights/indicator-right/state");
     setprop("/save/r/indicator", right_indicator);
 
+    var headlight = getprop("/controls/lighting/headlight");
+    setprop("/save/headlight", headlight);
+
 
     var horn = getprop("/systems/horn");
     setprop("/save/horn", horn);
@@ -57,6 +60,34 @@ var save = func {
 
     var interior = getprop("/systems/interior/type");
     setprop("/save/type/int", interior);
+
+    var dec = getprop("/systems/decorations-enable");
+    setprop("/save/int/dec", dec);
+
+    var pmodel = getprop("/systems/pmodel-enable");
+    setprop("/save/pmodel", pmodel);
+    
+    
+    var drr = getprop("/controls/doors/rearright/position-norm");
+    setprop("/save/drr", drr);
+
+    var drl = getprop("/controls/doors/rearleft/position-norm");
+    setprop("/save/drl", drl);
+
+    var dfr = getprop("/controls/doors/frontright/position-norm");
+    setprop("/save/dfr", dfr);
+
+    var dfl = getprop("/controls/doors/frontleft/position-norm");
+    setprop("/save/dfl", dfl);
+
+
+    var bkwh = getprop("/systems/electrical/e-tron/battery-kWh");
+    setprop("/save/bkwh", bkwh);
+
+    var br = getprop("/systems/electrical/e-tron/battery-remaining-percent-float");
+    setprop("/save/br", br);
+
+
     print("State saved");
 }
 
@@ -91,6 +122,9 @@ var resume = func {
     var right_indicator = getprop("/save/r/indicator");
     setprop("/sim/model/lights/indicator-right/state", right_indicator);
 
+    var headlight = getprop("/save/headlight");
+    setprop("/controls/lighting/headlight", headlight);
+
 
     var horn = getprop("/save/horn");
     setprop("/systems/horn", horn);
@@ -120,5 +154,33 @@ var resume = func {
 
     var interior = getprop("/save/type/int");
     setprop("/systems/interior/type", interior);
+
+    var dec = getprop("/save/int/dec");
+    setprop("/systems/decorations-enable", dec);
+
+    var pmodel = getprop("/save/pmodel");
+    setprop("/systems/pmodel-enable", pmodel);
+
+    
+    var drr = getprop("/save/drr");
+    setprop("/controls/doors/rearright/position-norm", drr);
+
+    var drl = getprop("/save/drl");
+    setprop("/controls/doors/rearleft/position-norm", drl);
+
+    var dfr = getprop("/save/dfr");
+    setprop("/controls/doors/frontright/position-norm", dfr);
+
+    var dfl = getprop("/save/dfl");
+    setprop("/controls/doors/frontleft/position-norm", dfl);
+
+
+    
+    var bkwh = getprop("/save/bkwh");
+    setprop("/systems/electrical/e-tron/battery-kWh", bkwh);
+
+    var br = getprop("/save/br");
+    setprop("/systems/electrical/e-tron/battery-remaining-percent-float", br);
+
     print("State resumed!");
 }
