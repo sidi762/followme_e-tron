@@ -1,5 +1,5 @@
 # Followme e-tron save and resume by Marsdolphin c 2020
-# This saves and lets you resume the basic functions of the car.
+# This saves and lets you resume the functions of the car.
 # It will be under development for new features.
 
 
