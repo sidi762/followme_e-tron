@@ -50,6 +50,10 @@ var save = func {
     var steering_wheel = getprop("/controls/steering_wheel");
     setprop("/save/controls/stw", steering_wheel);
 
+    var pb = getprop("/controls/gear/brake-parking");
+    setprop("/save/controls/pb", pb);
+
+
 
     var platename = getprop("/systems/plate/name");
     setprop("/save/plate_name", platename);
@@ -141,6 +145,9 @@ var resume = func {
 
     var steering_wheel = getprop("/save/controls/stw");
     setprop("/controls/steering_wheel", steering_wheel);
+
+    var pb = getprop("/save/controls/pb");
+    setprop("/controls/gear/brake-parking", pb);
 
 
 
