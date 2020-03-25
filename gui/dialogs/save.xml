@@ -66,6 +66,9 @@
         			<property>/position/altitude-agl-ft</property>
                     <value>0</value>
                 </binding>
+		<binding>
+   				<command>pause</command>
+ 		 </binding>
           </button>
 
       
