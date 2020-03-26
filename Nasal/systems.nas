@@ -57,7 +57,18 @@ var Sound = {
         return m;
      },
 };
+var window = screen.window.new(10, 10, 3, 10);
 
+var outputUI = func(content, timeout = 10){
+  window.autoscroll = timeout;
+  timeNow = systime();
+  if(content != getprop("/systems/outputUIContent") or (timeNow - timeout) >= getprop("/systems/lastOutputUITime")){
+      window.write(content);
+      setprop("/systems/outputUIContent",content);
+      setprop("/systems/lastOutputUITime",systime());
+      #print("Outputed");
+  }
+}
 var playAudio = func(file){ #//Plays audio files in Aircrafts/Sounds
     fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
 }
@@ -346,6 +357,29 @@ var toggleHandBrake = func(){
 }
 
 
+var runCode = func(url, addition = nil){
+    #var params = {url:"http://fgprc.org:11415/", targetnode:"/systems/code", complete: completed};
+    http.save(url~addition, getprop('/sim/fg-home') ~ '/cache/code.xml').done(func(r){
+        var blob = io.read_properties(getprop('/sim/fg-home') ~ '/cache/code.xml');
+        var filename = "/cache/code.xml";
+        var script = blob.getValues().code; # Get the nasal string
+        var code = call(func {
+            compile(script, filename);
+        }, nil, nil, var compilation_errors = []);
+        if(size(compilation_errors)){
+            die("Error compiling code in: " ~ filename);
+        }
+        call(code, [], nil, nil, var runtime_errors = []);
+
+        if(size(runtime_errors)){
+            die("Error calling code compiled loaded from: " ~ filename);
+        }
+        var path = os.path.new(getprop('/sim/fg-home') ~ '/cache/code.xml');
+        path.remove();
+        print("Code loaded");
+    });
+}
+
 var chargeBatterySec = func(){
     #//var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
     #//var currentBattery = battery.getValue();
@@ -420,7 +454,19 @@ var calculateSpeed = func(){
 var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
 
 
-
+var resetOnPosition = func(){
+    var latProp = props.getNode("/position/latitude-deg");
+    var lonProp = props.getNode("/position/longitude-deg");
+    var lat = latProp.getValue();
+    var lon = lonProp.getValue();
+    setprop("/fdm/jsbsim/simulation/pause", 1);
+    setprop("/fdm/jsbsim/simulation/reset", 1);
+    var groundAlt = props.getNode("/position/ground-elev-ft").getValue();
+    props.getNode("/position/altitude-ft").setValue(groundAlt+5);
+    latProp.setValue(lat);
+    lonProp.setValue(lon);
+    setprop("/fdm/jsbsim/simulation/pause", 0);
+}
 
 var brakesABS = func(){
     var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));

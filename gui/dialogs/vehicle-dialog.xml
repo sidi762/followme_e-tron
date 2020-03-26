@@ -286,66 +286,82 @@
         </button>
         <hrule/>
         <group>
-            <layout>hbox</layout>
+            <layout>vbox</layout>
             <text>
                 <label>Rescue</label>
             </text>
+            <group>
+                <layout>hbox</layout>
+                <button>
+                    <halign>left</halign>
+                    <legend>Flip Vehicle</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <enable>
+                        <and>
+                            <not>
+                                <property>/sim/freeze/replay-state</property>
+                            </not>
+                            <less-than>
+                                <property>velocities/groundspeed-kt</property>
+                                <value>1.0</value>
+                            </less-than>
+                        </and>
+                    </enable>
+                    <binding>
+            			<command>property-assign</command>
+            			<property>/orientation/roll-deg</property>
+                        <value>0</value>
+                    </binding>
+                    <binding>
+            			<command>property-assign</command>
+            			<property>velocities/groundspeed-kt</property>
+                        <value>0</value>
+                    </binding>
+                </button>
+
+                <button>
+                    <halign>right</halign>
+                    <legend>Quick Recharge</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <enable>
+                        <and>
+                            <not>
+                                <property>/sim/freeze/replay-state</property>
+                            </not>
+                            <less-than>
+                                <property>velocities/groundspeed-kt</property>
+                                <value>1.0</value>
+                            </less-than>
+                            <not>
+                                <property>/controls/engines/engine/started</property>
+                            </not>
+                        </and>
+                    </enable>
+    				<binding>
+    					<command>nasal</command>
+    					<script>followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull()</script>
+    				</binding>
+                </button>
+            </group>
             <button>
-                <halign>right</halign>
-                <legend>Flip Vehicle</legend>
+                <halign>middle</halign>
+                <legend>Reset Here</legend>
                 <pref-width>120</pref-width>
                 <pref-height>28</pref-height>
                 <enable>
-                    <and>
-                        <not>
-                            <property>/sim/freeze/replay-state</property>
-                        </not>
-                        <!--<less-than>
-                            <property>velocities/groundspeed-kt</property>
-                            <value>1.0</value>
-                        </less-than>-->
-                    </and>
+                    <not>
+                        <property>/sim/freeze/replay-state</property>
+                    </not>
                 </enable>
                 <binding>
-        			<command>property-assign</command>
-        			<property>/orientation/roll-deg</property>
-                    <value>0</value>
-                </binding>
-                <binding>
-        			<command>property-assign</command>
-        			<property>velocities/groundspeed-kt</property>
-                    <value>0</value>
+                    <command>nasal</command>
+                    <script>followme.resetOnPosition();</script>
                 </binding>
             </button>
-
-            <button>
-                <halign>right</halign>
-                <legend>Quick Recharge</legend>
-                <pref-width>120</pref-width>
-                <pref-height>28</pref-height>
-                <enable>
-                    <and>
-                        <not>
-                            <property>/sim/freeze/replay-state</property>
-                        </not>
-                        <less-than>
-                            <property>velocities/groundspeed-kt</property>
-                            <value>1.0</value>
-                        </less-than>
-                        <not>
-                            <property>/controls/engines/engine/started</property>
-                        </not>
-                    </and>
-                </enable>
-				<binding>
-					<command>nasal</command>
-					<script>followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull()</script>
-				</binding>
-            </button>
-
 
         </group>
-
 
         <hrule/>
         <group>
