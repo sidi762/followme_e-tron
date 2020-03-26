@@ -1,4 +1,4 @@
-# Airbus_A330 Contributing Guidelines
+# Followme E-tron Contributing Guidelines
 
 These examples will show the Guidelines for contributing. Please follow this at all times, or your contribution will not be merged.
 
