@@ -105,15 +105,15 @@
 <model>
  <condition>
 	<equals>
-		<property>sim/multiplay/generic/bool[1]</property>
+		<property>sim/multiplay/generic/int[12]</property>
 		<value>1</value>
 	</equals>
  </condition>
  <path>Aircraft/followme_e-tron/Models/people/people2.ac</path>
  <offsets>
-  <x-m> 1.71</x-m>
-  <y-m> -0.2</y-m>
-  <z-m> 0.8</z-m>
+  <x-m> 1.9</x-m>
+  <y-m> 0</y-m>
+  <z-m> 1.255</z-m>
  </offsets>
 </model>
 
@@ -630,6 +630,8 @@
 <animation>
  <type>pick</type>
  <object-name>ldoor</object-name>
+ <object-name>lmirror</object-name>
+ <object-name>indicater_ldoor</object-name>
  <action>
   <button>0</button>
   <repeatable>false</repeatable>
@@ -643,6 +645,9 @@
 <animation>
  <type>rotate</type>
  <object-name>ldoor</object-name>
+ <object-name>lmirror</object-name>
+ <object-name>indicater_ldoor</object-name>
+ <object-name>lbose</object-name>
  <property>sim/multiplay/generic/float[3]</property>
  <factor>-75</factor>
  <center>
@@ -662,6 +667,8 @@
 <animation>
  <type>pick</type>
  <object-name>rdoor</object-name>
+ <object-name>rmirror</object-name>
+ <object-name>indicater_rdoor</object-name>
  <action>
   <button>0</button>
   <repeatable>false</repeatable>
@@ -675,6 +682,9 @@
 <animation>
  <type>rotate</type>
  <object-name>rdoor</object-name>
+ <object-name>rmirror</object-name>
+ <object-name>indicater_rdoor</object-name>
+ <object-name>rbose</object-name>
  <property>sim/multiplay/generic/float[2]</property>
  <factor>75</factor>
  <center>
@@ -809,6 +819,17 @@
 
 <animation>
  <type>material</type>
+ <object-name>indicater_ldoor</object-name>
+ <emission>
+  <red>1.0</red>
+  <green>0.8</green>
+  <blue>0.2</blue>
+  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
+ </emission>
+</animation>
+
+<animation>
+ <type>material</type>
  <object-name>indicater_right</object-name>
  <emission>
   <red>1.0</red>
@@ -826,6 +847,17 @@
   <green>1.0</green>
   <blue>0</blue>
   <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
+ </emission>
+</animation>
+
+<animation>
+ <type>material</type>
+ <object-name>indicater_rdoor</object-name>
+ <emission>
+  <red>1.0</red>
+  <green>0.8</green>
+  <blue>0.2</blue>
+  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
  </emission>
 </animation>
 
