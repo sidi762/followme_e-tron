@@ -18,6 +18,11 @@
     <path>Aircraft/followme_e-tron/Sounds/followme-sound.xml</path>
 </sound>
 
+<!-- Airbag -->
+<model>
+    <path>Aircraft/followme_e-tron/Models/Interior/airbags.xml</path>
+</model>
+
 <!-- Interior -->
 <model>
     <condition>
@@ -632,6 +637,7 @@
  <object-name>ldoor</object-name>
  <object-name>lmirror</object-name>
  <object-name>indicater_ldoor</object-name>
+ <object-name>ldoor_inside</object-name>
  <action>
   <button>0</button>
   <repeatable>false</repeatable>
@@ -648,6 +654,7 @@
  <object-name>lmirror</object-name>
  <object-name>indicater_ldoor</object-name>
  <object-name>lbose</object-name>
+ <object-name>ldoor_inside</object-name>
  <property>sim/multiplay/generic/float[3]</property>
  <factor>-75</factor>
  <center>
@@ -669,6 +676,7 @@
  <object-name>rdoor</object-name>
  <object-name>rmirror</object-name>
  <object-name>indicater_rdoor</object-name>
+ <object-name>rdoor_inside</object-name>
  <action>
   <button>0</button>
   <repeatable>false</repeatable>
@@ -685,6 +693,7 @@
  <object-name>rmirror</object-name>
  <object-name>indicater_rdoor</object-name>
  <object-name>rbose</object-name>
+ <object-name>rdoor_inside</object-name>
  <property>sim/multiplay/generic/float[2]</property>
  <factor>75</factor>
  <center>
