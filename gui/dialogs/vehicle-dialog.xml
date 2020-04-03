@@ -302,10 +302,10 @@
                             <not>
                                 <property>/sim/freeze/replay-state</property>
                             </not>
-                            <less-than>
+                            <!--<less-than>
                                 <property>velocities/groundspeed-kt</property>
                                 <value>1.0</value>
-                            </less-than>
+                            </less-than>-->
                         </and>
                     </enable>
                     <binding>
@@ -321,7 +321,7 @@
                 </button>
 
                 <button>
-                    <halign>right</halign>
+                    <halign>left</halign>
                     <legend>Quick Recharge</legend>
                     <pref-width>120</pref-width>
                     <pref-height>28</pref-height>
@@ -345,21 +345,39 @@
     				</binding>
                 </button>
             </group>
-            <button>
-                <halign>middle</halign>
-                <legend>Reset Here</legend>
-                <pref-width>120</pref-width>
-                <pref-height>28</pref-height>
-                <enable>
-                    <not>
-                        <property>/sim/freeze/replay-state</property>
-                    </not>
-                </enable>
-                <binding>
-                    <command>nasal</command>
-                    <script>followme.resetOnPosition();</script>
-                </binding>
-            </button>
+            <group>
+                <button>
+                    <halign>left</halign>
+                    <legend>Reset Airbag</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <enable>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                    </enable>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.safety.reset();</script>
+                    </binding>
+                </button>
+
+                <button>
+                    <halign>left</halign>
+                    <legend>Reset Here</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <enable>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                    </enable>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.resetOnPosition();</script>
+                    </binding>
+                </button>
+            </group>
 
         </group>
 
