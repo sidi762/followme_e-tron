@@ -118,7 +118,7 @@
 	                 <value>1</value>
 	       </equals>
     </condition>
-    <texture>../../Instruments/parkingbrake/parkingbrake_LIT.png</texture>
+    <texture>../Instruments/parkingbrake/parkingbrake_LIT.png</texture>
 </animation>
 <animation>
      <type>material</type>
@@ -129,7 +129,7 @@
 	 	     <value>0</value>
 	     </equals>
      </condition>
-     <texture>../../Instruments/parkingbrake/parkingbrake.png</texture>
+     <texture>../Instruments/parkingbrake/parkingbrake.png</texture>
 </animation>
 
 <!-- switch for horn -->
