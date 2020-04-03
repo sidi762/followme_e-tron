@@ -1,0 +1,31 @@
+<PropertyList>
+
+<path>airbugs.ac</path>
+<animation>
+ <type>select</type>
+ <object-name>main_airbug_l</object-name>
+ <object-name>main_airbug_r</object-name>
+ <object-name>knee_airbag_l</object-name>
+ <object-name>knee_airbag_r</object-name>
+ <condition>
+     <equals>
+         <property>/systems/safety/airbag/front</property>
+         <value>1</value>
+     </equals>
+ </condition>
+</animation>
+
+<animation>
+ <type>select</type>
+ <object-name>side_airbug_l</object-name>
+ <object-name>side_airbug_r</object-name>
+ <object-name>curtain_airbag_l</object-name>
+ <object-name>curtain_airbag_r</object-name>
+ <condition>
+     <equals>
+         <property>/systems/safety/airbag/side</property>
+         <value>1</value>
+     </equals>
+ </condition>
+</animation>
+</PropertyList>

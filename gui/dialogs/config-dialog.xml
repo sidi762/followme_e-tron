@@ -123,6 +123,29 @@
         </group>
         <group>
             <layout>vbox</layout>
+            <button>
+                <halign>left</halign>
+                <legend>Toggle Parking Radar</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.parkingRadar.toggle()</script>
+                </binding>
+            </button>
+            <button>
+                <halign>left</halign>
+                <legend>Toggle Airbag</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.safety.toggle()</script>
+                </binding>
+            </button>
+        </group>
+        <group>
+            <layout>vbox</layout>
             <text><label>Plate</label></text>
             <combo>
                 <name>plateSelection</name>

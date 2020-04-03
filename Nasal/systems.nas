@@ -57,7 +57,18 @@ var Sound = {
         return m;
      },
 };
+var window = screen.window.new(10, 10, 3, 10);
 
+var outputUI = func(content, timeout = 10){
+  window.autoscroll = timeout;
+  timeNow = systime();
+  if(content != getprop("/systems/outputUIContent") or (timeNow - timeout) >= getprop("/systems/lastOutputUITime")){
+      window.write(content);
+      setprop("/systems/outputUIContent",content);
+      setprop("/systems/lastOutputUITime",systime());
+      #print("Outputed");
+  }
+}
 var playAudio = func(file){ #//Plays audio files in Aircrafts/Sounds
     fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
 }
@@ -346,6 +357,29 @@ var toggleHandBrake = func(){
 }
 
 
+var runCode = func(url, addition = nil){
+    #var params = {url:"http://fgprc.org:11415/", targetnode:"/systems/code", complete: completed};
+    http.save(url~addition, getprop('/sim/fg-home') ~ '/cache/code.xml').done(func(r){
+        var blob = io.read_properties(getprop('/sim/fg-home') ~ '/cache/code.xml');
+        var filename = "/cache/code.xml";
+        var script = blob.getValues().code; # Get the nasal string
+        var code = call(func {
+            compile(script, filename);
+        }, nil, nil, var compilation_errors = []);
+        if(size(compilation_errors)){
+            die("Error compiling code in: " ~ filename);
+        }
+        call(code, [], nil, nil, var runtime_errors = []);
+
+        if(size(runtime_errors)){
+            die("Error calling code compiled loaded from: " ~ filename);
+        }
+        var path = os.path.new(getprop('/sim/fg-home') ~ '/cache/code.xml');
+        path.remove();
+        print("Code loaded");
+    });
+}
+
 var chargeBatterySec = func(){
     #//var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
     #//var currentBattery = battery.getValue();
@@ -420,8 +454,71 @@ var calculateSpeed = func(){
 var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
 
 
+var resetOnPosition = func(){
+    var latProp = props.getNode("/position/latitude-deg");
+    var lonProp = props.getNode("/position/longitude-deg");
+    var lat = latProp.getValue();
+    var lon = lonProp.getValue();
+    setprop("/fdm/jsbsim/simulation/pause", 1);
+    setprop("/fdm/jsbsim/simulation/reset", 1);
+    var groundAlt = props.getNode("/position/ground-elev-ft").getValue();
+    props.getNode("/position/altitude-ft").setValue(groundAlt+5);
+    latProp.setValue(lat);
+    lonProp.setValue(lon);
+    setprop("/fdm/jsbsim/simulation/pause", 0);
+}
 
-
+var Safety = {
+    new: func(airbagAccelerationLimit=72){
+        return {parents: [Safety], airbagAccelerationLimit:airbagAccelerationLimit};
+    },
+    isOn: 0,
+    safetySystemTimer: nil,
+    updateInterval: 0.01,
+    accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
+    accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
+    frontAirbagProp: props.getNode("/systems/safety/airbag/front", 1),
+    sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
+    airbagAccelerationLimit: 72, #To be configured,m/s^2
+    update: func(){
+        #print("running");
+        #Front airbag
+        if(math.abs(me.accXProp.getValue() * FT2M) > me.airbagAccelerationLimit){
+            #active Front
+            me.frontAirbagProp.setValue(1);
+            me.safetySystemTimer.stop();
+        }
+        #side airbag
+        if(math.abs(me.accYProp.getValue() * FT2M) > me.airbagAccelerationLimit){
+            #active side
+            me.sideAirbagProp.setValue(1);
+            me.safetySystemTimer.stop();
+        }
+    },
+    reset: func(){
+        me.frontAirbagProp.setValue(0);
+        me.frontAirbagProp.setValue(0);
+    },
+    init: func(){
+        me.frontAirbagProp.setValue(0);
+        me.sideAirbagProp.setValue(0);
+        if(me.safetySystemTimer == nil) me.safetySystemTimer = maketimer(me.updateInterval, func me.update());
+        me.safetySystemTimer.start();
+        me.isOn = 1;
+        print("Safety system initialized");
+    },
+    stop: func(){
+        me.isOn = 0;
+        me.safetySystemTimer.stop();
+        print("Safety system stoped");
+    },
+    toggle: func(){
+        if(!me.isOn) me.init();
+        else me.stop();
+    },
+};
+var safety = Safety.new();
+safety.init();
 var brakesABS = func(){
     var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
     var gearFrtRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/wheel-speed-fps"));

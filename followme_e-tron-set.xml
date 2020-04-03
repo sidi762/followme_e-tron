@@ -869,12 +869,12 @@
         <file>Aircraft/followme_e-tron/Nasal/auto_speed.nas</file>
     </autospeed>
     <cdu>
-         <file>Aircraft/followme_e-tron/Models/Instruments/CDU/boeing.nas</file>
-         <file>Aircraft/followme_e-tron/Models/Instruments/CDU/library.nas</file>
-         <file>Aircraft/followme_e-tron/Models/Instruments/CDU/functions.nas</file>
+         <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/boeing.nas</file>
+         <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/library.nas</file>
+         <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/functions.nas</file>
     </cdu>
     <datalink>
-        <file>Aircraft/followme_e-tron/Models/Instruments/CDU/datalink.nas</file>
+        <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/datalink.nas</file>
     </datalink>
     <!--<musicplayer>
      <file>Aircraft/followme_e-tron/MusicPlayer/musicplayer.nas</file>
