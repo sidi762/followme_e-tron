@@ -135,12 +135,22 @@
             </button>
             <button>
                 <halign>left</halign>
-                <legend>Toggle Airbag</legend>
+                <legend>Enable/Repair Airbag</legend>
                 <pref-width>120</pref-width>
                 <pref-height>28</pref-height>
                 <binding>
                     <command>nasal</command>
-                    <script>followme.safety.toggle()</script>
+                    <script>followme.safety.init()</script>
+                </binding>
+            </button>
+            <button>
+                <halign>left</halign>
+                <legend>Disable Airbag</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.safety.stop()</script>
                 </binding>
             </button>
         </group>

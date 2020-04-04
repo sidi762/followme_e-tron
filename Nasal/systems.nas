@@ -486,20 +486,21 @@ var Safety = {
         if(math.abs(me.accXProp.getValue() * FT2M) > me.airbagAccelerationLimit){
             #active Front
             me.frontAirbagProp.setValue(1);
-            me.safetySystemTimer.stop();
         }
         #side airbag
         if(math.abs(me.accYProp.getValue() * FT2M) > me.airbagAccelerationLimit){
             #active side
             me.sideAirbagProp.setValue(1);
-            me.safetySystemTimer.stop();
         }
     },
     reset: func(){
+        #resetting stops the system
+        me.safetySystemTimer.stop();
         me.frontAirbagProp.setValue(0);
-        me.frontAirbagProp.setValue(0);
+        me.sideAirbagProp.setValue(0);
     },
     init: func(){
+        #initialize or reinitialize
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
         if(me.safetySystemTimer == nil) me.safetySystemTimer = maketimer(me.updateInterval, func me.update());
