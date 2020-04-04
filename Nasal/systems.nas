@@ -487,13 +487,22 @@ var Safety = {
         if(math.abs(me.accXProp.getValue() * FT2M) > me.airbagAccelerationLimit){
             #active Front
             me.frontAirbagProp.setValue(1);
+            me.emergencyMode();
         }
         #side airbag
         if(math.abs(me.accYProp.getValue() * FT2M) > me.sideAirbagAccelerationLimit){
             #active side
             me.sideAirbagProp.setValue(1);
+            me.emergencyMode();
         }
     },
+
+    emergencyMode: func(){
+        indicatorController.setMode(3); #Active malfunction light
+        if(autospeed.autoSpeedTimer.isRunning) autospeed.stopAutoSpeed();
+        if(autopilot.road_check_timer.isRunning) autopilot.road_check_timer.stop();
+    },
+
     reset: func(){
         #resetting stops the system
         me.safetySystemTimer.stop();
