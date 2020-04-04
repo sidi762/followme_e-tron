@@ -316,6 +316,7 @@ var IndicatorController = {
     },
 
     falseLightOn : func(){
+        if(isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 1;
         if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
            print("falseLight mode on");
@@ -326,6 +327,7 @@ var IndicatorController = {
 
     },
     falseLightOff : func(){
+        if(isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 0;
         if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
            print("falseLight mode off");
@@ -335,7 +337,6 @@ var IndicatorController = {
         }
     },
     false_light_toggle : func(){
-        if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.falseLight == 0){
             me.falseLightOn();
         }else if(me.falseLight == 1){
@@ -498,7 +499,7 @@ var Safety = {
     },
 
     emergencyMode: func(){
-        indicatorController.setMode(3); #Active malfunction light
+        indicatorController.falseLightOn(); #Active malfunction light
         if(autospeed.autoSpeedTimer.isRunning) autospeed.stopAutoSpeed();
         if(autopilot.road_check_timer.isRunning) autopilot.road_check_timer.stop();
     },
