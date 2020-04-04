@@ -469,8 +469,8 @@ var resetOnPosition = func(){
 }
 
 var Safety = {
-    new: func(airbagAccelerationLimit=72){
-        return {parents: [Safety], airbagAccelerationLimit:airbagAccelerationLimit};
+    new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=72){
+        return {parents: [Safety], airbagAccelerationLimit:airbagAccelerationLimit, sideAirbagAccelerationLimit:sideAirbagAccelerationLimit};
     },
     isOn: 0,
     safetySystemTimer: nil,
@@ -479,7 +479,8 @@ var Safety = {
     accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
     frontAirbagProp: props.getNode("/systems/safety/airbag/front", 1),
     sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
-    airbagAccelerationLimit: 72, #To be configured,m/s^2
+    airbagAccelerationLimit: 140, #To be configured,m/s^2
+    sideAirbagAccelerationLimit: 72, #To be configured,m/s^2
     update: func(){
         #print("running");
         #Front airbag
@@ -488,7 +489,7 @@ var Safety = {
             me.frontAirbagProp.setValue(1);
         }
         #side airbag
-        if(math.abs(me.accYProp.getValue() * FT2M) > me.airbagAccelerationLimit){
+        if(math.abs(me.accYProp.getValue() * FT2M) > me.sideAirbagAccelerationLimit){
             #active side
             me.sideAirbagProp.setValue(1);
         }
@@ -518,7 +519,7 @@ var Safety = {
         else me.stop();
     },
 };
-var safety = Safety.new();
+var safety = Safety.new(140, 72);
 safety.init();
 var brakesABS = func(){
     var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
