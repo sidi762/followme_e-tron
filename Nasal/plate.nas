@@ -24,7 +24,7 @@ var scan = func(){
 }
 var updateList = func(){
     var allPlates = scan();
-    var data = props.globals.getNode("/sim/gui/dialogs/vehicle_config/dialog/group[3]/combo/", 1);
+    var data = props.globals.getNode("/sim/gui/dialogs/vehicle_config/dialog/group[4]/combo/", 1);
     data.removeChildren("value");
     data.getChild("value", 0, 1).setValue("NONE");
     forindex(var i; allPlates){

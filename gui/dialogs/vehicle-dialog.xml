@@ -295,7 +295,7 @@
                 <button>
                     <halign>left</halign>
                     <legend>Flip Vehicle</legend>
-                    <pref-width>120</pref-width>
+                    <pref-width>150</pref-width>
                     <pref-height>28</pref-height>
                     <enable>
                         <and>
@@ -323,7 +323,7 @@
                 <button>
                     <halign>left</halign>
                     <legend>Quick Recharge</legend>
-                    <pref-width>120</pref-width>
+                    <pref-width>150</pref-width>
                     <pref-height>28</pref-height>
                     <enable>
                         <and>
@@ -346,10 +346,11 @@
                 </button>
             </group>
             <group>
+                <layout>hbox</layout>
                 <button>
                     <halign>left</halign>
                     <legend>Reset Airbag</legend>
-                    <pref-width>120</pref-width>
+                    <pref-width>150</pref-width>
                     <pref-height>28</pref-height>
                     <enable>
                         <not>
@@ -365,7 +366,7 @@
                 <button>
                     <halign>left</halign>
                     <legend>Reset Here</legend>
-                    <pref-width>120</pref-width>
+                    <pref-width>150</pref-width>
                     <pref-height>28</pref-height>
                     <enable>
                         <not>
