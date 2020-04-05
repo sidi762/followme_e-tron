@@ -2,12 +2,22 @@
 var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
     #//height: height of installation above ground;installCoordX: X coord of installation; installCoordY: Y coord of installation; maxRange: max radar range; maxWidth: width of the sector
+    #//orientationMode 0:towards back, 180:towards front, 90: towards left, 270:towards right, custom values are accepted(in degrees)
+    #//Node that 0 degrees is the backward(180 degrees heading of the vehicle), which is a little weird because I forget about it when designing the system
+    #//and the support of other install orientations are added afterwards
+    #//For a typical parking radar, set orientationMode=0(or leave it as default)
+    #//warnEnabled: set it to 1 (or leave it as default) enables the internal warning system(typecally used for a parking radar)
+    #//Notice: when warnEnabled set to 1, there's nothing being outputed to radarOutput!
     #//For follow me EV: height 0.3m; installCoordX:0m; installCoordY:3.8m; maxRange:3m;maxWidth:3m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
-    new: func(height, installCoordX, installCoordY, maxRange, maxWidth) {
-        return { parents:[Radar, followme.Appliance.new()], height: height, installCoordX:installCoordX, installCoordY:installCoordY, maxRange:maxRange, maxWidth:maxWidth};
+    new: func(height, installCoordX, installCoordY, maxRange, maxWidth, orientationMode=0, warnEnabled=1, debug=0) {
+        return { parents:[Radar, Appliance.new()], height: height, installCoordX:installCoordX, installCoordY:installCoordY, maxRange:maxRange, maxWidth:maxWidth, orientationMode:orientationMode, warnEnabled:warnEnabled, debug:debug, radarOutput:10000};
     },
+
+    debug: 0,#if debug = 1, shows marker and prints info
+    warnEnabled: 1,#1 enables the internal warning system(typecally used for a parking radar) as 0 disables it
+
     height: 0.3, #METERS
     installCoordX: 0, #METERS
     installCoordY: 3.8, #METERS
@@ -17,6 +27,7 @@ var Radar = {
     updateInterval:0.25,#SEC
     searchAngle: 0, #RAD, half of the search angle
     tanSearchAngle: 0,
+    orientationMode:0, #Deg
 
     vehiclePosition: nil,
     coord: nil,
@@ -33,6 +44,8 @@ var Radar = {
     warningSound: "parking_radar.wav",
     lastDis: 0,
 
+    radarOutput: 10000,#The value which radar returns in meters
+
     init: func(){
         me.searchAngle = math.acos(me.maxRange / math.sqrt((2/me.maxWidth)*(2/me.maxWidth) + me.maxRange*me.maxRange));
         me.tanSearchAngle = math.tan(me.searchAngle);
@@ -42,14 +55,23 @@ var Radar = {
         me.widthLatRange = me.calculateLatChange(me.maxWidth);
         me.widthLonRange = me.calculateLonChange(me.maxWidth, me.coord);
         if(me.radarTimer == nil) me.radarTimer = maketimer(me.updateInterval, func me.update());
-        if(me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
+        if(me.warnEnabled and me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
         me.radarTimer.start();
-        print("Parking radar initialized!");
-        playAudio("parking_radar_init.wav");
+        if(me.warnEnabled){
+            print("Parking radar initialized!");
+            playAudio("parking_radar_init.wav");
+        }else{
+            #print("Radar initialized!");
+        }
     },
     stop: func(){
-        print("Parking radar stopped!");
-        me.warningTimer.stop();
+        if(me.warnEnabled){
+            print("Parking radar stopped!");
+            playAudio("parking_radar_init.wav");
+        }else{
+            #print("Radar Stopped!");
+        }
+        if(me.warnEnabled) me.warningTimer.stop();
         me.radarTimer.stop();
     },
     toggle: func(){
@@ -61,7 +83,7 @@ var Radar = {
     },
 
     getCoord: func(){
-        me.vehicleHeading = props.getNode("/orientation/heading-deg",1).getValue();
+        me.vehicleHeading = geo.normdeg(props.getNode("/orientation/heading-deg",1).getValue() + me.orientationMode);
         me.vehiclePosition = geo.aircraft_position();
         me.coord = geo.Coord.new(me.vehiclePosition);
         me.coord.apply_course_distance(geo.normdeg(me.vehicleHeading-90), me.installCoordX);
@@ -113,14 +135,14 @@ var Radar = {
         if(meters <= 0.5){
             me.warningInterval = 0.2;
             me.warningSound = "parking_radar_long.wav";
-            #print("Caution! Something behind at less than 0.5 meters!");
+            if(me.debug) print("Caution! Something detected at less than 0.5 meters!");
             return;
         }else{
             me.warningSound = "parking_radar.wav";
         }
         meters = sprintf("%.3f", meters);
         if(meters != me.lastDis) me.warningInterval = (meters)/me.maxRange;
-        #print("Caution! Something behind at approximatly "~meters~" meters");
+        if(me.debug) print("Caution! Something detected at approximatly "~meters~" meters");
         me.lastDis = meters;
     },
     sample: func(stepLat, stepLon, searchLat, searchLon){ # returns an elevtion
@@ -128,7 +150,7 @@ var Radar = {
         var lonChange  = -math.cos(me.vehicleHeading * D2R);
         var sampleCoord = geo.Coord.new();
         sampleCoord.set_latlon(me.position_change(searchLat,stepLat*latChange), me.position_change(searchLon,stepLon*lonChange));
-        #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", sampleCoord.lat(), sampleCoord.lon(), me.coord.alt());
+        if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", sampleCoord.lat(), sampleCoord.lon(), me.coord.alt());
         return sampleCoord;
     },
     update: func(){
@@ -150,8 +172,9 @@ var Radar = {
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
-                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
-                    me.warnControl(meters);
+                    if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
+                    if(me.warnEnabled) me.warnControl(meters);
+                    else me.radarOutput = meters;
                     return;
                 }
             }
@@ -162,16 +185,18 @@ var Radar = {
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
-                    #var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
-                    me.warnControl(meters);
+                    if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
+                    if(me.warnEnabled) me.warnControl(meters);
+                    else me.radarOutput = meters;
                     return;
                 }
             }
             searchStep += 0.1;
             searchDis += searchStep;
         }
-        #print("All clear");
-        me.warnControl(10000);
+        if(me.debug) print("All clear");
+        if(me.warnEnabled) me.warnControl(10000);
+        else me.radarOutput = 10000;
     },
 };
 

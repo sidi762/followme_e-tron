@@ -471,17 +471,60 @@ var resetOnPosition = func(){
 
 var Safety = {
     new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=72){
-        return {parents: [Safety], airbagAccelerationLimit:airbagAccelerationLimit, sideAirbagAccelerationLimit:sideAirbagAccelerationLimit};
+        var newSafety = { parents:[Safety] };
+        newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
+        newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
+        newSafety.frontRadar = Radar.new(0.3, 0, 0, 10, 1, 180, 0, 0);
+        return newSafety;
     },
     isOn: 0,
     safetySystemTimer: nil,
     updateInterval: 0.01,
+    frontRadarEnabled: 0,
+    aebActivated: 0,
+
+    #Airbag
     accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
     accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
     frontAirbagProp: props.getNode("/systems/safety/airbag/front", 1),
     sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
     airbagAccelerationLimit: 140, #To be configured,m/s^2
     sideAirbagAccelerationLimit: 72, #To be configured,m/s^2
+
+    #Frontwards radar
+    frontRadar: nil,
+
+    enableFrontRadar: func(){
+        #Enables the front radar
+        me.frontRadarEnabled = 1;
+        me.frontRadar.init();
+        me.frontRadar.stop();
+        print("Front radar enabled");
+    },
+    disableFrontRadar: func(){
+        #Disables the front radar
+        me.frontRadar.stop();
+        me.frontRadarEnabled = 0;
+    },
+
+    aebActive: func(){
+        me.aebActivated = 1;
+        #engine.engine_1.engineSwitch.switchDisconnect();
+        props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
+        props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
+        props.getNode("/",1).setValue("/controls/gear/brake-parking", 1);
+        playAudio("parking_radar_init.wav");
+        print("AEB Activated!");
+    },
+    aebStop: func(){
+        me.aebActivated = 0;
+        print("AEB Stopped");
+        #engine.engine_1.engineSwitch.switchConnect();
+        props.getNode("/",1).setValue("/controls/gear/brake-left", 0);
+        props.getNode("/",1).setValue("/controls/gear/brake-right", 0);
+        props.getNode("/",1).setValue("/controls/gear/brake-parking", 0);
+    },
+
     update: func(){
         #print("running");
         #Front airbag
@@ -496,10 +539,28 @@ var Safety = {
             me.sideAirbagProp.setValue(1);
             me.emergencyMode();
         }
+        #AEB, Automatic Emergency Brake
+        var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]")*1.852;#In km/h
+        if(currentSpeed > 20){
+            if(me.frontRadarEnabled){
+                me.frontRadar.init();
+                if(me.frontRadar.radarOutput <= 8 and !me.aebActivated){
+                    me.aebActive();
+                    me.emergencyMode();
+                }else if(me.frontRadar.radarOutput >= 8 and me.aebActivated){
+                    me.aebStop();
+                }
+            }
+        }else{
+            if(me.frontRadarEnabled and me.frontRadar.radarTimer.isRunning) me.frontRadar.stop();
+        }
+
+
     },
 
     emergencyMode: func(){
-        indicatorController.falseLightOn(); #Active malfunction light
+        indicatorController.setMode(3); #Active malfunction light
+        indicatorController.falseLight = 1;
         if(autospeed.autoSpeedTimer.isRunning) autospeed.stopAutoSpeed();
         if(autopilot.road_check_timer.isRunning) autopilot.road_check_timer.stop();
     },
@@ -531,6 +592,7 @@ var Safety = {
 };
 var safety = Safety.new(140, 72);
 safety.init();
+safety.enableFrontRadar();
 var brakesABS = func(){
     var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
     var gearFrtRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/wheel-speed-fps"));
