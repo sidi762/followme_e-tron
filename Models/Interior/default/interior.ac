@@ -31585,7 +31585,7 @@ name "handbrake.001"
 loc -0.00712359 -0.30269 0.0188993
 data 25
 Mesh61 in1 Group1 Mod.001
-texture "../../Instruments/parkingbrake/parkingbrake.png"
+texture "../Instruments/parkingbrake/parkingbrake.png"
 crease 30.000000
 numvert 8
 1.47621 1.00512 -0.00831
