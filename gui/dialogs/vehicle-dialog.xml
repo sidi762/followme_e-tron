@@ -379,6 +379,9 @@
                     </binding>
                 </button>
             </group>
+            <text>
+                <label>Resetting Airbag stops the entire safety system!</label>
+            </text>
 
         </group>
 

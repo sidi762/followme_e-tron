@@ -135,7 +135,7 @@
             </button>
             <button>
                 <halign>left</halign>
-                <legend>Enable/Repair Airbag</legend>
+                <legend>(Re)Initialize Safety</legend>
                 <pref-width>120</pref-width>
                 <pref-height>28</pref-height>
                 <binding>
@@ -145,7 +145,7 @@
             </button>
             <button>
                 <halign>left</halign>
-                <legend>Disable Airbag</legend>
+                <legend>Disable Safety</legend>
                 <pref-width>120</pref-width>
                 <pref-height>28</pref-height>
                 <binding>
@@ -153,7 +153,21 @@
                     <script>followme.safety.stop()</script>
                 </binding>
             </button>
+            <button>
+                <halign>left</halign>
+                <legend>Toggle AEB</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.safety.toggleFrontRadar()</script>
+                </binding>
+            </button>
+            <text>
+                <label>To repair Airbag, reinitialize safety system</label>
+            </text>
         </group>
+        <hrule/>
         <group>
             <layout>vbox</layout>
             <text><label>Plate</label></text>

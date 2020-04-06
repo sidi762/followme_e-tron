@@ -474,7 +474,7 @@ var Safety = {
         var newSafety = { parents:[Safety] };
         newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
         newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
-        newSafety.frontRadar = Radar.new(0.3, 0, 0, 10, 1, 180, 0, 0);
+        newSafety.frontRadar = Radar.new(0.3, 0, 0, 9, 0.1, 180, 0, 0);#For AEB
         return newSafety;
     },
     isOn: 0,
@@ -482,7 +482,7 @@ var Safety = {
     updateInterval: 0.01,
     frontRadarEnabled: 0,
     aebActivated: 0,
-
+    throttleNode: props.getNode("/controls/engines/engine/throttle",1),
     #Airbag
     accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
     accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
@@ -506,10 +506,18 @@ var Safety = {
         me.frontRadar.stop();
         me.frontRadarEnabled = 0;
     },
+    toggleFrontRadar: func(){
+        if(!me.frontRadarEnabled){
+            me.enableFrontRadar();
+            playAudio("parking_radar_init.wav");
+        }
+        else me.disableFrontRadar();
+    },
 
     aebActive: func(){
         me.aebActivated = 1;
         #engine.engine_1.engineSwitch.switchDisconnect();
+        me.throttleNode.setValue(0);
         props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
         props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
         props.getNode("/",1).setValue("/controls/gear/brake-parking", 1);
@@ -541,7 +549,7 @@ var Safety = {
         }
         #AEB, Automatic Emergency Brake
         var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]")*1.852;#In km/h
-        if(currentSpeed > 20){
+        if(currentSpeed > 30 and engine.engine_1.getDirection() == 1){
             if(me.frontRadarEnabled){
                 me.frontRadar.init();
                 if(me.frontRadar.radarOutput <= 8 and !me.aebActivated){
@@ -566,8 +574,9 @@ var Safety = {
     },
 
     reset: func(){
-        #resetting stops the system
+        #resetting stops the safety system
         me.safetySystemTimer.stop();
+        me.disableFrontRadar();
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
     },
@@ -577,11 +586,13 @@ var Safety = {
         me.sideAirbagProp.setValue(0);
         if(me.safetySystemTimer == nil) me.safetySystemTimer = maketimer(me.updateInterval, func me.update());
         me.safetySystemTimer.start();
+        if(me.frontRadarEnabled) me.enableFrontRadar();
         me.isOn = 1;
         print("Safety system initialized");
     },
     stop: func(){
         me.isOn = 0;
+        me.disableFrontRadar();
         me.safetySystemTimer.stop();
         print("Safety system stoped");
     },
@@ -591,8 +602,6 @@ var Safety = {
     },
 };
 var safety = Safety.new(140, 72);
-safety.init();
-safety.enableFrontRadar();
 var brakesABS = func(){
     var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
     var gearFrtRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/wheel-speed-fps"));

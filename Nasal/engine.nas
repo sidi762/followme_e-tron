@@ -231,6 +231,8 @@ var startEngine = func(my_engine){
         var signal = my_engine.startEngine();
         if(signal){
             print("Engine started");
+            followme.safety.init();
+            followme.safety.enableFrontRadar();
             if(props.getNode("systems/welcome-message", 1).getValue() == 1){
                 props.getNode("/sim/messages/copilot", 1).setValue("Beijing di san tsui jiao tong wei ti xing nin, Dao lu tsian wan tiao, ann tsuan di yi tiao, xing che bull gui fun, tsin ren liang hang lei");
             }else if(props.getNode("systems/welcome-message", 1).getValue() == 2){
@@ -250,6 +252,7 @@ var startEngine = func(my_engine){
 
 var stopEngine = func(my_engine){
     my_engine.stopEngine();
+    followme.safety.stop();
     print("Engine stopped");
 }
 
