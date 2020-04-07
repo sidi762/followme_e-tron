@@ -42,6 +42,15 @@
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/sport/interior.xml</path>
 </model>
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
+			<value>Luxury</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/luxury/interior.xml</path>
+</model>
 
 <animation>
  <type>material</type>

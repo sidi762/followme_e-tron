@@ -63,6 +63,7 @@
                 <property>/systems/interior/type</property>
                 <value>Default</value>
                 <value>Sport</value>
+                <value>Luxury</value>
                 <binding>
         			<command>dialog-apply</command>
         			<object-name>interiorStyle</object-name>
