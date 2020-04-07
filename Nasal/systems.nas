@@ -469,12 +469,29 @@ var resetOnPosition = func(){
     setprop("/fdm/jsbsim/simulation/pause", 0);
 }
 
+
+var brakesABS = func(){
+    var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
+    var gearFrtRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/wheel-speed-fps"));
+    var gearBckLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[2]/wheel-speed-fps"));
+    var gearBckRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[3]/wheel-speed-fps"));
+    if(gearFrtLftSpeed == 0 or gearBckLftSpeed == 0 or gearFrtRgtSpeed == 0 or gearBckRgtSpeed == 0){
+        safety.emergencyMode();
+        props.getNode("/",1).setValue("/controls/gear/brake-left", 0);
+        props.getNode("/",1).setValue("/controls/gear/brake-right", 0);
+    }else{
+        props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
+        props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
+    }
+}
+
 var Safety = {
     new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=72){
         var newSafety = { parents:[Safety] };
         newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
         newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
         newSafety.frontRadar = Radar.new(0.3, 0, 0, 9, 0.1, 180, 0, 0);#For AEB
+        newSafety.absTimer = maketimer(0.001, brakesABS);
         return newSafety;
     },
     isOn: 0,
@@ -482,6 +499,7 @@ var Safety = {
     updateInterval: 0.01,
     frontRadarEnabled: 0,
     aebActivated: 0,
+    lastRadarOutput:10000,
     throttleNode: props.getNode("/controls/engines/engine/throttle",1),
     #Airbag
     accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
@@ -547,15 +565,20 @@ var Safety = {
             me.sideAirbagProp.setValue(1);
             me.emergencyMode();
         }
-        #AEB, Automatic Emergency Brake
+
         var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]")*1.852;#In km/h
+        #AEB, Automatic Emergency Brake
+        var radarOutput = me.frontRadar.radarOutput;
+        var deltaX = me.lastRadarOutput - radarOutput;
+        var reletiveSpeed = 3.6 * (deltaX / me.updateInterval);#In km/h
         if(currentSpeed > 30 and engine.engine_1.getDirection() == 1){
+            #Enable AEB when speed is greater then 30kmh
             if(me.frontRadarEnabled){
                 me.frontRadar.init();
-                if(me.frontRadar.radarOutput <= 8 and !me.aebActivated){
+                if(me.frontRadar.radarOutput <= 8 and reletiveSpeed > 30 and !me.aebActivated){
                     me.aebActive();
                     me.emergencyMode();
-                }else if(me.frontRadar.radarOutput >= 8 and me.aebActivated){
+                }else if((me.frontRadar.radarOutput >= 8 or reletiveSpeed <= 0) and me.aebActivated){
                     me.aebStop();
                 }
             }
@@ -563,6 +586,13 @@ var Safety = {
             if(me.frontRadarEnabled and me.frontRadar.radarTimer.isRunning) me.frontRadar.stop();
         }
 
+        #ABS
+        #var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-left");
+        #if(brakeCmd and currentSpeed){
+        #    me.absTimer.start();
+        #}else{
+        #    me.absTimer.stop();
+        #}
 
     },
 
@@ -602,24 +632,12 @@ var Safety = {
     },
 };
 var safety = Safety.new(140, 72);
-var brakesABS = func(){
-    var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
-    var gearFrtRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/wheel-speed-fps"));
-    var gearBckLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[2]/wheel-speed-fps"));
-    var gearBckRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[3]/wheel-speed-fps"));
-    if(gearFrtLftSpeed == 0 or gearBckLftSpeed == 0 or gearFrtRgtSpeed == 0 or gearBckRgtSpeed == 0){
-        props.getNode("/",1).setValue("/controls/gear/brake-left", 0);
-        props.getNode("/",1).setValue("/controls/gear/brake-right", 0);
-    }else{
-        props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
-        props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
-    }
-}
 
-var absTimer = maketimer(0.001, brakesABS);
+
 
 var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim wheels never overbrake?
-    var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-cmd");
+#//abondoned since the new safety system
+    var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-left");
     if(brakeCmd){
         absTimer.start();
     }else{
@@ -627,4 +645,28 @@ var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim
     }
 }
 
-#setlistener("/controls/gear/brake-cmd", brakeWithABS);
+var testingProgram_1_Entry = func(){
+    autospeed.startAutoSpeed();
+    autospeed.targetSpeedChange(100);
+    settimer(testingProgram_1, 10);
+}
+
+var testingProgram_1 = func(){
+    props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
+    props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
+    props.getNode("/",1).setValue("/controls/gear/brake-parking", 1);
+}
+
+var testingProgram_2_Entry = func(){
+    autospeed.startAutoSpeed();
+    autospeed.targetSpeedChange(100);
+    settimer(testingProgram_2, 10);
+}
+
+var testingProgram_2 = func(){
+    props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
+    props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
+    #props.getNode("/",1).setValue("/controls/gear/brake-parking", 1);
+}
+
+#setlistener("/controls/gear/brake-left", brakeWithABS);
