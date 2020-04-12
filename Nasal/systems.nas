@@ -347,13 +347,79 @@ var IndicatorController = {
 
 var indicatorController = IndicatorController.new();
 
+var BrakeController = {
+    new: func() { return { parents:[BrakeController]}; },
+    leftBrakeNode: props.getNode("/controls/gear/brake-left",1),
+    rightBrakeNode: props.getNode("/controls/gear/brake-right",1),
+    parkingBrakeNode: props.getNode("/controls/gear/brake-parking",1),
+
+    handBrakeIsOn: 0,
+    leftBrakeValue: 0,
+    rightBrakeValue: 0,
+
+    applyLeftBrake: func(value){
+        me.leftBrakeNode.setValue(value);
+        me.leftBrakeValue = value;
+    },
+    applyRightBrake: func(value){
+        me.rightBrakeNode.setValue(value);
+        me.rightBrakeValue = value;
+    },
+    applyBrakes: func(value){
+        me.rightBrakeNode.setValue(value);
+        me.rightBrakeValue = value;
+        me.leftBrakeNode.setValue(value);
+        me.leftBrakeValue = value;
+    },
+
+    enableHandBrake: func(){
+        me.parkingBrakeNode.setValue(1);
+        me.handBrakeIsOn = 1;
+    },
+    disableHandBrake: func(){
+        me.parkingBrakeNode.setValue(0);
+        me.handBrakeIsOn = 0;
+    },
+    toggleHandBrake: func(){
+        if(isInternalView()) playAudio("electric_handbrake.wav");
+        if(!me.handBrakeIsOn){
+            me.enableHandBrake();
+        }else{
+            me.disableHandBrake();
+        }
+    },
+    activeEmergencyBrake: func(){
+        me.applyLeftBrake(1);
+        me.applyRightBrake(1);
+        me.enableHandBrake();
+        safety.emergencyMode();
+    },
+    keyboardBrake: func(){
+        me.applyBrakes(0.8);
+    },
+    keyboardBrakeRelease: func(){
+        me.applyBrakes(0);
+    },
+    releaseBrake: func(){
+        me.applyLeftBrake(0);
+        me.applyRightBrake(0);
+    },
+    releaseAllBrakes: func(){
+        me.applyLeftBrake(0);
+        me.applyRightBrake(0);
+        me.disableHandBrake();
+    },
+};
+
+var brakeController = BrakeController.new();
+
 var toggleHandBrake = func(){
+    #//Depreciated as BrakeController has it internally now
     if(isInternalView()) playAudio("electric_handbrake.wav");
-    var handBrake = props.getNode("/controls/gear/brake-parking", 1);
-    if(!handBrake.getValue()){
-        handBrake.setValue(1);
+    if(!brakeController.handBrakeIsOn){
+        brakeController.enableHandBrake();
     }else{
-        handBrake.setValue(0);
+        brakeController.disableHandBrake();
     }
 }
 
@@ -536,9 +602,7 @@ var Safety = {
         me.aebActivated = 1;
         #engine.engine_1.engineSwitch.switchDisconnect();
         me.throttleNode.setValue(0);
-        props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
-        props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
-        props.getNode("/",1).setValue("/controls/gear/brake-parking", 1);
+        brakeController.activeEmergencyBrake();
         playAudio("parking_radar_init.wav");
         print("AEB Activated!");
     },
@@ -546,9 +610,7 @@ var Safety = {
         me.aebActivated = 0;
         print("AEB Stopped");
         #engine.engine_1.engineSwitch.switchConnect();
-        props.getNode("/",1).setValue("/controls/gear/brake-left", 0);
-        props.getNode("/",1).setValue("/controls/gear/brake-right", 0);
-        props.getNode("/",1).setValue("/controls/gear/brake-parking", 0);
+        brakeController.releaseAllBrakes();
     },
 
     update: func(){
@@ -577,7 +639,6 @@ var Safety = {
                 me.frontRadar.init();
                 if(me.frontRadar.radarOutput <= 8 and reletiveSpeed > 30 and !me.aebActivated){
                     me.aebActive();
-                    me.emergencyMode();
                 }else if((me.frontRadar.radarOutput >= 8 or reletiveSpeed <= 0) and me.aebActivated){
                     me.aebStop();
                 }
