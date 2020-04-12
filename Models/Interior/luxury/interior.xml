@@ -56,15 +56,15 @@
 
 <!--  Engine Starter  -->
 
-<!--<model>
-  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/starter/starter.xml</path>
+<model>
+  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/starter/starter_luxury.xml</path>
   <offsets>
    <x-m>1.278</x-m>
    <y-m>-0.18</y-m>
-   <z-m>0.91</z-m>
+   <z-m>0.93</z-m>
    <pitch-deg>-10</pitch-deg>
   </offsets>
-</model>-->
+</model>
 
 <!-- MUG -->
 <model>
