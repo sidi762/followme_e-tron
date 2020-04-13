@@ -35,7 +35,7 @@ zhe ge jiao cheng gei ni duan zan de shuo ming yi bias pan de gong neng.
 	</view>
 </step>
 <step>
-	<message>xu yao xian shi kai guan shi, qing dao FollowmeEV > Show Options xiang mu lan zhong da gou</message>
+	<message>xu yao xian shi kai guan shi, qing dao FollowmeEV > Configuration xiang mu lan zhong da gou</message>
         <set>
 		<property>sim/multiplay/generic/int[14]</property>
 		<value>1</value>
