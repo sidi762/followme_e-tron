@@ -137,6 +137,102 @@
      <texture>parkingbrake.png</texture>
 </animation>
 
+<animation>
+     <type>material</type>
+     <object-name>handbrake_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/float[19]</property>
+	 	     <value>1</value>
+	     </equals>
+     </condition>
+     <texture>handbrake_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name></object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/float[19]</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>panel_black.png</texture>
+</animation>
+
+<!-- AEB -->
+<animation>
+     <type>material</type>
+     <object-name>AEB_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>system/safety/aeb_activated</property>
+	 	     <value>1</value>
+	     </equals>
+     </condition>
+     <texture>AEB_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>AEB_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>system/safety/aeb_activated</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>panel_black.png</texture>
+</animation>
+
+<!-- Headlight -->
+<animation>
+     <type>material</type>
+     <object-name>headlight_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/int[3]</property>
+	 	     <value>1</value>
+	     </equals>
+     </condition>
+     <texture>headlight_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>headlight_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/int[3]</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>panel_black.png</texture>
+</animation>
+
+<!-- HighBeam -->
+<animation>
+     <type>material</type>
+     <object-name>longheadlight_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>controls/lighting/highBeam</property>
+	 	     <value>1</value>
+	     </equals>
+     </condition>
+     <texture>longheadlight_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>longheadlight_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>controls/lighting/highBeam</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>panel_black.png</texture>
+</animation>
+
+
 <!-- Indicator -->
 <animation>
  <type>material</type>

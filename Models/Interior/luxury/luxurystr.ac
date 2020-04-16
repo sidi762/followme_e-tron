@@ -6,7 +6,7 @@ kids 7
 OBJECT poly
 name "box"
 loc 1.22736 -0.0293362 0.119003
-texture "C:/Users/13272/Desktop/luxury/leather.jpg"
+texture "leather.jpg"
 crease 45.000000
 numvert 52
 0.00245416 -8.9312e-05 -0.237599
@@ -402,7 +402,7 @@ kids 0
 OBJECT poly
 name "block"
 loc 1.22826 0 -0.457865
-texture "C:/Users/13272/Desktop/luxury/leather.jpg"
+texture "leather.jpg"
 crease 45.000000
 numvert 428
 0.0681581 -0.14358 0.507291
@@ -5708,7 +5708,7 @@ kids 0
 OBJECT poly
 name "box"
 loc 0.0285985 -0.942069 -0.000498766
-texture "C:/Users/13272/Desktop/luxury/leather.jpg"
+texture "leather.jpg"
 crease 45.000000
 numvert 8
 1.20884 0.880577 -0.0566651
@@ -5766,7 +5766,7 @@ kids 0
 OBJECT poly
 name "block"
 loc 1.26047 -0.0553972 0.098279
-texture "C:/Users/13272/Desktop/luxury/leather.jpg"
+texture "leather.jpg"
 crease 45.000000
 numvert 436
 0.00708902 -0.0268546 -0.098279
@@ -9234,7 +9234,7 @@ kids 0
 OBJECT poly
 name "cylinder"
 loc 1.21499 -0.0516568 0
-texture "C:/Users/13272/Desktop/luxury/leather.jpg"
+texture "leather.jpg"
 crease 45.000000
 numvert 34
 0.0301465 0.0523032 0.0844235
@@ -9580,7 +9580,7 @@ kids 0
 OBJECT poly
 name "cylinder"
 loc 1.24991 -0.0311779 0.114224
-texture "C:/Users/13272/Desktop/luxury/leather.jpg"
+texture "leather.jpg"
 crease 45.000000
 numvert 68
 0.00400531 0.0173331 -0.269026
@@ -10264,7 +10264,7 @@ kids 0
 OBJECT poly
 name "cylinder"
 loc 1.25252 -0.0291307 0.117667
-texture "C:/Users/13272/Desktop/luxury/leather.jpg"
+texture "leather.jpg"
 crease 45.000000
 numvert 68
 0.00322115 0.0128943 -0.273153

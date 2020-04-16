@@ -114,6 +114,7 @@ props.getNode("systems/screen-enable", 1).setValue(0);
 props.getNode("systems/pmodel-enable", 1).setValue(1);
 props.getNode("systems/decorations-enable", 1).setValue(0);
 props.getNode("systems/interior/type", 1).setValue("Default");
+props.getNode("/systems/safety/aeb_activated", 1).setValue(0);
 
 #var Led = {
 #
@@ -572,6 +573,7 @@ var Safety = {
     accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
     frontAirbagProp: props.getNode("/systems/safety/airbag/front", 1),
     sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
+    aebStateProp: props.getNode("/systems/safety/aeb_activated", 1),
     airbagAccelerationLimit: 140, #To be configured,m/s^2
     sideAirbagAccelerationLimit: 72, #To be configured,m/s^2
 
@@ -604,11 +606,13 @@ var Safety = {
         me.throttleNode.setValue(0);
         brakeController.activeEmergencyBrake();
         playAudio("parking_radar_init.wav");
+        me.aebStateProp.setValue(1);
         print("AEB Activated!");
     },
     aebStop: func(){
         me.aebActivated = 0;
         print("AEB Stopped");
+        me.aebStateProp.setValue(0);
         #engine.engine_1.engineSwitch.switchConnect();
         brakeController.releaseAllBrakes();
     },
@@ -645,6 +649,7 @@ var Safety = {
             }
         }else{
             if(me.frontRadarEnabled and me.frontRadar.radarTimer.isRunning) me.frontRadar.stop();
+            props.getNode("/systems/safety/aeb_activated", 1).setValue(0);
         }
 
         #ABS
@@ -670,11 +675,13 @@ var Safety = {
         me.disableFrontRadar();
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
+        me.aebStateProp.setValue(0);
     },
     init: func(){
         #initialize or reinitialize
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
+        me.aebStateProp.setValue(0);
         if(me.safetySystemTimer == nil) me.safetySystemTimer = maketimer(me.updateInterval, func me.update());
         me.safetySystemTimer.start();
         if(me.frontRadarEnabled) me.enableFrontRadar();
@@ -683,6 +690,7 @@ var Safety = {
     },
     stop: func(){
         me.isOn = 0;
+        me.aebStateProp.setValue(0);
         me.disableFrontRadar();
         me.safetySystemTimer.stop();
         print("Safety system stoped");
