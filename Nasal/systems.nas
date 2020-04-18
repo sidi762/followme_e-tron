@@ -650,7 +650,7 @@ var Safety = {
             }
         }else{
             if(me.frontRadarEnabled and me.frontRadar.radarTimer.isRunning) me.frontRadar.stop();
-            props.getNode("/systems/safety/aeb_activated", 1).setValue(0);
+            if(reletiveSpeed <= 0) and me.aebActivated) me.aebStop();
         }
 
         #ABS
