@@ -208,15 +208,12 @@
      <texture>panel_black.png</texture>
 </animation>
 
-<!-- HighBeam -->
+<!-- HighBeam
 <animation>
      <type>material</type>
      <object-name>longheadlight_LIT</object-name>
      <condition>
-         <equals>
-	 	     <property>controls/lighting/highBeam</property>
-	 	     <value>1</value>
-	     </equals>
+
      </condition>
      <texture>longheadlight_LIT.png</texture>
 </animation>
@@ -230,8 +227,7 @@
 	     </equals>
      </condition>
      <texture>panel_black.png</texture>
-</animation>
-
+</animation>-->
 
 <!-- Indicator -->
 <animation>

@@ -100,7 +100,7 @@ props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
 props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
 
 props.getNode("/",1).setValue("services/service-truck/enable", 0);
-props.getNode("/controls/is-recharging", 1).setValue(0);
+props.getNode("controls/is-recharging", 1).setValue(0);
 props.getNode("systems/welcome-message", 1).setValue(0);
 props.getNode("systems/display-speed", 1).setValue(0);
 props.getNode("systems/speedometer/type", 1).setValue("Type_A");
@@ -108,13 +108,14 @@ props.getNode("systems/battery-gauge/type", 1).setValue("Type_A");
 props.getNode("systems/plate/file", 1).setValue("NONE");
 props.getNode("systems/plate/name", 1).setValue("NONE");
 props.getNode("controls/lighting/headlight-als", 1).setValue(0);
+props.getNode("controls/lighting/highBeam", 1).setValue(0);
 props.getNode("sim/remote/pilot-callsign", 1).setValue("");
-props.getNode("/systems/codriver-enable", 1).setValue(0);
+props.getNode("systems/codriver-enable", 1).setValue(0);
 props.getNode("systems/screen-enable", 1).setValue(0);
 props.getNode("systems/pmodel-enable", 1).setValue(1);
 props.getNode("systems/decorations-enable", 1).setValue(0);
 props.getNode("systems/interior/type", 1).setValue("Default");
-props.getNode("/systems/safety/aeb_activated", 1).setValue(0);
+props.getNode("systems/safety/aeb_activated", 1).setValue(0);
 
 #var Led = {
 #
