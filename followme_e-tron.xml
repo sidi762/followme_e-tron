@@ -498,4 +498,29 @@
         </direction>
       </force>
     </external_reactions>
+
+    <system name="Followme EV animations">
+        <channel name="Stroage">
+            <fcs_function name="animation/storage_nul">
+			<function>
+				<table>
+					<independentVar lookup="row">/controls/interior/luxury/storage_cover_pos</independentVar>
+					<tableData>
+						0.00  0.0
+                        0.05  0.1
+                        0.10  0.1
+                        0.30  0.2
+						0.75  0.7
+						0.95  1.0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+
+		<lag_filter name="animation/storage_cover_pos">
+			<input>animation/storage_nul</input>
+			<c1>3</c1>
+		</lag_filter>
+        </channel>
+    </system>
 </fdm_config>

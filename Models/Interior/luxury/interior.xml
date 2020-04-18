@@ -288,6 +288,43 @@
  </emission>
 </animation>
 
+<!-- storage_cover -->
+<animation>
+  <type>pick</type>
+  <object-name>storage_cover</object-name>
+  <action>
+    <button>0</button>
+    <binding>
+        <command>property-cycle</command>
+        <property>controls/interior/luxury/storage_cover_pos</property>
+        <value type="double">0</value>
+        <value type="double">1</value>
+    </binding>
+  </action>
+ </animation>
+<animation>
+  <type>translate</type>
+  <object-name>storage_cover</object-name>
+  <property>fdm/jsbsim/animation/storage_cover_pos</property>
+  <factor>0.13</factor>
+  <offset-m>0</offset-m>
+  <axis>
+   <x>1</x>
+   <y>0</y>
+   <z>0</z>
+  </axis>
+ </animation>
+ <!-- storage -->
+<animation>
+    <type>select</type>
+    <object-name>stroage</object-name>
+    <condition>
+        <equals>
+            <property>controls/interior/luxury/storage_cover_pos</property>
+            <value>1</value>
+        </equals>
+    </condition>
+</animation>
 
 <!-- Accelerator -->
 <animation>
