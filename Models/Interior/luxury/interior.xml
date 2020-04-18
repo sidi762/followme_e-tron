@@ -150,7 +150,7 @@
 </animation>
 <animation>
      <type>material</type>
-     <object-name></object-name>
+     <object-name>handbrake_LIT</object-name>
      <condition>
          <equals>
 	 	     <property>sim/multiplay/generic/float[19]</property>
@@ -166,7 +166,7 @@
      <object-name>AEB_LIT</object-name>
      <condition>
          <equals>
-	 	     <property>system/safety/aeb_activated</property>
+	 	     <property>systems/safety/aeb_activated</property>
 	 	     <value>1</value>
 	     </equals>
      </condition>
@@ -177,7 +177,7 @@
      <object-name>AEB_LIT</object-name>
      <condition>
          <equals>
-	 	     <property>system/safety/aeb_activated</property>
+	 	     <property>systems/safety/aeb_activated</property>
 	 	     <value>0</value>
 	     </equals>
      </condition>
@@ -208,12 +208,15 @@
      <texture>panel_black.png</texture>
 </animation>
 
-<!-- HighBeam
+<!-- HighBeam -->
 <animation>
      <type>material</type>
      <object-name>longheadlight_LIT</object-name>
      <condition>
-
+         <equals>
+	 	     <property>controls/lighting/highBeam</property>
+	 	     <value>1</value>
+	     </equals>
      </condition>
      <texture>longheadlight_LIT.png</texture>
 </animation>
@@ -227,7 +230,7 @@
 	     </equals>
      </condition>
      <texture>panel_black.png</texture>
-</animation>-->
+</animation>
 
 <!-- Indicator -->
 <animation>
