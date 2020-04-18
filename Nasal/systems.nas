@@ -356,6 +356,7 @@ var BrakeController = {
     rightBrakeNode: props.getNode("/controls/gear/brake-right",1),
     parkingBrakeNode: props.getNode("/controls/gear/brake-parking",1),
 
+    applyingFeetBrake: 0,
     handBrakeIsOn: 0,
     leftBrakeValue: 0,
     rightBrakeValue: 0,
@@ -398,9 +399,11 @@ var BrakeController = {
         safety.emergencyMode();
     },
     keyboardBrake: func(){
+        applyingFeetBrake = 1;
         me.applyBrakes(0.8);
     },
     keyboardBrakeRelease: func(){
+        applyingFeetBrake = 0;
         me.applyBrakes(0);
     },
     releaseBrake: func(){

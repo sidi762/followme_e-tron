@@ -856,6 +856,9 @@
     <autospeed>
         <file>Aircraft/followme_e-tron/Nasal/auto_speed.nas</file>
     </autospeed>
+    <autohold>
+        <file>Aircraft/followme_e-tron/Nasal/auto_hold.nas</file>
+    </autohold>
     <cdu>
          <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/boeing.nas</file>
          <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/library.nas</file>
