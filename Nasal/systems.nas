@@ -117,6 +117,8 @@ props.getNode("systems/pmodel-enable", 1).setValue(1);
 props.getNode("systems/decorations-enable", 1).setValue(0);
 props.getNode("systems/interior/type", 1).setValue("Default");
 props.getNode("systems/safety/aeb_activated", 1).setValue(0);
+props.getNode("systems/auto_hold_enabled", 1).setValue(0);
+props.getNode("systems/auto_hold_working", 1).setValue(0);
 
 #var Led = {
 #

@@ -2041,7 +2041,7 @@ kids 0
 OBJECT poly
 name "autohold_switch"
 loc 1.49125 0.76676 -0.0165006
-texture "autohold.png"
+texture "autohold_switch.png"
 crease 45.000000
 numvert 8
 -0.0125815 0.00182033 -0.0114677

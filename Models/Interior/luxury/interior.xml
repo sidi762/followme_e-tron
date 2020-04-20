@@ -97,6 +97,70 @@
 </animation>
 
 
+<!-- Auto hold -->
+<!--<effect>
+    <inherits-from>Aircraft/followme_e-tron/Models/Effects/autohold</inherits-from>
+    <object-name>autohold_switch</object-name>
+</effect>-->
+<animation>
+		<type>pick</type>
+		<object-name>autohold_switch</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>nasal</command>
+				<script>autohold.toggleAutoHold()</script>
+			</binding>
+		</action>
+</animation>
+<animation>
+    <type>material</type>
+    <object-name>autohold_switch</object-name>
+    <condition>
+	       <equals>
+		             <property>systems/auto_hold_enabled</property>
+	                 <value>1</value>
+	       </equals>
+    </condition>
+    <texture>autohold_switch_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>autohold_switch</object-name>
+     <condition>
+         <equals>
+	 	     <property>systems/auto_hold_enabled</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>autohold_switch.png</texture>
+</animation>
+
+<animation>
+     <type>material</type>
+     <object-name>autohold_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>systems/auto_hold_working</property>
+	 	     <value>1</value>
+	     </equals>
+     </condition>
+     <texture>autohold_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>autohold_LIT</object-name>
+     <condition>
+         <equals>
+	 	     <property>systems/auto_hold_working</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>panel_black.png</texture>
+</animation>
+
+
 <!-- Hand brake -->
 <effect>
     <inherits-from>Aircraft/followme_e-tron/Models/parkingbrake</inherits-from>
