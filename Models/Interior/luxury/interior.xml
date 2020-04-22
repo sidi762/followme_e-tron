@@ -77,9 +77,9 @@
   <path>Aircraft/followme_e-tron/Models/Interior/mug/mug.ac</path>
   <name>mug</name>
   <offsets>
-      <x-m>1.55</x-m>
+      <x-m>2.15</x-m>
       <y-m>-0.027</y-m>
-      <z-m>0.735</z-m>
+      <z-m>0.755</z-m>
   </offsets>
 </model>
 
