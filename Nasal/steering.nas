@@ -21,49 +21,51 @@ memoize.lookup = func(value) {
 }
 
 var Steering = {
-    
+
     new: func() {
         print("Steering system initialized!");
-        return {parents:[Steering]}; 
+        var steering = { parents:[Steering] };
+        props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steering.steeringLimit * R2D);
+        return steering;
     },
-    
+
     mode: 0, #//0: direct; 1: advanced
-    
+
     debugMode: 0,
-    
+
     input: 0, #//-1: left, 1:right, 0: none
     command: 0, #//Steering command, range from -1 to 1
     steeringAngle: 0, #//in rad
-    steeringAngleDeg: 0, #//in degrees
-    
+    #steeringAngleDeg: 0, #//in degrees
+
     steeringLimit: 15.707963, #// 5 * 3.1415926
-    
-    
+
+
     powPointThree: memoize.new( func(value){
         return math.pow(value, 0.3);
     }),
-    
+
     powPointOne: memoize.new( func(value){
         return math.pow(value, 0.1);
     }),
-    
+
     steeringStep:func(rad){
         return 0.1 * me.powPointOne.lookup(sprintf("%.1f", math.abs(rad))) + 0.04;
     },
     neutralStep: func(rad){
         var speed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]");
-        return 0.01 * me.powPointThree.lookup(sprintf("%.1f", math.abs(speed))) * math.abs(rad);
+        return 0.03 * me.powPointThree.lookup(sprintf("%.1f", math.abs(speed))) * math.abs(rad);
     },
-    
+
     mainLoop: func(){
         if(me.input == 0)
         {
             if(math.abs(me.steeringAngle) <=0.2)
             {
                 me.steeringAngle = 0;
-                me.steeringAngleDeg = me.steeringAngle * R2D;
                 props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
-                props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+                #me.steeringAngleDeg = me.steeringAngle * R2D;
+                #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
             }
             if(me.steeringAngle == 0)
             {
@@ -95,11 +97,11 @@ var Steering = {
             else
                 me.steeringAngle -= me.steeringStep(me.steeringAngle);
         }
-        
+
         me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
-        me.steeringAngleDeg = me.steeringAngle * R2D;
+        #me.steeringAngleDeg = me.steeringAngle * R2D;
         props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
-        props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+        #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
         if(me.debugMode)
         {
             print("Steering system command:" ~ me.command);
@@ -107,14 +109,14 @@ var Steering = {
             print("Steering system angle degrees:" ~ me.steeringAngleDeg);
         }
     },
-    
+
     inputLeft: func(){
         me.input = -1;
         if(!me.mode){
-            me.command = -0.5; 
-            me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
+            me.command = -0.5;
             props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
-            props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+            #me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
+            #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
         }else if(me.mode and !me.timerStarted){
             me.startTimer();
         }
@@ -123,9 +125,9 @@ var Steering = {
         me.input = 1;
         if(!me.mode){
             me.command = 0.5;
-            me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
             props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
-            props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+            #me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
+            #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
         }else if(me.mode and !me.timerStarted){
             me.startTimer();
         }
@@ -134,14 +136,14 @@ var Steering = {
         me.input = 0;
         if(!me.mode){
             me.command = 0;
-            me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
             props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
-            props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+            #me.steeringAngleDeg = me.steeringLimit * me.command * R2D;
+            #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
         }else if(me.mode and !me.timerStarted){
             me.startTimer();
         }
     },
-    
+
     steeringTimer: nil,
     timerCreated: 0,
     timerStarted: 0,

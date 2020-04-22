@@ -109,6 +109,7 @@ props.getNode("systems/plate/file", 1).setValue("NONE");
 props.getNode("systems/plate/name", 1).setValue("NONE");
 props.getNode("controls/lighting/headlight-als", 1).setValue(0);
 props.getNode("controls/lighting/highBeam", 1).setValue(0);
+props.getNode("/controls/steering_wheel", 1).setValue(0);
 props.getNode("controls/interior/luxury/storage_cover_pos", 1).setValue(0);
 props.getNode("sim/remote/pilot-callsign", 1).setValue("");
 props.getNode("systems/codriver-enable", 1).setValue(0);

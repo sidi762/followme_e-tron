@@ -563,6 +563,9 @@
         <float n="19" alias="/controls/gear/brake-parking"/>
         <float n="22" alias="/controls/engines/engine/throttle"/>
 
+        <float n="23" alias="/fdm/jsbsim/animation/storage_cover_pos"/>
+        <float n="24" alias="/controls/interior/luxury/storage_cover_pos"/>
+
 
         <!--<string n="0" alias="/systems/plate"/>-->
         <string n="1" alias="/systems/battery-gauge/type"/>

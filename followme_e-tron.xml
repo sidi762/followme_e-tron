@@ -430,6 +430,10 @@
                 </clipto>
                 <output>fcs/rudder-pos-norm</output>
             </summer>
+            <lag_filter name="fcs/rudder-pos-norm">
+				<input>fcs/rudder-cmd-norm</input>
+				<c1>30</c1>
+			</lag_filter>
         </channel>
     </flight_control>
 
@@ -500,7 +504,7 @@
     </external_reactions>
 
     <system name="Followme EV animations">
-        <channel name="Stroage">
+        <channel name="Stroage" execrate="2">
             <fcs_function name="animation/storage_nul">
 			<function>
 				<table>
@@ -522,5 +526,17 @@
 			<c1>3</c1>
 		</lag_filter>
         </channel>
+
+        <channel name="SteeringWheel">
+            <fcs_function name="animation/steering_nul">
+			<function>
+                <product>
+    					<property>/controls/steering_wheel/steering_limit-deg</property>
+    					<property>/controls/flight/rudder</property>
+    			</product>
+            </function>
+            </fcs_function>
+        </channel>
     </system>
+
 </fdm_config>
