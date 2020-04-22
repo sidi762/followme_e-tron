@@ -528,7 +528,7 @@
         </channel>
 
         <channel name="SteeringWheel">
-            <fcs_function name="animation/steering_nul">
+            <fcs_function name="animation/steering_wheel_pos">
 			<function>
                 <product>
     					<property>/controls/steering_wheel/steering_limit-deg</property>
