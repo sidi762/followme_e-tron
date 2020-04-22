@@ -508,6 +508,10 @@
       <generic>
         <bool n="0" alias="/systems/decorations-enable"/>
         <bool n="1" alias="/systems/pmodel-enable"/>
+        <bool n="2" alias="/systems/auto_hold_enabled"/>
+        <bool n="3" alias="/systems/auto_hold_working"/>
+        <bool n="4" alias="/systems/safety/aeb_activated"/>
+        <bool n="5" alias="/controls/lighting/highBeam"/>
 
         <int n="0" alias="/sim/model/lights/indicator-left/state"/>
         <int n="1" alias="/sim/model/lights/indicator-right/state"/>
@@ -555,7 +559,7 @@
         <float n="16" alias="/systems/electrical/e-tron/battery-kWh"/>
         <float n="17" alias="/systems/electrical/e-tron/battery-remaining-percent-float"/>
 
-        <float n="18" alias="/controls/steering_wheel"/>
+        <float n="18" alias="/fdm/jsbsim/animation/steering_wheel_pos"/>
         <float n="19" alias="/controls/gear/brake-parking"/>
         <float n="22" alias="/controls/engines/engine/throttle"/>
 
