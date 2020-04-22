@@ -369,7 +369,7 @@
 <animation>
   <type>translate</type>
   <object-name>storage_cover</object-name>
-  <property>fdm/jsbsim/animation/storage_cover_pos</property>
+  <property>sim/multiplay/generic/float[23]</property>
   <factor>0.13</factor>
   <offset-m>0</offset-m>
   <axis>
@@ -384,7 +384,7 @@
     <object-name>stroage</object-name>
     <condition>
         <equals>
-            <property>controls/interior/luxury/storage_cover_pos</property>
+            <property>sim/multiplay/generic/float[24]</property>
             <value>1</value>
         </equals>
     </condition>
