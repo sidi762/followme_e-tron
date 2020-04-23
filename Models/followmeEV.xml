@@ -866,7 +866,7 @@
   <red>1.0</red>
   <green>0.8</green>
   <blue>0.2</blue>
-  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
+  <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
  </emission>
 </animation>
 
