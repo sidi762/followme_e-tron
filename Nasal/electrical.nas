@@ -1,4 +1,6 @@
 #//Followme EV electrical system by Sidi Liang
+#//Contact: sidi.liang@gmail.com
+ 
 var kWh2kWs = func(kWh){
     return kWh * 3600;
 }
@@ -18,7 +20,7 @@ var Series = {
     isSwitch: func(){
         return 0;
     },
-    
+
     totalResistance: func(){
         var total = 0;
         foreach(elem; me.units){
@@ -26,7 +28,7 @@ var Series = {
         }
         return total;
     },
-    
+
     totalActivePower: func(){
         var total = 0;
         foreach(elem; me.units){
@@ -36,7 +38,7 @@ var Series = {
         #print("totalAP: "~total);
         return total;
     },
-    
+
     totalPower: func(){
         var total = 0;
         foreach(elem; me.units){
@@ -44,8 +46,8 @@ var Series = {
         }
         return total;
     },
-    
-    
+
+
     voltage: 0, #//Volt
     current: func(){
         foreach(elem; me.units){
@@ -61,8 +63,8 @@ var Series = {
         var d = b - c;
         return d / (2 * a); #//Ampere
     },
-    
-    
+
+
     calculateSeriesVoltage: func(){
         var tR = me.totalResistance();
         foreach(elem; me.units){
@@ -74,7 +76,7 @@ var Series = {
             elem.voltage = (elem.resistance/tR) * me.voltage;
         }
     },
-    
+
     calculateSeriesCurrent: func(){
         foreach(elem; me.units){
             elem.current = me.current();
@@ -91,10 +93,10 @@ var Circuit = {
         new_circuit.addNewSeriesWithUnitToParallel(cSource);
         return new_circuit;
     },
-    
-    
+
+
     parallelConnection: [],
-    
+
     newSeriesWithUnits: func(addedUnits...){
         var newSeries = Series.new();
         foreach(elem; addedUnits){
@@ -102,27 +104,27 @@ var Circuit = {
         }
         return newSeries;
     },
-    
-    
+
+
     addUnitToSeries: func(seriesNum, unit){
         me.parallelConnection[seriesNum].addUnit(unit);
     },
-    
+
     addParallel: func(units){
-      append(me.parallelConnection, units);  
+      append(me.parallelConnection, units);
     },
-    
+
     addNewSeriesWithUnitToParallel: func(units){
         var new_series = me.newSeriesWithUnits(units);
         me.addParallel(new_series);
     },
-    
-    
+
+
     current: 0, #//Ampere
     voltage: func(){
         return me.parallelConnection[0].units[0].electromotiveForce;
     }, #//Volt
-    
+
     calculateParallelVoltage: func(){
         var setVoltage = me.voltage();
         foreach(elem; me.parallelConnection){
@@ -134,13 +136,13 @@ var Circuit = {
             elem.voltage = setVoltage;
         }
     }, #//Volt
-    
+
     calculateSeriesVoltage: func(){
         foreach(elem; me.parallelConnection){
             elem.calculateSeriesVoltage();
         }
     }, #//Volt
-    
+
     calculateTotalParalleCurrent: func(){
         var total = 0;
         foreach(elem; me.parallelConnection){
@@ -155,38 +157,38 @@ var Circuit = {
         me.current = total;
         return total;
     }, #//Ampere
-    
+
     calculateTotalPower: func(){
       var total = 0;
       foreach(elem; me.parallelConnection){
           total += elem.totalPower();
-      }  
+      }
       return total;
     },
-    
+
     updateInterval: 1, #//Seconds between each update
-    
+
     debugMode: 0,
-    
+
     loopCount: 0,
-    
+
     update: func(){
         if(me.debugMode) print("Loop Count: "~me.loopCount);
-        
+
         me.calculateParallelVoltage();
         if(me.debugMode == 2) print("Parallel Voltage Calculated");
-        
+
         me.calculateSeriesVoltage();
         if(me.debugMode == 2) print("Series Voltage Calculated");
-        
+
         foreach(elem; me.parallelConnection){
             elem.calculateSeriesCurrent();
         }
         if(me.debugMode == 2) print("Series Current Calculated");
-        
+
         me.calculateTotalParalleCurrent();
         if(me.debugMode == 2) print("Parallel Current Calculated");
-        
+
         foreach(elem; me.parallelConnection){
             foreach(unit; elem.units){
                 if(unit.isCurrentSource()) unit.currentSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Pass in negetive power for charging
@@ -194,39 +196,39 @@ var Circuit = {
         }
         if(me.debugMode == 2) print("Power Calculated");
         if(me.debugMode) print("Power: "~me.calculateTotalPower());
-        
+
         props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent-float", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentageFloat());
-        
+
         if(me.debugMode) print("current: "~me.current);
         if(me.debugMode) print("voltage: "~me.voltage());
         if(me.debugMode) print("Main Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
-        #//if(me.debugMode) 
+        #//if(me.debugMode)
         #//print("Secondery Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
-        
+
         me.loopCount += 1;
     },
-    
-    
+
+
 };
 
 var Appliance = {
     #//Class for any electrical appliance
-    new: func() { 
-        return { parents:[Appliance] }; 
+    new: func() {
+        return { parents:[Appliance] };
     },
-    
+
     isCurrentSource: func(){
         return 0;
     },
-    
+
     ratedPower: 0, #//rate power , Watt, 0 if isResistor
-    
+
     isSwitch: func(){
         return 0;
     },
-    
+
     resistance: 0, #//electric resistance, Ωμέγα
     resistivity: 0,#//Ω·m
     voltage: 0, #//electric voltage, Volt
@@ -237,15 +239,15 @@ var Appliance = {
         return me.current * me.current * me.resistance;
     },#//heating Power
     power: func(){
-      return me.activePower + me.activePower_kW*1000 + me.heatingPower();  
+      return me.activePower + me.activePower_kW*1000 + me.heatingPower();
     },
-    
-    
+
+
     isResistor: 0,
-    
+
     applianceName: "Appliance",
     applianceDescription: "This is a electric appliance",
-    
+
     setName: func(text){
         me.applianceName = text;
     },
@@ -265,18 +267,18 @@ var CurrentSource = {
         newCS.resetRemainingToFull();
         return newCS;
     },
-    
+
     isCurrentSource: func(){
         return 1;
     },
-        
+
     direction: 1, #//1 means it is connected in the current direction, -1 means the opposite
     ratedElectromotiveForce: 0, #//Volt
     electromotiveForce: 0, #//Volt
     electricalCapacity: 0, #//kWs
     remaining: 0, #//kWs
-    
-    
+
+
     currentSourceUpdate: func(power, interval){
         me.remaining -= power * 0.001 * interval; #//Pass in negetive power for charging
         if(me.remaining <= 0){
@@ -285,7 +287,7 @@ var CurrentSource = {
             me.electromotiveForce = me.ratedElectromotiveForce;
         }
     },
-    
+
     #//Usage: followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull();
     resetRemainingToFull: func(){
         me.remaining = me.electricalCapacity;
@@ -305,7 +307,7 @@ var CurrentSource = {
     addToBattery: func(num){
         me.remaining += num;
     },
-    
+
 };
 
 var Switch = {
@@ -324,9 +326,9 @@ var Switch = {
     isSwitch: func(){
         return 1;
     },
-    
+
     switchState: 1, #//0 for disconnect, 1 for connect
-    
+
     isConnected: func(){
         if(me.switchState){
             return 1;
@@ -334,7 +336,7 @@ var Switch = {
             return 0;
         }
     },
-    
+
     switchConnect: func(){
         me.switchState = 1;
         return 1;
@@ -350,15 +352,15 @@ var Switch = {
             return me.switchConnect();
         }
     },
-    
+
 };
 
 var Cable = {
     #//Class for any copper electrical cable
-    new: func(l = 0, s = 0.008) { 
+    new: func(l = 0, s = 0.008) {
         var newCable = { parents:[Cable, Appliance.new()], resistivity: 1.75 * 0.00000001, length: l, crossSection: s};
         print("Created Cable with resistance of " ~ newCable.setResistance());
-        return newCable; 
+        return newCable;
     },
     length: 0,#//Meter
     crossSection: 0,#//Meter^2

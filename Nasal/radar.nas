@@ -1,4 +1,6 @@
-#Parking radar by Sidi Liang
+#//Parking radar by Sidi Liang
+#//Contact: sidi.liang@gmail.com
+
 var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
     #//height: height of installation above ground;installCoordX: X coord of installation; installCoordY: Y coord of installation; maxRange: max radar range; maxWidth: width of the sector

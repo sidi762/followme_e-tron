@@ -1,4 +1,6 @@
 #//Auto speed system by Sidi Liang
+#//Contact: sidi.liang@gmail.com
+
 print("Auto speed system loaded");
 var active = 0;
 var targetSpeed = 0;

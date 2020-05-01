@@ -1,4 +1,6 @@
-   #//Followme EV steering system by Sidi Liang
+#//Followme EV steering system by Sidi Liang
+#//Contact: sidi.liang@gmail.com
+
 var cache = {
     new: func return { parents:[cache] };
 };

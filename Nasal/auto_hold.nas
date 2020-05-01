@@ -1,4 +1,6 @@
 #//Auto hold system by Sidi Liang
+#//Contact: sidi.liang@gmail.com
+
 print("Auto hold system loaded");
 var active = 0;
 var activeNode = props.getNode("systems/auto_hold_enabled", 1);

@@ -2,6 +2,8 @@
 ####    Gijs de Rooy (Original)    ####
 ####    Sidi Liang    ####
 
+io.include("library.nas");
+
 props.getNode("/sim/gui/dialogs/vehicle_config/dialog",1);
 var configDialog = gui.Dialog.new("/sim/gui/dialogs/vehicle_config/dialog", "Aircraft/followme_e-tron/gui/dialogs/config-dialog.xml");
 
@@ -35,44 +37,6 @@ var tyreSmoke_2 = aircraft.tyresmoke.new(2, auto = 1, diff_norm = 0.4, check_vsp
 var tyreSmoke_3 = aircraft.tyresmoke.new(3, auto = 1, diff_norm = 0.4, check_vspeed = 0);
 
 
-props.getNode("/",1).setValue("/systems/horn", 0);
-props.getNode("/",1).setValue("/controls/mode", 1);
-props.getNode("/",1).setValue("/controls/direction", 1);
-props.getNode("/",1).setValue("/systems/instruments/enable_switches", 0);
-props.getNode("/",1).setValue("/systems/instruments/enable_cdu", 0);
-props.getNode("/",1).setValue("/instrumentation/cdu/ident/model", "Follow me EV");
-props.getNode("/",1).setValue("/instrumentation/cdu/ident/engines", "EV Motor");
-
-var isInternalView = func(){ #// return 1 if is in internal view, otherwise return 0.
-    return props.getNode("sim/current-view/internal", 1).getValue();
-}
-
-var Sound = {
-    new: func(filename, volume = 1, path=nil) {
-        var m = props.Node.new({
-            path : path,
-            file : filename,
-            volume : volume,
-        });
-        return m;
-     },
-};
-var window = screen.window.new(10, 10, 3, 10);
-
-var outputUI = func(content, timeout = 10){
-  window.autoscroll = timeout;
-  timeNow = systime();
-  if(content != getprop("/systems/outputUIContent") or (timeNow - timeout) >= getprop("/systems/lastOutputUITime")){
-      window.write(content);
-      setprop("/systems/outputUIContent",content);
-      setprop("/systems/lastOutputUITime",systime());
-      #print("Outputed");
-  }
-}
-var playAudio = func(file){ #//Plays audio files in Aircrafts/Sounds
-    fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
-}
-
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
 var rearleft_door = aircraft.door.new("/controls/doors/rearleft", 1);
@@ -98,6 +62,14 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.8, 0.5]
 
 props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
 props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
+
+props.getNode("/",1).setValue("/systems/horn", 0);
+props.getNode("/",1).setValue("/controls/mode", 1);
+props.getNode("/",1).setValue("/controls/direction", 1);
+props.getNode("/",1).setValue("/systems/instruments/enable_switches", 0);
+props.getNode("/",1).setValue("/systems/instruments/enable_cdu", 0);
+props.getNode("/",1).setValue("/instrumentation/cdu/ident/model", "Follow me EV");
+props.getNode("/",1).setValue("/instrumentation/cdu/ident/engines", "EV Motor");
 
 props.getNode("/",1).setValue("services/service-truck/enable", 0);
 props.getNode("controls/is-recharging", 1).setValue(0);
@@ -365,14 +337,26 @@ var BrakeController = {
     rightBrakeValue: 0,
 
     applyLeftBrake: func(value){
+        #For internal use
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
     },
     applyRightBrake: func(value){
+        #For internal use
         me.rightBrakeNode.setValue(value);
         me.rightBrakeValue = value;
     },
     applyBrakes: func(value){
+        #For internal use
+        me.rightBrakeNode.setValue(value);
+        me.rightBrakeValue = value;
+        me.leftBrakeNode.setValue(value);
+        me.leftBrakeValue = value;
+    },
+    applyFeetBrakes: func(value){
+        #For feet brakes
+        if(value) applyingFeetBrake = 1;
+        else applyingFeetBrake = 0;
         me.rightBrakeNode.setValue(value);
         me.rightBrakeValue = value;
         me.leftBrakeNode.setValue(value);
@@ -380,14 +364,19 @@ var BrakeController = {
     },
 
     enableHandBrake: func(){
-        me.parkingBrakeNode.setValue(1);
-        me.handBrakeIsOn = 1;
+        settimer(func(){ #Delay for 0.8 seconds
+            me.parkingBrakeNode.setValue(1);
+            me.handBrakeIsOn = 1;
+        }, 0.8);
     },
     disableHandBrake: func(){
-        me.parkingBrakeNode.setValue(0);
-        me.handBrakeIsOn = 0;
+        settimer(func(){ #Delay for 0.8 seconds
+            me.parkingBrakeNode.setValue(0);
+            me.handBrakeIsOn = 0;
+        }, 0.8);
     },
     toggleHandBrake: func(){
+        #Toggle handbrake from button
         if(isInternalView()) playAudio("electric_handbrake.wav");
         if(!me.handBrakeIsOn){
             me.enableHandBrake();
@@ -402,17 +391,15 @@ var BrakeController = {
         safety.emergencyMode();
     },
     keyboardBrake: func(){
-        applyingFeetBrake = 1;
-        me.applyBrakes(0.8);
+        me.applyFeetBrakes(0.8);
     },
     keyboardBrakeRelease: func(){
-        applyingFeetBrake = 0;
-        me.applyBrakes(0);
+        me.applyFeetBrakes(0);
     },
     releaseBrake: func(){
         me.applyLeftBrake(0);
         me.applyRightBrake(0);
-    },
+    }
     releaseAllBrakes: func(){
         me.applyLeftBrake(0);
         me.applyRightBrake(0);
@@ -430,30 +417,6 @@ var toggleHandBrake = func(){
     }else{
         brakeController.disableHandBrake();
     }
-}
-
-
-var runCode = func(url, addition = nil){
-    #var params = {url:"http://fgprc.org:11415/", targetnode:"/systems/code", complete: completed};
-    http.save(url~addition, getprop('/sim/fg-home') ~ '/cache/code.xml').done(func(r){
-        var blob = io.read_properties(getprop('/sim/fg-home') ~ '/cache/code.xml');
-        var filename = "/cache/code.xml";
-        var script = blob.getValues().code; # Get the nasal string
-        var code = call(func {
-            compile(script, filename);
-        }, nil, nil, var compilation_errors = []);
-        if(size(compilation_errors)){
-            die("Error compiling code in: " ~ filename);
-        }
-        call(code, [], nil, nil, var runtime_errors = []);
-
-        if(size(runtime_errors)){
-            die("Error calling code compiled loaded from: " ~ filename);
-        }
-        var path = os.path.new(getprop('/sim/fg-home') ~ '/cache/code.xml');
-        path.remove();
-        print("Code loaded");
-    });
 }
 
 var chargeBatterySec = func(){
@@ -504,8 +467,6 @@ var chargeBatteryStop = func(bef){
    props.getNode("/controls/is-recharging", 1).setValue(0);
 }
 
-
-
 var calculateSpeed = func(){
     var gs = props.getNode("velocities/groundspeed-kt", 1).getValue();
     var speedKmh = 1.852 * gs;
@@ -529,7 +490,6 @@ var calculateSpeed = func(){
 }
 var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
 
-
 var resetOnPosition = func(){
     var latProp = props.getNode("/position/latitude-deg");
     var lonProp = props.getNode("/position/longitude-deg");
@@ -543,7 +503,6 @@ var resetOnPosition = func(){
     lonProp.setValue(lon);
     setprop("/fdm/jsbsim/simulation/pause", 0);
 }
-
 
 var brakesABS = func(){
     var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
@@ -709,8 +668,6 @@ var Safety = {
     },
 };
 var safety = Safety.new(140, 72);
-
-
 
 var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim wheels never overbrake?
 #//abondoned since the new safety system
