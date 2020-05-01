@@ -42,6 +42,15 @@
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/sport/interior.xml</path>
 </model>
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
+			<value>Luxury</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/luxury/interior.xml</path>
+</model>
 
 <animation>
  <type>material</type>
@@ -63,15 +72,6 @@
  <texture>followmeoutside.png</texture>
 </animation>
 
-
-
-<effect>
-    <inherits-from>Aircraft/followme_e-tron/Models/Effects/interior</inherits-from>
-    <object-name>Mesh63</object-name>
-    <object-name>Mesh64</object-name>
-    <object-name>Mesh68</object-name>
-    <object-name>Mesh69</object-name>
-</effect>
 
 <model>
  <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
@@ -777,6 +777,88 @@
  </axis>
 </animation>
 
+<!-- COMPOSITOR LIGHTS -->
+<light>
+  <name>left-headlight-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.09</l>
+    <q>0.032</q>
+  </attenuation>
+  <spot-exponent>5</spot-exponent>
+  <spot-cutoff>10</spot-cutoff>
+  <range-m>15</range-m>
+</light>
+<light>
+  <name>right-headlight-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>-0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.09</l>
+    <q>0.032</q>
+  </attenuation>
+  <spot-exponent>5</spot-exponent>
+  <spot-cutoff>10</spot-cutoff>
+  <range-m>15</range-m>
+</light>
+
 <!-- LIGHTS -->
 
 <effect>
@@ -866,7 +948,7 @@
   <red>1.0</red>
   <green>0.8</green>
   <blue>0.2</blue>
-  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
+  <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
  </emission>
 </animation>
 

@@ -63,6 +63,7 @@
                 <property>/systems/interior/type</property>
                 <value>Default</value>
                 <value>Sport</value>
+                <value>Luxury</value>
                 <binding>
         			<command>dialog-apply</command>
         			<object-name>interiorStyle</object-name>
@@ -135,15 +136,39 @@
             </button>
             <button>
                 <halign>left</halign>
-                <legend>Toggle Airbag</legend>
+                <legend>(Re)Initialize Safety</legend>
                 <pref-width>120</pref-width>
                 <pref-height>28</pref-height>
                 <binding>
                     <command>nasal</command>
-                    <script>followme.safety.toggle()</script>
+                    <script>followme.safety.init()</script>
                 </binding>
             </button>
+            <button>
+                <halign>left</halign>
+                <legend>Disable Safety</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.safety.stop()</script>
+                </binding>
+            </button>
+            <button>
+                <halign>left</halign>
+                <legend>Toggle AEB</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.safety.toggleFrontRadar()</script>
+                </binding>
+            </button>
+            <text>
+                <label>To repair Airbag, reinitialize safety system</label>
+            </text>
         </group>
+        <hrule/>
         <group>
             <layout>vbox</layout>
             <text><label>Plate</label></text>

@@ -2,6 +2,8 @@
 ####    Gijs de Rooy (Original)    ####
 ####    Sidi Liang    ####
 
+io.include("library.nas");
+
 props.getNode("/sim/gui/dialogs/vehicle_config/dialog",1);
 var configDialog = gui.Dialog.new("/sim/gui/dialogs/vehicle_config/dialog", "Aircraft/followme_e-tron/gui/dialogs/config-dialog.xml");
 
@@ -35,44 +37,6 @@ var tyreSmoke_2 = aircraft.tyresmoke.new(2, auto = 1, diff_norm = 0.4, check_vsp
 var tyreSmoke_3 = aircraft.tyresmoke.new(3, auto = 1, diff_norm = 0.4, check_vspeed = 0);
 
 
-props.getNode("/",1).setValue("/systems/horn", 0);
-props.getNode("/",1).setValue("/controls/mode", 1);
-props.getNode("/",1).setValue("/controls/direction", 1);
-props.getNode("/",1).setValue("/systems/instruments/enable_switches", 0);
-props.getNode("/",1).setValue("/systems/instruments/enable_cdu", 0);
-props.getNode("/",1).setValue("/instrumentation/cdu/ident/model", "Follow me EV");
-props.getNode("/",1).setValue("/instrumentation/cdu/ident/engines", "EV Motor");
-
-var isInternalView = func(){ #// return 1 if is in internal view, otherwise return 0.
-    return props.getNode("sim/current-view/internal", 1).getValue();
-}
-
-var Sound = {
-    new: func(filename, volume = 1, path=nil) {
-        var m = props.Node.new({
-            path : path,
-            file : filename,
-            volume : volume,
-        });
-        return m;
-     },
-};
-var window = screen.window.new(10, 10, 3, 10);
-
-var outputUI = func(content, timeout = 10){
-  window.autoscroll = timeout;
-  timeNow = systime();
-  if(content != getprop("/systems/outputUIContent") or (timeNow - timeout) >= getprop("/systems/lastOutputUITime")){
-      window.write(content);
-      setprop("/systems/outputUIContent",content);
-      setprop("/systems/lastOutputUITime",systime());
-      #print("Outputed");
-  }
-}
-var playAudio = func(file){ #//Plays audio files in Aircrafts/Sounds
-    fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
-}
-
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
 var rearleft_door = aircraft.door.new("/controls/doors/rearleft", 1);
@@ -92,15 +56,23 @@ aircraft.door.toggle = func(){
 beacon_switch = props.globals.getNode("controls/switches/warninglight", 2);
 var beacon = aircraft.light.new( "/sim/model/lights/warning", [0.5, 0.5], "/controls/lighting/warning" );
 beacon_switch = props.globals.getNode("controls/switches/indicator-left", 2);
-var beacon = aircraft.light.new( "/sim/model/lights/indicator-left", [0.8, 0.5], "/controls/lighting/indicator-left");
+var beacon = aircraft.light.new( "/sim/model/lights/indicator-left", [0.5, 0.5], "/controls/lighting/indicator-left");
 beacon_switch = props.globals.getNode("controls/switches/indicator-right", 2);
-var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.8, 0.5], "/controls/lighting/indicator-right");
+var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5], "/controls/lighting/indicator-right");
 
 props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
 props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
 
+props.getNode("/",1).setValue("/systems/horn", 0);
+props.getNode("/",1).setValue("/controls/mode", 1);
+props.getNode("/",1).setValue("/controls/direction", 1);
+props.getNode("/",1).setValue("/systems/instruments/enable_switches", 0);
+props.getNode("/",1).setValue("/systems/instruments/enable_cdu", 0);
+props.getNode("/",1).setValue("/instrumentation/cdu/ident/model", "Follow me EV");
+props.getNode("/",1).setValue("/instrumentation/cdu/ident/engines", "EV Motor");
+
 props.getNode("/",1).setValue("services/service-truck/enable", 0);
-props.getNode("/controls/is-recharging", 1).setValue(0);
+props.getNode("controls/is-recharging", 1).setValue(0);
 props.getNode("systems/welcome-message", 1).setValue(0);
 props.getNode("systems/display-speed", 1).setValue(0);
 props.getNode("systems/speedometer/type", 1).setValue("Type_A");
@@ -108,12 +80,18 @@ props.getNode("systems/battery-gauge/type", 1).setValue("Type_A");
 props.getNode("systems/plate/file", 1).setValue("NONE");
 props.getNode("systems/plate/name", 1).setValue("NONE");
 props.getNode("controls/lighting/headlight-als", 1).setValue(0);
+props.getNode("controls/lighting/highBeam", 1).setValue(0);
+props.getNode("/controls/steering_wheel", 1).setValue(0);
+props.getNode("controls/interior/luxury/storage_cover_pos", 1).setValue(0);
 props.getNode("sim/remote/pilot-callsign", 1).setValue("");
-props.getNode("/systems/codriver-enable", 1).setValue(0);
+props.getNode("systems/codriver-enable", 1).setValue(0);
 props.getNode("systems/screen-enable", 1).setValue(0);
 props.getNode("systems/pmodel-enable", 1).setValue(1);
 props.getNode("systems/decorations-enable", 1).setValue(0);
 props.getNode("systems/interior/type", 1).setValue("Default");
+props.getNode("systems/safety/aeb_activated", 1).setValue(0);
+props.getNode("systems/auto_hold_enabled", 1).setValue(0);
+props.getNode("systems/auto_hold_working", 1).setValue(0);
 
 #var Led = {
 #
@@ -129,7 +107,6 @@ props.getNode("systems/interior/type", 1).setValue("Default");
 #
 #
 #};
-
 
 var Indicator = {
 
@@ -211,9 +188,6 @@ var IndicatorController = {
         file: "left",
         name: "Left",
     },
-
-
-
 
     saveLedMessage: func(){
         me.savedMessage.texture = me.ledMessage.getValue();
@@ -316,6 +290,7 @@ var IndicatorController = {
     },
 
     falseLightOn : func(){
+        if(isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 1;
         if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
            print("falseLight mode on");
@@ -326,6 +301,7 @@ var IndicatorController = {
 
     },
     falseLightOff : func(){
+        if(isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 0;
         if(me.mode == 1 or me.mode == 2 or me.mode == 4 or me.mode == 5){
            print("falseLight mode off");
@@ -335,7 +311,6 @@ var IndicatorController = {
         }
     },
     false_light_toggle : func(){
-        if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.falseLight == 0){
             me.falseLightOn();
         }else if(me.falseLight == 1){
@@ -346,38 +321,98 @@ var IndicatorController = {
 
 var indicatorController = IndicatorController.new();
 
-var toggleHandBrake = func(){
-    if(isInternalView()) playAudio("electric_handbrake.wav");
-    var handBrake = props.getNode("/controls/gear/brake-parking", 1);
-    if(!handBrake.getValue()){
-        handBrake.setValue(1);
-    }else{
-        handBrake.setValue(0);
+var BrakeController = {
+    new: func() { return { parents:[BrakeController]}; },
+    leftBrakeNode: props.getNode("/controls/gear/brake-left",1),
+    rightBrakeNode: props.getNode("/controls/gear/brake-right",1),
+    parkingBrakeNode: props.getNode("/controls/gear/brake-parking",1),
+
+    applyingFeetBrake: 0,
+    handBrakeIsOn: 0,
+    leftBrakeValue: 0,
+    rightBrakeValue: 0,
+
+    applyLeftBrake: func(value){
+        #For internal use
+        me.leftBrakeNode.setValue(value);
+        me.leftBrakeValue = value;
+    },
+    applyRightBrake: func(value){
+        #For internal use
+        me.rightBrakeNode.setValue(value);
+        me.rightBrakeValue = value;
+    },
+    applyBrakes: func(value){
+        #For internal use
+        me.rightBrakeNode.setValue(value);
+        me.rightBrakeValue = value;
+        me.leftBrakeNode.setValue(value);
+        me.leftBrakeValue = value;
+    },
+    applyFeetBrakes: func(value){
+        #For feet brakes
+        if(value) applyingFeetBrake = 1;
+        else applyingFeetBrake = 0;
+        me.rightBrakeNode.setValue(value);
+        me.rightBrakeValue = value;
+        me.leftBrakeNode.setValue(value);
+        me.leftBrakeValue = value;
+    },
+
+    enableHandBrake: func(){
+        settimer(func(){ #Delay for 0.8 seconds
+            me.parkingBrakeNode.setValue(1);
+            me.handBrakeIsOn = 1;
+        }, 0.8);
+    },
+    disableHandBrake: func(){
+        settimer(func(){ #Delay for 0.8 seconds
+            me.parkingBrakeNode.setValue(0);
+            me.handBrakeIsOn = 0;
+        }, 0.8);
+    },
+    toggleHandBrake: func(){
+        #Toggle handbrake from button
+        if(isInternalView()) playAudio("electric_handbrake.wav");
+        if(!me.handBrakeIsOn){
+            me.enableHandBrake();
+        }else{
+            me.disableHandBrake();
+        }
+    },
+    activeEmergencyBrake: func(){
+        me.applyLeftBrake(1);
+        me.applyRightBrake(1);
+        me.enableHandBrake();
+        safety.emergencyMode();
+    },
+    keyboardBrake: func(){
+        me.applyFeetBrakes(0.8);
+    },
+    keyboardBrakeRelease: func(){
+        me.applyFeetBrakes(0);
+    },
+    releaseBrake: func(){
+        me.applyLeftBrake(0);
+        me.applyRightBrake(0);
     }
-}
+    releaseAllBrakes: func(){
+        me.applyLeftBrake(0);
+        me.applyRightBrake(0);
+        me.disableHandBrake();
+    },
+};
 
+var brakeController = BrakeController.new();
 
-var runCode = func(url, addition = nil){
-    #var params = {url:"http://fgprc.org:11415/", targetnode:"/systems/code", complete: completed};
-    http.save(url~addition, getprop('/sim/fg-home') ~ '/cache/code.xml').done(func(r){
-        var blob = io.read_properties(getprop('/sim/fg-home') ~ '/cache/code.xml');
-        var filename = "/cache/code.xml";
-        var script = blob.getValues().code; # Get the nasal string
-        var code = call(func {
-            compile(script, filename);
-        }, nil, nil, var compilation_errors = []);
-        if(size(compilation_errors)){
-            die("Error compiling code in: " ~ filename);
-        }
-        call(code, [], nil, nil, var runtime_errors = []);
-
-        if(size(runtime_errors)){
-            die("Error calling code compiled loaded from: " ~ filename);
-        }
-        var path = os.path.new(getprop('/sim/fg-home') ~ '/cache/code.xml');
-        path.remove();
-        print("Code loaded");
-    });
+var toggleHandBrake = func(){
+    #//Depreciated as BrakeController has it internally now
+    if(isInternalView()) playAudio("electric_handbrake.wav");
+    if(!brakeController.handBrakeIsOn){
+        brakeController.enableHandBrake();
+    }else{
+        brakeController.disableHandBrake();
+    }
 }
 
 var chargeBatterySec = func(){
@@ -428,8 +463,6 @@ var chargeBatteryStop = func(bef){
    props.getNode("/controls/is-recharging", 1).setValue(0);
 }
 
-
-
 var calculateSpeed = func(){
     var gs = props.getNode("velocities/groundspeed-kt", 1).getValue();
     var speedKmh = 1.852 * gs;
@@ -453,7 +486,6 @@ var calculateSpeed = func(){
 }
 var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
 
-
 var resetOnPosition = func(){
     var latProp = props.getNode("/position/latitude-deg");
     var lonProp = props.getNode("/position/longitude-deg");
@@ -468,63 +500,13 @@ var resetOnPosition = func(){
     setprop("/fdm/jsbsim/simulation/pause", 0);
 }
 
-var Safety = {
-    new: func(airbagAccelerationLimit=72){
-        return {parents: [Safety], airbagAccelerationLimit:airbagAccelerationLimit};
-    },
-    isOn: 0,
-    safetySystemTimer: nil,
-    updateInterval: 0.01,
-    accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
-    accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
-    frontAirbagProp: props.getNode("/systems/safety/airbag/front", 1),
-    sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
-    airbagAccelerationLimit: 72, #To be configured,m/s^2
-    update: func(){
-        #print("running");
-        #Front airbag
-        if(math.abs(me.accXProp.getValue() * FT2M) > me.airbagAccelerationLimit){
-            #active Front
-            me.frontAirbagProp.setValue(1);
-            me.safetySystemTimer.stop();
-        }
-        #side airbag
-        if(math.abs(me.accYProp.getValue() * FT2M) > me.airbagAccelerationLimit){
-            #active side
-            me.sideAirbagProp.setValue(1);
-            me.safetySystemTimer.stop();
-        }
-    },
-    reset: func(){
-        me.frontAirbagProp.setValue(0);
-        me.frontAirbagProp.setValue(0);
-    },
-    init: func(){
-        me.frontAirbagProp.setValue(0);
-        me.sideAirbagProp.setValue(0);
-        if(me.safetySystemTimer == nil) me.safetySystemTimer = maketimer(me.updateInterval, func me.update());
-        me.safetySystemTimer.start();
-        me.isOn = 1;
-        print("Safety system initialized");
-    },
-    stop: func(){
-        me.isOn = 0;
-        me.safetySystemTimer.stop();
-        print("Safety system stoped");
-    },
-    toggle: func(){
-        if(!me.isOn) me.init();
-        else me.stop();
-    },
-};
-var safety = Safety.new();
-safety.init();
 var brakesABS = func(){
     var gearFrtLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/wheel-speed-fps"));
     var gearFrtRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/wheel-speed-fps"));
     var gearBckLftSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[2]/wheel-speed-fps"));
     var gearBckRgtSpeed = math.round(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[3]/wheel-speed-fps"));
     if(gearFrtLftSpeed == 0 or gearBckLftSpeed == 0 or gearFrtRgtSpeed == 0 or gearBckRgtSpeed == 0){
+        safety.emergencyMode();
         props.getNode("/",1).setValue("/controls/gear/brake-left", 0);
         props.getNode("/",1).setValue("/controls/gear/brake-right", 0);
     }else{
@@ -533,10 +515,159 @@ var brakesABS = func(){
     }
 }
 
-var absTimer = maketimer(0.001, brakesABS);
+var Safety = {
+    new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=72){
+        var newSafety = { parents:[Safety] };
+        newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
+        newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
+        newSafety.frontRadar = Radar.new(0.3, 0, 0, 9, 0.1, 180, 0, 0);#For AEB
+        newSafety.absTimer = maketimer(0.001, brakesABS);
+        return newSafety;
+    },
+    isOn: 0,
+    safetySystemTimer: nil,
+    updateInterval: 0.01,
+    frontRadarEnabled: 0,
+    aebActivated: 0,
+    lastRadarOutput:10000,
+    throttleNode: props.getNode("/controls/engines/engine/throttle",1),
+    #Airbag
+    accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
+    accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
+    frontAirbagProp: props.getNode("/systems/safety/airbag/front", 1),
+    sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
+    aebStateProp: props.getNode("/systems/safety/aeb_activated", 1),
+    airbagAccelerationLimit: 140, #To be configured,m/s^2
+    sideAirbagAccelerationLimit: 72, #To be configured,m/s^2
+
+    #Frontwards radar
+    frontRadar: nil,
+
+    enableFrontRadar: func(){
+        #Enables the front radar
+        me.frontRadarEnabled = 1;
+        me.frontRadar.init();
+        me.frontRadar.stop();
+        print("Front radar enabled");
+    },
+    disableFrontRadar: func(){
+        #Disables the front radar
+        me.frontRadar.stop();
+        me.frontRadarEnabled = 0;
+    },
+    toggleFrontRadar: func(){
+        if(!me.frontRadarEnabled){
+            me.enableFrontRadar();
+            playAudio("parking_radar_init.wav");
+        }
+        else me.disableFrontRadar();
+    },
+
+    aebActive: func(){
+        me.aebActivated = 1;
+        #engine.engine_1.engineSwitch.switchDisconnect();
+        me.throttleNode.setValue(0);
+        brakeController.activeEmergencyBrake();
+        playAudio("parking_radar_init.wav");
+        me.aebStateProp.setValue(1);
+        print("AEB Activated!");
+    },
+    aebStop: func(){
+        me.aebActivated = 0;
+        print("AEB Stopped");
+        me.aebStateProp.setValue(0);
+        #engine.engine_1.engineSwitch.switchConnect();
+        brakeController.releaseAllBrakes();
+    },
+
+    update: func(){
+        #print("running");
+        #Front airbag
+        if(math.abs(me.accXProp.getValue() * FT2M) > me.airbagAccelerationLimit){
+            #active Front
+            me.frontAirbagProp.setValue(1);
+            me.emergencyMode();
+        }
+        #side airbag
+        if(math.abs(me.accYProp.getValue() * FT2M) > me.sideAirbagAccelerationLimit){
+            #active side
+            me.sideAirbagProp.setValue(1);
+            me.emergencyMode();
+        }
+
+        var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]")*1.852;#In km/h
+        #AEB, Automatic Emergency Brake
+        var radarOutput = me.frontRadar.radarOutput;
+        var deltaX = me.lastRadarOutput - radarOutput;
+        var reletiveSpeed = 3.6 * (deltaX / me.updateInterval);#In km/h
+        if(currentSpeed > 30 and engine.engine_1.getDirection() == 1){
+            #Enable AEB when speed is greater then 30kmh
+            if(me.frontRadarEnabled){
+                me.frontRadar.init();
+                if(me.frontRadar.radarOutput <= 8 and reletiveSpeed > 30 and !me.aebActivated){
+                    me.aebActive();
+                }else if((me.frontRadar.radarOutput >= 8 or reletiveSpeed <= 0) and me.aebActivated){
+                    me.aebStop();
+                }
+            }
+        }else{
+            if(me.frontRadarEnabled and me.frontRadar.radarTimer.isRunning) me.frontRadar.stop();
+            if(reletiveSpeed <= 0 and me.aebActivated) me.aebStop();
+        }
+
+        #ABS
+        #var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-left");
+        #if(brakeCmd and currentSpeed){
+        #    me.absTimer.start();
+        #}else{
+        #    me.absTimer.stop();
+        #}
+
+    },
+
+    emergencyMode: func(){
+        indicatorController.setMode(3); #Active malfunction light
+        indicatorController.falseLight = 1;
+        if(autospeed.autoSpeedTimer.isRunning) autospeed.stopAutoSpeed();
+        if(autopilot.road_check_timer.isRunning) autopilot.road_check_timer.stop();
+    },
+
+    reset: func(){
+        #resetting stops the safety system
+        me.safetySystemTimer.stop();
+        me.disableFrontRadar();
+        me.frontAirbagProp.setValue(0);
+        me.sideAirbagProp.setValue(0);
+        me.aebStateProp.setValue(0);
+    },
+    init: func(){
+        #initialize or reinitialize
+        me.frontAirbagProp.setValue(0);
+        me.sideAirbagProp.setValue(0);
+        me.aebStateProp.setValue(0);
+        if(me.safetySystemTimer == nil) me.safetySystemTimer = maketimer(me.updateInterval, func me.update());
+        me.safetySystemTimer.start();
+        if(me.frontRadarEnabled) me.enableFrontRadar();
+        me.isOn = 1;
+        print("Safety system initialized");
+    },
+    stop: func(){
+        me.isOn = 0;
+        me.aebStateProp.setValue(0);
+        me.disableFrontRadar();
+        me.safetySystemTimer.stop();
+        print("Safety system stoped");
+    },
+    toggle: func(){
+        if(!me.isOn) me.init();
+        else me.stop();
+    },
+};
+var safety = Safety.new(140, 72);
 
 var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim wheels never overbrake?
-    var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-cmd");
+#//abondoned since the new safety system
+    var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-left");
     if(brakeCmd){
         absTimer.start();
     }else{
@@ -544,4 +675,28 @@ var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim
     }
 }
 
-#setlistener("/controls/gear/brake-cmd", brakeWithABS);
+var testingProgram_1_Entry = func(){
+    autospeed.startAutoSpeed();
+    autospeed.targetSpeedChange(100);
+    settimer(testingProgram_1, 10);
+}
+
+var testingProgram_1 = func(){
+    props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
+    props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
+    props.getNode("/",1).setValue("/controls/gear/brake-parking", 1);
+}
+
+var testingProgram_2_Entry = func(){
+    autospeed.startAutoSpeed();
+    autospeed.targetSpeedChange(100);
+    settimer(testingProgram_2, 10);
+}
+
+var testingProgram_2 = func(){
+    props.getNode("/",1).setValue("/controls/gear/brake-left", 1);
+    props.getNode("/",1).setValue("/controls/gear/brake-right", 1);
+    #props.getNode("/",1).setValue("/controls/gear/brake-parking", 1);
+}
+
+#setlistener("/controls/gear/brake-left", brakeWithABS);

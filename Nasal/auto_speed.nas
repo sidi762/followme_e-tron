@@ -1,4 +1,6 @@
 #//Auto speed system by Sidi Liang
+#//Contact: sidi.liang@gmail.com
+
 print("Auto speed system loaded");
 var active = 0;
 var targetSpeed = 0;
@@ -25,7 +27,8 @@ var autoSpeedMainLoop = func(){
     }else{
         throttle = 0;
     }
-    throttleNode.setValue(throttle);
+    if(active) throttleNode.setValue(throttle);
+    else throttleNode.setValue(0);
     leftBrakes.setValue(brakes);
     rightBrakes.setValue(brakes);
     lastDeltaSpeed = deltaSpeed;
@@ -43,9 +46,9 @@ var startAutoSpeed = func(){
 }
 
 var stopAutoSpeed = func(){
+    active = 0;
     autoSpeedTimer.stop();
     props.getNode("/sim/messages/copilot",1).setValue("ze dong chao sue see tong yee guan bee. Auto Speeding System is off.");
-    active = 0;
     throttleNode.setValue(0);
 }
 

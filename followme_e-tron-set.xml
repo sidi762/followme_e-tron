@@ -508,6 +508,10 @@
       <generic>
         <bool n="0" alias="/systems/decorations-enable"/>
         <bool n="1" alias="/systems/pmodel-enable"/>
+        <bool n="2" alias="/systems/auto_hold_enabled"/>
+        <bool n="3" alias="/systems/auto_hold_working"/>
+        <bool n="4" alias="/systems/safety/aeb_activated"/>
+        <bool n="5" alias="/controls/lighting/highBeam"/>
 
         <int n="0" alias="/sim/model/lights/indicator-left/state"/>
         <int n="1" alias="/sim/model/lights/indicator-right/state"/>
@@ -555,9 +559,12 @@
         <float n="16" alias="/systems/electrical/e-tron/battery-kWh"/>
         <float n="17" alias="/systems/electrical/e-tron/battery-remaining-percent-float"/>
 
-        <float n="18" alias="/controls/steering_wheel"/>
+        <float n="18" alias="/fdm/jsbsim/animation/steering_wheel_pos"/>
         <float n="19" alias="/controls/gear/brake-parking"/>
         <float n="22" alias="/controls/engines/engine/throttle"/>
+
+        <float n="23" alias="/fdm/jsbsim/animation/storage_cover_pos"/>
+        <float n="24" alias="/controls/interior/luxury/storage_cover_pos"/>
 
 
         <!--<string n="0" alias="/systems/plate"/>-->
@@ -681,25 +688,13 @@
             <desc>break</desc>
             <repeatable>false</repeatable>
             <binding>
-                <command>property-assign</command>
-                <property>/controls/gear/brake-left</property>
-                <value>1</value>
-            </binding>
-            <binding>
-                <command>property-assign</command>
-                <property>/controls/gear/brake-right</property>
-                <value>1</value>
+                <command>nasal</command>
+                <script>followme.brakeController.keyboardBrake();</script>
             </binding>
             <mod-up>
                 <binding>
-                    <command>property-assign</command>
-                    <property>/controls/gear/brake-left</property>
-                    <value>0</value>
-                </binding>
-                <binding>
-                    <command>property-assign</command>
-                    <property>/controls/gear/brake-right</property>
-                    <value>0</value>
+                    <command>nasal</command>
+                    <script>followme.brakeController.keyboardBrakeRelease();</script>
                 </binding>
             </mod-up>
         </key>
@@ -829,7 +824,7 @@
             <desc>handbrake</desc>
             <binding>
 				<command>nasal</command>
-                <script>followme.toggleHandBrake();</script>
+                <script>followme.brakeController.toggleHandBrake();</script>
             </binding>
         </key>
 	</keyboard>
@@ -838,11 +833,11 @@
 <nasal>
 	<followme>
         <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
+        <file>Aircraft/followme_e-tron/Nasal/radar.nas</file>
 		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>
         <file>Aircraft/followme_e-tron/Nasal/plate.nas</file>
         <file>Aircraft/followme_e-tron/Nasal/steering.nas</file>
-        <file>Aircraft/followme_e-tron/Nasal/radar.nas</file>
-	<file>Aircraft/followme_e-tron/Nasal/save.nas</file>
+	    <file>Aircraft/followme_e-tron/Nasal/save.nas</file>
 	</followme>
 	<!--<screen>
 		<file>Aircraft/followme_e-tron/Nasal/SmartScreen.nas</file>
@@ -868,6 +863,9 @@
     <autospeed>
         <file>Aircraft/followme_e-tron/Nasal/auto_speed.nas</file>
     </autospeed>
+    <autohold>
+        <file>Aircraft/followme_e-tron/Nasal/auto_hold.nas</file>
+    </autohold>
     <cdu>
          <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/boeing.nas</file>
          <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/library.nas</file>
