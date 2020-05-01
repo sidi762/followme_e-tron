@@ -56,9 +56,9 @@ aircraft.door.toggle = func(){
 beacon_switch = props.globals.getNode("controls/switches/warninglight", 2);
 var beacon = aircraft.light.new( "/sim/model/lights/warning", [0.5, 0.5], "/controls/lighting/warning" );
 beacon_switch = props.globals.getNode("controls/switches/indicator-left", 2);
-var beacon = aircraft.light.new( "/sim/model/lights/indicator-left", [0.8, 0.5], "/controls/lighting/indicator-left");
+var beacon = aircraft.light.new( "/sim/model/lights/indicator-left", [0.5, 0.5], "/controls/lighting/indicator-left");
 beacon_switch = props.globals.getNode("controls/switches/indicator-right", 2);
-var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.8, 0.5], "/controls/lighting/indicator-right");
+var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5], "/controls/lighting/indicator-right");
 
 props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
 props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
@@ -107,7 +107,6 @@ props.getNode("systems/auto_hold_working", 1).setValue(0);
 #
 #
 #};
-
 
 var Indicator = {
 
@@ -189,9 +188,6 @@ var IndicatorController = {
         file: "left",
         name: "Left",
     },
-
-
-
 
     saveLedMessage: func(){
         me.savedMessage.texture = me.ledMessage.getValue();
