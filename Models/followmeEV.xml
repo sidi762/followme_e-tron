@@ -777,6 +777,88 @@
  </axis>
 </animation>
 
+<!-- COMPOSITOR LIGHTS -->
+<light>
+  <name>left-headlight-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.09</l>
+    <q>0.032</q>
+  </attenuation>
+  <spot-exponent>5</spot-exponent>
+  <spot-cutoff>10</spot-cutoff>
+  <range-m>15</range-m>
+</light>
+<light>
+  <name>right-headlight-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>-0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.09</l>
+    <q>0.032</q>
+  </attenuation>
+  <spot-exponent>5</spot-exponent>
+  <spot-cutoff>10</spot-cutoff>
+  <range-m>15</range-m>
+</light>
+
 <!-- LIGHTS -->
 
 <effect>
