@@ -395,7 +395,7 @@ var BrakeController = {
     releaseBrake: func(){
         me.applyLeftBrake(0);
         me.applyRightBrake(0);
-    }
+    },
     releaseAllBrakes: func(){
         me.applyLeftBrake(0);
         me.applyRightBrake(0);
