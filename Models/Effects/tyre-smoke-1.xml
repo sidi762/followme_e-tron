@@ -15,7 +15,7 @@
 		</offsets>
 
 		<condition>
-			<and>
+			<or>
 				<property>sim/multiplay/generic/int[8]</property>
 				<value>1</value>
 				<greater-than>
@@ -28,7 +28,7 @@
        				</greater-than>
                 			<property>gear/gear[1]/wow</property>
                 			<value>1</value>
-			</and>
+			</or>
 		</condition>
 
 		<!--<condition>
