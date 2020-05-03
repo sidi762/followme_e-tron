@@ -16,8 +16,11 @@
 
 		<condition>
 			<or>
-				<property>sim/multiplay/generic/int[8]</property>
-				<value>1</value>
+				<equals>
+					<property>sim/multiplay/generic/int[8]</property>
+					<value>1</value>
+				</equals>
+				<and>
 				<greater-than>
                 			<property>environment/rain-norm</property>
                 			<value>0.2</value>
@@ -26,8 +29,11 @@
        					<property>velocities/groundspeed-kt</property>
        					<value>0</value>
        				</greater-than>
+				<equals>
                 			<property>gear/gear[1]/wow</property>
                 			<value>1</value>
+				</equals>
+				</and>
 			</or>
 		</condition>
 
