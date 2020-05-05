@@ -69,7 +69,7 @@ var Radar = {
     stop: func(){
         if(me.warnEnabled){
             print("Parking radar stopped!");
-            playAudio("parking_radar_init.wav");
+            #playAudio("parking_radar_init.wav");
         }else{
             #print("Radar Stopped!");
         }
