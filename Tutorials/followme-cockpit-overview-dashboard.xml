@@ -38,7 +38,7 @@ This tutorial walks you through the functions and details of the dashboard.
 	</view>
 </step>
 <step>
-	<message>You can enable switches at "Follow Me EV > Show Options" menu in the menubar.</message>
+	<message>You can enable switches at "Follow Me EV > Configuration" menu in the menubar.</message>
         <set>
 		<property>sim/multiplay/generic/int[14]</property>
 		<value>1</value>
