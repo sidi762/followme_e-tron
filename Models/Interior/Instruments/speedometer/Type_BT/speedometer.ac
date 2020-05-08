@@ -26,7 +26,7 @@ OBJECT poly
 name "case_Cube.001"
 data 13
 case_Cube.001
-crease 30.000000
+crease 180.000000
 numvert 144
 0.01018 0.02771 0.048
 0.01018 0.02434 0.04217

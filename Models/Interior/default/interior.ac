@@ -23397,7 +23397,7 @@ OBJECT poly
 name "indicontrol"
 data 20
 Mesh35 steeringwheel
-crease 30.000000
+crease 180.000000
 numvert 26
 1.41494 0.91344 0.51601
 1.41314 0.91048 0.49627
@@ -23830,7 +23830,7 @@ name "steeringwheel"
 loc 1.4667 0.960375 0.32832
 data 20
 Mesh34 steeringwheel
-crease 30.000000
+crease 180.000000
 numvert 584
 0.038451 0.00365579 0.0019488
 0.0439297 -0.013777 0.00892764
@@ -31262,7 +31262,7 @@ OBJECT poly
 name "wipercontrol"
 data 20
 Mesh36 steeringwheel
-crease 30.000000
+crease 180.000000
 numvert 26
 1.39591 0.92478 0.14254
 1.39814 0.91422 0.2051
@@ -32893,7 +32893,7 @@ OBJECT poly
 name "sphere"
 loc 0.412754 0 0
 texture "../zuoyi.jpg"
-crease 45.000000
+crease 180.000000
 numvert 134
 1.3997 0.817778 0.000989117
 1.43788 0.816356 -0.00904228
@@ -34190,7 +34190,7 @@ OBJECT poly
 name "Mesh56"
 data 21
 Mesh56 in1 Group1 Mod
-crease 30.000000
+crease 35.000000
 numvert 71
 1.26568 1.04634 0.2899
 1.05777 1.01051 0.2931
