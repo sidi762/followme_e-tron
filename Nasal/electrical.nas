@@ -1,6 +1,6 @@
 #//Followme EV electrical system by Sidi Liang
 #//Contact: sidi.liang@gmail.com
- 
+
 var kWh2kWs = func(kWh){
     return kWh * 3600;
 }
@@ -143,7 +143,7 @@ var Circuit = {
         }
     }, #//Volt
 
-    calculateTotalParalleCurrent: func(){
+    calculateTotalParallelCurrent: func(){
         var total = 0;
         foreach(elem; me.parallelConnection){
             if(elem.isSwitch()){
@@ -186,7 +186,7 @@ var Circuit = {
         }
         if(me.debugMode == 2) print("Series Current Calculated");
 
-        me.calculateTotalParalleCurrent();
+        me.calculateTotalParallelCurrent();
         if(me.debugMode == 2) print("Parallel Current Calculated");
 
         foreach(elem; me.parallelConnection){
