@@ -635,7 +635,7 @@ var Safety = {
     reset: func(){
         #resetting stops the safety system
         me.safetySystemTimer.stop();
-        me.disableFrontRadar();
+        me.frontRadar.stop();
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
         me.aebStateProp.setValue(0);
