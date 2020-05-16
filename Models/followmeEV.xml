@@ -975,11 +975,11 @@
   <red>1.0</red>
   <green>0.0</green>
   <blue>0.0</blue>
-  <factor-prop>sim/multiplay/generic/int[4]</factor-prop>
+  <factor-prop>sim/multiplay/generic/float[25]</factor-prop>
  </emission>
  <condition>
   <greater-than>
-   <property>sim/multiplay/generic/int[4]</property>
+   <property>sim/multiplay/generic/float[25]</property>
    <value>0.3</value>
   </greater-than>
  </condition>
