@@ -37,6 +37,7 @@ var Steering = {
 
     input: 0, #//-1: left, 1:right, 0: none
     command: 0, #//Steering command, range from -1 to 1
+    commandNode: props.getNode("/controls/flight/rudder", 1),
     steeringAngle: 0, #//in rad
     #steeringAngleDeg: 0, #//in degrees
 
@@ -65,7 +66,8 @@ var Steering = {
             if(math.abs(me.steeringAngle) <=0.2)
             {
                 me.steeringAngle = 0;
-                props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
+                me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
+                me.commandNode.setValue(me.command);
                 #me.steeringAngleDeg = me.steeringAngle * R2D;
                 #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
             }
@@ -102,7 +104,7 @@ var Steering = {
 
         me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
         #me.steeringAngleDeg = me.steeringAngle * R2D;
-        props.getNode("/",1).setValue("/controls/flight/rudder", me.command);
+        me.commandNode.setValue(me.command);
         #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
         if(me.debugMode)
         {

@@ -4,7 +4,7 @@
 <sim>
 
 	<description>Follow Me e-tron</description>
-	<author>Gijs de Rooy, 李维昊 (Weihao Li), 梁思地 (Sidi Liang), 罗启元 (Qiyuan Luo), ValKmjolnir, Marsdolphin</author>
+	<author>Gijs de Rooy, 梁思地 (Sidi Liang), 罗启元 (Qiyuan Luo), ValKmjolnir, 李维昊 (Weihao Li), Marsdolphin</author>
 	<status>early production</status>
     <long-description>
         An electronic, High-Performance version of a follow me car (Renault Kangoo I) with Chinese characteristics.
@@ -517,7 +517,6 @@
         <int n="1" alias="/sim/model/lights/indicator-right/state"/>
         <int n="2" alias="/systems/horn"/>
         <int n="3" alias="/controls/lighting/headlight"/>
-        <int n="4" alias="/controls/gear/brake-left"/>
         <int n="5" alias="/services/service-truck/enable"/>
         <int n="6" alias="/systems/screen-enable"/>
         <int n="7" alias="/gear/gear[0]/tyre-smoke"/>
@@ -531,6 +530,7 @@
 	    <int n="15" alias="/systems/instruments/enable_switches"/>
         <int n="16" alias="/warninglight/start"/>
 
+        <!--float current num:25 -->
         <float n="0" alias="/controls/doors/rearright/position-norm"/>
         <float n="1" alias="/controls/doors/rearleft/position-norm"/>
         <float n="2" alias="/controls/doors/frontright/position-norm"/>
@@ -561,6 +561,7 @@
 
         <float n="18" alias="/fdm/jsbsim/animation/steering_wheel_pos"/>
         <float n="19" alias="/controls/gear/brake-parking"/>
+        <float n="25" alias="/controls/gear/brake-left"/>
         <float n="22" alias="/controls/engines/engine/throttle"/>
 
         <float n="23" alias="/fdm/jsbsim/animation/storage_cover_pos"/>
