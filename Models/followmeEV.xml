@@ -887,6 +887,21 @@
 </animation>
 
 <animation>
+ <type>select</type>
+ <object-name>left-headlight-compositor</object-name>
+ <object-name>right-headlight-compositor</object-name>
+ <condition>
+     <and>
+         <equals>
+             <property>sim/multiplay/generic/int[3]</property>
+             <value>1</value>
+         </equals>
+     </and>
+ </condition>
+</animation>
+
+
+<animation>
  <type>material</type>
  <object-name>indicater_left</object-name>
  <emission>
