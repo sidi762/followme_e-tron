@@ -552,7 +552,7 @@ var Safety = {
     },
     disableFrontRadar: func(){
         #Disables the front radar
-        me.frontRadar.stop();
+        if(me.frontRadarEnabled) me.frontRadar.stop();
         me.frontRadarEnabled = 0;
     },
     toggleFrontRadar: func(){
@@ -635,7 +635,7 @@ var Safety = {
     reset: func(){
         #resetting stops the safety system
         me.safetySystemTimer.stop();
-        me.frontRadar.stop();
+        if(me.frontRadarEnabled) me.frontRadar.stop();
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
         me.aebStateProp.setValue(0);
