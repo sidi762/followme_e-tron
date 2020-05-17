@@ -512,6 +512,8 @@
         <bool n="3" alias="/systems/auto_hold_working"/>
         <bool n="4" alias="/systems/safety/aeb_activated"/>
         <bool n="5" alias="/controls/lighting/highBeam"/>
+        <bool n="6" alias="/systems/safety/airbag/front"/>
+        <bool n="7" alias="/systems/safety/airbag/side"/>
 
         <int n="0" alias="/sim/model/lights/indicator-left/state"/>
         <int n="1" alias="/sim/model/lights/indicator-right/state"/>

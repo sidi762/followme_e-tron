@@ -9,7 +9,7 @@
  <object-name>knee_airbag_r</object-name>
  <condition>
      <equals>
-         <property>/systems/safety/airbag/front</property>
+         <property>sim/multiplay/generic/bool[6]</property>
          <value>1</value>
      </equals>
  </condition>
@@ -23,7 +23,7 @@
  <object-name>curtain_airbag_r</object-name>
  <condition>
      <equals>
-         <property>/systems/safety/airbag/side</property>
+         <property>sim/multiplay/generic/bool[7]</property>
          <value>1</value>
      </equals>
  </condition>
