@@ -116,9 +116,9 @@
  </condition>
  <path>Aircraft/followme_e-tron/Models/people/people2.ac</path>
  <offsets>
-  <x-m> 1.9</x-m>
-  <y-m> 0</y-m>
-  <z-m> 1.255</z-m>
+  <x-m> 1.7</x-m>
+  <y-m> -0.17</y-m>
+  <z-m> 0.8</z-m>
  </offsets>
 </model>
 
