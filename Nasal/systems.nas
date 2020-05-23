@@ -357,6 +357,7 @@ var BrakeController = {
         me.rightBrakeValue = value;
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
+        if(value == 1) safety.emergencyMode();
     },
 
     enableHandBrake: func(){
@@ -516,7 +517,7 @@ var brakesABS = func(){
 }
 
 var Safety = {
-    new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=72){
+    new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=75){
         var newSafety = { parents:[Safety] };
         newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
         newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
@@ -538,7 +539,7 @@ var Safety = {
     sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
     aebStateProp: props.getNode("/systems/safety/aeb_activated", 1),
     airbagAccelerationLimit: 140, #To be configured,m/s^2
-    sideAirbagAccelerationLimit: 72, #To be configured,m/s^2
+    sideAirbagAccelerationLimit: 75, #To be configured,m/s^2
 
     #Frontwards radar
     frontRadar: nil,
@@ -663,7 +664,7 @@ var Safety = {
         else me.stop();
     },
 };
-var safety = Safety.new(140, 72);
+var safety = Safety.new(140, 75);
 
 var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim wheels never overbrake?
 #//abondoned since the new safety system
