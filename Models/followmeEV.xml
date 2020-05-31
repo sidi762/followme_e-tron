@@ -6,7 +6,7 @@
 <nasal>
  <load>
  var livery_update = aircraft.livery_update.new("Aircraft/followme_e-tron/Models/Messages", 1, nil);
- var liveryFuse_update = followme.liveryFuse_update.new("Aircraft/followme_e-tron/Models/Texture", 5, nil);
+ var liveryFuse_update = followme.liveryFuse_update.new("Aircraft/followme_e-tron/Models/Texture", 1, nil);
  </load>
  <unload>
  livery_update.stop();

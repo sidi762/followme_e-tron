@@ -1,4 +1,4 @@
-#//Follow Me Library by Sidi Liang   
+#//Follow Me Library by Sidi Liang
 #//Contact: sidi.liang@gmail.com
 
 var isInternalView = func(){ #// return 1 if is in internal view, otherwise return 0.
@@ -53,3 +53,22 @@ var runCode = func(url, addition = nil){
         print("Code loaded");
     });
 }
+
+var liveryFuse = {
+	init: func(dir, nameprop = "sim/model/livery/name", sortprop = nil) {
+		me.parents = [gui.OverlaySelector.new("Select Livery", dir, nameprop,
+				sortprop, "sim/model/livery/file")];
+		me.dialog = me.parents[0];
+	},
+};
+var liveryFuse_update = {
+	new: func(liveriesdir, interval = 10.01, callback = nil) {
+		var m = { parents: [liveryFuse_update, aircraft.overlay_update.new()] };
+		m.parents[1].add(liveriesdir, "sim/model/livery/file", callback);
+		m.parents[1].interval = interval;
+		return m;
+	},
+	stop: func {
+		me.parents[1].stop();
+	},
+};
