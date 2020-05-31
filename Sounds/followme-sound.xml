@@ -23,7 +23,7 @@
  	 </condition>
    <volume>
     <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.011</factor>
+    <factor>0.015</factor>
     <min>0</min>
     <max>2</max>
     <offset>0</offset>
@@ -42,7 +42,7 @@
    <property>sim/multiplay/generic/float[15]</property>
    <volume>
     <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.0015</factor>
+    <factor>0.003</factor>
     <min>0.0</min>
     <max>1.0</max>
    </volume>
@@ -136,7 +136,7 @@
         </and>
 	</condition>
 	<volume>
-        <value>3</value>
+        <value>0.6</value>
 	</volume>
   </indicator>
 
