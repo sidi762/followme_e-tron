@@ -576,7 +576,7 @@
         <string n="3" alias="/systems/interior/type"/>
         <string n="4" alias="/systems/plate/name"/>
         <string n="5" alias="/systems/plate/file"/>
-
+        
       </generic>
     </multiplay>
 
