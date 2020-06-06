@@ -4,7 +4,7 @@
 <sim>
 
 	<description>Follow Me e-tron</description>
-	<author>Gijs de Rooy, 梁思地 (Sidi Liang), 罗启元 (Qiyuan Luo), ValKmjolnir, 李维昊 (Weihao Li), Marsdolphin</author>
+	<author>Gijs de Rooy, 梁思地/Sidi Liang, 罗启元/Qiyuan Luo, ValKmjolnir, 李维昊/Weihao Li, Marsdolphin</author>
 	<status>early production</status>
     <long-description>
         An electronic, High-Performance version of a follow me car (Renault Kangoo I) with Chinese characteristics.
@@ -404,9 +404,23 @@
 		</key>
 		<!-- Start text -->
 		<text>
+        Follow me e-tron Brought to you by FGPRC.
+
 		You can select the message to be displayed on the bar, through the "Follow Me EV > Select message" menu.
 		For more options, see "Follow Me EV > Show Options" menu.
-		Follow me e-tron Brought to you by FGPRC.
+
+        Instructions:
+        Auto Crash system: An auto pilot that keeps the vehicle on the road. It's not 100% reliable and make sure you keep monitoring the road!
+        Auto Speed system: Keeps the vehicle on a certain speed.
+        Auto Hold system: This realisticlly implemented auto hold system will prevent the vehicle from unintented moving.
+        It will turn off switch to parking brake in certain conditions, as the real one does.
+        Only avilable in Luxury interior style and the switch is next to the parking brake.
+
+        Safety system:
+        AEB: Automatically brakes the vehicle to prevent crashes. Not very reliable, disabled as default.
+        Note: The entire safety system will be disabled when resetting airbags. Reinitialize the system to make them work again.
+
+        Drive safe!
 		</text>
 	</help>
 
@@ -576,7 +590,7 @@
         <string n="3" alias="/systems/interior/type"/>
         <string n="4" alias="/systems/plate/name"/>
         <string n="5" alias="/systems/plate/file"/>
-        
+
       </generic>
     </multiplay>
 
