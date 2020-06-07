@@ -8,8 +8,9 @@ props.getNode("/sim/gui/dialogs/vehicle_config/dialog",1);
 var configDialog = gui.Dialog.new("/sim/gui/dialogs/vehicle_config/dialog", "Aircraft/followme_e-tron/gui/dialogs/config-dialog.xml");
 
 aircraft.livery.init("Aircraft/followme_e-tron/Models/Messages");
-liveryFuse.init("Aircraft/followme_e-tron/Models/Texture");
-
+var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/";
+var liverySelector = followme.TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", defaultValue: "Yellow(Default)");
+liverySelector.scanXML();
 aircraft.livery.select("Blanco");
 
 var tyreSmoke_0 = aircraft.tyresmoke.new(0, auto = 1, diff_norm = 0.4, check_vspeed = 0);
@@ -476,7 +477,7 @@ var resetOnPosition = func(){
     setprop("/fdm/jsbsim/simulation/pause", 1);
     setprop("/fdm/jsbsim/simulation/reset", 1);
     var groundAlt = props.getNode("/position/ground-elev-ft").getValue();
-    props.getNode("/position/altitude-ft").setValue(groundAlt+5);
+    props.getNode("/position/altitude-ft").setValue(groundAlt+7);
     latProp.setValue(lat);
     lonProp.setValue(lon);
     setprop("/fdm/jsbsim/simulation/pause", 0);

@@ -10,7 +10,7 @@
 
     <nasal>
      <open>
-         followme.updateList();
+         followme.plateSelector.updateList();
          #print(cmdarg().getPath());
          var nameNode = props.getNode("systems/plate/name", 1);
          var fileNode = props.getNode("systems/plate/file", 1);
@@ -196,7 +196,7 @@
                 <pref-height>28</pref-height>
 				<binding>
 					<command>nasal</command>
-					<script>followme.liveryFuse.dialog.toggle()</script>
+					<script>followme.liverySelector.dialog.open()</script>
 				</binding>
             </button>
             <button>

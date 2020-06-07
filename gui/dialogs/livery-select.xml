@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<PropertyList>
+
+    <name>livery-select</name>
+    <layout>vbox</layout>
+    <resizable>true</resizable>
+	<x>-20</x>
+	<pref-width>300</pref-width>
+    <modal>false</modal>
+    <draggable>true</draggable>
+
+    <group>
+		<layout>hbox</layout>
+		<empty><stretch>1</stretch></empty>
+
+		<text>
+			<label>$name</label>
+		</text>
+
+		<empty><stretch>1</stretch></empty>
+
+		<button>
+			<pref-width>16</pref-width>
+			<pref-height>16</pref-height>
+			<legend></legend>
+			<default>1</default>
+			<keynum>27</keynum>
+			<border>2</border>
+
+			<binding>
+				<command>nasal</command>
+				<script>$close</script>
+			</binding>
+		</button>
+	</group>
+
+	<hrule/>
+
+	<list>
+		<halign>fill</halign>
+		<valign>fill</valign>
+		<stretch>true</stretch>
+		<pref-height>500</pref-height>
+		<property>$result</property>
+		<binding>
+			<command>dialog-apply</command>
+		</binding>
+		<value>$value</value>
+	</list>
+
+</PropertyList>

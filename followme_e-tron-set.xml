@@ -235,8 +235,8 @@
 	<!-- Splah ends here -->
 	<rating>
 		<FDM type="int">4</FDM>
-		<systems type="int">2</systems>
-		<cockpit type="int">3</cockpit>
+		<systems type="int">3</systems>
+		<cockpit type="int">4</cockpit>
 		<model type="int">4</model>
 	</rating>
 
@@ -431,7 +431,7 @@
     </systems>
     <!-- Start tutorials -->
    <tutorials>
-            <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
+        <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
 	    <tutorial include="Tutorials/followme-cockpit-overview-dashboard-zh.xml"/>
 	    <tutorial include="Tutorials/followme-cockpit-overview-center-console.xml"/>
 	    <tutorial include="Tutorials/followme-keyboard.xml"/>
@@ -463,11 +463,11 @@
 						<script>followme.configDialog.open();</script>
 					</binding>
 				</item>
-				<item>
+                <item>
 					<label>Select Livery</label>
 					<binding>
 						<command>nasal</command>
-						<script>followme.liveryFuse.dialog.toggle()</script>
+						<script>followme.liverySelector.dialog.open()</script>
 					</binding>
 				</item>
 				<item>

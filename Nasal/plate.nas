@@ -6,41 +6,9 @@
 #To add an plate, just place the new plate texture file (must be .png
 #format) to that folder and it will show up in the dialog.
 
-
-var Scanner = {
-    new: func(path, fileType) {
-        return { parents:[Scanner], path: path, fileType: fileType};
-    },
-    path: "",
-    fileType: "",
-    scan: func(){
-        var data = [];
-        var files = directory(me.path);
-        if (size(files)) {
-            foreach (var file; files) {
-                if (substr(file, 0 - size(me.fileType)) != me.fileType)
-                    continue;
-                var n = io.read_properties(me.path ~ file);
-                append(data, [substr(file, 0, size(file) - size(me.fileType)), me.path ~ file]);
-            }
-            #me.data = sort(me.data, func(a, b) num(a[1]) == nil or num(b[1]) == nil
-            #        ? cmp(a[1], b[1]) : a[1] - b[1]);
-        }
-        return data;
-    },
-};
 var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
-var plateScanner = Scanner.new(path, ".png");
+var plateSelector = TextureSelector.new(path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/"); #Using the scanner in library.nas
 
-var updateList = func(){
-    var allPlates = plateScanner.scan();
-    var data = props.globals.getNode("/sim/gui/dialogs/vehicle_config/dialog/group[4]/combo/", 1);
-    data.removeChildren("value");
-    data.getChild("value", 0, 1).setValue("NONE");
-    forindex(var i; allPlates){
-        data.getChild("value", i+1, 1).setValue(allPlates[i][0]);
-    }
-}
 var Plate = {
     new: func() {
         return { parents:[Plate]};

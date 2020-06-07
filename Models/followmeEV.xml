@@ -5,12 +5,10 @@
 
 <nasal>
  <load>
- var livery_update = aircraft.livery_update.new("Aircraft/followme_e-tron/Models/Messages", 1, nil);
- var liveryFuse_update = followme.liveryFuse_update.new("Aircraft/followme_e-tron/Models/Texture", 1, nil);
+     var livery_update = aircraft.livery_update.new("Aircraft/followme_e-tron/Models/Messages", 1, nil);
  </load>
  <unload>
- livery_update.stop();
- liveryFuse_update.stop();
+     livery_update.stop();
  </unload>
 </nasal>
 
@@ -67,8 +65,10 @@
  <object-name>door.rr</object-name>
  <object-name>rdoor</object-name>
  <object-name>ldoor</object-name>
- <property-base>sim/model/livery</property-base>
- <texture-prop>texture-fuse</texture-prop>
+ <!--<property-base>sim/model/livery</property-base>
+ <texture-prop>texture-fuse</texture-prop>-->
+ <property-base>sim/multiplay/generic</property-base>
+ <texture-prop>string[19]</texture-prop>
  <texture>followmeoutside.png</texture>
 </animation>
 
