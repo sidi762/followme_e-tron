@@ -4,7 +4,7 @@
 	<model>
 		<livery>
 			<name type="string">Carbon fiber White</name>
-			<texture-fuse>Texture/carbon_fiber_white.png</texture-fuse>
+			<texture-fuse>Liveries/carbon_fiber_white.png</texture-fuse>
 		</livery>
 	</model>
 </sim>

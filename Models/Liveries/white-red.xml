@@ -3,8 +3,8 @@
 <sim>
 	<model>
 		<livery>
-			<name type="string">e-tron red</name>
-			<texture-fuse>Texture/e-tron_Red.png</texture-fuse>
+			<name type="string">white-red</name>
+			<texture-fuse>Liveries/white-red.png</texture-fuse>
 		</livery>
 	</model>
 </sim>

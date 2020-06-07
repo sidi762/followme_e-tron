@@ -3,8 +3,8 @@
 <sim>
 	<model>
 		<livery>
-			<name type="string">Creamy White</name>
-			<texture-fuse>Texture/cream.png</texture-fuse>
+			<name type="string">Pink</name>
+			<texture-fuse>Liveries/followmeoutside_pink.png</texture-fuse>
 		</livery>
 	</model>
 </sim>

@@ -4,7 +4,7 @@
 	<model>
 		<livery>
 			<name type="string">07 Camouflage</name>
-			<texture-fuse>Texture/07_Camouflage.png</texture-fuse>
+			<texture-fuse>Liveries/07_Camouflage.png</texture-fuse>
 		</livery>
 	</model>
 </sim>

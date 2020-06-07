@@ -4,8 +4,8 @@
     <model>
         <livery>
             <name type="string">Orange</name>
-            <texture-fuse>Texture/Orange.png</texture-fuse>
+            <texture-fuse>Liveries/Orange.png</texture-fuse>
         </livery>
-    </model>    
+    </model>
 </sim>
 </PropertyList>

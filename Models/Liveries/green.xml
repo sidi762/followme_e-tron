@@ -3,8 +3,8 @@
 <sim>
 	<model>
 		<livery>
-			<name type="string">marble-blue</name>
-			<texture-fuse>Texture/marble-blue.png</texture-fuse>
+			<name type="string">green</name>
+			<texture-fuse>Liveries/green.png</texture-fuse>
 		</livery>
 	</model>
 </sim>

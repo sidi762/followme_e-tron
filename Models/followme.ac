@@ -648,7 +648,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.131738 0.110367 -0.143257
-texture "Texture/carbon_fiber.png"
+texture "Liveries/carbon_fiber.png"
 crease 45.000000
 numvert 4
 -0.234658 -0.0282584 0
@@ -24879,7 +24879,7 @@ kids 0
 OBJECT poly
 name "rect"
 loc -0.131738 0.110367 -0.143257
-texture "Texture/carbon_fiber.png"
+texture "Liveries/carbon_fiber.png"
 crease 45.000000
 numvert 4
 -0.161544 0.00401026 -2.33076
@@ -28519,7 +28519,7 @@ OBJECT poly
 name "door.rr_1"
 data 21
 Mesh76 body1 Grou.003
-texture "Texture/carbon_fiber_white.png"
+texture "Liveries/carbon_fiber_white.png"
 crease 30.000000
 numvert 63
 3.61204 1.72722 -0.1309
@@ -29102,7 +29102,7 @@ name "Mesh76.004_1"
 loc 1.89037 0.99732 0
 data 17
 Mesh76 body1 Grou
-texture "Texture/carbon_fiber_white.png"
+texture "Liveries/carbon_fiber_white.png"
 crease 30.000000
 numvert 791
 -1.77351 -0.44096 -0.588289
@@ -42340,7 +42340,7 @@ name "ldoor_1"
 loc 1.5544 0.95137 0.706335
 data 21
 Mesh27 door_lf_hi.001
-texture "Texture/carbon_fiber_white.png"
+texture "Liveries/carbon_fiber_white.png"
 crease 30.000000
 numvert 59
 -0.39487 -0.63378 0.051275

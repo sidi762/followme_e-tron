@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">e-tron uk police</name>
+			<texture-fuse>Liveries/e-tron uk police.png</texture-fuse>
+		</livery>
+	</model>
+</sim>
+</PropertyList>
