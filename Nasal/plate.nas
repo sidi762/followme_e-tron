@@ -7,7 +7,7 @@
 #format) to that folder and it will show up in the dialog.
 
 var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
-var plateSelector = TextureSelector.new(path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/"); #Using the scanner in library.nas
+var plateSelector = TextureSelector.new(path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/"); 
 
 var Plate = {
     new: func() {

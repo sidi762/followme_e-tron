@@ -1,10 +1,19 @@
 #//Sidi Liang, 2020
-#//Docs to be done
+#//Docs WIP
+#//Texture Selector for Followme EV
+#//Quick start:
+#//Aircraft liveries with dedicated selection dialog: (The same applies to any texture defined in PropertyList XML):
+#//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/";
+#//     var liverySelector = followme.TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
+#//Pure texture, custom dialog(without multiplayer):
+#//     var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
+#//     var plateSelector = TextureSelector.new(path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
+
 
 var TextureSelector = { #//Tmp Note: path MUST end with "/"
     new: func(path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
             customDialogPosition = "", texturePropertyBase = "sim/model/livery/", textureProp = "livery", textureNameProp = "name",
-            textureDataNode = nil, defaultValue = ""){
+            textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]", defaultValue = ""){
 
         var m = {parents:[TextureSelector]};
         if(customDialog == 1){
@@ -24,6 +33,8 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
         m.textureNameProp = textureNameProp;
         m.textureDataNode = textureDataNode;
         m.defaultValue = defaultValue;
+        m.enableMultiplayer = enableMultiplayer;
+        m.multiplayerProperty = multiplayerProperty;
         if(defaultValue) m.setTextureByNameXML(defaultValue);
         return m;
     },
@@ -39,6 +50,8 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
     dialogNode:nil,
     dialog:nil,
     textureDataNode:props.getNode("/TextureSelector/liveries/", 1),
+    enableMultiplayer: 0, #//The property will be transmitted via MP if enabled.
+    multiplayerProperty: "/sim/multiplay/generic/string[19]", #// The multiplayer property. Only be used if enableMultiplayer is set to 1. Default to be /sim/multiplay/generic/string[19](The last string property in the MP Protocol)
     scan: func(path = nil, fileType = nil){
         if(path == nil and me.path) path = me.path;
         else return 1;
@@ -104,7 +117,9 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
             if(tmp.getNode(me.textureNameProp).getValue() == name){
                 print(tmp.getNode(me.textureProp).getValue());
                 props.copy(tmp, props.getNode(me.texturePropertyBase));
-                props.getNode("/sim/multiplay/generic/string[19]", 1).setValue(texture.getNode(me.texturePropertyBase).getNode(me.textureProp).getValue());
+                if(me.enableMultiplayer){
+                    props.getNode(me.multiplayerProperty, 1).setValue(texture.getNode(me.texturePropertyBase).getNode(me.textureProp).getValue());
+                }
                 break;
             }
         }

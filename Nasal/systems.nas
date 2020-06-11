@@ -9,8 +9,7 @@ var configDialog = gui.Dialog.new("/sim/gui/dialogs/vehicle_config/dialog", "Air
 
 aircraft.livery.init("Aircraft/followme_e-tron/Models/Messages");
 var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/";
-var liverySelector = followme.TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", defaultValue: "Yellow(Default)");
-liverySelector.scanXML();
+var liverySelector = followme.TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
 aircraft.livery.select("Blanco");
 
 var tyreSmoke_0 = aircraft.tyresmoke.new(0, auto = 1, diff_norm = 0.4, check_vspeed = 0);
