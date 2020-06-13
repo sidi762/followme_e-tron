@@ -3,11 +3,12 @@
 <PropertyList>
 <sim>
 
-	<description>Follow Me e-tron</description>
+	<description>Follow Me e-tron LIMO</description>
 	<author>Gijs de Rooy, 梁思地/Sidi Liang, 罗启元/Qiyuan Luo, ValKmjolnir, 李维昊/Weihao Li, Marsdolphin</author>
 	<status>early production</status>
+    <variant-of>followme_e-tron</variant-of>
     <long-description>
-        An electronic, High-Performance version of a follow me car (Renault Kangoo I) with Chinese characteristics.
+        An electronic, fictional limousine version of a follow me car (Renault Kangoo I) with Chinese characteristics.
     </long-description>
 
     <gui><style><colors>
@@ -24,141 +25,6 @@
     </colors></style></gui>
 
     <previews>
-	    <!-- Splash starts here -->
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/01.png</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/02.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/03.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/04.png</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/05.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/06.jpg</path>
-            </preview>
-
-            <preview>
-                <type>interior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/07.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/08.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/09.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/10.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/11.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/12.png</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/13.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/14.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/15.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/16.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/17.jpg</path>
-            </preview>
-
-            <preview>
-                <type>interior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/18.jpg</path>
-            </preview>
-
-            <preview>
-                <type>interior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/19.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/20.jpg</path>
-            </preview>
-
-	    <!-- Start sunrise splash -->
-
-	    <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Sunrise/21.jpg</path>
-            </preview>
-
-	    <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Sunrise/22.jpg</path>
-            </preview>
-
 	    <!-- Start G4 Tour splash -->
 
             <preview>
@@ -249,11 +115,10 @@
 	</tags>
 
 	<flight-model>jsb</flight-model>
-	<aero>followme_e-tron</aero>
-    <primary-set>true</primary-set>
+	<aero>followme_e-tron-limo</aero>
 
 	<model>
-		<path>Aircraft/followme_e-tron/Models/followmeEV.xml</path>
+		<path>Aircraft/followme_e-tron/Models/followmeEV-limo.xml</path>
 		<livery>
 			<file type="string"/>
 		</livery>
@@ -262,7 +127,86 @@
         <path>Aircraft/followme_e-tron/Sounds/followme-sound.xml</path>
     </sound>
 
-
+    <menubar>
+        <default>
+            <menu n="10">
+                <label>Follow Me EV</label>
+                <enabled type="bool">true</enabled>
+                <item>
+                    <label>Show Options</label>
+                    <binding>
+                        <command>dialog-show</command>
+                        <dialog-name>vehicle-dialog</dialog-name>
+                    </binding>
+                </item>
+                <item>
+                    <label>Battery Management</label>
+                    <binding>
+                        <command>dialog-show</command>
+                        <dialog-name>battery-management</dialog-name>
+                    </binding>
+                </item>
+                <item>
+                    <label>Configuration</label>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.configDialog.open();</script>
+                    </binding>
+                </item>
+                <item>
+                    <label>Select Livery</label>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.liverySelector.dialog.open()</script>
+                    </binding>
+                </item>
+                <item>
+                    <label>Select Message</label>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.displaySelector.dialog.open()</script>
+                    </binding>
+                </item>
+                <item>
+                    <label>Start Engine</label>
+                    <binding>
+                        <command>nasal</command>
+                        <script>engine.startEngine(engine.engine_1)</script>
+                    </binding>
+                </item>
+                <item>
+                    <label>Stop Engine</label>
+                    <binding>
+                        <command>nasal</command>
+                        <script>engine.stopEngine(engine.engine_1)</script>
+                    </binding>
+                </item>
+                <item>
+                    <label>Save/Resume</label>
+                    <binding>
+                        <command>dialog-show</command>
+                        <dialog-name>save_dialog</dialog-name>
+                    </binding>
+                </item>
+                <item>
+                    <label>Toggle Parking Radar</label>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.parkingRadar.toggle()</script>
+                    </binding>
+                </item>
+                <item>
+                 <label>Select Passenger</label>
+                 <binding>
+                  <command>nasal</command>
+                  <script>
+                    dual_control_tools.copilot_dialog.show(aircraft_dual_control.copilot_type);
+                   </script>
+                  </binding>
+                 </item>
+            </menu>
+        </default>
+    </menubar>
 	<view n="/0">
 		<internal archive="y">true</internal>
 		<config>
@@ -437,87 +381,7 @@
 	    <tutorial include="Tutorials/followme-cockpit-overview-center-console.xml"/>
 	    <tutorial include="Tutorials/followme-keyboard.xml"/>
    </tutorials>
-   <!-- Start Menubar -->
-    <menubar>
-		<default>
-			<menu n="10">
-				<label>Follow Me EV</label>
-				<enabled type="bool">true</enabled>
-				<item>
-					<label>Show Options</label>
-					<binding>
-						<command>dialog-show</command>
-						<dialog-name>vehicle-dialog</dialog-name>
-					</binding>
-				</item>
-				<item>
-					<label>Battery Management</label>
-					<binding>
-						<command>dialog-show</command>
-						<dialog-name>battery-management</dialog-name>
-					</binding>
-				</item>
-                <item>
-					<label>Configuration</label>
-					<binding>
-						<command>nasal</command>
-						<script>followme.configDialog.open();</script>
-					</binding>
-				</item>
-                <item>
-					<label>Select Livery</label>
-					<binding>
-						<command>nasal</command>
-						<script>followme.liverySelector.dialog.open()</script>
-					</binding>
-				</item>
-				<item>
-					<label>Select Message</label>
-                    <binding>
-    					<command>nasal</command>
-    					<script>followme.displaySelector.dialog.open()</script>
-    				</binding>
-				</item>
-				<item>
-					<label>Start Engine</label>
-					<binding>
-						<command>nasal</command>
-						<script>engine.startEngine(engine.engine_1)</script>
-					</binding>
-				</item>
-				<item>
-					<label>Stop Engine</label>
-					<binding>
-						<command>nasal</command>
-						<script>engine.stopEngine(engine.engine_1)</script>
-					</binding>
-				</item>
-				<item>
-					<label>Save/Resume</label>
-					<binding>
-						<command>dialog-show</command>
-						<dialog-name>save_dialog</dialog-name>
-					</binding>
-				</item>
-                <item>
-					<label>Toggle Parking Radar</label>
-					<binding>
-						<command>nasal</command>
-						<script>followme.parkingRadar.toggle()</script>
-					</binding>
-				</item>
-		        <item>
-		         <label>Select Passenger</label>
-		         <binding>
-		          <command>nasal</command>
-		          <script>
-		            dual_control_tools.copilot_dialog.show(aircraft_dual_control.copilot_type);
-		           </script>
-		          </binding>
-		         </item>
-			</menu>
-		</default>
-	</menubar>
+
 
     <multiplay>
       <generic>
