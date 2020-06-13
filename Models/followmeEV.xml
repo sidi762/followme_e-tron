@@ -2,16 +2,6 @@
 
 <path>followme.ac</path>
 
-
-<nasal>
- <load>
-     var livery_update = aircraft.livery_update.new("Aircraft/followme_e-tron/Models/Messages", 1, nil);
- </load>
- <unload>
-     livery_update.stop();
- </unload>
-</nasal>
-
 <sound>
     <path>Aircraft/followme_e-tron/Sounds/followme-sound_mp.xml</path>
 </sound>
@@ -53,8 +43,8 @@
 <animation>
  <type>material</type>
  <object-name>sign</object-name>
- <property-base>sim/model/livery</property-base>
- <texture-prop>texture</texture-prop>
+ <property-base>/sim/multiplay/generic</property-base>
+ <texture-prop>string[18]</texture-prop>
  <texture>blanco.png</texture>
 </animation>
 

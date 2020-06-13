@@ -7,10 +7,10 @@ io.include("library.nas");
 props.getNode("/sim/gui/dialogs/vehicle_config/dialog",1);
 var configDialog = gui.Dialog.new("/sim/gui/dialogs/vehicle_config/dialog", "Aircraft/followme_e-tron/gui/dialogs/config-dialog.xml");
 
-aircraft.livery.init("Aircraft/followme_e-tron/Models/Messages");
+var displayPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Messages/";
+var displaySelector = TextureSelector.new(name: "Message-Selector", path: displayPath, fileType: ".xml", textureProp: "texture", enableMultiplayer: 1, multiplayerProperty:"/sim/multiplay/generic/string[18]", defaultValue: "Blanco");
 var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/";
-var liverySelector = followme.TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
-aircraft.livery.select("Blanco");
+var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
 
 var tyreSmoke_0 = aircraft.tyresmoke.new(0, auto = 1, diff_norm = 0.4, check_vspeed = 0);
 var tyreSmoke_1 = aircraft.tyresmoke.new(1, auto = 1, diff_norm = 0.4, check_vspeed = 0);

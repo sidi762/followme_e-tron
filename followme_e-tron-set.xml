@@ -28,121 +28,121 @@
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/01.png</path>
+                <path>Splash/Legacy/01.png</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/02.jpg</path>
+                <path>Splash/Legacy/02.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/03.jpg</path>
+                <path>Splash/Legacy/03.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/04.png</path>
+                <path>Splash/Legacy/04.png</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/05.jpg</path>
+                <path>Splash/Legacy/05.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/06.jpg</path>
+                <path>Splash/Legacy/06.jpg</path>
             </preview>
 
             <preview>
                 <type>interior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/07.jpg</path>
+                <path>Splash/Legacy/07.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/08.jpg</path>
+                <path>Splash/Legacy/08.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/09.jpg</path>
+                <path>Splash/Legacy/09.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/10.jpg</path>
+                <path>Splash/Legacy/10.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/11.jpg</path>
+                <path>Splash/Legacy/11.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/12.png</path>
+                <path>Splash/Legacy/12.png</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/13.jpg</path>
+                <path>Splash/Legacy/13.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/14.jpg</path>
+                <path>Splash/Legacy/14.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/15.jpg</path>
+                <path>Splash/Legacy/15.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/16.jpg</path>
+                <path>Splash/Legacy/16.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/17.jpg</path>
+                <path>Splash/Legacy/17.jpg</path>
             </preview>
 
             <preview>
                 <type>interior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/18.jpg</path>
+                <path>Splash/Legacy/18.jpg</path>
             </preview>
 
             <preview>
                 <type>interior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/19.jpg</path>
+                <path>Splash/Legacy/19.jpg</path>
             </preview>
 
             <preview>
                 <type>exterior</type>
                 <splash type="bool">true</splash>
-                <path>Splash/20.jpg</path>
+                <path>Splash/Legacy/20.jpg</path>
             </preview>
 
 	    <!-- Start sunrise splash -->
@@ -472,10 +472,10 @@
 				</item>
 				<item>
 					<label>Select Message</label>
-					<binding>
-						<command>nasal</command>
-						<script>aircraft.livery.dialog.toggle()</script>
-					</binding>
+                    <binding>
+    					<command>nasal</command>
+    					<script>followme.displaySelector.dialog.open()</script>
+    				</binding>
 				</item>
 				<item>
 					<label>Start Engine</label>

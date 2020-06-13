@@ -204,9 +204,9 @@
                 <legend>Select Message</legend>
                 <pref-width>120</pref-width>
                 <pref-height>28</pref-height>
-				<binding>
-						<command>nasal</command>
-						<script>aircraft.livery.dialog.toggle()</script>
+                <binding>
+					<command>nasal</command>
+					<script>followme.displaySelector.dialog.open()</script>
 				</binding>
             </button>
         </group>

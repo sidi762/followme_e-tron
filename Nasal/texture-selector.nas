@@ -4,14 +4,14 @@
 #//Quick start:
 #//Aircraft liveries with dedicated selection dialog: (The same applies to any texture defined in PropertyList XML):
 #//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/";
-#//     var liverySelector = followme.TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
+#//     var liverySelector = TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
 #//Pure texture, custom dialog(without multiplayer):
 #//     var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
 #//     var plateSelector = TextureSelector.new(path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
 
 
 var TextureSelector = { #//Tmp Note: path MUST end with "/"
-    new: func(path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
+    new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
             customDialogPosition = "", texturePropertyBase = "sim/model/livery/", textureProp = "livery", textureNameProp = "name",
             textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]", defaultValue = ""){
 
@@ -19,10 +19,13 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
         if(customDialog == 1){
             m.dialogNode = props.getNode(customDialogBase, 1);
         }else{
-            m.dialog = TextureSelectorDialog.new(defaultV: defaultValue);
+            m.dialogBaseNode = props.getNode("/sim/gui/dialogs/TextureSelector", 1).getNode(name, 1).getNode("dialog", 1);
+            m.dialog = TextureSelectorDialog.new(dialogBase : m.dialogBaseNode, defaultV: defaultValue, name: name);
+            m.dialogLis = setlistener(m.dialogBaseNode.getNode("opened", 1), func m.dialogTriggered());
         }
         if(textureDataNode == nil) textureDataNode = props.getNode("/TextureSelector/liveries/", 1);
 
+        m.name = name;
         m.path = path;
         m.fileType = fileType;
         m.enableNone = enableNone;
@@ -110,6 +113,22 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
             }
         }
     },
+    dialogTriggered: func(){
+        if(me.dialogBaseNode.getNode("opened", 1).getValue() == 1){
+            print("Dialog opened");
+            me.updateList();
+            me.resultLis = setlistener(me.dialog.result, func(){
+               var selected = me.dialog.result.getValue();
+               if(selected != "none"){
+                   me.setTextureByNameXML(selected);
+               }else{
+                   #fileNode.setValue(nameNode.getValue());
+               }
+            });
+        }else{
+            removelistener(me.resultLis);
+        }
+    },
     setTextureByNameXML: func(name){
         allTextures = me.textureDataNode.getChildren(me.textureProp);
         foreach(var texture; allTextures){
@@ -127,31 +146,22 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
 };
 
 var TextureSelectorDialog = {
-    new: func(dialogBase = "/sim/gui/dialogs/TextureSelector/dialog", dialogFile = "Aircraft/followme_e-tron/gui/dialogs/livery-select.xml", defaultV = ""){
-        var m = gui.Dialog.new(dialogBase, dialogFile);
+    new: func(dialogBase, dialogFile = "Aircraft/followme_e-tron/gui/dialogs/livery-select.xml", defaultV = "", name = "Texture selection"){
+        var m = gui.Dialog.new(dialogBase, dialogFile, name);
         m.parents = [TextureSelectorDialog, gui.Dialog];
-        var dNode = props.getNode(dialogBase, 1);
-        m.dialogNode = dNode;
+        m.dialogNode = dialogBase;
         m.dialogFile = dialogFile;
-        m.title = "Livery Selection";
+        m.title = name;
         m.list = m.dialogNode.getNode("list", 1);
         m.result = props.getNode(m.list.getPath() ~ "/result", 1);
         m.defaultValue = defaultV;
         m.nasal = m.dialogNode.getNode("nasal", 1);
         m.openScript = m.nasal.getNode("open", 1);
         m.closeScript = m.nasal.getNode("close", 1);
-        m.openScript.setValue('print("livery-select dialog opened");
-        followme.liverySelector.updateList();
-        #print(cmdarg().getPath());
-        var lis = setlistener(followme.liverySelector.dialog.result, func(){
-           var selected = followme.liverySelector.dialog.result.getValue();
-           if(selected != "none"){
-               followme.liverySelector.setTextureByNameXML(selected);
-           }else{
-               #fileNode.setValue(nameNode.getValue());
-           }
-        });');
-        m.closeScript.setValue('\n followme.playAudio("repair.wav");');
+        m.openScript.setValue('print("' ~ m.title ~ ' dialog opened");
+        props.getNode(cmdarg().getPath()).getNode("opened"), 1).setValue(1);');
+        m.closeScript.setValue('followme.playAudio("repair.wav");
+        props.getNode(cmdarg().getPath()).getNode("opened", 1).setValue(0);');
         m.reload();
         #Reload when the GUI is reloaded
         m.reload_listener = setlistener("/sim/signals/reinit-gui", func(n) m.reload());
@@ -161,18 +171,10 @@ var TextureSelectorDialog = {
     reload: func(){
         me.list.getNode("property").setValue(me.result.getPath());
         me.result.setValue(me.result.getValue() or me.defaultValue);
-        me.openScript.setValue('print("livery-select dialog opened");
-        followme.liverySelector.updateList();
-        #print(cmdarg().getPath());
-        var lis = setlistener(followme.liverySelector.dialog.result, func(){
-           var selected = followme.liverySelector.dialog.result.getValue();
-           if(selected != "none"){
-               followme.liverySelector.setTextureByNameXML(selected);
-           }else{
-               #fileNode.setValue(nameNode.getValue());
-           }
-        });');
-        me.closeScript.setValue('followme.playAudio("repair.wav");');
+        me.openScript.setValue('print("' ~ me.title ~ ' dialog opened");
+        props.getNode(cmdarg().getPath()~"/opened", 1).setValue(1);');
+        me.closeScript.setValue('followme.playAudio("repair.wav");
+        props.getNode(cmdarg().getPath()).getNode("opened", 1).setValue(0);');
         me.dialogNode.getNode("group/text/label").setValue(me.title);
         me.dialogNode.getNode("group/button/binding/script").setValue('gui.Dialog.instance["' ~ me.dialogNode.getNode("name").getValue() ~ '"].close()');
     }
