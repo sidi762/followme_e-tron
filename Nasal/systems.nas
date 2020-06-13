@@ -149,30 +149,24 @@ var IndicatorController = {
     falseLight: 0,
 
     ledMessage: props.getNode("/sim/model/livery/texture",1),
-    ledMessageFile: props.getNode("/sim/model/livery/file",1),
     ledMessageName: props.getNode("/sim/model/livery/name",1),
-
 
     savedMessage:{
         texture: "",
-        file: "",
         name: "",
     },
 
     textureRight: {
         texture:"Messages/right.png",
-        file: "right",
         name: "Right",
     },
     textureLeft: {
         texture:"Messages/left.png",
-        file: "left",
         name: "Left",
     },
 
     saveLedMessage: func(){
         me.savedMessage.texture = me.ledMessage.getValue();
-        me.savedMessage.file = me.ledMessageFile.getValue();
         me.savedMessage.name = me.ledMessageName.getValue();
     },
     getSavedMessage: func(){
@@ -180,12 +174,10 @@ var IndicatorController = {
     },
     clearSavedMessage: func(){
         me.savedMessage.texture = "";
-        me.savedMessage.file = "";
         me.savedMessage.name = "";
     },
     setLedMessage: func(content){
         me.ledMessage.setValue(content.texture);
-        me.ledMessageFile.setValue(content.file);
         me.ledMessageName.setValue(content.name);
     },
     resumeLedMessage: func(){

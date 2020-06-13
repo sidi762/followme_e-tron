@@ -38,7 +38,9 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
         m.defaultValue = defaultValue;
         m.enableMultiplayer = enableMultiplayer;
         m.multiplayerProperty = multiplayerProperty;
+        m.updateList();
         if(defaultValue) m.setTextureByNameXML(defaultValue);
+        if(enableMultiplayer) props.getNode(multiplayerProperty, 1).alias(props.getNode(m.texturePropertyBase).getNode(m.textureProp));
         return m;
     },
     path: "", #//path containing texture file
@@ -52,6 +54,7 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
     defaultValue:"",
     dialogNode:nil,
     dialog:nil,
+    current:nil,
     textureDataNode:props.getNode("/TextureSelector/liveries/", 1),
     enableMultiplayer: 0, #//The property will be transmitted via MP if enabled.
     multiplayerProperty: "/sim/multiplay/generic/string[19]", #// The multiplayer property. Only be used if enableMultiplayer is set to 1. Default to be /sim/multiplay/generic/string[19](The last string property in the MP Protocol)
@@ -120,6 +123,7 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
             me.resultLis = setlistener(me.dialog.result, func(){
                var selected = me.dialog.result.getValue();
                if(selected != "none"){
+                   me.current = selected;
                    me.setTextureByNameXML(selected);
                }else{
                    #fileNode.setValue(nameNode.getValue());
@@ -136,9 +140,9 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
             if(tmp.getNode(me.textureNameProp).getValue() == name){
                 print(tmp.getNode(me.textureProp).getValue());
                 props.copy(tmp, props.getNode(me.texturePropertyBase));
-                if(me.enableMultiplayer){
-                    props.getNode(me.multiplayerProperty, 1).setValue(texture.getNode(me.texturePropertyBase).getNode(me.textureProp).getValue());
-                }
+                #if(me.enableMultiplayer){
+                #    props.getNode(me.multiplayerProperty, 1).setValue(texture.getNode(me.texturePropertyBase).getNode(me.textureProp).getValue());
+                #}
                 break;
             }
         }
