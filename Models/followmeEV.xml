@@ -43,7 +43,7 @@
 <animation>
  <type>material</type>
  <object-name>sign</object-name>
- <property-base>/sim/multiplay/generic</property-base>
+ <property-base>sim/multiplay/generic</property-base>
  <texture-prop>string[18]</texture-prop>
  <texture>blanco.png</texture>
 </animation>
