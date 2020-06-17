@@ -196,7 +196,7 @@
                 <pref-height>28</pref-height>
 				<binding>
 					<command>nasal</command>
-					<script>followme.liverySelector.dialog.open()</script>
+					<script>liveries.liverySelector.dialog.open()</script>
 				</binding>
             </button>
             <button>
@@ -206,7 +206,7 @@
                 <pref-height>28</pref-height>
                 <binding>
 					<command>nasal</command>
-					<script>followme.displaySelector.dialog.open()</script>
+					<script>liveries.displaySelector.dialog.open()</script>
 				</binding>
             </button>
         </group>

@@ -53,7 +53,7 @@
     					<label>Select Livery</label>
     					<binding>
     						<command>nasal</command>
-    						<script>followme.liverySelector.dialog.open()</script>
+    						<script>liveries.liverySelector.dialog.open()</script>
     					</binding>
     				</item>
     				<item>

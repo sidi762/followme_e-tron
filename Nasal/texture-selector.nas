@@ -3,8 +3,8 @@
 #//Texture Selector for Followme EV
 #//Quick start:
 #//Aircraft liveries with dedicated selection dialog: (The same applies to any texture defined in PropertyList XML):
-#//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/";
-#//     var liverySelector = TextureSelector.new(path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
+#//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/FollowmeEV/";
+#//     var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
 #//Pure texture, custom dialog(without multiplayer):
 #//     var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
 #//     var plateSelector = TextureSelector.new(path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
@@ -13,7 +13,8 @@
 var TextureSelector = { #//Tmp Note: path MUST end with "/"
     new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
             customDialogPosition = "", texturePropertyBase = "sim/model/livery/", textureProp = "livery", textureNameProp = "name",
-            textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]", defaultValue = ""){
+            textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]",
+            texturePrePath = "", defaultValue = ""){
 
         var m = {parents:[TextureSelector]};
         if(customDialog == 1){
@@ -33,14 +34,16 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
         m.dialogCustom = customDialogPosition;
         m.texturePropertyBase = texturePropertyBase;
         m.textureProp = textureProp;
+        m.texturePrePath = texturePrePath;#//Tmp Node: must end with /
         m.textureNameProp = textureNameProp;
         m.textureDataNode = textureDataNode;
         m.defaultValue = defaultValue;
         m.enableMultiplayer = enableMultiplayer;
         m.multiplayerProperty = multiplayerProperty;
         m.updateList();
-        if(defaultValue) m.setTextureByNameXML(defaultValue);
-        if(enableMultiplayer) props.getNode(multiplayerProperty, 1).alias(props.getNode(m.texturePropertyBase).getNode(m.textureProp));
+        if(defaultValue and me.fileType == ".xml") m.setTextureByNameXML(defaultValue);
+        else if(defaultValue) props.getNode(m.texturePropertyBase, 1).getNode(m.textureProp, 1).setValue(m.texturePrePath ~ defaultValue ~ m.fileType);
+        if(enableMultiplayer) props.getNode(multiplayerProperty, 1).alias(props.getNode(m.texturePropertyBase, 1).getNode(m.textureProp, 1));
         return m;
     },
     path: "", #//path containing texture file
@@ -124,7 +127,8 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
                var selected = me.dialog.result.getValue();
                if(selected != "none"){
                    me.current = selected;
-                   me.setTextureByNameXML(selected);
+                   if(me.fileType == ".xml") me.setTextureByNameXML(selected);
+                   else props.getNode(me.texturePropertyBase, 1).getNode(me.textureProp, 1).setValue(me.texturePrePath ~ me.current ~ me.fileType);
                }else{
                    #fileNode.setValue(nameNode.getValue());
                }

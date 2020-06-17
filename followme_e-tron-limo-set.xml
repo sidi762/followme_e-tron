@@ -311,6 +311,9 @@
 </controls>
 
 <nasal>
+    <liveries>
+        <file>Aircraft/followme_e-tron/Nasal/Liveries/limo.nas</file>
+    </liveries>
 </nasal>
 
 </PropertyList>

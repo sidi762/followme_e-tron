@@ -446,6 +446,9 @@
 </controls>
 
 <nasal>
+    <liveries>
+        <file>Aircraft/followme_e-tron/Nasal/Liveries/EV.nas</file>
+    </liveries>
 </nasal>
 
 </PropertyList>
