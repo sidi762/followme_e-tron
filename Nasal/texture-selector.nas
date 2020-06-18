@@ -5,9 +5,14 @@
 #//Aircraft liveries with dedicated selection dialog: (The same applies to any texture defined in PropertyList XML):
 #//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/FollowmeEV/";
 #//     var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
+#//     Dialog:YourNameSpace.liverySelector.dialog.open()
+#//Pure texture, dedicated dialog with MP：
+#//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/Limo/";
+#//     var liverySelector = TextureSelector.new(name: "Livery-Selector-Limo", path: liveryPath, fileType: ".png", enableMultiplayer: 1, texturePrePath: "Liveries/Limo/", defaultValue: "limo-fgprc");
+#//     Dialog:Same as above
 #//Pure texture, custom dialog(without multiplayer):
 #//     var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
-#//     var plateSelector = TextureSelector.new(path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
+#//     var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
 
 
 var TextureSelector = { #//Tmp Note: path MUST end with "/"
