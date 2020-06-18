@@ -172,8 +172,8 @@ var IndicatorController = {
         me.savedMessage.name = "";
     },
     setLedMessage: func(content){
-        me.ledMessage.setValue(content.texture);
-        me.ledMessageName.setValue(content.name);
+        me.ledMessage.setValue(content.texture or " ");
+        me.ledMessageName.setValue(content.name or " ");
     },
     resumeLedMessage: func(){
         if(me.getSavedMessage().name != ""){
