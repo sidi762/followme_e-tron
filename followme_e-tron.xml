@@ -12,7 +12,7 @@
 
     <metrics>
         <wingarea unit="M2">1</wingarea>
-        <wingspan unit="M">1</wingspan>
+        <wingspan unit="M">1.6</wingspan>
         <chord unit="M">2</chord>
         <htailarea unit="M2">1</htailarea>
         <htailarm unit="M">1</htailarm>
@@ -24,9 +24,9 @@
             <z>1.20</z>
         </location>
         <location name="EYEPOINT" unit="M">
-            <x>-0.3 </x>
-            <y>0.0 </y>
-            <z>2.10</z>
+            <x>1.5 </x>
+            <y>0.33 </y>
+            <z>1.20</z>
         </location>
         <location name="VRP" unit="M">
             <x> 0.0 </x>
