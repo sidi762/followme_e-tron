@@ -60,7 +60,7 @@
     					<label>Select Message</label>
                         <binding>
         					<command>nasal</command>
-        					<script>followme.displaySelector.dialog.open()</script>
+        					<script>liveries.displaySelector.dialog.open()</script>
         				</binding>
     				</item>
     				<item>
