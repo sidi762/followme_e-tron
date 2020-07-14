@@ -13,13 +13,29 @@
 #//Pure texture, custom dialog(without multiplayer):
 #//     var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
 #//     var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
+#//new():
+#//     new(name, path[, fileType[, enableNone[, customDialog[, customDialogBase[, customDialogPosition[, texturePropertyBase[, textureProp[, textureNameProp[, textureDataNode[, enableMultiplayer[, multiplayerProperty[, texturePrePath[, defaultValue]]]]]]]]]]]]);
+#//name: The name of the Texture Selector (must be identical)
+#//path: The path which contains texture files
+#//fileType: The type of file to scan, eg. ".png" for png files and ".xml" for xml files. Defaults to nil.
+#//enableNone: Set to 1 to enable the item "NONE" in the selection dialog. Defaults to 0.
+#//customDialog: Set to 1 to disable the dedicated built in dialog so that you can make the TextureSelector to use your custom dialog. Defaults to 0.
+#//customDialogBase: The property base for the custom dialog(see the plate selection of the followmeEV for example). Defaults to "".
+#//WIP
 
 
-var TextureSelector = { #//Tmp Note: path MUST end with "/"
+
+var TextureSelector = {
     new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
             customDialogPosition = "", texturePropertyBase = "sim/model/livery/", textureProp = "livery", textureNameProp = "name",
             textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]",
             texturePrePath = "", defaultValue = ""){
+
+        #//Add the slash and the end of the path if it's not there already
+        if(right(path, 1) != "/"){
+            path = path ~ "/";
+            print("Texture selector: ‘/’ added in the end of the path");
+        }
 
         var m = {parents:[TextureSelector]};
         if(customDialog == 1){
@@ -97,6 +113,7 @@ var TextureSelector = { #//Tmp Note: path MUST end with "/"
                     continue;
                 var node = me.textureDataNode.getChild(me.textureProp, i, 1); #//Temporary solution, to be improved
                 n = io.read_properties(me.path ~ file, node);
+                if(n == nil) continue;
                 var data = [];
                 append(data, n.getNode(me.texturePropertyBase ~ me.textureNameProp).getValue());
                 append(names, data);
