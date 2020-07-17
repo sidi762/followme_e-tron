@@ -64,6 +64,7 @@
                 <value>Default</value>
                 <value>Sport</value>
                 <value>Luxury</value>
+                <value>Race</value>
                 <binding>
         			<command>dialog-apply</command>
         			<object-name>interiorStyle</object-name>
