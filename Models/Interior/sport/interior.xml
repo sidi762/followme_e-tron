@@ -41,7 +41,7 @@
  <type>rotate</type>
  <object-name>steeringwheel</object-name>
  <property>sim/multiplay/generic/float[18]</property>
- <factor>-0.5</factor>
+ <factor>-1</factor>
  <center>
   <x-m> 1.50</x-m>
   <y-m>-0.33</y-m>
