@@ -11,7 +11,7 @@ var throttleNode = props.getNode("/controls/engines/engine/throttle",1);
 var lastDeltaSpeed = 0;
 
 var autoSpeedMainLoop = func(){
-    if(leftBrakes.getValue() == 1 or rightBrakes.getValue() == 1 or throttleNode.getValue() == 1){  #//Stop if full brakes or full throttle are manually applied
+    if(leftBrakes.getValue() >= 0.8 or rightBrakes.getValue() >= 0.8 or throttleNode.getValue() == 1){  #//Stop if full brakes or full throttle are manually applied
         throttleNode.setValue(0);
         stopAutoSpeed();
     }
@@ -23,7 +23,7 @@ var autoSpeedMainLoop = func(){
         throttle = calculateThrottle(deltaSpeed / targetSpeed); #// Max throttle 0.9
     }else if(deltaSpeed <= -1.852){
         throttle = 0;
-        brakes = ((0 - deltaSpeed) / targetSpeed) - 0.2; #// Max brake 0.8
+        brakes = ((0 - deltaSpeed) / targetSpeed) - 0.21; #// Max brake 0.79
     }else{
         throttle = 0;
     }
