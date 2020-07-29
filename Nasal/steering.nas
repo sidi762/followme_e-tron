@@ -169,8 +169,24 @@ var Steering = {
     },
 };
 
+#//Force calculation for front wheel drive(and four wheel drive)
+var flForce = props.getNode("/fdm/jsbsim/external_reactions/FL");
+var frForce = props.getNode("/fdm/jsbsim/external_reactions/FR");
+var calculateFWForce = func(input){
+    var rad = input * 45 * D2R;
+    var x = math.cos(rad);
+    var y = math.sin(rad);
+    flForce.setValue("x", x);
+    flForce.setValue("y", y);
+    frForce.setValue("x", x);
+    frForce.setValue("y", y);
+}
 
 var steeringAssistance = Steering.new();
+var frontWheelListener = setlistener("/controls/flight/rudder", func(n){ # create listener
+    calculateFWForce(n.getValue());
+});
+
 addcommand("enableAdvancedSteering", func() {
     steeringAssistance.mode = 1;
     print("Advanced Steering Enabled");

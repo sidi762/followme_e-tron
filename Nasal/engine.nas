@@ -202,29 +202,28 @@ engine_1.engineSwitch.switchDisconnect();
 followme.circuit_1.addUnitToSeries(0, followme.Cable.new(5, 0.008));
 
 var outputForce = func(force){
-    #Changed to rear wheel drive before firguring out how to make sure that
-    #forces on the front wheel changes its direction to make sure it's the same as the wheel
+    #//Four wheel drive
 
-    #if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
-    #    props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FL/magnitude", force/4);
-    #}else{
-    #    props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FL/magnitude", 0);
-    #}
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FL/magnitude", force/4);
+    }else{
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FL/magnitude", 0);
+    }
 
-    #if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/compression-ft") > 0){
-    #    props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", force/4);
-    #}else{
-    #    props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
-    #}
+    if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[1]/compression-ft") > 0){
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", force/4);
+    }else{
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
+    }
 
     if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[2]/compression-ft") > 0){
-        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BL/magnitude", force/2);
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BL/magnitude", force/4);
     }else{
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BL/magnitude", 0);
     }
 
     if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[3]/compression-ft") > 0){
-        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BR/magnitude", force/2);
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BR/magnitude", force/4);
     }else{
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
     }
