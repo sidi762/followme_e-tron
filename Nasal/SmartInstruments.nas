@@ -139,7 +139,7 @@ var instrumentUpdate = func(){
     tempDisplay.updateText(sprintf("%0.1f", tempC)~" °C");
     var hour = props.getNode("/", 1).getValue("sim/time/real/hour");
     var minute = props.getNode("/", 1).getValue("sim/time/real/minute");
-    if(minute == 0 or minute == "0") minute = "00";
+    if(minute < 10) minute = "0"~minute;
     timeDisplay.updateText(hour~":"~minute);
     #runtimeTextAdjust(timeDisplay);
 }
