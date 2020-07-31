@@ -66,6 +66,7 @@ props.getNode("systems/pmodel-enable", 1).setValue(1);
 props.getNode("systems/decorations-enable", 1).setValue(0);
 props.getNode("systems/interior/type", 1).setValue("Default");
 props.getNode("systems/safety/aeb_activated", 1).setValue(0);
+props.getNode("systems/safety/aeb_on", 1).setValue(0);
 props.getNode("systems/auto_hold_enabled", 1).setValue(0);
 props.getNode("systems/auto_hold_working", 1).setValue(0);
 
@@ -506,6 +507,7 @@ var Safety = {
     frontAirbagProp: props.getNode("/systems/safety/airbag/front", 1),
     sideAirbagProp: props.getNode("/systems/safety/airbag/side", 1),
     aebStateProp: props.getNode("/systems/safety/aeb_activated", 1),
+    aebOnProp: props.getNode("/systems/safety/aeb_on", 1),
     airbagAccelerationLimit: 140, #To be configured,m/s^2
     sideAirbagAccelerationLimit: 75, #To be configured,m/s^2
 
@@ -517,12 +519,14 @@ var Safety = {
         me.frontRadarEnabled = 1;
         me.frontRadar.init();
         me.frontRadar.stop();
+        me.aebOnProp.setValue(1);
         print("Front radar enabled");
     },
     disableFrontRadar: func(){
         #Disables the front radar
         if(me.frontRadarEnabled) me.frontRadar.stop();
         me.frontRadarEnabled = 0;
+        me.aebOnProp.setValue(0);
     },
     toggleFrontRadar: func(){
         if(!me.frontRadarEnabled){
