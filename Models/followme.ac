@@ -1101,10 +1101,10 @@ numsurf 1
 SURF 0x30
 mat 19
 refs 4
-3 0.461297 1.97727
-2 0.343566 -1.30871
-1 0.656434 -1.30853
-0 0.656434 2.30871
+3 0.682119 0.213728
+2 0.359466 0.225288
+1 0.359484 0.194567
+0 0.714663 0.194567
 kids 0
 OBJECT poly
 name "Mesh11_0"
@@ -19726,7 +19726,7 @@ name "ldoor"
 loc 1.26919 1.09576 0.846426
 data 17
 Mesh27 door_lf_hi
-texture "Liveries/FollowmeEV/followmeoutside.png"
+texture "followmeoutside.png"
 crease 30.000000
 numvert 57
 0.0500771 -0.0239571 0.0914612
@@ -20289,7 +20289,7 @@ name "rdoor"
 loc 1.26919 1.09576 2.35043
 data 17
 Mesh27 door_lf_hi
-texture "Liveries/FollowmeEV/followmeoutside.png"
+texture "followmeoutside.png"
 crease 30.000000
 numvert 57
 0.0359584 0.0529525 -3.2997
@@ -23992,10 +23992,10 @@ numsurf 1
 SURF 0x30
 mat 19
 refs 4
-0 0.656434 2.30871
-1 0.656434 -1.30853
-2 0.343566 -1.30871
-3 0.461297 1.97727
+0 0.394969 0.237458
+1 0.644272 0.237458
+2 0.644285 0.259021
+3 0.417812 0.250907
 kids 0
 OBJECT poly
 name "Mesh11_0"
