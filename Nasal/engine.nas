@@ -42,6 +42,8 @@ var Engine = {
         return me.gear;
     },
 
+    mode: 1,
+
     rotor_moi: 2.3,
     wheel_moi: 0.9,
     wheel_radius: 0.31,#//M
@@ -109,6 +111,7 @@ var Engine = {
         var throttle = props.getNode("/",1).getValue("/controls/engines/engine/throttle");
         var direction = me.getDirection();
         var mode = props.getNode("/",1).getValue("/controls/mode");
+        me.mode = mode;
         var volt = me.voltage;
 
         if(!volt){
