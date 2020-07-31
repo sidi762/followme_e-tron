@@ -62,6 +62,7 @@
                 <name>Interior Style</name>
                 <property>/systems/interior/type</property>
                 <value>Default</value>
+                <value>404Design</value>
                 <value>Sport</value>
                 <value>Luxury</value>
                 <value>Race</value>
@@ -86,6 +87,7 @@
                     <halign>left</halign>
                     <name>Speedometer Type</name>
                     <property>/systems/speedometer/type</property>
+                    <value>None</value>
                     <value>Type_A</value>
                     <value>Type_M</value>
                     <value>Type_B</value>
@@ -110,6 +112,7 @@
                     <halign>left</halign>
                     <name>Battery gauge Type</name>
                     <property>/systems/battery-gauge/type</property>
+                    <value>None</value>
                     <value>Type_A</value>
                     <value>Type_M</value>
                     <value>Type_BT</value>
