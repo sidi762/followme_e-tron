@@ -116,6 +116,9 @@
             <bool n="5" alias="/controls/lighting/highBeam"/>
             <bool n="6" alias="/systems/safety/airbag/front"/>
             <bool n="7" alias="/systems/safety/airbag/side"/>
+            <bool n="8" alias="/systems/safety/aeb_on"/>
+            <bool n="9" alias="/controls/lighting/indicator/left_switch"/>
+            <bool n="10" alias="/controls/lighting/indicator/right_switch"/>
 
             <int n="0" alias="/sim/model/lights/indicator-left/state"/>
             <int n="1" alias="/sim/model/lights/indicator-right/state"/>
@@ -415,6 +418,9 @@
     	<!--<screen>
     		<file>Aircraft/followme_e-tron/Nasal/SmartScreen.nas</file>
         </screen> -->
+        <smartInstruments>
+    		<file>Aircraft/followme_e-tron/Nasal/SmartInstruments.nas</file>
+        </smartInstruments>
         <engine>
             <file>Aircraft/followme_e-tron/Nasal/engine.nas</file>
         </engine>

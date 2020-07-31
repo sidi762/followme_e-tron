@@ -69,6 +69,8 @@ props.getNode("systems/safety/aeb_activated", 1).setValue(0);
 props.getNode("systems/safety/aeb_on", 1).setValue(0);
 props.getNode("systems/auto_hold_enabled", 1).setValue(0);
 props.getNode("systems/auto_hold_working", 1).setValue(0);
+props.getNode("controls/lighting/indicator/left_switch", 1).setValue(0);
+props.getNode("controls/lighting/indicator/right_switch", 1).setValue(0);
 
 #var Led = {
 #
@@ -139,6 +141,9 @@ var IndicatorController = {
 
     leftIndicator : Indicator.new("left"),
     rightIndicator : Indicator.new("right"),
+
+    leftIndicatorSwitchNode: props.getNode("/controls/lighting/indicator/left_switch", 1),
+    rightIndicatorSwitchNode: props.getNode("/controls/lighting/indicator/right_switch", 1),
 
     mode:0,
 
@@ -245,16 +250,22 @@ var IndicatorController = {
         if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.getMode() != 4){
             me.setMode(4);
+            me.rightIndicatorSwitchNode.setValue(1);
+            me.leftIndicatorSwitchNode.setValue(0);
         }else if(me.getMode() == 4){
             me.setMode(0);
+            me.rightIndicatorSwitchNode.setValue(0);
         }
     },
     left_indicator_toggle : func(){
         if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.getMode() != 5){
             me.setMode(5);
+            me.leftIndicatorSwitchNode.setValue(1);
+            me.rightIndicatorSwitchNode.setValue(0);
         }else if(me.getMode() == 5){
             me.setMode(0);
+            me.leftIndicatorSwitchNode.setValue(0);
         }
     },
 
