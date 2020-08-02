@@ -395,6 +395,26 @@
                     </binding>
                 </mod-up>
             </key>
+            <key n="105">
+                <name>i</name>
+                <desc>next_center_screen</desc>
+                <repeatable>false</repeatable>
+                <binding>
+                    <command>nasal</command>
+                    <script>smartInstruments.smartInstruments.nextCenterScreen();</script>
+                    <value type="double">1</value>
+                </binding>
+            </key>
+            <key n="73">
+                <name>I</name>
+                <desc>previous_center_screen</desc>
+                <repeatable>false</repeatable>
+                <binding>
+                    <command>nasal</command>
+                    <script>smartInstruments.smartInstruments.previousCenterScreen();</script>
+                    <value type="double">1</value>
+                </binding>
+            </key>
             <key n="66">
                 <name>B</name>
                 <desc>handbrake</desc>
