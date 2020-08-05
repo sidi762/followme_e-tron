@@ -23,7 +23,8 @@ var SmartInstruments = {
         #center info
         m.infoImagePath = ["Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard1.png",
                            "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard2.png",
-                           "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard3.png"];
+                           "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard3.png",
+                           "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard4.png"];
         m.infoImageIndex = 0;
         m.infoImage = m.group.createChild("image")
                              .setFile(m.infoImagePath[m.infoImageIndex])
@@ -93,14 +94,14 @@ var SmartInstruments = {
     initialized: 0,
 
     nextCenterScreen: func(){
-        if(me.infoImageIndex < 2) me.infoImageIndex += 1;
-        else if(me.infoImageIndex >= 2) me.infoImageIndex = 0;
+        if(me.infoImageIndex < 3) me.infoImageIndex += 1;
+        else if(me.infoImageIndex >= 3) me.infoImageIndex = 0;
         me.infoImage.setFile(me.infoImagePath[me.infoImageIndex]);
         return me.infoImageIndex;
     },
     previousCenterScreen: func(){
         if(me.infoImageIndex > 0) me.infoImageIndex -= 1;
-        else if(me.infoImageIndex == 0) me.infoImageIndex = 2;
+        else if(me.infoImageIndex == 0) me.infoImageIndex = 3;
         me.infoImage.setFile(me.infoImagePath[me.infoImageIndex]);
         return me.infoImageIndex;
     },
