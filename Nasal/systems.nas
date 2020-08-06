@@ -659,6 +659,15 @@ var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim
     }
 }
 
+#//Service Staion
+var path = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
+var coord = geo.aircraft_position();
+var course = getprop("/orientation/heading-deg");
+coord.apply_course_distance(course, 100); # Model to be added 100 m ahead
+#//var model = geo.put_model(path, coord, course); # Place the default glider
+
+
+#//Testing
 var testingProgram_1_Entry = func(){
     autospeed.startAutoSpeed();
     autospeed.targetSpeedChange(100);
