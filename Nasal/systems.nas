@@ -341,16 +341,16 @@ var BrakeController = {
     },
 
     enableHandBrake: func(){
-        settimer(func(){ #Delay for 0.8 seconds
+        settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(1);
             me.handBrakeIsOn = 1;
-        }, 0.8);
+        }, 0.5);
     },
     disableHandBrake: func(){
-        settimer(func(){ #Delay for 0.8 seconds
+        settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(0);
             me.handBrakeIsOn = 0;
-        }, 0.8);
+        }, 0.5);
     },
     toggleHandBrake: func(){
         #Toggle handbrake from button
@@ -660,11 +660,11 @@ var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim
 }
 
 #//Service Staion
-var path = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
-var coord = geo.aircraft_position();
-var course = getprop("/orientation/heading-deg");
-coord.apply_course_distance(course, 100); # Model to be added 100 m ahead
-#//var model = geo.put_model(path, coord, course); # Place the default glider
+var stationPath = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
+var stationCoord = geo.aircraft_position();
+var stationCourse = getprop("/orientation/heading-deg");
+stationCoord.apply_course_distance(stationCourse, 100); # Model to be added 100 m ahead
+#//var model = geo.put_model(stationPath, stationCoord, stationCourse); # Place the default glider
 
 
 #//Testing
