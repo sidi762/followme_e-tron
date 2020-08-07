@@ -109,11 +109,53 @@
             <brake_group> RIGHT </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="STRUCTURE" name="Bottom1">
+        <contact type="STRUCTURE" name="Bottom_front">
             <location unit="M">
                 <x>0.08</x>
                 <y>0</y>
-                <z>0.38</z>
+                <z>0.27</z>
+            </location>
+    		<static_friction> 3.0 </static_friction>
+    		<dynamic_friction> 2.0 </dynamic_friction>
+    		<spring_coeff unit="LBS/FT"> 8000 </spring_coeff>
+    		<damping_coeff unit="LBS/FT/SEC"> 5000 </damping_coeff>
+    		<max_steer unit="DEG"> 0.0 </max_steer>
+    		<brake_group> NONE </brake_group>
+    		<retractable> 0 </retractable>
+        </contact>
+        <contact type="STRUCTURE" name="Bottom_front_1">
+            <location unit="M">
+                <x>0.01</x>
+                <y>0</y>
+                <z>0.44</z>
+            </location>
+    		<static_friction> 3.0 </static_friction>
+    		<dynamic_friction> 2.0 </dynamic_friction>
+    		<spring_coeff unit="LBS/FT"> 8000 </spring_coeff>
+    		<damping_coeff unit="LBS/FT/SEC"> 5000 </damping_coeff>
+    		<max_steer unit="DEG"> 0.0 </max_steer>
+    		<brake_group> NONE </brake_group>
+    		<retractable> 0 </retractable>
+        </contact>
+        <contact type="STRUCTURE" name="Bottom_left_bump">
+            <location unit="M">
+                <x>0.02</x>
+                <y>0.40</y>
+                <z>0.34</z>
+            </location>
+    		<static_friction> 3.0 </static_friction>
+    		<dynamic_friction> 2.0 </dynamic_friction>
+    		<spring_coeff unit="LBS/FT"> 8000 </spring_coeff>
+    		<damping_coeff unit="LBS/FT/SEC"> 5000 </damping_coeff>
+    		<max_steer unit="DEG"> 0.0 </max_steer>
+    		<brake_group> NONE </brake_group>
+    		<retractable> 0 </retractable>
+        </contact>
+        <contact type="STRUCTURE" name="Bottom_right_bump">
+            <location unit="M">
+                <x>0.02</x>
+                <y>-0.40</y>
+                <z>0.34</z>
             </location>
     		<static_friction> 3.0 </static_friction>
     		<dynamic_friction> 2.0 </dynamic_friction>
