@@ -40,7 +40,7 @@
         <iyy unit="SLUG*FT2"> 5334 </iyy>
         <izz unit="SLUG*FT2"> 11945 </izz>
         <ixz unit="SLUG*FT2"> 0 </ixz>
-        <emptywt unit="KG"> 1275 </emptywt>
+        <emptywt unit="KG"> 1575 </emptywt>
         <location name="CG" unit="M">
             <x> 1.5 </x>
             <y> 0.0 </y>
