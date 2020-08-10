@@ -552,7 +552,9 @@ var Safety = {
         #engine.engine_1.engineSwitch.switchDisconnect();
         me.throttleNode.setValue(0);
         brakeController.activeEmergencyBrake();
-        playAudio("parking_radar_init.wav");
+        playAudio("parking_radar_high.wav");
+        playAudio("parking_radar_high.wav");
+        playAudio("parking_radar_high.wav");
         me.aebStateProp.setValue(1);
         print("AEB Activated!");
     },
@@ -660,10 +662,10 @@ var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim
 }
 
 #//Service Staion
-var stationPath = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
-var stationCoord = geo.aircraft_position();
-var stationCourse = getprop("/orientation/heading-deg");
-stationCoord.apply_course_distance(stationCourse, 100); # Model to be added 100 m ahead
+#var stationPath = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
+#var stationCoord = geo.aircraft_position();
+#var stationCourse = getprop("/orientation/heading-deg");
+#stationCoord.apply_course_distance(stationCourse, 100); # Model to be added 100 m ahead
 #//var model = geo.put_model(stationPath, stationCoord, stationCourse); # Place the default glider
 
 
