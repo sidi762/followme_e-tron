@@ -5,6 +5,7 @@ var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
     #//height: height of installation above ground;installCoordX: X coord of installation; installCoordY: Y coord of installation; maxRange: max radar range; maxWidth: width of the sector
     #//orientationMode 0:towards back, 180:towards front, 90: towards left, 270:towards right, custom values are accepted(in degrees)
+    #//updateInterval: update interval of the radar timer, defaults to 0.25
     #//Note that 0 degrees is the backward(180 degrees heading of the vehicle), which is a little weird because I forgot about it when designing the system
     #//and the support of other install orientations are added afterwards
     #//For a typical parking radar, set orientationMode=0(or leave it as default)
@@ -13,7 +14,8 @@ var Radar = {
     #//For follow me EV: height 0.3m; installCoordX:0m; installCoordY:3.8m; maxRange:3m;maxWidth:3m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
-    new: func(height, installCoordX, installCoordY, maxRange, maxWidth, orientationMode=0, warnEnabled=1, debug=0) {
+    new: func(height, installCoordX, installCoordY, maxRange, maxWidth, orientationMode=0, warnEnabled=1,
+        updateInterval=0.25, debug=0) {
         return { parents:[Radar, Appliance.new()], height: height, installCoordX:installCoordX, installCoordY:installCoordY, maxRange:maxRange, maxWidth:maxWidth, orientationMode:orientationMode, warnEnabled:warnEnabled, debug:debug, radarOutput:10000};
     },
 
@@ -201,5 +203,3 @@ var Radar = {
         else me.radarOutput = 10000;
     },
 };
-
-var parkingRadar = Radar.new(0.3, 0, 3.8, 3, 3);

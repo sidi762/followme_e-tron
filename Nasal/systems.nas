@@ -496,12 +496,14 @@ var brakesABS = func(){
     }
 }
 
+var parkingRadar = Radar.new(0.3, 0, 3.8, 3, 3);
+
 var Safety = {
     new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=75){
         var newSafety = { parents:[Safety] };
         newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
         newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
-        newSafety.frontRadar = Radar.new(0.3, 0, 0, 9, 0.1, 180, 0, 0);#For AEB
+        newSafety.frontRadar = Radar.new(0.3, 0, 0, 9, 0.1, 180, 0, 0.1);#For AEB
         newSafety.absTimer = maketimer(0.001, brakesABS);
         return newSafety;
     },
