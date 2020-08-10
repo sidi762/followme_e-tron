@@ -5,11 +5,11 @@ var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
     #//height: height of installation above ground;installCoordX: X coord of installation; installCoordY: Y coord of installation; maxRange: max radar range; maxWidth: width of the sector
     #//orientationMode 0:towards back, 180:towards front, 90: towards left, 270:towards right, custom values are accepted(in degrees)
-    #//Node that 0 degrees is the backward(180 degrees heading of the vehicle), which is a little weird because I forget about it when designing the system
+    #//Note that 0 degrees is the backward(180 degrees heading of the vehicle), which is a little weird because I forgot about it when designing the system
     #//and the support of other install orientations are added afterwards
     #//For a typical parking radar, set orientationMode=0(or leave it as default)
     #//warnEnabled: set it to 1 (or leave it as default) enables the internal warning system(typecally used for a parking radar)
-    #//Notice: when warnEnabled set to 1, there's nothing being outputed to radarOutput!
+    #//Notice: when warnEnabled set to 1, nothing will be outputed to radarOutput!
     #//For follow me EV: height 0.3m; installCoordX:0m; installCoordY:3.8m; maxRange:3m;maxWidth:3m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
