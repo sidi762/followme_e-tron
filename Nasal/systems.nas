@@ -503,7 +503,7 @@ var Safety = {
         var newSafety = { parents:[Safety] };
         newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
         newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
-        newSafety.frontRadar = Radar.new(0.3, 0, 0, 9, 0.1, 180, 0, 0.1);#For AEB
+        newSafety.frontRadar = Radar.new(0.3, 0, 0, 15, 0.1, 180, 0, 0.1);#For AEB
         newSafety.absTimer = maketimer(0.001, brakesABS);
         return newSafety;
     },
@@ -533,13 +533,14 @@ var Safety = {
         me.frontRadar.init();
         me.frontRadar.stop();
         me.aebOnProp.setValue(1);
-        print("Front radar enabled");
+        print("Front radar(AEB) enabled");
     },
     disableFrontRadar: func(){
         #Disables the front radar
         if(me.frontRadarEnabled) me.frontRadar.stop();
         me.frontRadarEnabled = 0;
         me.aebOnProp.setValue(0);
+        print("Front radar(AEB) disabled");
     },
     toggleFrontRadar: func(){
         if(!me.frontRadarEnabled){
@@ -549,14 +550,36 @@ var Safety = {
         else me.disableFrontRadar();
     },
 
+    aebThreshold: 9,
+    aebFullThreshold: 8,
+    aebMode: 1, #//1: slow mode 2: fast mode
+    aebCount: 0,
+    aebSlowMode: func(){
+        me.frontRadar.maxRange = 10;
+        me.frontRadar.maxWidth = 0.1;
+        me.aebThreshold = 10;
+        me.aebFullThreshold = 10;
+        me.aebMode = 1;
+        print("AEB Slow Mode");
+    },
+    aebFastMode: func(){
+        me.frontRadar.maxRange = 18;
+        me.frontRadar.maxWidth = 0.03;
+        me.aebThreshold = 18;
+        me.aebFullThreshold = 15;
+        me.aebMode = 2;
+        print("AEB Fast Mode");
+    },
+    aebJudge: func(){
+        if(me.frontRadar.radarOutput <= me.aebThreshold and !me.aebActivated) return 1;
+        else return 0;
+    },
     aebActive: func(){
         me.aebActivated = 1;
         #engine.engine_1.engineSwitch.switchDisconnect();
+        brakeController.applyBrakes(0.8);#//Pre brake
         me.throttleNode.setValue(0);
-        brakeController.activeEmergencyBrake();
-        playAudio("parking_radar_high.wav");
-        playAudio("parking_radar_high.wav");
-        playAudio("parking_radar_high.wav");
+        me.aebWarning();
         me.aebStateProp.setValue(1);
         print("AEB Activated!");
     },
@@ -566,6 +589,16 @@ var Safety = {
         me.aebStateProp.setValue(0);
         #engine.engine_1.engineSwitch.switchConnect();
         brakeController.releaseAllBrakes();
+    },
+    aebWarning: func(){
+        playAudio("parking_radar_high.wav");
+        playAudio("parking_radar_high.wav");
+        playAudio("parking_radar_high.wav");
+    },
+    aebFullBrake: func(){
+        brakeController.activeEmergencyBrake();
+        #playAudio("parking_radar_high.wav");
+        print("AEB Full Brake Activated!");
     },
 
     update: func(){
@@ -586,21 +619,50 @@ var Safety = {
         var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]")*1.852;#In km/h
         #AEB, Automatic Emergency Brake
         var radarOutput = me.frontRadar.radarOutput;
+        #print("radar output: " ~ radarOutput);
+        #print("last radar output: " ~ me.lastRadarOutput);
         var deltaX = me.lastRadarOutput - radarOutput;
-        var reletiveSpeed = 3.6 * (deltaX / me.updateInterval);#In km/h
+        if(me.lastRadarOutput <= radarOutput) me.aebCount += 1;
+        else me.aebCount = 0;
+        if(radarOutput != 10000) me.lastRadarOutput = radarOutput;
+        #var reletiveSpeed = 3.6 * (deltaX / me.updateInterval);#In km/h
+        #if(reletiveSpeed) print(reletiveSpeed);
         if(currentSpeed > 30 and engine.engine_1.getDirection() == 1){
-            #Enable AEB when speed is greater then 30kmh
+            #Enable AEB when speed is greater then 30kmh and in D gear
             if(me.frontRadarEnabled){
                 me.frontRadar.init();
-                if(me.frontRadar.radarOutput <= 8 and reletiveSpeed > 30 and !me.aebActivated){
+                if(currentSpeed >= 48 and me.aebMode == 1) me.aebFastMode();
+                else if(currentSpeed < 48 and me.aebMode == 2) me.aebSlowMode();#//Adjust mode dynamically according to speed
+
+                if(me.aebJudge()){
                     me.aebActive();
-                }else if((me.frontRadar.radarOutput >= 8 or reletiveSpeed <= 0) and me.aebActivated){
-                    me.aebStop();
+                    if(me.frontRadar.radarOutput <= me.aebFullThreshold){ #//Phase two of braking
+                        me.aebFullBrake();
+                    }
+                }
+
+                if(me.aebActivated){
+                    #if(currentSpeed <= 0 or me.aebCount >= 10) me.aebStop();
+                    if(currentSpeed <= 0){
+                        me.aebStop();
+                        #print("1");
+                    }else if(me.aebCount >= 15){
+                        me.aebStop();
+                        #print("2");
+                    }
                 }
             }
         }else{
+            if(me.aebActivated){
+                if(currentSpeed <= 0){
+                    me.aebStop();
+                    #print("11");
+                }else if(me.aebCount >= 15){
+                    me.aebStop();
+                    #print("22");
+                }
+            }
             if(me.frontRadarEnabled and me.frontRadar.radarTimer.isRunning) me.frontRadar.stop();
-            if(reletiveSpeed <= 0 and me.aebActivated) me.aebStop();
         }
 
         #ABS

@@ -75,6 +75,7 @@ var Radar = {
         }else{
             #print("Radar Stopped!");
         }
+        me.radarOutput = 10000;
         if(me.warnEnabled) me.warningTimer.stop();
         me.radarTimer.stop();
     },
