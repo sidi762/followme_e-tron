@@ -503,7 +503,7 @@ var Safety = {
         var newSafety = { parents:[Safety] };
         newSafety.airbagAccelerationLimit = airbagAccelerationLimit;
         newSafety.sideAirbagAccelerationLimit = sideAirbagAccelerationLimit;
-        newSafety.frontRadar = Radar.new(0.3, 0, 0, 15, 0.1, 180, 0, 0.1);#For AEB
+        newSafety.frontRadar = Radar.new(0.3, 0, 0, 15, 0.1, 180, 0, 0.01);#For AEB
         newSafety.absTimer = maketimer(0.001, brakesABS);
         return newSafety;
     },
@@ -556,7 +556,7 @@ var Safety = {
     aebCount: 0,
     aebSlowMode: func(){
         me.frontRadar.maxRange = 10;
-        me.frontRadar.maxWidth = 0.1;
+        #me.frontRadar.maxWidth = 0.1;
         me.aebThreshold = 10;
         me.aebFullThreshold = 10;
         me.aebMode = 1;
@@ -564,9 +564,9 @@ var Safety = {
     },
     aebFastMode: func(){
         me.frontRadar.maxRange = 18;
-        me.frontRadar.maxWidth = 0.03;
+        #me.frontRadar.maxWidth = 0.05;
         me.aebThreshold = 18;
-        me.aebFullThreshold = 15;
+        me.aebFullThreshold = 16;
         me.aebMode = 2;
         print("AEB Fast Mode");
     },
@@ -621,10 +621,10 @@ var Safety = {
         var radarOutput = me.frontRadar.radarOutput;
         #print("radar output: " ~ radarOutput);
         #print("last radar output: " ~ me.lastRadarOutput);
-        var deltaX = me.lastRadarOutput - radarOutput;
         if(me.lastRadarOutput <= radarOutput) me.aebCount += 1;
         else me.aebCount = 0;
         if(radarOutput != 10000) me.lastRadarOutput = radarOutput;
+        #var deltaX = me.lastRadarOutput - radarOutput;
         #var reletiveSpeed = 3.6 * (deltaX / me.updateInterval);#In km/h
         #if(reletiveSpeed) print(reletiveSpeed);
         if(currentSpeed > 30 and engine.engine_1.getDirection() == 1){
@@ -646,7 +646,7 @@ var Safety = {
                     if(currentSpeed <= 0){
                         me.aebStop();
                         #print("1");
-                    }else if(me.aebCount >= 15){
+                    }else if(me.aebCount >= 20){
                         me.aebStop();
                         #print("2");
                     }
@@ -657,7 +657,7 @@ var Safety = {
                 if(currentSpeed <= 0){
                     me.aebStop();
                     #print("11");
-                }else if(me.aebCount >= 15){
+                }else if(me.aebCount >= 20){
                     me.aebStop();
                     #print("22");
                 }
