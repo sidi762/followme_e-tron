@@ -13,6 +13,8 @@
 #//Pure texture, custom dialog(without multiplayer):
 #//     var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
 #//     var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
+#//
+#//Documentation:
 #//new():
 #//     new(name, path[, fileType[, enableNone[, customDialog[, customDialogBase[, customDialogPosition[, texturePropertyBase[, textureProp[, textureNameProp[, textureDataNode[, enableMultiplayer[, multiplayerProperty[, texturePrePath[, defaultValue]]]]]]]]]]]]);
 #//name: The name of the Texture Selector (must be identical)
@@ -21,15 +23,17 @@
 #//enableNone: Set to 1 to enable the item "NONE" in the selection dialog. Defaults to 0.
 #//customDialog: Set to 1 to disable the dedicated built in dialog so that you can make the TextureSelector to use your custom dialog. Defaults to 0.
 #//customDialogBase: The property base for the custom dialog(see the plate selection of the followmeEV for example). Defaults to "".
+#//customDialogPosition: The element which serves to select the texture in the custom dialog. eg. "group[4]/combo/". Defaults to "".
+#//texturePropertyBase: The texture property base in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "sim/model/livery/".
+#//textureProp: The texture property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "livery".
+#//textureNameProp: The texture name property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "name".
 #//WIP
-
-
 
 var TextureSelector = {
     new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
             customDialogPosition = "", texturePropertyBase = "sim/model/livery/", textureProp = "livery", textureNameProp = "name",
             textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]",
-            texturePrePath = "", defaultValue = nil){
+            texturePrePath = "", defaultValue = ""){
 
         #//Add the slash and the end of the path if it's not there already
         if(right(path, 1) != "/"){
@@ -147,7 +151,7 @@ var TextureSelector = {
     },
     dialogTriggered: func(){
         if(me.dialogBaseNode.getNode("opened", 1).getValue() == 1){
-            print("Dialog opened");
+            #//print("Dialog opened");
             me.updateList();
             me.resultLis = setlistener(me.dialog.result, func(){
                var selected = me.dialog.result.getValue();
