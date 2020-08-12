@@ -57,6 +57,7 @@ var Series = {
                 }
             }
         }
+        #//Calculated by solving the equation UI = I^2*R + Power output
         var a = me.totalResistance();
         var b = me.voltage;
         var c = math.sqrt(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
@@ -67,13 +68,20 @@ var Series = {
 
     calculateSeriesVoltage: func(){
         var tR = me.totalResistance();
+        cElectromotiveForce = me.voltage - me.current() * tR; #Total counterElectromotiveForce, calculated from UI = I^R + Power output
+        me.voltage = me.voltage - cElectromotiveForce; #//Voltage with counterElectromotiveForce in consideration
+        totalTmp = 0;
+        foreach(elem; me.units){
+            totalTmp += elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000;
+        }
         foreach(elem; me.units){
             if(elem.isSwitch()){
                 if(!elem.isConnected()){
                     me.voltage = 0;
                 }
             }
-            elem.voltage = (elem.resistance/tR) * me.voltage;
+            var factor = (elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000)/totalTmp;
+            elem.voltage = me.voltage * factor;
         }
     },
 
@@ -122,11 +130,22 @@ var Circuit = {
 
     current: 0, #//Ampere
     voltage: func(){
-        return me.parallelConnection[0].units[0].electromotiveForce;
+        var v = 0;
+        #if(me.calculateTotalParallelCurrent()){
+            v = me.parallelConnection[0].units[0].electromotiveForce - me.calculateTotalParallelCurrent()*me.parallelConnection[0].units[0].resistance;
+        #}
+        #foreach(elem; me.parallelConnection){
+        #    if(elem.voltage != v){
+        #        v = elem.voltage;
+        #        break;
+        #    }
+        #}
+        return v
     }, #//Volt
 
     calculateParallelVoltage: func(){
         var setVoltage = me.voltage();
+        var totalCounterElecMotiveForce = 0;
         foreach(elem; me.parallelConnection){
             if(elem.isSwitch()){
                 if(!elem.isConnected()){
@@ -191,7 +210,7 @@ var Circuit = {
 
         foreach(elem; me.parallelConnection){
             foreach(unit; elem.units){
-                if(unit.isCurrentSource()) unit.currentSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Pass in negetive power for charging
+                if(unit.isCurrentSource()) unit.currentSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Update the current source. Pass in negetive power in case of charging
             }
         }
         if(me.debugMode == 2) print("Power Calculated");
@@ -241,7 +260,9 @@ var Appliance = {
     power: func(){
       return me.activePower + me.activePower_kW*1000 + me.heatingPower();
     },
-
+    counterElectromotiveForce: func(){
+        return (me.activePower + me.activePower_kW*1000)/me.current; #//Counter Electromotive Force calculated by output power divided by current
+    },
 
     isResistor: 0,
 

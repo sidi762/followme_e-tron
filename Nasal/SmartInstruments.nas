@@ -11,8 +11,15 @@ var SmartInstruments = {
             }),
         };
         m.group = m.instrumentCanvas.createGroup();#//Main group
+        m.signGroup = m.instrumentCanvas.createGroup();#//sign group
         m.welcomeGroup = m.instrumentCanvas.createGroup();
         m.instrumentCanvas.addPlacement({"node": placement});
+        #Sign svg
+        #canvas.parsesvg(
+        #        m.signGroup,
+        #        "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard.svg",
+        #);
+        #m.signGroup.hide();
         #Background
         m.backgroundPath = "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard0.png";
         # create an image child for the texture
@@ -169,7 +176,7 @@ var SmartInstruments = {
         me.updateTimer.start();
     },
     shutDown:func(){
-        if(me.updateTimer) me.updateTimer.stop();
+        if(me.updateTimer != nil) me.updateTimer.stop();
         me.group.hide();
         me.welcomeGroup.hide();
     }
@@ -178,10 +185,7 @@ var SmartInstruments = {
 
 var smartInstruments = SmartInstruments.new("instrumentScreen");
 
-#canvas.parsesvg(
-#        group,
-#        "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard.svg",
-#);
+
 
 #props.getNode("/dev/smart/size", 1).setValue(30);
 #props.getNode("/dev/smart/x", 1).setValue(520);
@@ -196,5 +200,5 @@ var runtimeTextAdjust = func(text){
 }
 
 
-var window = canvas.Window.new([756,368],"dialog");
-window.setCanvas(smartInstruments.instrumentCanvas);
+#var window = canvas.Window.new([756,368],"dialog");
+#window.setCanvas(smartInstruments.instrumentCanvas);
