@@ -70,9 +70,7 @@
 	</volume>
   </safety>-->
 
-
-
-    <brake>
+  <brake>
       <name>brake</name>
       <mode>once</mode>
       <path>Aircraft/followme_e-tron/Sounds/Renault4-brake.wav</path>
@@ -94,7 +92,7 @@
      </volume>
       <reference-dist>100</reference-dist>
       <max-dist>1000</max-dist>
-    </brake>
+  </brake>
 
   <horn>
 	<name>horn</name>
@@ -107,7 +105,7 @@
 		</equals>
 	</condition>
 	<volume>
-	  <factor>1</factor>
+	  <factor>0.8</factor>
     </volume>
     <reference-dist>100</reference-dist>
 	<max-dist>1000</max-dist>
@@ -136,7 +134,7 @@
         </and>
 	</condition>
 	<volume>
-        <value>0.6</value>
+        <value>0.4</value>
 	</volume>
   </indicator>
 

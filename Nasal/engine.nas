@@ -29,6 +29,7 @@ var Engine = {
         #//Toggle Direction, forward:1; barkward: -1
         me.direction *= -1;
         props.getNode("/",1).setValue("/controls/direction", me.direction);
+        followme.playAudio("change_gear.wav")
     },
     getDirection: func(){
         return me.direction;
@@ -260,6 +261,7 @@ var startEngine = func(my_engine){
 
 var stopEngine = func(my_engine){
     my_engine.stopEngine();
+    smartInstruments.smartInstruments.shutDown();
     followme.safety.stop();
     print("Engine stopped");
 }
