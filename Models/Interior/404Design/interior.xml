@@ -398,10 +398,45 @@
  </emission>
 </animation>
 
-<!-- storage_cover -->
-
- <!-- storage -->
-
+<!-- Rain wiper -->
+<animation>
+    <type>rotate</type>
+    <object-name>frontwiper1</object-name>
+    <property>/fdm/jsbsim/animation/wiper_pos</property>
+    <factor> 75 </factor>
+    <center>
+      <x-m> 0.89 </x-m>
+      <y-m> 0.11 </y-m>
+      <z-m> 1.02 </z-m>
+    </center>
+    <axis>
+        <x1-m>0</x1-m>
+        <y1-m>0</y1-m>
+        <z1-m>0</z1-m>
+        <x2-m>1</x2-m>
+        <y2-m>0</y2-m>
+        <z2-m>-1</z2-m>
+    </axis>
+</animation>
+<animation>
+    <type>rotate</type>
+    <object-name>frontwiper2</object-name>
+    <property>/fdm/jsbsim/animation/wiper_pos</property>
+    <factor> 75 </factor>
+    <center>
+      <x-m> 0.89 </x-m>
+      <y-m> -0.52 </y-m>
+      <z-m> 1.02 </z-m>
+    </center>
+    <axis>
+        <x1-m>0</x1-m>
+        <y1-m>0</y1-m>
+        <z1-m>0</z1-m>
+        <x2-m>1</x2-m>
+        <y2-m>0</y2-m>
+        <z2-m>-1.3</z2-m>
+    </axis>
+</animation>
 
 <!-- Accelerator -->
 <animation>
