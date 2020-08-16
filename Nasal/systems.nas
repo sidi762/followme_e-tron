@@ -382,27 +382,31 @@ var BrakeController = {
 
     activeHandBrake: func(){
         #for internal use
+        me.handBrakeIsOn = 1;
+        if(isInternalView()) playAudio("handbrake_on.wav");
         settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(1);
-            me.handBrakeIsOn = 1;
         }, 0.5);
     },
     deactiveHandBrake: func(){
         #for internal use
+        me.handBrakeIsOn = 0;
+        if(isInternalView()) playAudio("handbrake_off.wav");
         settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(0);
-            me.handBrakeIsOn = 0;
         }, 0.5);
     },
     enableHandBrake: func(){
         #enable handbrake from button
-        me.activeHandBrake();
-        if(isInternalView()) playAudio("handbrake_on.wav");
+        if(!me.handBrakeIsOn){
+            me.activeHandBrake();
+        }
     },
     disableHandBrake: func(){
         #disable handbrake from button
-        me.deactiveHandBrake();
-        if(isInternalView()) playAudio("handbrake_off.wav");
+        if(me.handBrakeIsOn){
+            me.deactiveHandBrake();
+        }
     },
     toggleHandBrake: func(){
         #Toggle handbrake from button
