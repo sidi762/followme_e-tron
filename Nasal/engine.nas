@@ -29,7 +29,7 @@ var Engine = {
         #//Toggle Direction, forward:1; barkward: -1
         me.direction *= -1;
         props.getNode("/",1).setValue("/controls/direction", me.direction);
-        if(isInternalView()) followme.playAudio("change_gear.wav");
+        if(followme.isInternalView()) followme.playAudio("change_gear.wav");
     },
     getDirection: func(){
         return me.direction;
