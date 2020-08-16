@@ -36,6 +36,46 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-left", [0.5, 0.5],
 beacon_switch = props.globals.getNode("controls/switches/indicator-right", 2);
 var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5], "/controls/lighting/indicator-right");
 
+#//Wiper
+var wiperMode = 0;
+var wiper = aircraft.light.new( "/controls/wiper/frontwiper", [1, 1], "/controls/wiper/frontwiper_switch");
+var wiperStop = func(){
+    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
+    wiperMode = 0;
+}
+var wiperFast = func(){
+    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 1);
+    wiperMode = 1;
+    wiper.del();
+    wiper = aircraft.light.new( "/controls/wiper/frontwiper", [1, 1], "/controls/wiper/frontwiper_switch");
+}
+var wiperMid = func(){
+    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 1);
+    wiperMode = 2;
+    wiper.del();
+    wiper = aircraft.light.new( "/controls/wiper/frontwiper", [2, 1], "/controls/wiper/frontwiper_switch");
+}
+var wiperSlow = func(){
+    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 1);
+    wiperMode = 3;
+    wiper.del();
+    wiper = aircraft.light.new( "/controls/wiper/frontwiper", [2, 1, 4], "/controls/wiper/frontwiper_switch");
+}
+var toggleWiper = func(){
+    if(wiperMode == 0){
+        wiperSlow();
+    }else if(wiperMode == 1){
+        wiperStop();
+    }else if(wiperMode == 2){
+        wiperFast();
+    }else if(wiperMode == 3){
+        wiperMid();
+    }
+}
+
+wiper.stateN = wiper.node.initNode("state", 0, "DOUBLE");
+props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
+
 props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
 props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
 
@@ -340,17 +380,29 @@ var BrakeController = {
         if(value == 1) safety.emergencyMode();
     },
 
-    enableHandBrake: func(){
+    activeHandBrake: func(){
+        #for internal use
         settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(1);
             me.handBrakeIsOn = 1;
         }, 0.5);
     },
-    disableHandBrake: func(){
+    deactiveHandBrake: func(){
+        #for internal use
         settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(0);
             me.handBrakeIsOn = 0;
         }, 0.5);
+    },
+    enableHandBrake: func(){
+        #enable handbrake from button
+        me.activeHandBrake();
+        if(isInternalView()) playAudio("handbrake_on.wav");
+    },
+    disableHandBrake: func(){
+        #disable handbrake from button
+        me.deactiveHandBrake();
+        if(isInternalView()) playAudio("handbrake_off.wav");
     },
     toggleHandBrake: func(){
         #Toggle handbrake from button
