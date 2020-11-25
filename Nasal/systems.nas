@@ -782,6 +782,7 @@ var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim
 }
 
 #//Service Staion
+io.include("service.nas");
 #var stationPath = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
 #var stationCoord = geo.aircraft_position();
 #var stationCourse = getprop("/orientation/heading-deg");
