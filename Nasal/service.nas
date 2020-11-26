@@ -4,18 +4,21 @@ var AdditionalModel = {
 		newCoord = geo.Coord.new();
 		newCoord.set_latlon(0, 0, 0);
 		m.coord = newCoord;
+		m._aircraftPath = getprop("sim/aircraft-dir") ~ "/";
 		print("AdditionalModel: Model initialized");
 		return m;
 	},
-	
+
 	name: "New Model",
 	info: "This is a new model for followme EV created by FGPRC",
-	path: "",
+	path: me._aircraftPath ~ me.relativePath,
+	relativePath: "",
 	hdg: 0,
 	coord: nil,
+	_aircraftPath: "",
 	_tileIndex:0,
 	_isPlaced: 0,
-	
+
 	setLonLat: func(lon, lat){
 		#//Use this to automatically update tileIndex
 		me.coord.set_latlon(lat, lon);
@@ -28,20 +31,20 @@ var AdditionalModel = {
 	setTileIndex: func(index){
 		me._tileIndex = index;
 	},
-	
+
 	tileIndex: func(){
 		return me._tileIndex;
 	},
 	isPlaced: func(){
 		return me._isPlaced;
 	},
-	
-	
+
+
 	node: func(){
 		var node = props.Node.new();
 		node.getNode("name", 1).setValue(me.name);
 		node.getNode("info", 1).setValue(me.info);
-		node.getNode("path", 1).setValue(me.path);
+		node.getNode("path", 1).setValue(me.relativePath);
 		node.getNode("hdg", 1).setValue(me.hdg);
 		node.getNode("lat", 1).setDoubleValue(me.coord.lat() or 0);
 		node.getNode("lon", 1).setDoubleValue(me.coord.lon() or 0);
@@ -51,7 +54,7 @@ var AdditionalModel = {
 	loadFromNode: func(node){
 		me.name = node.getNode("name", 1).getValue();
 		me.info = node.getNode("info", 1).getValue();
-		me.path = node.getNode("path", 1).getValue();
+		me.relativePath = node.getNode("path", 1).getValue();
 		me.hdg = node.getNode("hdg", 1).getValue();
 		me.setLonLat(node.getNode("lon", 1).getValue(), node.getNode("lat", 1).getValue());
 		me.coord.set_alt(node.getNode("alt", 1).getValue());
@@ -75,7 +78,7 @@ var AdditionalModel = {
 			print("AdditionalModel: Model " ~ me.name ~ " is not avilable!");
 		}
 	},
-	
+
 };
 
 var ModelManager = {
@@ -88,11 +91,11 @@ var ModelManager = {
 		m.addModels(m.readNodeFromFile());
 		return m;
 	},
-	
+
 	filePath: "",
 	allModels: [],
 	_allModelsNode: nil,
-	
+
 	addModel: func(model){ #//model: AdditionalModel
 		append(me.allModels, model);
 		#//Add to nodes
@@ -114,16 +117,16 @@ var ModelManager = {
 	removeModel: func(){
 		#//WIP
 	},
-	
+
 	node: func(){
 		return me._allModelsNode;
 	},
-	
+
 	writeNodeToFile: func(){
 		io.write_properties(me.filePath, me.node());
 		print("ModelManager: Node written to " ~ me.filePath);
 	},
-	readNodeFromFile: func(){ #//Returns a [AdditionalModel] vector  
+	readNodeFromFile: func(){ #//Returns a [AdditionalModel] vector
 		if(io.read_properties(me.filePath) == nil){
 			#//File doesn't exists or invalid, create new empty file
 			me.writeNodeToFile();
@@ -141,10 +144,10 @@ var ModelManager = {
 		print("ModelManager: readNodeFromFile: " ~ count ~ " models read from file");
 		return results;
 	},
-	
+
 	updateTimer: nil,
 	updateInterval: 10,
-	
+
 	update: func(){
 		var ac_pos = geo.aircraft_position();
 		acIndex = geo.tile_index(ac_pos.lat(), ac_pos.lon());
@@ -156,11 +159,11 @@ var ModelManager = {
 					model.setElevtionAsAlt();
 					model.placeModel();
 					print("ModelManager: Model " ~ model.name ~ " is now avilable and placed");
-				} 
+				}
 			}
 		}
 	},
-	
+
 	start: func(){
 		me.updateTimer.start();
 	},
@@ -174,7 +177,7 @@ var path = getprop("/sim/fg-home") ~ '/Export/followmeEV/service.xml';
 var modelManager = ModelManager.new(path);
 
 #//var serviceStationModel = AdditionalModel.new();
-#//var stationPath = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
+#//var stationPath = 'Models/Service-Station/Service-Staion.ac';
 
 #//serviceStationModel.name = "service station";
 #//serviceStationModel.info = "this is a service station";
