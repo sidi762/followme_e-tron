@@ -11,7 +11,9 @@ var AdditionalModel = {
 
 	name: "New Model",
 	info: "This is a new model for followme EV created by FGPRC",
-	path: me._aircraftPath ~ me.relativePath,
+	getPath: func(){
+		return me._aircraftPath ~ me.relativePath;
+	},
 	relativePath: "",
 	hdg: 0,
 	coord: nil,
@@ -61,7 +63,7 @@ var AdditionalModel = {
 		print("AdditionalModel: Model " ~ me.name ~ " loaded from node!");
 	},
 	placeModel: func(){
-		geo.put_model(me.path, me.coord, me.hdg);
+		geo.put_model(me.getPath(), me.coord, me.hdg);
 		me._isPlaced = 1;
 		print("AdditionalModel: Model " ~ me.name ~ " is placed");
 	},
