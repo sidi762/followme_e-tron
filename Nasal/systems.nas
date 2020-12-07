@@ -111,6 +111,7 @@ props.getNode("systems/auto_hold_enabled", 1).setValue(0);
 props.getNode("systems/auto_hold_working", 1).setValue(0);
 props.getNode("controls/lighting/indicator/left_switch", 1).setValue(0);
 props.getNode("controls/lighting/indicator/right_switch", 1).setValue(0);
+props.getNode("controls/lighting/reverse_indicator", 1).setValue(0);
 
 #var Led = {
 #

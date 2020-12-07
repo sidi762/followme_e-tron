@@ -119,6 +119,7 @@
             <bool n="8" alias="/systems/safety/aeb_on"/>
             <bool n="9" alias="/controls/lighting/indicator/left_switch"/>
             <bool n="10" alias="/controls/lighting/indicator/right_switch"/>
+						<bool n="11" alias="/controls/lighting/reverse_indicator"/>
 
             <int n="0" alias="/sim/model/lights/indicator-left/state"/>
             <int n="1" alias="/sim/model/lights/indicator-right/state"/>
@@ -133,8 +134,8 @@
             <int n="11" alias="/controls/direction"/>
             <int n="12" alias="/systems/codriver-enable"/>
             <!--<int n="13" alias="/interior/enable_mug"/>-->
-    	    <int n="14" alias="/systems/instruments/enable_cdu"/>
-    	    <int n="15" alias="/systems/instruments/enable_switches"/>
+    	      <int n="14" alias="/systems/instruments/enable_cdu"/>
+    	      <int n="15" alias="/systems/instruments/enable_switches"/>
             <int n="16" alias="/warninglight/start"/>
 
             <!--float current num:25 -->
