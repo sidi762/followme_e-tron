@@ -11,7 +11,8 @@ var Engine = {
         return { parents:[Engine, followme.Appliance.new()], maxTorque: mTorque, ratedPower:mPower, rpmAtMaxPower:rpmAtMPower };
     },
 
-    resistance: 0.1, #//No datasource, based on guess
+    motorResistance: 0.2,#//No datasource, based on guess
+    resistance: 0.2,
 
     runningState: 0,
 
@@ -29,6 +30,7 @@ var Engine = {
         #//Toggle Direction, forward:1; barkward: -1
         me.direction *= -1;
         props.getNode("/",1).setValue("/controls/direction", me.direction);
+        props.getNode("/",1).setValue("/controls/lighting/reverse_indicator", (me.direction < 0));
         if(followme.isInternalView()) followme.playAudio("change_gear.wav");
     },
     getDirection: func(){
@@ -60,6 +62,15 @@ var Engine = {
     outputForce: 0, #N
 
     debugMode: 0,
+
+    calculateRatedCurrent: func(){ #//Returns the rated current
+          var a = me.motorResistance;
+          var ratedVoltage = 760;#//Rated voltage, use this fixed value for now
+  		#//print(ratedVoltage * ratedVoltage - 4 * me.resistance * me.ratedPower);
+          var c = math.sqrt(ratedVoltage * ratedVoltage - 4 * me.motorResistance * me.ratedPower);
+          var d = ratedVoltage + c;
+          return d / (2 * a); #//Ampere
+  	},
 
     rpm_calculate: func(angularAcceleration){
 
@@ -113,9 +124,8 @@ var Engine = {
         var direction = me.getDirection();
         var mode = props.getNode("/",1).getValue("/controls/mode");
         me.mode = mode;
-        var volt = me.voltage;
 
-        if(!volt){
+        if(!me.voltage){
             me.rpm = 0;
             props.getNode("/",1).setValue("/controls/engines/engine/rpma", 0);
             outputForce(0);
@@ -124,6 +134,11 @@ var Engine = {
 
         throttle = throttle * mode;
         #print("throttle:" ~throttle);
+
+        me.controlResistance = (0 - throttle * 3000000000000) + 3000000000000;#//We do this for now as I still can't find out how is the speed of motor being controlled. Imagine this is a tunable resistor
+        me.resistance = me.controlResistance + me.motorResistance;
+
+        var actualMaxTorque = me.current * (me.maxTorque / me.calculateRatedCurrent()); #//We can do this because torque is directly proportional to the current
 
         var cmdRpm = throttle * me.rpmAtMaxPower;
         #print("cmdRpm: "~cmdRpm);
@@ -134,7 +149,9 @@ var Engine = {
 
         if(math.abs(me.rpm) < cmdRpm){
             #print("me.rpm < cmdRpm");
+            #//me.torque = throttle * actualMaxTorque * direction;
             me.torque = throttle * me.maxTorque * direction;
+			      print("torque: "~me.torque);
             var angularAcceleration = me.torque / me.rotor_moi; #rad/s^2
             me.rpm = me.rpm_calculate(angularAcceleration);
         }else if(throttle == 0){

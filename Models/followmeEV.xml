@@ -993,6 +993,18 @@
  </condition>
 </animation>
 
+<animation>
+ <type>material</type>
+ <object-name>reverse_right</object-name>
+ <object-name>reverse_left</object-name>
+ <emission>
+  <red>1</red>
+  <green>1</green>
+  <blue>1</blue>
+  <factor-prop>sim/multiplay/generic/bool[11]</factor-prop>
+ </emission>
+</animation>
+
 <!-- Fuel Truck -->
 
 <model>
