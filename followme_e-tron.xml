@@ -58,6 +58,14 @@
             <static_friction> 1.7 </static_friction>
             <dynamic_friction> 1.0 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
+			<table name="CORNERING_COEFF" type="internal">
+			  <tableData>
+			    -10. -1.0
+			    -2.0 -1.0
+			     2.0  1.0
+			     10.  1.0
+			  </tableData>
+			</table>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
             <max_steer unit="DEG"> 45 </max_steer>
@@ -73,6 +81,14 @@
             <static_friction> 1.7 </static_friction>
             <dynamic_friction> 1.0 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
+			<table name="CORNERING_COEFF" type="internal">
+			  <tableData>
+			    -10. -1.0
+			    -2.0 -1.0
+			     2.0  1.0
+			     10.  1.0
+			  </tableData>
+			</table>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
             <max_steer unit="DEG"> 45 </max_steer>
@@ -88,6 +104,14 @@
             <static_friction> 1.7 </static_friction>
             <dynamic_friction> 1.5 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
+			<table name="CORNERING_COEFF" type="internal">
+			  <tableData>
+			    -10. -1.0
+			    -2.0 -1.0
+			     2.0  1.0
+			     10.  1.0
+			  </tableData>
+			</table>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
             <max_steer unit="DEG"> 0 </max_steer>
@@ -103,6 +127,14 @@
             <static_friction> 1.7 </static_friction>
             <dynamic_friction> 1.5 </dynamic_friction>
             <rolling_friction> 0.06 </rolling_friction>
+			<table name="CORNERING_COEFF" type="internal">
+			  <tableData>
+			    -10. -1.0
+			    -2.0 -1.0
+			     2.0  1.0
+			     10.  1.0
+			  </tableData>
+			</table>
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
             <max_steer unit="DEG"> 0 </max_steer>
