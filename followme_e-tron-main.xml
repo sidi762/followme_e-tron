@@ -346,7 +346,7 @@
                 <repeatable>false</repeatable>
                 <binding>
                     <command>property-cycle</command>
-                    <property>/controls/lighting/headlight-als</property>
+                    <property>/controls/lighting/headlight</property>
                     <value type="double">0</value>
                     <value type="double">1</value>
                     <value type="double">2</value>
@@ -362,12 +362,12 @@
                     <value type="double">0</value>
                     <value type="double">1</value>
                 </binding>
-                <binding>
+                <!--<binding>
                     <command>property-cycle</command>
                     <property>/controls/lighting/headlight</property>
                     <value type="double">0</value>
                     <value type="double">1</value>
-                </binding>
+                </binding>-->
             </key>
             <key n="106">
                 <name>j</name>
@@ -378,22 +378,22 @@
                     <property>/controls/lighting/highBeam</property>
                     <value type="double">1</value>
                 </binding>
-                <binding>
+                <!--<binding>
                     <command>property-assign</command>
                     <property>/controls/lighting/headlight</property>
                     <value type="double">1</value>
-                </binding>
+                </binding>-->
                 <mod-up>
                     <binding>
                         <command>property-assign</command>
                         <property>/controls/lighting/highBeam</property>
                         <value type="double">0</value>
                     </binding>
-                    <binding>
+                    <!--<binding>
                         <command>property-assign</command>
                         <property>/controls/lighting/headlight</property>
                         <value type="double">0</value>
-                    </binding>
+                    </binding>-->
                 </mod-up>
             </key>
             <key n="105">

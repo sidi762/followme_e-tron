@@ -819,12 +819,12 @@
   </specular>
   <attenuation>
     <c>1.0</c>
-    <l>0.09</l>
-    <q>0.032</q>
+    <l>0.07</l>
+    <q>0.017</q>
   </attenuation>
-  <spot-exponent>5</spot-exponent>
-  <spot-cutoff>10</spot-cutoff>
-  <range-m>15</range-m>
+  <spot-exponent>10</spot-exponent>
+  <spot-cutoff>50</spot-cutoff>
+  <range-m>50</range-m>
 </light>
 <light>
   <name>right-headlight-compositor</name>
@@ -859,14 +859,174 @@
   </specular>
   <attenuation>
     <c>1.0</c>
-    <l>0.09</l>
-    <q>0.032</q>
+    <l>0.07</l>
+    <q>0.017</q>
   </attenuation>
-  <spot-exponent>5</spot-exponent>
-  <spot-cutoff>10</spot-cutoff>
-  <range-m>15</range-m>
+  <spot-exponent>10</spot-exponent>
+  <spot-cutoff>50</spot-cutoff>
+  <range-m>50</range-m>
+</light>
+<light>
+  <name>left-highbeam-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.027</l>
+    <q>0.0028</q>
+  </attenuation>
+  <spot-exponent>40</spot-exponent>
+  <spot-cutoff>30</spot-cutoff>
+  <range-m>150</range-m>
+</light>
+<light>
+  <name>right-highbeam-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>-0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.027</l>
+    <q>0.0028</q>
+  </attenuation>
+  <spot-exponent>40</spot-exponent>
+  <spot-cutoff>30</spot-cutoff>
+  <range-m>150</range-m>
 </light>
 
+<light>
+  <name>left-marker-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.22</l>
+    <q>0.20</q>
+  </attenuation>
+  <spot-exponent>10</spot-exponent>
+  <spot-cutoff>50</spot-cutoff>
+  <range-m>20</range-m>
+</light>
+<light>
+  <name>right-marker-compositor</name>
+  <type>spot</type>
+  <position>
+      <x-m>0.15</x-m>
+      <y-m>-0.57</y-m>
+      <z-m>0.7</z-m>
+  </position>
+  <direction>
+      <pitch-deg>90</pitch-deg>
+      <roll-deg>0</roll-deg>
+      <heading-deg>0</heading-deg>
+  </direction>
+  <ambient>
+    <r>0.6</r>
+    <g>0.6</g>
+    <b>0.6</b>
+    <a>1</a>
+  </ambient>
+  <diffuse>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </diffuse>
+  <specular>
+    <r>0.95</r>
+    <g>0.9</g>
+    <b>0.9</b>
+    <a>1</a>
+  </specular>
+  <attenuation>
+    <c>1.0</c>
+    <l>0.22</l>
+    <q>0.20</q>
+  </attenuation>
+  <spot-exponent>10</spot-exponent>
+  <spot-cutoff>50</spot-cutoff>
+  <range-m>20</range-m>
+</light>
 <!-- LIGHTS -->
 
 <effect>
@@ -888,6 +1048,20 @@
          </not>
          <equals>
              <property>sim/multiplay/generic/int[3]</property>
+             <value>100</value>
+         </equals>
+     </and>
+ </condition>
+</animation>
+
+<animation>
+ <type>select</type>
+ <object-name>left-marker-compositor</object-name>
+ <object-name>right-marker-compositor</object-name>
+ <condition>
+     <and>
+         <equals>
+             <property>sim/multiplay/generic/int[3]</property>
              <value>1</value>
          </equals>
      </and>
@@ -902,6 +1076,20 @@
      <and>
          <equals>
              <property>sim/multiplay/generic/int[3]</property>
+             <value>2</value>
+         </equals>
+     </and>
+ </condition>
+</animation>
+
+<animation>
+ <type>select</type>
+ <object-name>left-highbeam-compositor</object-name>
+ <object-name>right-highbeam-compositor</object-name>
+ <condition>
+     <and>
+         <equals>
+             <property>sim/multiplay/generic/bool[5]</property>
              <value>1</value>
          </equals>
      </and>
