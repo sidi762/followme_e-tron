@@ -415,4 +415,4 @@ var light_manager = {
 		},
 };
 
-light_manager.init();
+//light_manager.init();
