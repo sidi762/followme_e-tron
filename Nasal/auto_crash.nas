@@ -57,12 +57,12 @@ var road_check_func = func(){
         if(left_range>right_range)
         {
             props.getNode("/", 1).setValue("/controls/flight/rudder",-(right_range-left_range)*(right_range-left_range)/900);
-            print("right ",right_range);
+            #print("right ",right_range);
         }
         else if(left_range<right_range)
         {
             props.getNode("/", 1).setValue("/controls/flight/rudder",(right_range-left_range)*(right_range-left_range)/900);
-            print("left ",left_range);
+            #print("left ",left_range);
         }
         else
             props.getNode("/", 1).setValue("/controls/flight/rudder",0);
