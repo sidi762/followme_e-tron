@@ -86,8 +86,6 @@ var Engine = {
         #print(angularAcceleration);
         #print("de"~angularDecelaeration);
 
-
-
         angularDecelaeration = math.abs(angularDecelaeration) * me.getDirection() * -1;
 
 
@@ -95,22 +93,34 @@ var Engine = {
         var totalAcceleration = angularAcceleration + angularDecelaeration;
 
         if(me.getDirection() == 1){
-            if(angularSpeed + totalAcceleration * 0.1 > 10){
+            if(angularSpeed + totalAcceleration * 0.1 > 5){
                 angularSpeed = angularSpeed + totalAcceleration * 0.1;
-            }else if(angularSpeed + totalAcceleration * 0.1 < 10){
+            }else if(angularSpeed + totalAcceleration * 0.1 < 5){
                 #print("angularSpeed + totalAcceleration * 0.1 < 10");
                 angularSpeed = angularSpeed + angularAcceleration * 0.1;
             }
         }else if(me.getDirection() == -1){
-            if(angularSpeed + totalAcceleration * 0.1 < -10){
+            if(angularSpeed + totalAcceleration * 0.1 < -5){
                 angularSpeed = angularSpeed + totalAcceleration * 0.1;
-            }else if(angularSpeed + totalAcceleration * 0.1 > -10){
+            }else if(angularSpeed + totalAcceleration * 0.1 > -5){
                 angularSpeed = angularSpeed + angularAcceleration * 0.1;
             }
         }
 
+        var wheelSpeed_ms = math.abs(props.getNode("/",1).getValue("gear/gear/rollspeed-ms"));
+        var wheelAngularSpeed = wheelSpeed_ms / me.wheel_radius;
+
+        var targetAngularSpeed = wheelAngularSpeed * me.gear;
+
+        #print("WheelAngularSpeed x gear " ~ wheelAngularSpeed * me.gear);
+
+        if(angularSpeed < targetAngularSpeed) angularSpeed = targetAngularSpeed;
+        #print("AngularSpeed " ~ angularSpeed);
+
+
         #//rps = angularSpeed / 6.2831853;
         rpm = angularSpeed * 9.5492966; #//rps * 60
+
 
         me.rpm = rpm;
         props.getNode("/",1).setValue("/controls/engines/engine/rpma",rpm);
@@ -143,28 +153,34 @@ var Engine = {
         var cmdRpm = throttle * me.rpmAtMaxPower;
         #print("cmdRpm: "~cmdRpm);
 
-        var cmdPower = throttle * me.ratedPower;
+        #var cmdPower = throttle * me.ratedPower;
         #print("cmdPower: "~cmdPower);
+        me.cmdTorque = throttle * me.maxTorque * direction;
+        me.cmdPower = math.abs(me.rpm * me.cmdTorque / 9549);
+        if(me.cmdPower >= me.ratedPower){
+          me.cmdPower = me.ratedPower;
+        }
+
+        var angularAcceleration = me.cmdTorque / me.rotor_moi; #rad/s^2
+        me.rpm = me.rpm_calculate(angularAcceleration);
+        if(me.rpm) me.torque = direction * math.abs((9549 * me.cmdPower) / me.rpm);
+
         me.activePower_kW = math.abs(me.rpm * me.torque / 9549);
 
-        if(math.abs(me.rpm) < cmdRpm){
+        #if(math.abs(me.rpm) < cmdRpm){
             #print("me.rpm < cmdRpm");
             #//me.torque = throttle * actualMaxTorque * direction;
-            me.torque = throttle * me.maxTorque * direction;
-			      print("torque: "~me.torque);
-            var angularAcceleration = me.torque / me.rotor_moi; #rad/s^2
-            me.rpm = me.rpm_calculate(angularAcceleration);
-        }else if(throttle == 0){
-            me.activePower_kW = 0;
-            me.torque = 0;
-            var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
-            me.rpm = me.rpm_calculate(angularAcceleration);
-        }else{
-            me.activePower_kW = cmdPower;
-            var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
-            me.rpm = me.rpm_calculate(angularAcceleration);
-            me.torque = direction * math.abs((9549 * me.activePower_kW) / me.rpm);
-        }
+
+        #}else if(throttle == 0){
+        #    me.activePower_kW = 0;
+        #    me.torque = 0;
+        #    var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
+        #    me.rpm = me.rpm_calculate(angularAcceleration);
+        #}else{
+        #    var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
+        #    me.rpm = me.rpm_calculate(angularAcceleration);
+        #    me.torque = throttle * direction * math.abs((9549 * me.activePower_kW) / me.rpm);
+        #}
 
         var force = (1/me.wheel_radius) * me.torque * me.gear;#//unit: N
 
@@ -215,7 +231,7 @@ var Engine = {
 };
 
 
-var engine_1 = Engine.new(460, 375, 6150);
+var engine_1 = Engine.new(460, 375, 7750);
 followme.circuit_1.addUnitToSeries(0, followme.Cable.new(5, 0.008));
 followme.circuit_1.addUnitToSeries(0, engine_1);
 followme.circuit_1.addUnitToSeries(0, engine_1.engineSwitch);

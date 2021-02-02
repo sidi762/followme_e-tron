@@ -1,6 +1,8 @@
 #//Followme EV electrical system by Sidi Liang
 #//Contact: sidi.liang@gmail.com
 
+#//Notes: switch should be changed to a (very very) large resistant
+
 var kWh2kWs = func(kWh){
     return kWh * 3600;
 }
@@ -60,16 +62,22 @@ var Series = {
         #//Calculated by solving the equation UI = I^2*R + Power output
         var a = me.totalResistance();
         var b = me.voltage;
+        if(me.voltage == 0) return 0;#//No voltage, no current Trying to solve the floating point error at the next line
+        #print(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
         var c = math.sqrt(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
-        var d = b - c;
+        var d = b + c; #//used to be minus, but adding it seems to be correct
         return d / (2 * a); #//Ampere
     },
 
+	calculateTotalCounterElectromotiveForce: func(){
+		#//Total counterElectromotiveForce, calculated from UI = I^R + Power output
+		return me.voltage - me.current() * me.totalResistance();
+	},
+
 
     calculateSeriesVoltage: func(){
-        var tR = me.totalResistance();
-        cElectromotiveForce = me.voltage - me.current() * tR; #Total counterElectromotiveForce, calculated from UI = I^R + Power output
-        me.voltage = me.voltage - cElectromotiveForce; #//Voltage with counterElectromotiveForce in consideration
+        cElectromotiveForce = me.calculateTotalCounterElectromotiveForce();
+        #//me.voltage = me.voltage - cElectromotiveForce; #//Voltage with counterElectromotiveForce in consideration
         totalTmp = 0;
         foreach(elem; me.units){
             totalTmp += elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000;
@@ -129,10 +137,17 @@ var Circuit = {
 
 
     current: 0, #//Ampere
-    voltage: func(){
-        var v = 0;
+    voltage: func(){ #//Terminal voltage
+        var v = me.parallelConnection[0].units[0].electromotiveForce - me.calculateTotalParallelCurrent()*me.parallelConnection[0].units[0].resistance;
+        foreach(elem; me.parallelConnection){
+            if(elem.isSwitch()){
+               continue;
+            }
+			      v -= elem.calculateTotalCounterElectromotiveForce();#//All counterElectromotiveForce is substracted
+        }
+
         #if(me.calculateTotalParallelCurrent()){
-            v = me.parallelConnection[0].units[0].electromotiveForce - me.calculateTotalParallelCurrent()*me.parallelConnection[0].units[0].resistance;
+        #   v = me.parallelConnection[0].units[0].electromotiveForce - me.calculateTotalParallelCurrent()*me.parallelConnection[0].units[0].resistance;
         #}
         #foreach(elem; me.parallelConnection){
         #    if(elem.voltage != v){
@@ -145,7 +160,7 @@ var Circuit = {
 
     calculateParallelVoltage: func(){
         var setVoltage = me.voltage();
-        var totalCounterElecMotiveForce = 0;
+        #//var totalCounterElecMotiveForce = 0;
         foreach(elem; me.parallelConnection){
             if(elem.isSwitch()){
                 if(!elem.isConnected()){
@@ -406,6 +421,7 @@ cSource_small.resetRemainingToZero();
 
 
 var electricTimer1 = maketimer(circuit_1.updateInterval, func circuit_1.update());
+electricTimer1.simulatedTime = 1;
 
 var L = setlistener("/sim/signals/fdm-initialized", func{
     electricTimer1.start();
