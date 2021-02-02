@@ -29,8 +29,9 @@ var outputUI = func(content, timeout = 10){
       #print("Outputed");
   }
 }
-var playAudio = func(file){ #//Plays audio files in Aircrafts/Sounds
-    fgcommand("play-audio-sample", Sound.new(filename: file, volume: 1, path: props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds'));
+var playAudio = func(file, audioVolume=1, audioPath=""){ #//Plays audio files in Aircrafts/Sounds
+    if(!audioPath) audioPath = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Sounds';
+    fgcommand("play-audio-sample", Sound.new(filename: file, volume: audioVolume, path: audioPath));
 }
 
 var runCode = func(url, addition = nil){

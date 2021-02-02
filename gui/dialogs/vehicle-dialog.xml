@@ -147,7 +147,17 @@
         <group>
         <layout>vbox</layout>
         <padding>6</padding>
-        <text><label>Welcome message</label></text>
+        <text><label>Welcome message/Startup Sound</label></text>
+        <button>
+            <halign>left</halign>
+            <legend>Set Startup Sound</legend>
+            <pref-width>160</pref-width>
+            <pref-height>28</pref-height>
+            <binding>
+    			<command>nasal</command>
+    			<script>smartInstruments.setStartupSound_dlg.open()</script>
+            </binding>
+        </button>
         <button>
             <halign>left</halign>
             <legend>Disable welcome message</legend>

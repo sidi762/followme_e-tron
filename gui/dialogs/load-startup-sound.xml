@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- Copyright (c) 2020 Josh Davidson (Octal450) -->
+
+<!-- A3XX Load Flightplans -->
+
+<PropertyList>
+
+    <name>load-startup-sound</name>
+    <layout>vbox</layout>
+
+    <nasal>
+        <open><![CDATA[
+            var setStartUpSound = func(path) {
+                smartInstruments.smartInstruments.setStartupSound(path.getValue());
+            }
+
+            var defaultDirInFileSelector = getprop("/sim/fg-home") ~ "/Export";
+
+            var file_selector = gui.FileSelector.new(
+              callback: setStartUpSound, title: "Set Startup Sound", button: "Load",
+              dir: defaultDirInFileSelector, dotfiles: 1, pattern: ["*.wav","*.ogg"]);
+
+        ]]></open>
+
+        <close><![CDATA[
+            file_selector.del();
+        ]]></close>
+    </nasal>
+
+    <group>
+        <layout>hbox</layout>
+        <text>
+            <halign>left</halign>
+            <label>Set Startup Sound</label>
+        </text>
+        <button>
+            <halign>right</halign>
+            <pref-width>20</pref-width>
+            <pref-height>20</pref-height>
+            <legend>X</legend>
+            <key>Esc</key>
+            <binding>
+                <command>dialog-close</command>
+            </binding>
+        </button>
+    </group>
+
+    <hrule/>
+
+    <group>
+		<layout>vbox</layout>
+		<text>
+			<halign>left</halign>
+			<label>This dialog allows users to set their own start up sounds for the smart instruments.</label>
+		</text>
+		<text>
+			<halign>left</halign>
+			<label>Please note that the sound sample must be in mono format due to limitions in FlightGear.</label>
+		</text>
+
+        <group>
+            <layout>hbox</layout>
+            <button>
+				<legend>Enable Startup Sound</legend>
+				<binding>
+					<command>nasal</command>
+					<script>smartInstruments.smartInstruments.enableStartupSound()</script>
+				</binding>
+			</button>
+            <button>
+				<legend>Disable Startup Sound</legend>
+				<binding>
+					<command>nasal</command>
+					<script>smartInstruments.smartInstruments.disableStartupSound()</script>
+				</binding>
+			</button>
+        </group>
+		<group>
+			<layout>hbox</layout>
+			<text>
+				<halign>left</halign>
+				<label>Set your sound</label>
+			</text>
+
+			<button>
+				<legend>Set your sound</legend>
+				<equal>true</equal>
+
+				<binding>
+					<command>nasal</command>
+					<script>file_selector.open()</script>
+				</binding>
+			</button>
+		</group>
+	</group>
+
+</PropertyList>

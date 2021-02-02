@@ -10,16 +10,20 @@ var SmartInstruments = {
               "mipmapping": 0       # Enable mipmapping (optional)
             }),
         };
+
+        m.startupSoundIsEnabled = 0;
+        m.startupSound = nil;#//The startup sound
+        m.startupSoundPath = nil;#//Path to the startup sound
         m.group = m.instrumentCanvas.createGroup();#//Main group
         m.signGroup = m.instrumentCanvas.createGroup();#//sign group
         m.welcomeGroup = m.instrumentCanvas.createGroup();
         m.instrumentCanvas.addPlacement({"node": placement});
         #Sign svg
-        #canvas.parsesvg(
-        #        m.signGroup,
-        #        "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard.svg",
-        #);
-        #m.signGroup.hide();
+        canvas.parsesvg(
+                m.signGroup,
+                "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard.svg",
+        );
+        m.signGroup.hide();
         #Background
         m.backgroundPath = "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard0.png";
         # create an image child for the texture
@@ -100,6 +104,16 @@ var SmartInstruments = {
     },
     initialized: 0,
 
+    enableStartupSound: func(){
+        me.startupSoundIsEnabled = 1;
+    },
+    disableStartupSound: func(){
+        me.startupSoundIsEnabled = 0;
+    },
+    setStartupSound: func(startupSoundPath){
+        me.startupSoundPath = io.dirname(startupSoundPath);
+        me.startupSound = io.basename(startupSoundPath);
+    },
     nextCenterScreen: func(){
         if(me.infoImageIndex < 3) me.infoImageIndex += 1;
         else if(me.infoImageIndex >= 3) me.infoImageIndex = 0;
@@ -166,6 +180,8 @@ var SmartInstruments = {
         me.tempDisplay.enableUpdate();
         me.timeDisplay.enableUpdate();
 
+        if(me.startupSound and me.startupSoundIsEnabled) followme.playAudio(me.startupSound, 1, me.startupSoundPath);
+
         var timer2 = maketimer(2, func(){
             me.welcomeGroup.hide();
         });
@@ -198,6 +214,10 @@ var runtimeTextAdjust = func(text){
     var siz = props.getNode("/dev/smart/size", 1).getValue();
     text.setFontSize(siz);
 }
+
+
+var setStartupSound_dlg = gui.Dialog.new("/sim/gui/dialogs/smartinstruments/setStartupSound_dlg/dialog","Aircraft/followme_e-tron/gui/dialogs/load-startup-sound.xml");
+
 
 
 #var window = canvas.Window.new([756,368],"dialog");
