@@ -61,7 +61,10 @@ var Engine = {
     torque: 0, #Nm
     outputForce: 0, #N
 
-    debugMode: 0,
+    frictionNode: props.getNode("/fdm/jsbsim/forces/fbx-gear-lbs", 1),
+    wheelSpeedNode: props.getNode("/gear/gear/rollspeed-ms", 1),
+
+    debugMode: 1,
 
     calculateRatedCurrent: func(){ #//Returns the rated current
           var a = me.motorResistance;
@@ -80,7 +83,7 @@ var Engine = {
 
         var angularSpeed = rpm * 0.10471975; #//rps * 2 * 3.1415926
 
-        var friction_lbs = props.getNode("/",1).getValue("fdm/jsbsim/forces/fbx-gear-lbs");
+        var friction_lbs = me.frictionNode.getValue();
         var friction = 4.4492 * friction_lbs * 0.25;#//0.25: single wheel
         var angularDecelaeration = friction * me.wheel_radius * (1/me.wheel_moi); #//frictionTorque = friction * wheel_radius, angularDecelaeration = frictionTorque/wheel_moi;
         #print(angularAcceleration);
@@ -92,22 +95,24 @@ var Engine = {
 
         var totalAcceleration = angularAcceleration + angularDecelaeration;
 
-        if(me.getDirection() == 1){
-            if(angularSpeed + totalAcceleration * 0.1 > 5){
-                angularSpeed = angularSpeed + totalAcceleration * 0.1;
-            }else if(angularSpeed + totalAcceleration * 0.1 < 5){
-                #print("angularSpeed + totalAcceleration * 0.1 < 10");
-                angularSpeed = angularSpeed + angularAcceleration * 0.1;
-            }
-        }else if(me.getDirection() == -1){
-            if(angularSpeed + totalAcceleration * 0.1 < -5){
-                angularSpeed = angularSpeed + totalAcceleration * 0.1;
-            }else if(angularSpeed + totalAcceleration * 0.1 > -5){
-                angularSpeed = angularSpeed + angularAcceleration * 0.1;
-            }
-        }
+        #if(me.getDirection() == 1){
+        #    if(angularSpeed + totalAcceleration * 0.1 > 10){
+        #        angularSpeed = angularSpeed + totalAcceleration * 0.1;
+        #    }else if(angularSpeed + totalAcceleration * 0.1 < 10){
+        #        #print("angularSpeed + totalAcceleration * 0.1 < 10");
+        #        angularSpeed = angularSpeed + angularAcceleration * 0.1;
+        #    }
+        #}else if(me.getDirection() == -1){
+        #    if(angularSpeed + totalAcceleration * 0.1 < -10){
+        #        angularSpeed = angularSpeed + totalAcceleration * 0.1;
+        #    }else if(angularSpeed + totalAcceleration * 0.1 > -10){
+        #        angularSpeed = angularSpeed + angularAcceleration * 0.1;
+        #    }
+        #}
 
-        var wheelSpeed_ms = math.abs(props.getNode("/",1).getValue("gear/gear/rollspeed-ms"));
+        angularSpeed += totalAcceleration * 0.1;
+
+        var wheelSpeed_ms = math.abs(me.wheelSpeedNode.getValue()) * me.getDirection();
         var wheelAngularSpeed = wheelSpeed_ms / me.wheel_radius;
 
         var targetAngularSpeed = wheelAngularSpeed * me.gear;
@@ -120,6 +125,11 @@ var Engine = {
 
         #//rps = angularSpeed / 6.2831853;
         rpm = angularSpeed * 9.5492966; #//rps * 60
+
+        #//Prevent the rpm goes too small
+        if(rpm * me.getDirection() < 50){
+            rpm = 50 * me.getDirection();
+        }
 
 
         me.rpm = rpm;
@@ -163,7 +173,7 @@ var Engine = {
 
         var angularAcceleration = me.cmdTorque / me.rotor_moi; #rad/s^2
         me.rpm = me.rpm_calculate(angularAcceleration);
-        if(me.rpm) me.torque = direction * math.abs((9549 * me.cmdPower) / me.rpm);
+        if(me.rpm) me.torque = (9549 * me.cmdPower) / me.rpm;
 
         me.activePower_kW = math.abs(me.rpm * me.torque / 9549);
 
