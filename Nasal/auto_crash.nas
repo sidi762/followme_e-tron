@@ -1,5 +1,8 @@
-# Road check and auto pilot(??) by ValKmjolnir
-
+# Road check and auto pilot by ValKmjolnir
+var dt=0.01;
+var intergral=0;
+var derivative=0;
+var previous_error=0;
 var position_change = func(position_val,value){
     if(position_val+value>180)
         position_val += value-360;
@@ -15,7 +18,6 @@ var road_check_func = func(){
     var lon = props.getNode("/position/longitude-deg",1).getValue();
     var position_info = geodinfo(lat,lon);
     var position_names = position_info[1].names;
-    # the friction_factor of freeway runway and road is 1
 
     if((position_names[0]=="Freeway") or (position_names[0]=="Road"))
     {
@@ -53,26 +55,26 @@ var road_check_func = func(){
             else
                 break;
         }
-
-        if(left_range>right_range)
-        {
-            props.getNode("/", 1).setValue("/controls/flight/rudder",-(right_range-left_range)*(right_range-left_range)/900);
-            #print("right ",right_range);
-        }
-        else if(left_range<right_range)
-        {
-            props.getNode("/", 1).setValue("/controls/flight/rudder",(right_range-left_range)*(right_range-left_range)/900);
-            #print("left ",left_range);
-        }
+        var error=right_range-left_range;
+        intergral+=error*dt;
+        derivative=(error-previous_error)/dt;
+        var (Kp,Ki,Kd)=(1/900,0.05,0.005);
+        # print("change p ",Kp*error*error,' i ',Ki*intergral,' d ',Kd*derivative);
+        if(error<0)
+            props.getNode("/", 1).setValue("/controls/flight/rudder",-Kp*error*error+Ki*intergral+Kd*derivative);
+        else if(error>0)
+            props.getNode("/", 1).setValue("/controls/flight/rudder",Kp*error*error+Ki*intergral+Kd*derivative);
         else
             props.getNode("/", 1).setValue("/controls/flight/rudder",0);
-        #props.getNode("/controls/flight/rudder",1).setValue((right_range-left_range)/200);
+        previous_error=error;
     }
 };
+
 var road_check_timer = maketimer(0.01,road_check_func);
 var toggle_auto_pilot = func(){
     if(!road_check_timer.isRunning)
     {
+        intergral=0;
         road_check_timer.start();
         props.getNode("/sim/messages/copilot",1).setValue("ze dong sheng teaan see tong yee tse yung. Auto Sheng Teaan System Activated!");
     }
