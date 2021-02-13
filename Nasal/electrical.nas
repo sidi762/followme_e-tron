@@ -37,7 +37,6 @@ var Series = {
             total += elem.activePower;
             total += elem.activePower_kW * 1000;
         }
-        #print("totalAP: "~total);
         return total;
     },
 
@@ -59,14 +58,19 @@ var Series = {
                 }
             }
         }
+        
         #//Calculated by solving the equation UI = I^2*R + Power output
-        var a = me.totalResistance();
-        var b = me.voltage;
-        if(me.voltage == 0) return 0;#//No voltage, no current Trying to solve the floating point error at the next line
-        #print(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
-        var c = math.sqrt(me.voltage * me.voltage - 4 * me.totalResistance() * me.totalActivePower());
-        var d = b + c; #//used to be minus, but adding it seems to be correct
-        return d / (2 * a); #//Ampere
+        var R = me.totalResistance();
+        var U = me.voltage;
+        var Pout = me.totalActivePower();
+        if(U == 0) return 0;#//No voltage, no current. Trying to solve the floating point error at the next line
+
+        # print("U ",U," R ",R," Pout ",Pout);
+        # print("delta^2 ",U*U - 4*R*Pout);
+        var delta = math.sqrt(U*U - 4*R*Pout);
+
+        #//used to be minus, but adding it seems to be correct
+        return (U+delta)/(2*R); #//Ampere
     },
 
 	calculateTotalCounterElectromotiveForce: func(){
