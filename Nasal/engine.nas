@@ -77,6 +77,8 @@ var Engine = {
 
     rpm_calculate: func(angularAcceleration){
 
+        var direction = me.getDirection();
+
         var rpm = me.rpm;
         #//var rps = rpm / 60;
 
@@ -89,37 +91,37 @@ var Engine = {
         #print(angularAcceleration);
         #print("de"~angularDecelaeration);
 
-        angularDecelaeration = math.abs(angularDecelaeration) * me.getDirection() * -1;
+        angularDecelaeration = math.abs(angularDecelaeration) * direction * -1;
 
 
-
+        angularAcceleration *= direction;
         var totalAcceleration = angularAcceleration + angularDecelaeration;
 
-        #if(me.getDirection() == 1){
-        #    if(angularSpeed + totalAcceleration * 0.1 > 10){
-        #        angularSpeed = angularSpeed + totalAcceleration * 0.1;
-        #    }else if(angularSpeed + totalAcceleration * 0.1 < 10){
-        #        #print("angularSpeed + totalAcceleration * 0.1 < 10");
-        #        angularSpeed = angularSpeed + angularAcceleration * 0.1;
-        #    }
-        #}else if(me.getDirection() == -1){
-        #    if(angularSpeed + totalAcceleration * 0.1 < -10){
-        #        angularSpeed = angularSpeed + totalAcceleration * 0.1;
-        #    }else if(angularSpeed + totalAcceleration * 0.1 > -10){
-        #        angularSpeed = angularSpeed + angularAcceleration * 0.1;
-        #    }
-        #}
+        if(direction == 1){
+            if(angularSpeed + totalAcceleration * 0.1 > 10){
+                angularSpeed += totalAcceleration * 0.1;
+            }else if(angularSpeed + totalAcceleration * 0.1 < 10){
+                #print("angularSpeed + totalAcceleration * 0.1 < 10");
+                angularSpeed += angularAcceleration * 0.1;
+            }
+        }else if(direction == -1){
+            if(angularSpeed + totalAcceleration * 0.1 < -10){
+                angularSpeed += totalAcceleration * 0.1;
+            }else if(angularSpeed + totalAcceleration * 0.1 > -10){
+                angularSpeed += angularAcceleration * 0.1;
+            }
+        }
 
-        angularSpeed += totalAcceleration * 0.1;
+        #angularSpeed += totalAcceleration * 0.1;
 
-        var wheelSpeed_ms = math.abs(me.wheelSpeedNode.getValue()) * me.getDirection();
+        var wheelSpeed_ms = me.wheelSpeedNode.getValue();
         var wheelAngularSpeed = wheelSpeed_ms / me.wheel_radius;
 
         var targetAngularSpeed = wheelAngularSpeed * me.gear;
 
         #print("WheelAngularSpeed x gear " ~ wheelAngularSpeed * me.gear);
 
-        if(angularSpeed < targetAngularSpeed) angularSpeed = targetAngularSpeed;
+        if(math.abs(angularSpeed) < targetAngularSpeed) angularSpeed = targetAngularSpeed * direction;
         #print("AngularSpeed " ~ angularSpeed);
 
 
@@ -127,9 +129,9 @@ var Engine = {
         rpm = angularSpeed * 9.5492966; #//rps * 60
 
         #//Prevent the rpm goes too small
-        if(rpm * me.getDirection() < 50){
-            rpm = 50 * me.getDirection();
-        }
+        #if(math.abs(rpm) < 50){
+        #    rpm = 50 * direction;
+        #}
 
 
         me.rpm = rpm;
@@ -165,7 +167,7 @@ var Engine = {
 
         #var cmdPower = throttle * me.ratedPower;
         #print("cmdPower: "~cmdPower);
-        me.cmdTorque = throttle * me.maxTorque * direction;
+        me.cmdTorque = throttle * me.maxTorque;
         me.cmdPower = math.abs(me.rpm * me.cmdTorque / 9549);
         if(me.cmdPower >= me.ratedPower){
           me.cmdPower = me.ratedPower;
