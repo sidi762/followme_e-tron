@@ -56,3 +56,18 @@ var runCode = func(url, addition = nil){
         print("Code loaded");
     });
 }
+
+var Debugger = {
+    new: func(name = "Debugger"){
+        return { parents:[Debugger], name: name };
+    },
+
+    _debugLevel: 0,
+    debugPrint: func(info, debugLevel){
+        if(debugLevel = me._debugLevel) print(me.name ~ ": " ~ info);
+    },
+    setDebugLevel: func(debugLevel){
+        me._debugLevel = debugLevel;
+        print(me.name ~ "Debugger debug level set to" ~ debugLevel);
+    },
+};
