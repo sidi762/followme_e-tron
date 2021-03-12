@@ -3,6 +3,11 @@
 
 #//Notes: switch should be changed to a (very very) large resistant
 
+io.include("library.nas");
+
+var electricalDebug = Debugger.new("Electrical");
+electricalDebug.setDebugLevel(3);
+
 var kWh2kWs = func(kWh){
     return kWh * 3600;
 }
@@ -58,7 +63,7 @@ var Series = {
                 }
             }
         }
-        
+
         #//Calculated by solving the equation UI = I^2*R + Power output
         var R = me.totalResistance();
         var U = me.voltage;
@@ -75,7 +80,8 @@ var Series = {
 
 	calculateTotalCounterElectromotiveForce: func(){
 		#//Total counterElectromotiveForce, calculated from UI = I^R + Power output
-		return me.voltage - me.current() * me.totalResistance();
+		if(me.voltage) return me.voltage - me.current() * me.totalResistance();
+        else return 0;
 	},
 
 
@@ -94,7 +100,9 @@ var Series = {
             }
             var factor = (elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000)/totalTmp;
             elem.voltage = me.voltage * factor;
+            electricalDebug.debugPrint("elem volt" ~ elem.voltage, 3);
         }
+        electricalDebug.debugPrint("————————————————————SeriesVoltage calculated____________________________", 3);
     },
 
     calculateSeriesCurrent: func(){
@@ -147,7 +155,7 @@ var Circuit = {
             if(elem.isSwitch()){
                continue;
             }
-			      v -= elem.calculateTotalCounterElectromotiveForce();#//All counterElectromotiveForce is substracted
+			v -= elem.calculateTotalCounterElectromotiveForce();#//All counterElectromotiveForce is substracted
         }
 
         #if(me.calculateTotalParallelCurrent()){
@@ -206,42 +214,40 @@ var Circuit = {
 
     updateInterval: 1, #//Seconds between each update
 
-    debugMode: 0,
-
     loopCount: 0,
 
     update: func(){
-        if(me.debugMode) print("Loop Count: "~me.loopCount);
+        electricalDebug.debugPrint("Loop Count: "~me.loopCount, 1);
 
         me.calculateParallelVoltage();
-        if(me.debugMode == 2) print("Parallel Voltage Calculated");
+        electricalDebug.debugPrint("Parallel Voltage Calculated", 2);
 
         me.calculateSeriesVoltage();
-        if(me.debugMode == 2) print("Series Voltage Calculated");
+        electricalDebug.debugPrint("Series Voltage Calculated", 2);
 
         foreach(elem; me.parallelConnection){
             elem.calculateSeriesCurrent();
         }
-        if(me.debugMode == 2) print("Series Current Calculated");
+        electricalDebug.debugPrint("Series Current Calculated", 2);
 
         me.calculateTotalParallelCurrent();
-        if(me.debugMode == 2) print("Parallel Current Calculated");
+        electricalDebug.debugPrint("Parallel Current Calculated", 2);
 
         foreach(elem; me.parallelConnection){
             foreach(unit; elem.units){
                 if(unit.isCurrentSource()) unit.currentSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Update the current source. Pass in negetive power in case of charging
             }
         }
-        if(me.debugMode == 2) print("Power Calculated");
-        if(me.debugMode) print("Power: "~me.calculateTotalPower());
+        electricalDebug.debugPrint("Power Calculated", 2);
+        electricalDebug.debugPrint("Power: "~me.calculateTotalPower(), 1);
 
         props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent-float", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentageFloat());
 
-        if(me.debugMode) print("current: "~me.current);
-        if(me.debugMode) print("voltage: "~me.voltage());
-        if(me.debugMode) print("Main Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
+        electricalDebug.debugPrint("current: "~me.current, 1);
+        electricalDebug.debugPrint("voltage: "~me.voltage(), 1);
+        electricalDebug.debugPrint("Main Battery Remaining: "~me.parallelConnection[0].units[0].remaining, 1);
         #//if(me.debugMode)
         #//print("Secondery Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
 
