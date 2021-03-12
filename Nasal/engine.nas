@@ -1,6 +1,12 @@
 #//Followme EV electric engine by Sidi Liang
 #//Contact: sidi.liang@gmail.com
 
+#//Bug log: engine still runs after battary drains up
+#//Switching between D and R might fail?
+#//Goes crazy when attampt to drive with brakes not released
+#//Electrical system error message
+#//Drain battary too fast?
+
 var N2LBS = 0.2248089;
 var Engine = {
     #//Class for any electric engine
@@ -64,7 +70,7 @@ var Engine = {
     frictionNode: props.getNode("/fdm/jsbsim/forces/fbx-gear-lbs", 1),
     wheelSpeedNode: props.getNode("/gear/gear/rollspeed-ms", 1),
 
-    debugMode: 1,
+    debugMode: 0,
 
     calculateRatedCurrent: func(){ #//Returns the rated current
           var a = me.motorResistance;
@@ -82,7 +88,6 @@ var Engine = {
         var rpm = me.rpm;
         #//var rps = rpm / 60;
 
-
         var angularSpeed = rpm * 0.10471975; #//rps * 2 * 3.1415926
 
         var friction_lbs = me.frictionNode.getValue();
@@ -91,10 +96,8 @@ var Engine = {
         #print(angularAcceleration);
         #print("de"~angularDecelaeration);
 
-        angularDecelaeration = math.abs(angularDecelaeration) * direction * -1;
+        angularDecelaeration = math.abs(angularDecelaeration) * -1;#//Not accurate
 
-
-        angularAcceleration *= direction;
         var totalAcceleration = angularAcceleration + angularDecelaeration;
 
         if(direction == 1){
@@ -117,11 +120,11 @@ var Engine = {
         var wheelSpeed_ms = me.wheelSpeedNode.getValue();
         var wheelAngularSpeed = wheelSpeed_ms / me.wheel_radius;
 
-        var targetAngularSpeed = wheelAngularSpeed * me.gear;
+        var targetAngularSpeed = math.abs(wheelAngularSpeed) * me.gear;
 
         #print("WheelAngularSpeed x gear " ~ wheelAngularSpeed * me.gear);
 
-        if(math.abs(angularSpeed) < targetAngularSpeed) angularSpeed = targetAngularSpeed * direction;
+        if(math.abs(angularSpeed) < targetAngularSpeed) angularSpeed = targetAngularSpeed;
         #print("AngularSpeed " ~ angularSpeed);
 
 
@@ -175,7 +178,7 @@ var Engine = {
 
         var angularAcceleration = me.cmdTorque / me.rotor_moi; #rad/s^2
         me.rpm = me.rpm_calculate(angularAcceleration);
-        if(me.rpm) me.torque = (9549 * me.cmdPower) / me.rpm;
+        if(me.rpm) me.torque = ((9549 * me.cmdPower) / me.rpm) * direction;
 
         me.activePower_kW = math.abs(me.rpm * me.torque / 9549);
 
@@ -199,7 +202,7 @@ var Engine = {
         me.outputForce = force;
 
         if(me.debugMode){
-            me.debugPrint();
+            me.printDebugInfo();
         }
 
 
@@ -233,7 +236,7 @@ var Engine = {
         props.getNode("/",1).setValue("/controls/engines/engine/started",0);
     },
 
-    debugPrint: func(){
+    printDebugInfo: func(){
         print("rpm: "~me.rpm);
         print("torque: "~me.torque);
         print("power: "~me.activePower_kW);
