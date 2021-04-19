@@ -1,6 +1,102 @@
 #//Parking radar by Sidi Liang
 #//Contact: sidi.liang@gmail.com
 
+var MultiplayerCoordManager = {
+    new: func() {
+        var m = {
+            parents: [MultiplayerCoordManager],
+            items: {},
+            updateKeys: [],
+            addListener: nil,
+            delListener: nil,
+        };
+        return m;
+    },
+    start: func() {
+        me.stop();
+        var self = me;
+        me.addListener = setlistener('/ai/models/model-added', func(changed, listen, mode, is_child) {
+            var path = changed.getValue();
+            if (path == nil) return;
+            #printf("ADD: %s", path);
+            if (me.items[path] == nil) {
+                me.items[path] = {
+                    prop: props.globals.getNode(path),
+                    data: {},
+                };
+            }
+            else {
+                me.items[path].prop = prop;
+            }
+        }, 1, 1);
+        me.delListener = setlistener('/ai/models/model-removed', func(changed, listen, mode, is_child) {
+            var path = changed.getValue();
+            if (path == nil) return;
+            #printf("DEL: %s", path);
+            if (me.items[path] == nil) return;
+            if (me.items[path] != nil) {
+                me.items[path].prop = nil;
+                me.items[path].data = {};
+            }
+        }, 1, 1);
+    },
+
+    stop: func() {
+        if (me.addListener != nil) {
+            removelistener(me.addListener);
+            me.addListener = nil;
+        }
+        if (me.delListener != nil) {
+            removelistener(me.delListener);
+            me.delListener = nil;
+        }
+        me.items = {};
+    },
+
+    nxtupdatetime: 0,
+
+    update: func() {
+        var _tm = systime();
+        if (me.nxtupdatetime != 0) {
+            if (_tm<me.nxtupdatetime) return;            
+        }
+        me.nxtupdatetime = _tm + 0.5; # refresh rate at 500ms
+
+        if (size(me.updateKeys) == 0) {
+            me.updateKeys = keys(me.items);
+        }
+        var path = pop(me.updateKeys);
+        foreach (var path; keys(me.items)) {
+            me.updateItem(path);
+        }
+    },
+
+    proplist: ['lat', 'lon', 'alt'],
+    
+    updateItem: func(path) {
+
+        var item = me.items[path];
+        if (item == nil or item.prop == nil) return;
+
+        if (item.prop['lat'] == nil) {
+            item.prop['lat'] = item.prop.getNode('position/latitude-deg');
+            item.prop['lon'] = item.prop.getNode('position/longitude-deg');
+            item.prop['alt'] = item.prop.getNode('position/altitude-ft');
+        }
+
+        foreach (var k; me.proplist) {
+            if (item.prop[k] != nil) {
+                item.data[k] = item.prop[k].getValue();
+            }
+        }
+        print("MultiplayerCoordManager: Working!");
+
+    },
+   
+    
+};
+
+
 var Radar = {
     #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
     #//height: height of installation above ground;installCoordX: X coord of installation; installCoordY: Y coord of installation; maxRange: max radar range; maxWidth: width of the sector
@@ -49,6 +145,8 @@ var Radar = {
     lastDis: 0,
 
     radarOutput: 10000,#The value which radar returns in meters
+    
+    multiplayerManager: MultiplayerCoordManager.new(), #//Experimental new multiplayer coordinate manager
 
     init: func(){
         me.searchAngle = math.acos(me.maxRange / math.sqrt((2/me.maxWidth)*(2/me.maxWidth) + me.maxRange*me.maxRange));
@@ -67,6 +165,8 @@ var Radar = {
         }else{
             #print("Radar initialized!");
         }
+        
+        me.multiplayerManager.start();
     },
     stop: func(){
         if(me.warnEnabled){
@@ -160,6 +260,7 @@ var Radar = {
     },
     update: func(){
         me.getCoord();
+        me.multiplayerManager.update(); #//Updates the multiplayer coordinates manager at it's own refresh rate
         var searchDis = 0.01;#Meters
         var searchStep = 0;#Meters
         while(searchDis <= me.maxRange){
