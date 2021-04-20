@@ -60,7 +60,7 @@ var MultiplayerCoordManager = {
         if (me.nxtupdatetime != 0) {
             if (_tm<me.nxtupdatetime) return;
         }
-        me.nxtupdatetime = _tm + 0.5; # refresh rate at 500ms
+        me.nxtupdatetime = _tm + 0.1; # refresh rate at 100ms
 
         if (size(me.updateKeys) == 0) {
             me.updateKeys = keys(me.items);
@@ -98,7 +98,7 @@ var MultiplayerCoordManager = {
 
 
 var Radar = {
-    #//Class for any Parking Radar (currently only support terrain detection) which scans in a sector
+    #//Class for any Parking Radar (currently supports terrain detection and multiplayer(and ai) model detection) which scans in a sector
     #//height: height of installation above ground;installCoordX: X coord of installation; installCoordY: Y coord of installation; maxRange: max radar range; maxWidth: width of the sector
     #//orientationMode 0:towards back, 180:towards front, 90: towards left, 270:towards right, custom values are accepted(in degrees)
     #//updateInterval: update interval of the radar timer, defaults to 0.25
@@ -110,6 +110,9 @@ var Radar = {
     #//For follow me EV: height 0.3m; installCoordX:0m; installCoordY:3.8m; maxRange:3m;maxWidth:3m
     #//To start scanning: myRadar.init();
     #//To Stop: myRadar.stop();
+
+    #//Todo: Add the tilt angle into consideratoin
+
     new: func(height, installCoordX, installCoordY, maxRange, maxWidth, orientationMode=0, warnEnabled=1,
         updateInterval=0.25, debug=0) {
         return { parents:[Radar, Appliance.new()], height: height, installCoordX:installCoordX, installCoordY:installCoordY, maxRange:maxRange, maxWidth:maxWidth, orientationMode:orientationMode, warnEnabled:warnEnabled, debug:debug, radarOutput:10000};
@@ -131,7 +134,9 @@ var Radar = {
 
     vehiclePosition: nil,
     coord: nil,
+    vehicleHeadingProp: props.getNode("/orientation/heading-deg",1),
     vehicleHeading: nil,
+    vehicleElevProp: props.getNode("/position/altitude-ft",1),
 
     backLonRange: nil,
     backLatRange: nil,
@@ -147,6 +152,12 @@ var Radar = {
     radarOutput: 10000,#The value which radar returns in meters
 
     multiplayerManager: MultiplayerCoordManager.new(), #//Experimental new multiplayer coordinate manager
+
+    calculateVehicleElevation: func(){
+        #//Return the elevation in METERS
+        var elev_ft = me.vehicleElevProp.getValue();
+        return elev_ft * FT2M;
+    },
 
     init: func(){
         me.searchAngle = math.acos(me.maxRange / math.sqrt((2/me.maxWidth)*(2/me.maxWidth) + me.maxRange*me.maxRange));
@@ -188,7 +199,7 @@ var Radar = {
     },
 
     getCoord: func(){
-        me.vehicleHeading = geo.normdeg(props.getNode("/orientation/heading-deg",1).getValue() + me.orientationMode);
+        me.vehicleHeading = geo.normdeg(me.vehicleHeadingProp.getValue() + me.orientationMode);
         me.vehiclePosition = geo.aircraft_position();
         me.coord = geo.Coord.new(me.vehiclePosition);
         me.coord.apply_course_distance(geo.normdeg(me.vehicleHeading-90), me.installCoordX);
@@ -220,7 +231,10 @@ var Radar = {
         return position_val;
     },
     judgeElev: func(targetElev){
-        myElev = me.getElevByCoord(me.coord);
+        #//myElev = me.getElevByCoord(me.coord);
+        myElev = me.calculateVehicleElevation();
+        print("elevgeo: "~me.getElevByCoord(me.coord));
+        print("elevprop: "~me.calculateVehicleElevation());
         if((myElev + me.height) < targetElev){
             return 1;
         }else{
@@ -258,6 +272,23 @@ var Radar = {
         if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", sampleCoord.lat(), sampleCoord.lon(), me.coord.alt());
         return sampleCoord;
     },
+    multiplayerModelDetection: func(targetCoord){
+        foreach(var itemPath; keys(me.multiplayerManager.items)){
+            var item = me.multiplayerManager.items[itemPath];
+            if(item.data != nil){
+                if(math.abs(item.data['alt'] - me.height - me.calculateVehicleElevation()) > 2) continue;
+                var itemCoord = geo.Coord.new();
+                itemCoord.set_latlon(item.data['lat'], item.data['lon']);
+                var multiplayerModelDistanceInMeters = itemCoord.distance_to(targetCoord);
+                if(multiplayerModelDistanceInMeters <= 0.3){#//Value based on guessing
+                    var meters = me.coord.distance_to(targetCoord);
+                    if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
+                    return meters;
+                }
+            }
+        }
+        return nil;
+    },
     update: func(){
         me.getCoord();
         me.multiplayerManager.update(); #//Updates the multiplayer coordinates manager at it's own refresh rate
@@ -276,25 +307,15 @@ var Radar = {
                 var stepLon = 0 - searchWidthLon * percentage;
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
                 #//Multiplayer model detection
-                foreach(var itemPath; keys(me.multiplayerManager.items)){
-                    var item = me.multiplayerManager.items[itemPath];
-                    if(item.data != nil){
-                        var itemCoord = geo.Coord.new();
-                        itemCoord.set_latlon(item.data['lat'], item.data['lon']);
-                        var multiplayerModelDistanceInMeters = itemCoord.distance_to(targetCoord);
-                        if(multiplayerModelDistanceInMeters <= 0.3){#//Value based on guessing
-                            var meters = me.coord.distance_to(targetCoord);
-                            if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
-                            if(me.warnEnabled) me.warnControl(meters);
-                            else me.radarOutput = meters;
-                            return;
-                        }
-                    }
+                meters = me.multiplayerModelDetection(targetCoord);
+                if(meters != nil){
+                    if(me.warnEnabled) me.warnControl(meters);
+                    else me.radarOutput = meters;
+                    return;
                 }
 
-
                 #//Terrain detection
-                targetElev = me.getElevByCoord(targetCoord);
+                var targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
                     if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
@@ -308,25 +329,15 @@ var Radar = {
                 var stepLon = searchWidthLon * percentage;
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
                 #//Multiplayer model detection
-                foreach(var itemPath; keys(me.multiplayerManager.items)){
-                    var item = me.multiplayerManager.items[itemPath];
-                    if(item.data != nil){
-                        var itemCoord = geo.Coord.new();
-                        itemCoord.set_latlon(item.data['lat'], item.data['lon']);
-                        var multiplayerModelDistanceInMeters = itemCoord.distance_to(targetCoord);
-                        if(multiplayerModelDistanceInMeters <= 0.3){#//Value based on guessing
-                            var meters = me.coord.distance_to(targetCoord);
-                            if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
-                            if(me.warnEnabled) me.warnControl(meters);
-                            else me.radarOutput = meters;
-                            return;
-                        }
-                    }
+                meters = me.multiplayerModelDetection(targetCoord);
+                if(meters != nil){
+                    if(me.warnEnabled) me.warnControl(meters);
+                    else me.radarOutput = meters;
+                    return
                 }
 
-
                 #//Terrain detection
-                targetElev = me.getElevByCoord(targetCoord);
+                var targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
                     if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
