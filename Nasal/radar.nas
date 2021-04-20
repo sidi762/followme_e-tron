@@ -58,7 +58,7 @@ var MultiplayerCoordManager = {
     update: func() {
         var _tm = systime();
         if (me.nxtupdatetime != 0) {
-            if (_tm<me.nxtupdatetime) return;            
+            if (_tm<me.nxtupdatetime) return;
         }
         me.nxtupdatetime = _tm + 0.5; # refresh rate at 500ms
 
@@ -72,7 +72,7 @@ var MultiplayerCoordManager = {
     },
 
     proplist: ['lat', 'lon', 'alt'],
-    
+
     updateItem: func(path) {
 
         var item = me.items[path];
@@ -89,11 +89,11 @@ var MultiplayerCoordManager = {
                 item.data[k] = item.prop[k].getValue();
             }
         }
-        print("MultiplayerCoordManager: Working!");
+        #//print("MultiplayerCoordManager: Working!");
 
     },
-   
-    
+
+
 };
 
 
@@ -145,7 +145,7 @@ var Radar = {
     lastDis: 0,
 
     radarOutput: 10000,#The value which radar returns in meters
-    
+
     multiplayerManager: MultiplayerCoordManager.new(), #//Experimental new multiplayer coordinate manager
 
     init: func(){
@@ -165,7 +165,7 @@ var Radar = {
         }else{
             #print("Radar initialized!");
         }
-        
+
         me.multiplayerManager.start();
     },
     stop: func(){
@@ -275,6 +275,25 @@ var Radar = {
                 var percentage = (0-i)/(searchWidthLat/2); #use approximate value to reduce cost
                 var stepLon = 0 - searchWidthLon * percentage;
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
+                #//Multiplayer model detection
+                foreach(var itemPath; keys(me.multiplayerManager.items)){
+                    var item = me.multiplayerManager.items[itemPath];
+                    if(item.data != nil){
+                        var itemCoord = geo.Coord.new();
+                        itemCoord.set_latlon(item.data['lat'], item.data['lon']);
+                        var multiplayerModelDistanceInMeters = itemCoord.distance_to(targetCoord);
+                        if(multiplayerModelDistanceInMeters <= 0.3){#//Value based on guessing
+                            var meters = me.coord.distance_to(targetCoord);
+                            if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
+                            if(me.warnEnabled) me.warnControl(meters);
+                            else me.radarOutput = meters;
+                            return;
+                        }
+                    }
+                }
+
+
+                #//Terrain detection
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
@@ -288,6 +307,25 @@ var Radar = {
                 var percentage = i/(searchWidthLat/2); #use approximate value to reduce cost
                 var stepLon = searchWidthLon * percentage;
                 var targetCoord = me.sample(i, stepLon, searchCoord.lat(), searchCoord.lon());
+                #//Multiplayer model detection
+                foreach(var itemPath; keys(me.multiplayerManager.items)){
+                    var item = me.multiplayerManager.items[itemPath];
+                    if(item.data != nil){
+                        var itemCoord = geo.Coord.new();
+                        itemCoord.set_latlon(item.data['lat'], item.data['lon']);
+                        var multiplayerModelDistanceInMeters = itemCoord.distance_to(targetCoord);
+                        if(multiplayerModelDistanceInMeters <= 0.3){#//Value based on guessing
+                            var meters = me.coord.distance_to(targetCoord);
+                            if(me.debug) var model = geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", targetCoord.lat(), targetCoord.lon(), me.coord.alt());
+                            if(me.warnEnabled) me.warnControl(meters);
+                            else me.radarOutput = meters;
+                            return;
+                        }
+                    }
+                }
+
+
+                #//Terrain detection
                 targetElev = me.getElevByCoord(targetCoord);
                 if(me.judgeElev(targetElev)){
                     var meters = me.coord.distance_to(targetCoord);
