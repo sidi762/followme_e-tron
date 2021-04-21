@@ -119,6 +119,7 @@ var Radar = {
     },
 
     initialized: 0,
+    running: 0,
 
     debug: 0,#if debug = 1, shows marker and prints info
     warnEnabled: 1,#1 enables the internal warning system(typecally used for a parking radar) as 0 disables it
@@ -196,6 +197,7 @@ var Radar = {
         if(me.warnEnabled and me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
         me.radarTimer.start();
         me.multiplayerManager.start();
+        me.running = 1;
         if(me.warnEnabled){
             print("Parking radar started!");
             playAudio("parking_radar_init.wav");
@@ -204,7 +206,7 @@ var Radar = {
         }
     },
     stop: func(){
-        me.initialized = 0;
+        me.running = 0;
         if(me.warnEnabled){
             print("Parking radar stopped!");
             #playAudio("parking_radar_init.wav");
