@@ -587,7 +587,7 @@ var Safety = {
     enableFrontRadar: func(){
         #Enables the front radar
         me.frontRadarEnabled = 1;
-        me.frontRadar.init();
+        me.frontRadar.initWithoutStarting();
         me.frontRadar.stop();
         me.aebOnProp.setValue(1);
         print("Front radar(AEB) enabled");
@@ -687,7 +687,7 @@ var Safety = {
         if(currentSpeed > 30 and engine.engine_1.getDirection() == 1){
             #Enable AEB when speed is greater then 30kmh and in D gear
             if(me.frontRadarEnabled){
-                me.frontRadar.init();
+                if(!me.frontRadar.isRunning) me.frontRadar.start();
                 if(currentSpeed >= 48 and me.aebMode == 1) me.aebFastMode();
                 else if(currentSpeed < 48 and me.aebMode == 2) me.aebSlowMode();#//Adjust mode dynamically according to speed
 
