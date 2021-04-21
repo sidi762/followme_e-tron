@@ -118,6 +118,8 @@ var Radar = {
         return { parents:[Radar, Appliance.new()], height: height, installCoordX:installCoordX, installCoordY:installCoordY, maxRange:maxRange, maxWidth:maxWidth, orientationMode:orientationMode, warnEnabled:warnEnabled, debug:debug, radarOutput:10000};
     },
 
+    initialized: 0,
+
     debug: 0,#if debug = 1, shows marker and prints info
     warnEnabled: 1,#1 enables the internal warning system(typecally used for a parking radar) as 0 disables it
 
@@ -170,16 +172,39 @@ var Radar = {
         if(me.radarTimer == nil) me.radarTimer = maketimer(me.updateInterval, func me.update());
         if(me.warnEnabled and me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
         me.radarTimer.start();
+        me.multiplayerManager.start();
+        me.initialized = 1;
         if(me.warnEnabled){
-            print("Parking radar initialized!");
+            print("Parking radar initialized and started!");
             playAudio("parking_radar_init.wav");
         }else{
             #print("Radar initialized!");
         }
-
+    },
+    initWithoutStarting: func(){ #//Added due to compability
+        me.searchAngle = math.acos(me.maxRange / math.sqrt((2/me.maxWidth)*(2/me.maxWidth) + me.maxRange*me.maxRange));
+        me.tanSearchAngle = math.tan(me.searchAngle);
+        me.getCoord();
+        me.backLatRange = me.calculateLatChange(me.maxRange);
+        me.backLonRange = me.calculateLonChange(me.maxRange, me.coord);
+        me.widthLatRange = me.calculateLatChange(me.maxWidth);
+        me.widthLonRange = me.calculateLonChange(me.maxWidth, me.coord);
+        me.initialized = 1;
+    },
+    start: func(){
+        if(me.radarTimer == nil) me.radarTimer = maketimer(me.updateInterval, func me.update());
+        if(me.warnEnabled and me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
+        me.radarTimer.start();
         me.multiplayerManager.start();
+        if(me.warnEnabled){
+            print("Parking radar started!");
+            playAudio("parking_radar_init.wav");
+        }else{
+            #print("Radar initialized!");
+        }
     },
     stop: func(){
+        me.initialized = 0;
         if(me.warnEnabled){
             print("Parking radar stopped!");
             #playAudio("parking_radar_init.wav");
@@ -189,6 +214,7 @@ var Radar = {
         me.radarOutput = 10000;
         if(me.warnEnabled) me.warningTimer.stop();
         me.radarTimer.stop();
+        me.multiplayerManager.stop();
     },
     toggle: func(){
         if(me.radarTimer == nil or me.radarTimer.isRunning == 0){
