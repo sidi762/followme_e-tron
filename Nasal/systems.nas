@@ -588,7 +588,7 @@ var Safety = {
         #Enables the front radar
         me.frontRadarEnabled = 1;
         me.frontRadar.initWithoutStarting();
-        me.frontRadar.stop();
+        #//me.frontRadar.stop();
         me.aebOnProp.setValue(1);
         print("Front radar(AEB) enabled");
     },
@@ -719,7 +719,7 @@ var Safety = {
                     #print("22");
                 }
             }
-            if(me.frontRadarEnabled and me.frontRadar.radarTimer.isRunning) me.frontRadar.stop();
+            if(me.frontRadarEnabled and me.frontRadar.isRunning) me.frontRadar.stop();
         }
 
         #ABS
