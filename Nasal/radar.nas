@@ -183,6 +183,8 @@ var Radar = {
         }
     },
     initWithoutStarting: func(){ #//Added due to compability
+        if(me.radarTimer == nil) me.radarTimer = maketimer(me.updateInterval, func me.update());
+        if(me.warnEnabled and me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
         me.searchAngle = math.acos(me.maxRange / math.sqrt((2/me.maxWidth)*(2/me.maxWidth) + me.maxRange*me.maxRange));
         me.tanSearchAngle = math.tan(me.searchAngle);
         me.getCoord();
@@ -193,8 +195,6 @@ var Radar = {
         me.initialized = 1;
     },
     start: func(){
-        if(me.radarTimer == nil) me.radarTimer = maketimer(me.updateInterval, func me.update());
-        if(me.warnEnabled and me.warningTimer == nil) me.warningTimer = maketimer(me.warningInterval, func me.warn());
         me.radarTimer.start();
         me.multiplayerManager.start();
         me.isRunning = 1;
