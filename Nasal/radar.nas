@@ -261,8 +261,8 @@ var Radar = {
     judgeElev: func(targetElev){
         #//myElev = me.getElevByCoord(me.coord);
         myElev = me.calculateVehicleElevation();
-        print("elevgeo: "~me.getElevByCoord(me.coord));
-        print("elevprop: "~me.calculateVehicleElevation());
+        #print("elevgeo: "~me.getElevByCoord(me.coord));
+        #print("elevprop: "~me.calculateVehicleElevation());
         if((myElev + me.height) < targetElev){
             return 1;
         }else{
@@ -302,9 +302,14 @@ var Radar = {
     },
     multiplayerModelDetection: func(targetCoord){
         foreach(var itemPath; keys(me.multiplayerManager.items)){
+            print("-----------------------------------");
+            print(itemPath);
             var item = me.multiplayerManager.items[itemPath];
             if(item.data != nil){
-                if(math.abs(item.data['alt'] - me.height - me.calculateVehicleElevation()) > 2) continue;
+                if(math.abs(item.data['alt'] * FT2M - me.height - me.calculateVehicleElevation()) > 1){
+                    #print(math.abs(item.data['alt'] - me.height - me.calculateVehicleElevation())~"     wont crash alt");
+                    continue;
+                }
                 var itemCoord = geo.Coord.new();
                 itemCoord.set_latlon(item.data['lat'], item.data['lon']);
                 var multiplayerModelDistanceInMeters = itemCoord.distance_to(targetCoord);
