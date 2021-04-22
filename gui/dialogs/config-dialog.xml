@@ -119,58 +119,67 @@
                     <value>Concept</value>
                     <value>Original</value>
                     <binding>
-            			<command>dialog-apply</command>
-            			<object-name>batteryType</object-name>
+                  <command>dialog-apply</command>
+                  <object-name>batteryType</object-name>
                     </binding>
                 </combo>
             </group>
 
         </group>
         <group>
-            <layout>vbox</layout>
-            <button>
-                <halign>left</halign>
-                <legend>Toggle Parking Radar</legend>
-                <pref-width>120</pref-width>
-                <pref-height>28</pref-height>
-                <binding>
-                    <command>nasal</command>
-                    <script>followme.parkingRadar.toggle()</script>
-                </binding>
-            </button>
-            <button>
-                <halign>left</halign>
-                <legend>(Re)Initialize Safety</legend>
-                <pref-width>120</pref-width>
-                <pref-height>28</pref-height>
-                <binding>
-                    <command>nasal</command>
-                    <script>followme.safety.init()</script>
-                </binding>
-            </button>
-            <button>
-                <halign>left</halign>
-                <legend>Disable Safety</legend>
-                <pref-width>120</pref-width>
-                <pref-height>28</pref-height>
-                <binding>
-                    <command>nasal</command>
-                    <script>followme.safety.stop()</script>
-                </binding>
-            </button>
-            <button>
-                <halign>left</halign>
-                <legend>Toggle AEB</legend>
-                <pref-width>120</pref-width>
-                <pref-height>28</pref-height>
-                <binding>
-                    <command>nasal</command>
-                    <script>followme.safety.toggleFrontRadar()</script>
-                </binding>
-            </button>
-            <text>
-                <label>To repair Airbag, reinitialize safety system</label>
-            </text>
+          <layout>vbox</layout>
+          <group>
+            <layout>hbox</layout>
+            <group>
+                <layout>vbox</layout>
+                <button>
+                    <halign>left</halign>
+                    <legend>Toggle Parking Radar</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.parkingRadar.toggle()</script>
+                    </binding>
+                </button>
+                <button>
+                    <halign>left</halign>
+                    <legend>(Re)Initialize Safety</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.safety.init()</script>
+                    </binding>
+                </button>
+            </group>
+            <group>
+                <layout>vbox</layout>
+                <button>
+                    <halign>left</halign>
+                    <legend>Disable Safety</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.safety.stop()</script>
+                    </binding>
+                </button>
+                <button>
+                    <halign>left</halign>
+                    <legend>Toggle AEB</legend>
+                    <pref-width>120</pref-width>
+                    <pref-height>28</pref-height>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.safety.toggleAEB()</script>
+                    </binding>
+                </button>
+            </group>
+          </group>
+          <text>
+              <label>To repair Airbag, reinitialize safety system</label>
+          </text>
         </group>
         <hrule/>
         <group>
