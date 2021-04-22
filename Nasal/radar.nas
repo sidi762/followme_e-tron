@@ -302,14 +302,9 @@ var Radar = {
     },
     multiplayerModelDetection: func(targetCoord){
         foreach(var itemPath; keys(me.multiplayerManager.items)){
-            print("-----------------------------------");
-            print(itemPath);
             var item = me.multiplayerManager.items[itemPath];
             if(item.data != nil){
-                if(math.abs(item.data['alt'] * FT2M - me.height - me.calculateVehicleElevation()) > 1){
-                    #print(math.abs(item.data['alt'] - me.height - me.calculateVehicleElevation())~"     wont crash alt");
-                    continue;
-                }
+                if(math.abs(item.data['alt'] * FT2M - me.height - me.calculateVehicleElevation()) > 1) continue;
                 var itemCoord = geo.Coord.new();
                 itemCoord.set_latlon(item.data['lat'], item.data['lon']);
                 var multiplayerModelDistanceInMeters = itemCoord.distance_to(targetCoord);
