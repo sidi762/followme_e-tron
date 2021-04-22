@@ -662,6 +662,8 @@ var Safety = {
     },
 
     aebUpdate: func(){
+        #//AEB Loop
+        
         var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]")*1.852;#In km/h
         var radarOutput = me.frontRadar.radarOutput;
         #print("radar output: " ~ radarOutput);
@@ -712,7 +714,6 @@ var Safety = {
     },
 
     update: func(){
-        #print("running");
         #Front airbag
         if(math.abs(me.accXProp.getValue() * FT2M) > me.airbagAccelerationLimit){
             #active Front
@@ -726,7 +727,7 @@ var Safety = {
             me.emergencyMode();
         }
         #AEB, Automatic Emergency Brake
-
+        #Moved out of the main loop
 
         #ABS
         #var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-left");
