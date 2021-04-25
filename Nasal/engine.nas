@@ -14,7 +14,7 @@ var Engine = {
     #//For this vehicle: maxPower: 375kW
 
     new: func(mTorque, mPower, rpmAtMPower) {
-        var m = {parents:[Engine], followme.Applicance.new()};
+        var m = { parents:[Engine, followme.Appliance.new()]};
         m.engineNode = followme.vehicleInformation.engine;
         m.engineNode.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
         m.engineNode.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
@@ -230,7 +230,7 @@ var Engine = {
         if(me.engineTimer == nil) me.engineTimer = maketimer(0.1, func me.update_engine());
         me.engineSwitch.switchConnect();
         me.runningState = 1;
-        engineNode.isStarted.setValue(1);
+        me.engineNode.isStarted.setValue(1);
         me.engineTimer.simulatedTime = 1;
         me.rpm = 100 * me.getDirection();
         followme.playAudio("starter.wav");
@@ -247,7 +247,7 @@ var Engine = {
         me.activePower_kW = 0;
         me.runningState = 0;
         me.engineSwitch.switchDisconnect();
-        engineNode.isStarted.setValue(0);
+        me.engineNode.isStarted.setValue(0);
     },
 
     printDebugInfo: func(){
