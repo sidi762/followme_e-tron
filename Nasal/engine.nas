@@ -14,7 +14,21 @@ var Engine = {
     #//For this vehicle: maxPower: 375kW
 
     new: func(mTorque, mPower, rpmAtMPower) {
-        return { parents:[Engine, followme.Appliance.new()], maxTorque: mTorque, ratedPower:mPower, rpmAtMaxPower:rpmAtMPower };
+        var m = {parents:[Engine], followme.Appliance.new()};
+        m.engineNode = followme.vehicleInformation.engine;
+        m.engineNode.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
+        m.engineNode.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
+        m.engineNode.isStarted = props.getNode("/controls/engines/engine/started",1);
+        m.engineNode.direction = props.getNode("/controls/direction", 1);
+        m.engineNode.mode = props.getNode("/controls/mode", 1);
+
+        followme.vehicleInformation.lighting.reverseIndicator = props.getNode("/controls/lighting/reverse_indicator", 1);;
+        m.reverseIndicatorNode = followme.vehicleInformation.lighting.reverseIndicator
+
+        m.maxTorque = mTorque;
+        m.ratedPower = mPower;
+        m.rpmAtMaxPower = rpmAtMPower;
+        return m;
     },
 
     motorResistance: 0.2,#//No datasource, based on guess
@@ -35,8 +49,8 @@ var Engine = {
     toggleDirection: func(){
         #//Toggle Direction, forward:1; barkward: -1
         me.direction *= -1;
-        props.getNode("/",1).setValue("/controls/direction", me.direction);
-        props.getNode("/",1).setValue("/controls/lighting/reverse_indicator", (me.direction < 0));
+        me.engineNode.direction.setValue(me.direction);
+        me.reverseIndicatorNode.setValue((me.direction < 0));
         if(followme.isInternalView()) followme.playAudio("change_gear.wav");
     },
     getDirection: func(){
@@ -138,21 +152,21 @@ var Engine = {
 
 
         me.rpm = rpm;
-        props.getNode("/",1).setValue("/controls/engines/engine/rpma",rpm);
+        me.engineNode.rpmNode.setValue(rpm);
         me.angularSpeed = angularSpeed;
 
         return rpm;
     },
 
     update_engine: func(){
-        var throttle = props.getNode("/",1).getValue("/controls/engines/engine/throttle");
+        var throttle = me.engineNode.throttleNode.getValue();
         var direction = me.getDirection();
-        var mode = props.getNode("/",1).getValue("/controls/mode");
+        var mode = me.engineNode.mode.getValue();
         me.mode = mode;
 
         if(!me.voltage){
             me.rpm = 0;
-            props.getNode("/",1).setValue("/controls/engines/engine/rpma", 0);
+            me.engineNode.rpmNode.setValue(0);
             outputForce(0);
             return 0;
         }
@@ -216,7 +230,7 @@ var Engine = {
         if(me.engineTimer == nil) me.engineTimer = maketimer(0.1, func me.update_engine());
         me.engineSwitch.switchConnect();
         me.runningState = 1;
-        props.getNode("/",1).setValue("/controls/engines/engine/started",1);
+        engineNode.isStarted.setValue(1);
         me.engineTimer.simulatedTime = 1;
         me.rpm = 100 * me.getDirection();
         followme.playAudio("starter.wav");
@@ -233,7 +247,7 @@ var Engine = {
         me.activePower_kW = 0;
         me.runningState = 0;
         me.engineSwitch.switchDisconnect();
-        props.getNode("/",1).setValue("/controls/engines/engine/started",0);
+        engineNode.isStarted.setValue(0);
     },
 
     printDebugInfo: func(){

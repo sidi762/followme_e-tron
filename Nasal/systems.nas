@@ -73,46 +73,6 @@ var toggleWiper = func(){
     }
 }
 
-wiper.stateN = wiper.node.initNode("state", 0, "DOUBLE");
-props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
-
-props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
-props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
-
-props.getNode("/",1).setValue("/systems/horn", 0);
-props.getNode("/",1).setValue("/controls/mode", 1);
-props.getNode("/",1).setValue("/controls/direction", 1);
-props.getNode("/",1).setValue("/systems/instruments/enable_switches", 0);
-props.getNode("/",1).setValue("/systems/instruments/enable_cdu", 0);
-props.getNode("/",1).setValue("/instrumentation/cdu/ident/model", "Follow me EV");
-props.getNode("/",1).setValue("/instrumentation/cdu/ident/engines", "EV Motor");
-
-props.getNode("/",1).setValue("services/service-truck/enable", 0);
-props.getNode("controls/is-recharging", 1).setValue(0);
-props.getNode("systems/welcome-message", 1).setValue(0);
-props.getNode("systems/display-speed", 1).setValue(0);
-props.getNode("systems/speedometer/type", 1).setValue("Type_A");
-props.getNode("systems/battery-gauge/type", 1).setValue("Type_A");
-props.getNode("systems/plate/file", 1).setValue("NONE");
-props.getNode("systems/plate/name", 1).setValue("NONE");
-props.getNode("controls/lighting/headlight-als", 1).setValue(0);
-props.getNode("controls/lighting/highBeam", 1).setValue(0);
-props.getNode("/controls/steering_wheel", 1).setValue(0);
-props.getNode("controls/interior/luxury/storage_cover_pos", 1).setValue(0);
-props.getNode("sim/remote/pilot-callsign", 1).setValue("");
-props.getNode("systems/codriver-enable", 1).setValue(0);
-props.getNode("systems/screen-enable", 1).setValue(0);
-props.getNode("systems/pmodel-enable", 1).setValue(1);
-props.getNode("systems/decorations-enable", 1).setValue(0);
-props.getNode("systems/interior/type", 1).setValue("Default");
-props.getNode("systems/safety/aeb_activated", 1).setValue(0);
-props.getNode("systems/safety/aeb_on", 1).setValue(0);
-props.getNode("systems/auto_hold_enabled", 1).setValue(0);
-props.getNode("systems/auto_hold_working", 1).setValue(0);
-props.getNode("controls/lighting/indicator/left_switch", 1).setValue(0);
-props.getNode("controls/lighting/indicator/right_switch", 1).setValue(0);
-props.getNode("controls/lighting/reverse_indicator", 1).setValue(0);
-
 #var Led = {
 #
 #    new: func() { return { parents:[Led] },
@@ -502,8 +462,7 @@ var chargeBatteryStop = func(bef){
 }
 
 var calculateSpeed = func(){
-    var gs = props.getNode("velocities/groundspeed-kt", 1).getValue();
-    var speedKmh = 1.852 * gs;
+    var speedKmh = vehicleInformation.getSpeedKMH();
     var calculated = 0;
     var output = 0;
     if(speedKmh <= 0){
@@ -571,7 +530,7 @@ var Safety = {
     aebEnabled: 0,
     aebActivated: 0,
     lastRadarOutput:10000,
-    throttleNode: props.getNode("/controls/engines/engine/throttle",1),
+    throttleNode: vehicleInformation.engine.throttleNode,
     #Airbag
     accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
     accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
@@ -663,8 +622,8 @@ var Safety = {
 
     aebUpdate: func(){
         #//AEB Loop
-        
-        var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]")*1.852;#In km/h
+
+        var currentSpeed = vehicleInformation.getSpeedKMH();#In km/h
         var radarOutput = me.frontRadar.radarOutput;
         #print("radar output: " ~ radarOutput);
         #print("last radar output: " ~ me.lastRadarOutput);
