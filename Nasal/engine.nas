@@ -23,7 +23,7 @@ var Engine = {
         m.engineNode.mode = props.getNode("/controls/mode", 1);
 
         followme.vehicleInformation.lighting.reverseIndicator = props.getNode("/controls/lighting/reverse_indicator", 1);;
-        m.reverseIndicatorNode = followme.vehicleInformation.lighting.reverseIndicator
+        m.reverseIndicatorNode = followme.vehicleInformation.lighting.reverseIndicator;
 
         m.maxTorque = mTorque;
         m.ratedPower = mPower;

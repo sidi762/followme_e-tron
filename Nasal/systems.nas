@@ -72,7 +72,8 @@ var toggleWiper = func(){
         wiperMid();
     }
 }
-
+wiper.stateN = wiper.node.initNode("state", 0, "DOUBLE");
+props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
 #var Led = {
 #
 #    new: func() { return { parents:[Led] },

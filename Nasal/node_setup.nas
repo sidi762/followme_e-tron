@@ -31,11 +31,8 @@ vehicleInformation.engine.direction = props.getNode("/controls/direction", 1);
 vehicleInformation.engine.mode = props.getNode("/controls/mode", 1);
 
 #//Lignting
-vehicleInformation.lighting = props.getNode("/controls/lighting", 1);;
-vehicleInformation.lighting.reverseIndicator = followme.vehicleInformation.lighting.getNode("reverse_indicator", 1);
-
-wiper.stateN = wiper.node.initNode("state", 0, "DOUBLE");
-props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
+vehicleInformation.lighting = props.getNode("/controls/lighting", 1);
+vehicleInformation.lighting.reverseIndicator = vehicleInformation.lighting.getNode("reverse_indicator", 1);
 
 props.getNode("/",1).setValue("/controls/lighting/indicator-left", 0);
 props.getNode("/",1).setValue("/controls/lighting/indicator-right", 0);
