@@ -429,6 +429,7 @@
 
     <nasal>
     	<followme>
+			<file>Aircraft/followme_e-tron/Nasal/node_setup.nas</file>
             <file>Aircraft/followme_e-tron/Nasal/electrical.nas</file>
             <file>Aircraft/followme_e-tron/Nasal/radar.nas</file>
     		<file>Aircraft/followme_e-tron/Nasal/systems.nas</file>
