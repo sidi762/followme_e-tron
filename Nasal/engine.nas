@@ -14,7 +14,7 @@ var Engine = {
     #//For this vehicle: maxPower: 375kW
 
     new: func(mTorque, mPower, rpmAtMPower) {
-        var m = {parents:[Engine], followme.Appliance.new()};
+        var m = {parents:[Engine], followme.Applicance.new()};
         m.engineNode = followme.vehicleInformation.engine;
         m.engineNode.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
         m.engineNode.rpmNode = props.getNode("/controls/engines/engine/rpma",1);

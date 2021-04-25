@@ -18,12 +18,12 @@ var VehicleInformationManager = {
     getAltitudeFT: func(){
         return me._altitudeFTNode.getValue();
     },
-    engine:{},
 };
 
 var vehicleInformation = VehicleInformationManager.new();
 
 #//For Engine
+vehicleInformation.engine = {};
 vehicleInformation.engine.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
 vehicleInformation.engine.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
 vehicleInformation.engine.isStarted = props.getNode("/controls/engines/engine/started",1);
