@@ -11,6 +11,7 @@ var SmartInstruments = {
             }),
         };
 
+        m.information = followme.vehicleInformation;
         m.startupSoundIsEnabled = 0;
         m.startupSound = nil;#//The startup sound
         m.startupSoundPath = nil;#//Path to the startup sound
@@ -127,7 +128,7 @@ var SmartInstruments = {
         return me.infoImageIndex;
     },
     update: func(){
-        var currentSpeedKMH = sprintf("%i", vehicleInformation.getSpeedKMH());
+        var currentSpeedKMH = sprintf("%i", me.information.getSpeedKMH());
         me.speedometer.updateText(currentSpeedKMH);
         if(autospeed.active == 1){
             me.speedometer.setColor(0.34, 0.63, 1);
@@ -148,10 +149,10 @@ var SmartInstruments = {
             me.driveMode.updateText("Low Power");
         }
 
-        var tempC = vehicleInformation.environment.temperature.getValue();
+        var tempC = me.information.environment.temperature.getValue();
         me.tempDisplay.updateText(sprintf("%0.1f", tempC)~" °C");
-        var hour = vehicleInformation.getTimeHour();
-        var minute = vehicleInformation.getTimeMinute();
+        var hour = me.information.getTimeHour();
+        var minute = me.information.getTimeMinute();
         if(minute < 10) minute = "0"~minute;
         me.timeDisplay.updateText(hour~":"~minute);
         #runtimeTextAdjust(timeDisplay);
