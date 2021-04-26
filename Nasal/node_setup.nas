@@ -4,6 +4,8 @@ var VehicleInformationManager = {
         m._speedKTSNode = props.getNode("/sim/multiplay/generic/float[15]", 1);
         m._headingNode = props.getNode("/orientation/heading-deg",1);
         m._altitudeFTNode = props.getNode("/position/altitude-ft",1);
+		m._timeHourNode = props.getNode("sim/time/real/hour", 1);
+		m._timeMinuteNode = props.getNode("sim/time/real/minute", 1);
         return m;
     },
     getSpeedKMH: func(){
@@ -18,9 +20,19 @@ var VehicleInformationManager = {
     getAltitudeFT: func(){
         return me._altitudeFTNode.getValue();
     },
+	getTimeHour: func(){
+		return me._timeHourNode.getValue();
+	},
+	getTimeMinute: func(){
+		return me._timeMinuteNode.getValue();
+	},
 };
 
 var vehicleInformation = VehicleInformationManager.new();
+
+
+#//Environment
+vehicleInformation.environment.temperature = props.getNode("environment/temperature-degc", 1);
 
 #//For Engine
 vehicleInformation.engine = {};

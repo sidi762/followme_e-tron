@@ -144,8 +144,8 @@ var IndicatorController = {
     leftIndicator : Indicator.new("left"),
     rightIndicator : Indicator.new("right"),
 
-    leftIndicatorSwitchNode: props.getNode("/controls/lighting/indicator/left_switch", 1),
-    rightIndicatorSwitchNode: props.getNode("/controls/lighting/indicator/right_switch", 1),
+    leftIndicatorSwitchNode: vehicleInformation.lighting.indicator.leftSwitch,
+    rightIndicatorSwitchNode: vehicleInformation.lighting.indicator.rightSwitch,
 
     mode:0,
 

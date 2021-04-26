@@ -127,8 +127,7 @@ var SmartInstruments = {
         return me.infoImageIndex;
     },
     update: func(){
-        var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]");
-        var currentSpeedKMH = sprintf("%i", currentSpeed*1.852);
+        var currentSpeedKMH = sprintf("%i", vehicleInformation.getSpeedKMH());
         me.speedometer.updateText(currentSpeedKMH);
         if(autospeed.active == 1){
             me.speedometer.setColor(0.34, 0.63, 1);
@@ -149,10 +148,10 @@ var SmartInstruments = {
             me.driveMode.updateText("Low Power");
         }
 
-        var tempC = props.getNode("/", 1).getValue("environment/temperature-degc");
+        var tempC = vehicleInformation.environment.temperature.getValue();
         me.tempDisplay.updateText(sprintf("%0.1f", tempC)~" °C");
-        var hour = props.getNode("/", 1).getValue("sim/time/real/hour");
-        var minute = props.getNode("/", 1).getValue("sim/time/real/minute");
+        var hour = vehicleInformation.getTimeHour();
+        var minute = vehicleInformation.getTimeMinute();
         if(minute < 10) minute = "0"~minute;
         me.timeDisplay.updateText(hour~":"~minute);
         #runtimeTextAdjust(timeDisplay);
