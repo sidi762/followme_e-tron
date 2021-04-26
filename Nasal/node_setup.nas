@@ -32,7 +32,8 @@ var vehicleInformation = VehicleInformationManager.new();
 
 
 #//Environment
-vehicleInformation.environment.temperature = props.getNode("environment/temperature-degc", 1);
+vehicleInformation.environment = props.getNode("/environment", 1);
+vehicleInformation.environment.temperature = props.getNode("/environment/temperature-degc", 1);
 
 #//For Engine
 vehicleInformation.engine = {};
