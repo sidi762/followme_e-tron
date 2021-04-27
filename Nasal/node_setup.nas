@@ -20,6 +20,9 @@ var VehicleInformationManager = {
     getAltitudeFT: func(){
         return me._altitudeFTNode.getValue();
     },
+    getAltitudeMETERS: func(){
+        return me._altitudeFTNode.getValue() * FT2M;
+    },
 	getTimeHour: func(){
 		return me._timeHourNode.getValue();
 	},
@@ -35,7 +38,7 @@ var vehicleInformation = VehicleInformationManager.new();
 vehicleInformation.environment = props.getNode("/environment", 1);
 vehicleInformation.environment.temperature = props.getNode("/environment/temperature-degc", 1);
 
-#//For Engine
+#//Engine
 vehicleInformation.engine = {};
 vehicleInformation.engine.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
 vehicleInformation.engine.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
@@ -65,6 +68,13 @@ vehicleInformation.systems.speedometer = vehicleInformation.systems.getNode("spe
 vehicleInformation.systems.speedometer.type = vehicleInformation.systems.speedometer.getNode("type", 1);
 vehicleInformation.systems.batteryGauge = vehicleInformation.systems.getNode("battery-gauge", 1);
 vehicleInformation.systems.batteryGauge.type = vehicleInformation.systems.batteryGauge.getNode("type", 1);
+#//Safety
+vehicleInformation.systems.safety = vehicleInformation.systems.getNode("safety", 1);
+vehicleInformation.systems.safety.aebActivated = vehicleInformation.systems.safety.getNode("aeb_activated", 1);
+vehicleInformation.systems.safety.isAebOn = vehicleInformation.systems.safety.getNode("aeb_on", 1);
+#//Automatic driving
+vehicleInformation.systems.isAutoholdEnabled = vehicleInformation.systems.getNode("auto_hold_enabled", 1);
+vehicleInformation.systems.isAutoholdWorking = vehicleInformation.systems.getNode("auto_hold_working", 1);
 
 
 #//Initialization
@@ -80,6 +90,12 @@ vehicleInformation.lighting.indicator.right.setValue(0);
 vehicleInformation.systems.welcomeMessage.setValue(0);
 vehicleInformation.systems.speedometer.type.setValue("Type_A");
 vehicleInformation.systems.batteryGauge.type.setValue("Type_A");
+
+vehicleInformation.systems.safety.aebActivated.setValue("0");
+vehicleInformation.systems.safety.isAebOn.setValue("0");
+
+vehicleInformation.systems.isAutoholdEnabled.setValue("0");
+vehicleInformation.systems.isAutoholdWorking.setValue("0");
 
 props.getNode("/",1).setValue("/controls/mode", 1);
 props.getNode("/",1).setValue("/controls/direction", 1);
@@ -102,12 +118,9 @@ props.getNode("systems/screen-enable", 1).setValue(0);
 props.getNode("systems/pmodel-enable", 1).setValue(1);
 props.getNode("systems/decorations-enable", 1).setValue(0);
 props.getNode("systems/interior/type", 1).setValue("Default");
-props.getNode("systems/safety/aeb_activated", 1).setValue(0);
-props.getNode("systems/safety/aeb_on", 1).setValue(0);
-props.getNode("systems/auto_hold_enabled", 1).setValue(0);
-props.getNode("systems/auto_hold_working", 1).setValue(0);
 
-#Keep?
+
+#Keep or abandon?
 props.getNode("controls/lighting/headlight-als", 1).setValue(0);
 props.getNode("systems/display-speed", 1).setValue(0);
 props.getNode("/",1).setValue("/systems/instruments/enable_cdu", 0);
