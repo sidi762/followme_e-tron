@@ -134,8 +134,8 @@
             <int n="11" alias="/controls/direction"/>
             <int n="12" alias="/systems/codriver-enable"/>
             <!--<int n="13" alias="/interior/enable_mug"/>-->
-    	      <int n="14" alias="/systems/instruments/enable_cdu"/>
-    	      <int n="15" alias="/systems/instruments/enable_switches"/>
+    	    <!--<int n="14" alias="/systems/instruments/enable_cdu"/>-->
+    	    <int n="15" alias="/systems/instruments/enable_switches"/>
             <int n="16" alias="/warninglight/start"/>
 
             <!--float current num:25 -->
@@ -467,11 +467,6 @@
         <autohold>
             <file>Aircraft/followme_e-tron/Nasal/auto_hold.nas</file>
         </autohold>
-        <cdu>
-             <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/boeing.nas</file>
-             <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/library.nas</file>
-             <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/functions.nas</file>
-        </cdu>
         <datalink>
             <file>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/datalink.nas</file>
         </datalink>

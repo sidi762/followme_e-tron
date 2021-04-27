@@ -237,22 +237,6 @@
     </offsets>
 </model>
 
-<!--  CDU  -->
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/int[14]</property>
-			<value>1</value>
-		</equals>
-    </condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/CDU/boeing.xml</path>
-    <offsets>
-         <x-m>1.35</x-m>
-        <y-m>0.25</y-m>
-        <z-m>0.9</z-m>
-        <pitch-deg>-4</pitch-deg>
-    </offsets>
-</model>
 <!-- Accelerator -->
 <animation>
   <type>translate</type>
