@@ -68,6 +68,15 @@ var SmartInstruments = {
                          .setFontSize(148)        # Set fontsize and optionally character aspect ratio
                          .setColor(1,1,1)             # Text color
                          .setText("--");
+        #//Battery remaining
+        m.batteryRemainingDisplay = m.group.createChild("text", "optional-id-for element")
+                         .setTranslation(312, 542)      # The origin is in the top left corner
+                         .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
+                         .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
+                         .setFontSize(30)        # Set fontsize and optionally character aspect ratio
+                         .setColor(0.58,0.894,1)             # Text color
+                         .setText("--");
+
         #//Drive Mode
         m.driveMode = m.group.createChild("text", "optional-id-for element")
                              .setTranslation(780, 628)      # The origin is in the top left corner
@@ -128,6 +137,7 @@ var SmartInstruments = {
         return me.infoImageIndex;
     },
     update: func(){
+        #//Speedometer
         var currentSpeedKMH = sprintf("%i", me.information.getSpeedKMH());
         me.speedometer.updateText(currentSpeedKMH);
         if(autospeed.active == 1){
@@ -135,12 +145,18 @@ var SmartInstruments = {
         }else{
             me.speedometer.setColor(1, 1, 1);
         }
+        #//Power
         me.power.updateText(sprintf("%i", engine.engine_1.activePower_kW));
+        #//Battery
+        me.batteryRemainingDisplay.updateText(me.information.systems.electrical.getBatteryRemainingPercentage(followme.circuit_1));
+        runtimeTextAdjust(me.batteryRemainingDisplay);
+        #//Gear
         if(engine.engine_1.direction == 1){
             me.gearDisplay.updateText("D");
         }else if(engine.engine_1.direction == -1){
             me.gearDisplay.updateText("R");
         }
+        #//Mode
         if(engine.engine_1.mode == 1){
             me.driveMode.updateText("Performance");
         }else if(engine.engine_1.mode == 0.65){
@@ -149,13 +165,13 @@ var SmartInstruments = {
             me.driveMode.updateText("Low Power");
         }
 
+        #//Temperature and Time
         var tempC = me.information.environment.temperature.getValue();
         me.tempDisplay.updateText(sprintf("%0.1f", tempC)~" °C");
         var hour = me.information.getTimeHour();
         var minute = me.information.getTimeMinute();
         if(minute < 10) minute = "0"~minute;
         me.timeDisplay.updateText(hour~":"~minute);
-        #runtimeTextAdjust(timeDisplay);
     },
 
     updateTimer:nil,
@@ -175,10 +191,12 @@ var SmartInstruments = {
         me.group.show();
         me.speedometer.enableUpdate();
         me.power.enableUpdate();
+        me.batteryRemainingDisplay.enableUpdate();
         me.driveMode.enableUpdate();
         me.gearDisplay.enableUpdate();
         me.tempDisplay.enableUpdate();
         me.timeDisplay.enableUpdate();
+
 
         if(me.startupSound and me.startupSoundIsEnabled) followme.playAudio(me.startupSound, 1, me.startupSoundPath);
 
