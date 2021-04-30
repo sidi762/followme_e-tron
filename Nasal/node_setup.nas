@@ -69,9 +69,7 @@ vehicleInformation.systems.speedometer.type = vehicleInformation.systems.speedom
 vehicleInformation.systems.batteryGauge = vehicleInformation.systems.getNode("battery-gauge", 1);
 vehicleInformation.systems.batteryGauge.type = vehicleInformation.systems.batteryGauge.getNode("type", 1);
 vehicleInformation.systems.electrical = {};
-vehicleInformation.systems.electrical.getBatteryRemainingPercentage = func(circuit){
-    return circuit.parallelConnection[0].units[0].getRemainingPercentage();
-}
+
 #//Safety
 vehicleInformation.systems.safety = vehicleInformation.systems.getNode("safety", 1);
 vehicleInformation.systems.safety.aebActivated = vehicleInformation.systems.safety.getNode("aeb_activated", 1);

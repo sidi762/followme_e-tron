@@ -148,7 +148,9 @@ var SmartInstruments = {
         #//Power
         me.power.updateText(sprintf("%i", engine.engine_1.activePower_kW));
         #//Battery
-        me.batteryRemainingDisplay.updateText(me.information.systems.electrical.getBatteryRemainingPercentage(followme.circuit_1));
+        me.batteryRemainingDisplay.updateText(me.information.systems.electrical.getMainBatteryRemainingPercentage);
+        if(me.information.systems.electrical.getMainBatteryRemainingPercentageFloat <= 20.0) me.batteryRemainingDisplay.setColor(1,0,0);
+        else me.batteryRemainingDisplay.setColor(0.58,0.894,1);
         runtimeTextAdjust(me.batteryRemainingDisplay);
         #//Gear
         if(engine.engine_1.direction == 1){

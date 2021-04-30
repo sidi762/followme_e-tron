@@ -6,7 +6,7 @@
 io.include("library.nas");
 
 var electricalDebug = Debugger.new("Electrical");
-electricalDebug.setDebugLevel(3);
+electricalDebug.setDebugLevel(0);
 
 var kWh2kWs = func(kWh){
     return kWh * 3600;
@@ -244,6 +244,9 @@ var Circuit = {
         props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent-float", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentageFloat());
+
+        vehicleInformation.systems.electrical.getMainBatteryRemainingPercentage = me.parallelConnection[0].units[0].getRemainingPercentage();
+        vehicleInformation.systems.electrical.getMainBatteryRemainingPercentageFloat = me.parallelConnection[0].units[0].getRemainingPercentageFloat();
 
         electricalDebug.debugPrint("current: "~me.current, 1);
         electricalDebug.debugPrint("voltage: "~me.voltage(), 1);
