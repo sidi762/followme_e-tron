@@ -551,7 +551,7 @@ var Safety = {
         me.aebEnabled = 1;
         me.frontRadar.initWithoutStarting();
         #//me.frontRadar.stop();
-        me.aebOnProp.setValue(1);
+        me.aebOnProp.setIntValue(1);
         print("AEB enabled");
     },
     disableAEB: func(){
@@ -559,7 +559,7 @@ var Safety = {
         me.aebTimer.stop();
         if(me.aebEnabled) me.frontRadar.stop();
         me.aebEnabled = 0;
-        me.aebOnProp.setValue(0);
+        me.aebOnProp.setIntValue(0);
         print("AEB disabled");
     },
     toggleAEB: func(){
@@ -583,9 +583,9 @@ var Safety = {
         print("AEB Slow Mode");
     },
     aebFastMode: func(){
-        me.frontRadar.maxRange = 18;
+        me.frontRadar.maxRange = 20;
         #me.frontRadar.maxWidth = 0.05;
-        me.aebThreshold = 18;
+        me.aebThreshold = 20;
         me.aebFullThreshold = 16;
         me.aebMode = 2;
         print("AEB Fast Mode");
@@ -653,7 +653,7 @@ var Safety = {
                     if(currentSpeed <= 0){
                         me.aebStop();
                         #print("1");
-                    }else if(me.aebCount >= 20){
+                    }else if(me.aebCount >= 15){
                         me.aebStop();
                         #print("2");
                     }
@@ -664,7 +664,7 @@ var Safety = {
                 if(currentSpeed <= 0){
                     me.aebStop();
                     #print("11");
-                }else if(me.aebCount >= 20){
+                }else if(me.aebCount >= 15){
                     me.aebStop();
                     #print("22");
                 }

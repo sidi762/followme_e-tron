@@ -22,21 +22,21 @@ var autoHoldMainLoop = func(){
             if(!door1.getpos() and !door2.getpos() and !door3.getpos() and !door4.getpos() and engineNode.getValue()){
                 followme.brakeController.applyBrakes(1);
                 working = 1;
-                workingNode.setValue(1);
+                workingNode.setIntValue(1);
             }else{
                 stopAndSwitchToParking();
             }
         }else if(!math.round(currentSpeed)){
             followme.brakeController.applyBrakes(0);
             working = 0;
-            workingNode.setValue(0);
+            workingNode.setIntValue(0);
         }
     }
 }
 var stopAndSwitchToParking = func(){
     followme.brakeController.applyBrakes(0);
     working = 0;
-    workingNode.setValue(0);
+    workingNode.setIntValue(0);
     followme.brakeController.enableHandBrake();
 }
 
@@ -45,17 +45,17 @@ var autoHoldTimer = maketimer(0.05,autoHoldMainLoop);
 var startAutoHold = func(){
     autoHoldTimer.start();
     active = 1;
-    activeNode.setValue(1);
+    activeNode.setIntValue(1);
 }
 
 var stopAutoHold = func(){
     active = 0;
-    activeNode.setValue(0);
+    activeNode.setIntValue(0);
     autoHoldTimer.stop();
     currentSpeed = speedNode.getValue();
     if(followme.brakeController.applyingFeetBrake){
         working = 0;
-        workingNode.setValue(0);
+        workingNode.setIntValue(0);
         followme.brakeController.applyBrakes(0);
     }else if(!math.round(currentSpeed)){
         stopAndSwitchToParking();
