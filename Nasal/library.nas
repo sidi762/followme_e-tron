@@ -64,7 +64,7 @@ var Debugger = {
 
     _debugLevel: 0,
     debugPrint: func(info, debugLevel){
-        if(debugLevel = me._debugLevel) print(me.name ~ ": " ~ info);
+        if(debugLevel <= me._debugLevel) print(me.name ~ ": " ~ info);
     },
     setDebugLevel: func(debugLevel){
         me._debugLevel = debugLevel;

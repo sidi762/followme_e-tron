@@ -2,11 +2,11 @@
 #//Sidi Liang, 2021
 io.include("library.nas");
 
-var informationNodeDebug = Debugger.new("Information Node");
-informationNodeDebug.setDebugLevel(2);
+var universalVariableDebug = Debugger.new("Information Node");
+universalVariableDebug.setDebugLevel(2);
 
-var InformationNode = {
-    #//testingInformationNode = InformationNode.new("test", "testing", "This is a node for testing", 0, 1, 1, "/systems/testingNode");
+var Variable = {
+    #//testingVariable = Variable.new("test", "testing", "This is a node for testing", 0, 1, 1, "/systems/testingNode");
     new: func(name, value = 0, note = nil, readOnly = 0, usePropertyTree = 0, listenPropertyTree = 1, property = nil){
         var m = {parents:[InformationNode]};
         m._name = name;
@@ -31,7 +31,7 @@ var InformationNode = {
             me._value = me._propertyNode.getValue();
             return 1;
         }else{
-            informationNodeDebug.debugPrint("Error when updating "~me._name~" from property: Cannot write to a read only node", 1);
+            universalVariableDebug.debugPrint("Error when updating "~me._name~" from property: Cannot write to a read only node", 1);
             return 0;
         }
     },
@@ -41,7 +41,7 @@ var InformationNode = {
             if(me._usePropertyTree) me._propertyNode.setValue(value);
             return 1;
         }else{
-            informationNodeDebug.debugPrint("Error when writing to "~me._name~" : Cannot write to a read only node", 1);
+            universalVariableDebug.debugPrint("Error when writing to "~me._name~" : Cannot write to a read only node", 1);
             return 0;
         }
     },
@@ -58,14 +58,14 @@ var InformationNode = {
             me._usePropertyTree = value;
             if(!value and me._listenPropertyTree){
                 removeListener(me._propertyListener);
-                informationNodeDebug.debugPrint(me._name~" : listener removed", 2);
+                universalVariableDebug.debugPrint(me._name~" : listener removed", 2);
             }else if(value and me._listenPropertyTree){
                 me._propertyListener = setlistener(property, func m._updateValueFromProperty, 0, 1);
-                informationNodeDebug.debugPrint(me._name~" : listener (re)added", 2);
+                universalVariableDebug.debugPrint(me._name~" : listener (re)added", 2);
             }
             return 1;
         }else{
-            informationNodeDebug.debugPrint("Error when (dis)enabling property tree of "~me._name~" : property node not initialized", 1);
+            universalVariableDebug.debugPrint("Error when (dis)enabling property tree of "~me._name~" : property node not initialized", 1);
             return 0;
         }
     },
