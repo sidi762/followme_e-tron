@@ -1,3 +1,96 @@
+#//Node Management system and setting up these nodes
+#//Sidi Liang, 2021
+io.include("library.nas");
+
+var informationNodeDebug = Debugger.new("Information Node");
+informationNodeDebug.setDebugLevel(2);
+
+var InformationNode = {
+    #//testingInformationNode = InformationNode.new("test", "testing", "This is a node for testing", 0, 1, 1, "/systems/testingNode");
+    new: func(name, value = 0, note = nil, readOnly = 0, usePropertyTree = 0, listenPropertyTree = 1, property = nil){
+        var m = {parents:[InformationNode]};
+        m._name = name;
+        m._value = value;
+        m._note = note;
+        m._readOnly = readOnly;
+        m._usePropertyTree = usePropertyTree;
+        m._listenPropertyTree = listenPropertyTree;
+        m._property = property;
+        m._propertyNodeInitialized = 0;
+
+        if(usePropertyTree){
+            m._propertyNode = props.getNode(property, 1);
+            m._propertyNode.setValue(value);
+            m._propertyNodeInitialized = 1;
+            if(listenPropertyTree) m._propertyListener = setlistener(property, func m._updateValueFromProperty, 0, 1);
+        }
+        return m;
+    },
+    _updateValueFromProperty: func(){
+        if(!me._readOnly){
+            me._value = me._propertyNode.getValue();
+            return 1;
+        }else{
+            informationNodeDebug.debugPrint("Error when updating "~me._name~" from property: Cannot write to a read only node", 1);
+            return 0;
+        }
+    },
+    setInfo: func(value){
+        if(!me._readOnly){
+            me._value = value;
+            if(me._usePropertyTree) me._propertyNode.setValue(value);
+            return 1;
+        }else{
+            informationNodeDebug.debugPrint("Error when writing to "~me._name~" : Cannot write to a read only node", 1);
+            return 0;
+        }
+    },
+    getInfo: func(){
+        return me._value;
+    },
+    setProperty: func(property){
+        me._property = property;
+        me._propertyNode = props.getNode(property, 1);
+        me._propertyNodeInitialized = 1;
+    },
+    setUsePropertyTree: func(value){
+        if(me._propertyNodeInitialized){
+            me._usePropertyTree = value;
+            if(!value and me._listenPropertyTree){
+                removeListener(me._propertyListener);
+                informationNodeDebug.debugPrint(me._name~" : listener removed", 2);
+            }else if(value and me._listenPropertyTree){
+                me._propertyListener = setlistener(property, func m._updateValueFromProperty, 0, 1);
+                informationNodeDebug.debugPrint(me._name~" : listener (re)added", 2);
+            }
+            return 1;
+        }else{
+            informationNodeDebug.debugPrint("Error when (dis)enabling property tree of "~me._name~" : property node not initialized", 1);
+            return 0;
+        }
+    },
+    isUsingPropertyTree: func(){
+        return me._usePropertyTree;
+    },
+    setListenPropertyTree: func(value){
+        if(me._usePropertyTree){
+            if(value){
+                me._propertyListener = setlistener(property, func m._updateValueFromProperty, 0, 1);
+                informationNodeDebug.debugPrint(me._name~" : listener added", 2);
+            }else{
+                removeListener(me._propertyListener);
+                informationNodeDebug.debugPrint(me._name~" : listener removed", 2);
+            }
+            return 1;
+        }else{
+            informationNodeDebug.debugPrint("Error when setting listeners of "~me._name~" : not using property tree", 1);
+        }
+    },
+    isListeningPropertyTree: func(){
+        return me._listenPropertyTree;
+    },
+};
+
 var VehicleInformationManager = {
     new: func(){
         var m = {parents:[VehicleInformationManager]};
@@ -7,6 +100,9 @@ var VehicleInformationManager = {
 		m._timeHourNode = props.getNode("sim/time/real/hour", 1);
 		m._timeMinuteNode = props.getNode("sim/time/real/minute", 1);
         return m;
+    },
+    registerNode:{
+
     },
     getSpeedKMH: func(){
         return me._speedKTSNode.getValue()*1.852;
