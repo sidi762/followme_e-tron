@@ -35,6 +35,22 @@
  </condition>
 </animation>
 
+<!-- Screen -->
+<animation>
+ <type>select</type>
+ <object-name>screen</object-name>
+ <object-name>frame</object-name>
+ <condition>
+
+     <equals>
+         <property>sim/multiplay/generic/int[6]</property>
+         <value>1</value>
+     </equals>
+
+ </condition>
+</animation>
+
+
 <!-- STEERINGWHEEL -->
 
 <animation>

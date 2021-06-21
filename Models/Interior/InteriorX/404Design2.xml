@@ -1,6 +1,6 @@
 <PropertyList>
 
-<path>interior.ac</path>
+<path>404Design2.ac</path>
 
 
 
@@ -30,20 +30,6 @@
 </animation>
 
 
-<!-- Screen -->
-<animation>
- <type>select</type>
- <object-name>screen</object-name>
- <object-name>frame</object-name>
- <condition>
-
-     <equals>
-         <property>sim/multiplay/generic/int[6]</property>
-         <value>1</value>
-     </equals>
-
- </condition>
-</animation>
 
 <!-- STEERINGWHEEL -->
 
@@ -69,16 +55,20 @@
 
 
 <!--  Engine Starter  -->
+<animation>
+  <type>pick</type>
+  <object-name>starter</object-name>
+  <visible>true</visible>
+  <action>
+    <button>0</button>
+    <repeatable>false</repeatable>
+    <binding>
+      <command>nasal</command>
+      <script>engine.toggleEngine(engine.engine_1)</script>
+    </binding>
+  </action>
+</animation>
 
-<model>
-  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/starter/starter_luxury.xml</path>
-  <offsets>
-   <x-m>1.3</x-m>
-   <y-m>-0.18</y-m>
-   <z-m>0.93</z-m>
-   <pitch-deg>-10</pitch-deg>
-  </offsets>
-</model>
 
 <!-- MUG -->
 <model>
@@ -100,7 +90,7 @@
 <!-- GEAR HANDLE -->
 <animation>
     <type>pick</type>
-    <object-name>gearbox</object-name>
+    <object-name>gearhandle</object-name>
     <action>
       <button>0</button>
       <binding>
@@ -110,6 +100,36 @@
     </action>
 </animation>
 
+<!-- Speed hold -->
+<!--<animation>
+		<type>pick</type>
+		<object-name>speedhold_switch</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>nasal</command>
+				<script>autospeed.toggleSpeedHold()</script>
+			</binding>
+		</action>
+</animation>-->
+
+<!-- Mode switch -->
+<animation>
+		<type>pick</type>
+		<object-name>drivemode_switch</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+            <binding>
+                <command>property-cycle</command>
+                <property>/controls/mode</property>
+                <value type="double">1</value>
+                <value type="double">0.65</value>
+                <value type="double">0.4</value>
+            </binding>
+		</action>
+</animation>
 
 <!-- Auto hold -->
 <!--<effect>
@@ -137,7 +157,7 @@
 	                 <value>1</value>
 	       </equals>
     </condition>
-    <texture>autohold_switch_LIT.png</texture>
+    <texture>control_LIT.png</texture>
 </animation>
 <animation>
      <type>material</type>
@@ -148,32 +168,80 @@
 	 	     <value>0</value>
 	     </equals>
      </condition>
-     <texture>autohold_switch.png</texture>
+     <texture>control.png</texture>
 </animation>
 
+<!-- AEB switch -->
 <animation>
-     <type>material</type>
-     <object-name>autohold_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[3]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-     <texture>autohold_LIT.png</texture>
+		<type>pick</type>
+		<object-name>aeb_switch</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>followme.safety.toggleFrontRadar()</script>
+            </binding>
+		</action>
+</animation>
+<animation>
+    <type>material</type>
+    <object-name>aeb_switch</object-name>
+    <condition>
+	       <equals>
+		             <property>sim/multiplay/generic/bool[8]</property>
+	                 <value>1</value>
+	       </equals>
+    </condition>
+    <texture>control_LIT.png</texture>
 </animation>
 <animation>
      <type>material</type>
-     <object-name>autohold_LIT</object-name>
+     <object-name>aeb_switch</object-name>
      <condition>
          <equals>
-	 	     <property>sim/multiplay/generic/bool[3]</property>
+	 	     <property>sim/multiplay/generic/bool[8]</property>
 	 	     <value>0</value>
 	     </equals>
      </condition>
-     <texture>panel_black.png</texture>
+     <texture>control.png</texture>
 </animation>
 
+<!-- warninglights switch -->
+<animation>
+		<type>pick</type>
+		<object-name>warninglights_switch</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+            <binding>
+              <command>property-toggle</command>
+              <property>warninglight/start</property>
+            </binding>
+		</action>
+</animation>
+<animation>
+    <type>material</type>
+    <object-name>warninglights_switch</object-name>
+    <condition>
+	       <equals>
+		             <property>sim/multiplay/generic/int[16]</property>
+	                 <value>1</value>
+	       </equals>
+    </condition>
+    <texture>control_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>warninglights_switch</object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/int[16]</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>control.png</texture>
+</animation>
 
 <!-- Hand brake -->
 <effect>
@@ -201,7 +269,7 @@
 	                 <value>1</value>
 	       </equals>
     </condition>
-    <texture>parkingbrake_LIT.png</texture>
+    <texture>control_LIT.png</texture>
 </animation>
 <animation>
      <type>material</type>
@@ -212,35 +280,13 @@
 	 	     <value>0</value>
 	     </equals>
      </condition>
-     <texture>parkingbrake.png</texture>
+     <texture>control.png</texture>
 </animation>
 
-<animation>
-     <type>material</type>
-     <object-name>handbrake_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/float[19]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-     <texture>handbrake_LIT.png</texture>
-</animation>
-<animation>
-     <type>material</type>
-     <object-name>handbrake_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/float[19]</property>
-	 	     <value>0</value>
-	     </equals>
-     </condition>
-     <texture>panel_black.png</texture>
-</animation>
 
 <!-- AEB -->
 <animation>
-     <type>material</type>
+     <type>select</type>
      <object-name>AEB_LIT</object-name>
      <condition>
          <equals>
@@ -248,67 +294,12 @@
 	 	     <value>1</value>
 	     </equals>
      </condition>
-     <texture>AEB_LIT.png</texture>
 </animation>
-<animation>
-     <type>material</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>0</value>
-	     </equals>
-     </condition>
-     <texture>panel_black.png</texture>
-</animation>
+
 
 <!-- Headlight -->
-<animation>
-     <type>material</type>
-     <object-name>headlight_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/int[3]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-     <texture>headlight_LIT.png</texture>
-</animation>
-<animation>
-     <type>material</type>
-     <object-name>headlight_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/int[3]</property>
-	 	     <value>0</value>
-	     </equals>
-     </condition>
-     <texture>panel_black.png</texture>
-</animation>
 
 <!-- HighBeam -->
-<animation>
-     <type>material</type>
-     <object-name>longheadlight_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[5]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-     <texture>longheadlight_LIT.png</texture>
-</animation>
-<animation>
-     <type>material</type>
-     <object-name>longheadlight_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[5]</property>
-	 	     <value>0</value>
-	     </equals>
-     </condition>
-     <texture>panel_black.png</texture>
-</animation>
 
 <!-- Indicator -->
 <animation>
@@ -331,6 +322,47 @@
   <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
  </emission>
 </animation>
+
+<animation>
+    <type>rotate</type>
+    <object-name>left_handle</object-name>
+    <property>/controls/lighting/indicator/left_switch</property>
+    <factor> 15 </factor>
+    <center>
+      <x-m> 1.38 </x-m>
+      <y-m> -0.39 </y-m>
+      <z-m> 0.89 </z-m>
+    </center>
+    <axis>
+        <x1-m>1.38</x1-m>
+        <y1-m>-0.39</y1-m>
+        <z1-m>0.72</z1-m>
+        <x2-m>2.00</x2-m>
+        <y2-m>-0.39</y2-m>
+        <z2-m>0.89</z2-m>
+    </axis>
+</animation>
+
+<animation>
+    <type>rotate</type>
+    <object-name>left_handle</object-name>
+    <property>/controls/lighting/indicator/right_switch</property>
+    <factor> -15 </factor>
+    <center>
+      <x-m> 1.38 </x-m>
+      <y-m> -0.39 </y-m>
+      <z-m> 0.89 </z-m>
+    </center>
+    <axis>
+        <x1-m>1.38</x1-m>
+        <y1-m>-0.39</y1-m>
+        <z1-m>0.72</z1-m>
+        <x2-m>2.00</x2-m>
+        <y2-m>-0.39</y2-m>
+        <z2-m>0.89</z2-m>
+    </axis>
+</animation>
+
 <animation>
 		<type>pick</type>
 		<object-name>doubleflash</object-name>
@@ -366,42 +398,44 @@
  </emission>
 </animation>
 
-<!-- storage_cover -->
+<!-- Rain wiper -->
 <animation>
-  <type>pick</type>
-  <object-name>storage_cover</object-name>
-  <action>
-    <button>0</button>
-    <binding>
-        <command>property-cycle</command>
-        <property>controls/interior/luxury/storage_cover_pos</property>
-        <value type="double">0</value>
-        <value type="double">1</value>
-    </binding>
-  </action>
- </animation>
+    <type>rotate</type>
+    <object-name>frontwiper1</object-name>
+    <property>/fdm/jsbsim/animation/wiper_pos</property>
+    <factor> 75 </factor>
+    <center>
+      <x-m> 0.89 </x-m>
+      <y-m> 0.11 </y-m>
+      <z-m> 1.02 </z-m>
+    </center>
+    <axis>
+        <x1-m>0</x1-m>
+        <y1-m>0</y1-m>
+        <z1-m>0</z1-m>
+        <x2-m>1</x2-m>
+        <y2-m>0</y2-m>
+        <z2-m>-1</z2-m>
+    </axis>
+</animation>
 <animation>
-  <type>translate</type>
-  <object-name>storage_cover</object-name>
-  <property>sim/multiplay/generic/float[23]</property>
-  <factor>0.13</factor>
-  <offset-m>0</offset-m>
-  <axis>
-   <x>1</x>
-   <y>0</y>
-   <z>0</z>
-  </axis>
- </animation>
- <!-- storage -->
-<animation>
-    <type>select</type>
-    <object-name>stroage</object-name>
-    <condition>
-        <equals>
-            <property>sim/multiplay/generic/float[24]</property>
-            <value>1</value>
-        </equals>
-    </condition>
+    <type>rotate</type>
+    <object-name>frontwiper2</object-name>
+    <property>/fdm/jsbsim/animation/wiper_pos</property>
+    <factor> 75 </factor>
+    <center>
+      <x-m> 0.89 </x-m>
+      <y-m> -0.52 </y-m>
+      <z-m> 1.02 </z-m>
+    </center>
+    <axis>
+        <x1-m>0</x1-m>
+        <y1-m>0</y1-m>
+        <z1-m>0</z1-m>
+        <x2-m>1</x2-m>
+        <y2-m>0</y2-m>
+        <z2-m>-1.3</z2-m>
+    </axis>
 </animation>
 
 <!-- Accelerator -->

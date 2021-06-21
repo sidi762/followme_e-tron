@@ -43,6 +43,16 @@
     <condition>
 		<equals>
 			<property>sim/multiplay/generic/string[3]</property>
+			<value>Luxury 2.0</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/luxury2.xml</path>
+</model>
+
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
 			<value>Race</value>
 		</equals>
 	</condition>
@@ -55,7 +65,16 @@
 			<value>404Design</value>
 		</equals>
 	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/404Design/interior.xml</path>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design.xml</path>
+</model>
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
+			<value>404Design 2.0</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2.xml</path>
 </model>
 
 <animation>
@@ -147,22 +166,6 @@
      <z-m> 0.39</z-m>
     </offsets>
 </model>
-
-<!-- INSTRUMENTS -->
-<animation>
- <type>select</type>
- <object-name>screen</object-name>
- <object-name>frame</object-name>
- <condition>
-
-     <equals>
-         <property>sim/multiplay/generic/int[6]</property>
-         <value>1</value>
-     </equals>
-
- </condition>
-</animation>
-
 
 <model>
   <path>Aircraft/followme_e-tron/Models/Interior/Instruments/indicater/inside_indicater.ac</path>
