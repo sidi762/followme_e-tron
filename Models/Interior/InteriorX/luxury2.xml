@@ -2,9 +2,6 @@
 
 <path>luxury2.ac</path>
 
-
-
-
 <effect>
     <inherits-from>Aircraft/followme_e-tron/Models/Effects/interior</inherits-from>
     <object-name>Mesh63</object-name>
@@ -12,22 +9,6 @@
     <object-name>Mesh68</object-name>
     <object-name>Mesh69</object-name>
 </effect>
-
-
-<!-- Decoration -->
-<animation>
- <type>select</type>
- <object-name>etc</object-name>
- <object-name>card</object-name>
- <condition>
-
-     <equals>
-         <property>sim/multiplay/generic/bool[0]</property>
-         <value>1</value>
-     </equals>
-
- </condition>
-</animation>
 
 <!-- Clock -->
 <animation>
@@ -69,6 +50,24 @@
   <z2-m>0.9075</z2-m>
  </axis>
 </animation>
+
+
+<!-- Decoration -->
+<animation>
+ <type>select</type>
+ <object-name>etc</object-name>
+ <object-name>card</object-name>
+ <condition>
+
+     <equals>
+         <property>sim/multiplay/generic/bool[0]</property>
+         <value>1</value>
+     </equals>
+
+ </condition>
+</animation>
+
+
 
 <!-- STEERINGWHEEL -->
 
@@ -210,6 +209,46 @@
      <texture>control.png</texture>
 </animation>
 
+<!-- Parking Radar -->
+<animation>
+		<type>pick</type>
+		<object-name>reversing_radar_switch</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>nasal</command>
+				<script>followme.parkingRadar.toggle()</script>
+			</binding>
+		</action>
+</animation>
+<!--
+<animation>
+    <type>material</type>
+    <object-name>reversing_radar_switch</object-name>
+    <condition>
+	       <equals>
+		             <property>sim/multiplay/generic/bool[2]</property>
+	                 <value>1</value>
+	       </equals>
+    </condition>
+    <texture>control_LIT.png</texture>
+</animation>
+<animation>
+     <type>material</type>
+     <object-name>autohold_switch</object-name>
+     <condition>
+         <equals>
+	 	     <property>sim/multiplay/generic/bool[2]</property>
+	 	     <value>0</value>
+	     </equals>
+     </condition>
+     <texture>control.png</texture>
+</animation>
+-->
+
+
+
 <!-- AEB switch -->
 <animation>
 		<type>pick</type>
@@ -219,7 +258,7 @@
 			<repeatable>false</repeatable>
             <binding>
                 <command>nasal</command>
-                <script>followme.safety.toggleFrontRadar()</script>
+                <script>followme.safety.toggleAEB()</script>
             </binding>
 		</action>
 </animation>

@@ -2,9 +2,6 @@
 
 <path>404Design.ac</path>
 
-
-
-
 <effect>
     <inherits-from>Aircraft/followme_e-tron/Models/Effects/interior</inherits-from>
     <object-name>Mesh63</object-name>
