@@ -29,7 +29,46 @@
  </condition>
 </animation>
 
-
+<!-- Clock -->
+<animation>
+ <type>rotate</type>
+ <object-name>hour_hand</object-name>
+ <property>sim/time/local-day-seconds</property>
+ <factor>-0.0083333333</factor>
+ <offset-deg>-90</offset-deg>
+ <center>
+  <x-m> 1.341</x-m>
+  <y-m>0</y-m>
+  <z-m> 0.906 </z-m>
+ </center>
+ <axis>
+  <x1-m>1.339</x1-m>
+  <y1-m>0</y1-m>
+  <z1-m>0.905</z1-m>
+  <x2-m>1.343</x2-m>
+  <y2-m>0</y2-m>
+  <z2-m>0.9075</z2-m>
+ </axis>
+</animation>
+<animation>
+ <type>rotate</type>
+ <object-name>minute_hand</object-name>
+ <property>sim/time/local-day-seconds</property>
+ <factor>-0.1</factor>
+ <center>
+  <x-m> 1.341</x-m>
+  <y-m>0</y-m>
+  <z-m> 0.906 </z-m>
+ </center>
+ <axis>
+  <x1-m>1.339</x1-m>
+  <y1-m>0</y1-m>
+  <z1-m>0.905</z1-m>
+  <x2-m>1.343</x2-m>
+  <y2-m>0</y2-m>
+  <z2-m>0.9075</z2-m>
+ </axis>
+</animation>
 
 <!-- STEERINGWHEEL -->
 
