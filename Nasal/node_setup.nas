@@ -36,7 +36,7 @@ var Variable = {
             return 0;
         }
     },
-    setInfo: func(value){
+    setValue: func(value){
         if(!me._readOnly){
             me._value = value;
             if(me._usePropertyTree) me._propertyNode.setValue(value);
@@ -46,7 +46,7 @@ var Variable = {
             return 0;
         }
     },
-    getInfo: func(){
+    getValue: func(){
         return me._value;
     },
     setProperty: func(property){
@@ -102,7 +102,7 @@ var VehicleInformationManager = {
 		m._timeMinuteNode = props.getNode("sim/time/real/minute", 1);
         return m;
     },
-    registerNode:{
+    registerNode: func(){
 
     },
     getSpeedKMH: func(){
