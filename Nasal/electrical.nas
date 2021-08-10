@@ -378,18 +378,13 @@ var Switch = {
     #//Type 0 for appliance switch. type 1 for series switch
     #//switchToggle: Return 1 if connected, return 0 if disconnected
     new: func(type, name = "Switch") {
-        if(type == 0){
-            var newCS = { parents:[Switch, Appliance.new()], applianceName: name };
-            return newCS;
-        }else if(type == 1){
-            var newCS = { parents:[Switch, Series.new()]};
-            return newCS;
-        }
+        var newCS = { parents:[Switch, Appliance.new()], applianceName: name, type: type, isResistor: 1,};
+        return newCS;
     },
     isSwitch: func(){
         return 1;
     },
-
+    resistance: 3000000000000, #//3000000000000 when disconnected and 0 when connected
     switchState: 1, #//0 for disconnect, 1 for connect
 
     isConnected: func(){
@@ -402,10 +397,12 @@ var Switch = {
 
     switchConnect: func(){
         me.switchState = 1;
+        me.resistance = 0;
         return 1;
     },
     switchDisconnect: func(){
         me.switchState = 0;
+        me.resistance = 3000000000000;
         return 0;
     },
     switchToggle: func(){
