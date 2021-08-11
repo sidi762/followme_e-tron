@@ -59,13 +59,6 @@ var Series = {
     totalCounterElectromotiveForce: 0,#//Total counterElectromotiveForce, calculated from v=Power output / I, after the current is calculated
 
     updateCurrent: func(){
-        foreach(elem; me.units){
-            if(elem.isSwitch()){
-                if(!elem.isConnected()){
-                    return 0;
-                }
-            }
-        }
 
         #//Calculated by solving the equation UI = I^2*R + Power output
         var R = me.totalResistance();
@@ -105,11 +98,6 @@ var Series = {
         #}
         foreach(elem; me.units){
             elem.voltage = me.current * elem.resistance + (elem.activePower + elem.activePower_kW * 1000) / me.current;
-            if(elem.isSwitch()){
-                if(!elem.isConnected()){
-                    me.voltage = 0;
-                }
-            }
             #var factor = (elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000)/totalTmp;
             #elem.voltage = me.voltage * factor;
             electricalDebug.debugPrint("elem volt" ~ elem.voltage, 3);
@@ -186,11 +174,6 @@ var Circuit = {
         #//var setVoltage = me.voltage();
         var setVoltage = me.parallelConnection[0].units[0].electromotiveForce; #//2021/8/9 note: view it as ideal voltage source for now
         foreach(elem; me.parallelConnection){
-            if(elem.isSwitch()){
-                if(!elem.isConnected()){
-                    setVoltage = 0;
-                }
-            }
             elem.voltage = setVoltage;
         }
     }, #//Volt
@@ -205,12 +188,6 @@ var Circuit = {
     calculateTotalParallelCurrent: func(){
         var total = 0;
         foreach(elem; me.parallelConnection){
-            if(elem.isSwitch()){
-                if(!elem.isConnected()){
-                    me.current = 0;
-                    return 0;
-                }
-            }
             total += elem.current;
         }
         me.current = total;
