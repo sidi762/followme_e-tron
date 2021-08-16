@@ -170,6 +170,8 @@ var Engine = {
             me.stopEngine();
             print("No Power");
             me.errorMessage = "NO POWER";
+            #//To be improved
+            smartInstruments.smartInstruments.showWarningMessage(me.errorMessage);
             return 0;
         }else{
             me.errorMessage = nil;
@@ -328,6 +330,7 @@ var startEngine = func(my_engine){
         }else{
             print("Engine start failed");
             my_engine.errorMessage = "START FAIL";
+            smartInstruments.smartInstruments.showWarningMessage(my_engine.errorMessage);
         }
 
     }else if(followme.chargeTimer.isRunning){

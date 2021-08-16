@@ -54,7 +54,7 @@ var SmartInstruments = {
                                .show();
         m.warningText = m.group.createChild("text", "optional-id-for element")
                                     .setTranslation(530, 140)      # The origin is in the top left corner
-                                    .setAlignment("left-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
+                                    .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                                     .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
                                     .setFontSize(50)        # Set fontsize and optionally character aspect ratio
                                     .setColor(1,0,0)             # Text color
@@ -193,7 +193,7 @@ var SmartInstruments = {
 
         #//Warning MESSAGE
         if(me.showingWarningMessage){
-            if(math.mod(me.loopCount, 10) == 0){
+            if(math.mod(me.loopCount, 10) < 5){
                 me.warningText.show();
             }else{
                 me.warningText.hide();
@@ -209,7 +209,7 @@ var SmartInstruments = {
         me.initialized = 1;
     },
     startUp:func(){
-        me.welcomeGroup.show();
+        if(!me.showingWarningMessage) me.welcomeGroup.show();
         var startScreenTimer = maketimer(1, func me.startSequence());
         startScreenTimer.singleShot = 1;
         startScreenTimer.start();
