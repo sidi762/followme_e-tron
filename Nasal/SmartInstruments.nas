@@ -18,6 +18,7 @@ var SmartInstruments = {
         m.group = m.instrumentCanvas.createGroup();#//Main group
         m.signGroup = m.instrumentCanvas.createGroup();#//sign group
         m.welcomeGroup = m.instrumentCanvas.createGroup();
+        m.mapGroup = m.instrumentCanvas.createGroup(); #//map group
         m.instrumentCanvas.addPlacement({"node": placement});
         #Sign svg
         canvas.parsesvg(
@@ -51,6 +52,13 @@ var SmartInstruments = {
                                .setColor(1,0,0)             # Text color
                                .setText("SELF TEST NORMAL")
                                .show();
+        m.warningText = m.group.createChild("text", "optional-id-for element")
+                                    .setTranslation(530, 140)      # The origin is in the top left corner
+                                    .setAlignment("left-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
+                                    .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
+                                    .setFontSize(50)        # Set fontsize and optionally character aspect ratio
+                                    .setColor(1,0,0)             # Text color
+                                    .setText("WARNING MESSAGE");
         #//speedometer
         m.speedometer = m.group.createChild("text", "optional-id-for element")
                                .setTranslation(1205, 380)      # The origin is in the top left corner
@@ -109,10 +117,16 @@ var SmartInstruments = {
                                .setFontSize(40)        # Set fontsize and optionally character aspect ratio
                                .setColor(1,1,1)             # Text color
                                .setText("9:41");
+
+        #//Map
+        #//Map Structure is a mess, removed
+
         m.init();
         return m;
     },
     initialized: 0,
+    loopCount:0,
+    showingWarningMessage: 0,
 
     enableStartupSound: func(){
         me.startupSoundIsEnabled = 1;
@@ -138,6 +152,7 @@ var SmartInstruments = {
     },
     update: func(){
         #//Speedometer
+        me.loopCount += 1;
         var currentSpeedKMH = sprintf("%i", me.information.getSpeedKMH());
         me.speedometer.updateText(currentSpeedKMH);
         if(autospeed.active == 1){
@@ -174,6 +189,15 @@ var SmartInstruments = {
         var minute = me.information.getTimeMinute();
         if(minute < 10) minute = "0"~minute;
         me.timeDisplay.updateText(hour~":"~minute);
+
+        #//Warning MESSAGE
+        if(me.showingWarningMessage){
+            if(math.mod(me.loopCount, 10) == 0){
+                me.warningText.show();
+            }else{
+                me.warningText.hide();
+            }
+        }
     },
 
     updateTimer:nil,
@@ -198,7 +222,7 @@ var SmartInstruments = {
         me.gearDisplay.enableUpdate();
         me.tempDisplay.enableUpdate();
         me.timeDisplay.enableUpdate();
-
+        me.warningText.enableUpdate();
 
         if(me.startupSound and me.startupSoundIsEnabled) followme.playAudio(me.startupSound, 1, me.startupSoundPath);
 
@@ -215,6 +239,13 @@ var SmartInstruments = {
         if(me.updateTimer != nil) me.updateTimer.stop();
         me.group.hide();
         me.welcomeGroup.hide();
+    },
+    showWarningMessage:func(msg){
+        me.warningText.setText(msg);
+        me.showingWarningMessage = 1;
+    },
+    hideWarningMessage:func(){
+        me.showingWarningMessage = 0;
     }
 
 };

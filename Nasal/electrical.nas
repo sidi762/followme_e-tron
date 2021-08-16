@@ -69,7 +69,7 @@ var Series = {
             return 0;#//No voltage, no current.
         }
 
-        print("U ",U," R ",R," Pout ",Pout);
+        #//print("U ",U," R ",R," Pout ",Pout);
 
         var deltaSquared = U*U - 4*R*Pout;
 
@@ -96,11 +96,17 @@ var Series = {
         #foreach(elem; me.units){
         #    totalTmp += elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000;
         #}
+
         foreach(elem; me.units){
-            elem.voltage = me.current * elem.resistance + (elem.activePower + elem.activePower_kW * 1000) / me.current;
+            if(me.current){
+                elem.voltage = me.current * elem.resistance + (elem.activePower + elem.activePower_kW * 1000) / me.current;
+            }else{
+                elem.voltage = 0;
+            }
+
             #var factor = (elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000)/totalTmp;
             #elem.voltage = me.voltage * factor;
-            electricalDebug.debugPrint("elem volt" ~ elem.voltage, 3);
+            electricalDebug.debugPrint(elem.applianceName ~ " volt" ~ elem.voltage, 3);
         }
         electricalDebug.debugPrint("____________________________SeriesVoltage calculated____________________________", 3);
     },
@@ -392,7 +398,7 @@ var Cable = {
     }
 };
 
-var cSource = CurrentSource.new(0.0136, 450, kWh2kWs(82), "Battery");#//Battery for engine, 82kWh, 450V
+var cSource = CurrentSource.new(0.0136, 405, kWh2kWs(82), "Battery");#//Battery for engine, 82kWh, 405V
 var circuit_1 = Circuit.new(cSource);#//Engine circuit
 
 var cSource_small = CurrentSource.new(0.0136, 12, kWh2kWs(0.72), "Battery");#//Battery for other systems, 60Ah, 12V

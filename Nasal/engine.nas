@@ -95,6 +95,8 @@ var Engine = {
     ratedVoltage: 0, #//Rated voltage
     ratedCurrent: 0, #//Rated Current, calculated when initializing
 
+    errorMessage: nil,
+
     rpm_calculate: func(angularAcceleration){
 
         var direction = me.getDirection();
@@ -164,10 +166,9 @@ var Engine = {
         var mode = me.engineNode.mode.getValue();
         me.mode = mode;
 
-        if(!me.voltage){
-            me.rpm = 0;
-            me.engineNode.rpmNode.setValue(0);
-            outputForce(0);
+        if(me.voltage <= 0){
+            me.stopEngine();
+            me.errorMessage = "NO POWER";
             return 0;
         }
 
@@ -222,8 +223,13 @@ var Engine = {
             me.printDebugInfo();
         }
 
-
         outputForce(me.outputForce * N2LBS);
+
+        if(me.errorMessage){
+            smartInstruments.smartInstruments.showWarningMessage(err);
+        }else{
+            smartInstruments.smartInstruments.hideWarningMessage();
+        }
 
     },
 
