@@ -41,7 +41,8 @@ var Steering = {
     steeringAngle: 0, #//in rad
     #steeringAngleDeg: 0, #//in degrees
 
-    steeringLimit: 15.707963, #// 5 * 3.1415926
+    #//steeringLimit: 7.8539815, #// 2.5 * 3.1415926 = 7.8539815 5 * 3.1415926 = 15.707963 3.1415926 / 4 = 0.78359815
+    steeringLimit: 15.707963,
 
 
     powPointThree: memoize.new( func(value){
@@ -194,4 +195,19 @@ addcommand("enableAdvancedSteering", func() {
 addcommand("disableAdvancedSteering", func() {
     steeringAssistance.mode = 0;
     print("Advanced Steering Disabled");
+});
+addcommand("setSteeringTravelToMin", func() {
+    steeringAssistance.steeringLimit = 0.78359815;
+    props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steeringAssistance.steeringLimit * R2D);
+    print("Steering Travel Set To 1 : 1");
+});
+addcommand("setSteeringTravelToNormal", func() {
+    steeringAssistance.steeringLimit = 7.8539815;
+    props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steeringAssistance.steeringLimit * R2D);
+    print("Steering Travel Set To Normal");
+});
+addcommand("setSteeringTravelToMax", func() {
+    steeringAssistance.steeringLimit = 15.707963;
+    props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steeringAssistance.steeringLimit * R2D);
+    print("Steering Travel Set To Max");
 });

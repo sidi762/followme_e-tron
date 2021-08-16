@@ -72,7 +72,43 @@
                 </binding>
             </combo>
         </group>
+            <group>
+              <layout>vbox</layout>
+              <text>
+                  <label>Steering Wheel Travel Settings</label>
+              </text>
+              <group>
+                  <layout>hbox</layout>
+                  <button>
+                      <halign>left</halign>
+                      <legend>Normal</legend>
+                      <pref-width>120</pref-width>
+                      <pref-height>28</pref-height>
+                      <binding>
+                          <command>setSteeringTravelToNormal</command>
+                      </binding>
+                  </button>
 
+                  <button>
+                      <halign>left</halign>
+                      <legend>Long</legend>
+                      <pref-width>120</pref-width>
+                      <pref-height>28</pref-height>
+                      <binding>
+                          <command>setSteeringTravelToMax</command>
+                      </binding>
+                  </button>
+              </group>
+              <button>
+                  <halign>left</halign>
+                  <legend>1:1</legend>
+                  <pref-width>120</pref-width>
+                  <pref-height>28</pref-height>
+                  <binding>
+                      <command>setSteeringTravelToMin</command>
+                  </binding>
+              </button>
+            </group>
         <group>
             <layout>hbox</layout>
 
@@ -95,8 +131,8 @@
                     <value>Concept</value>
                     <value>Original</value>
                     <binding>
-            			<command>dialog-apply</command>
-            			<object-name>speedType</object-name>
+                  <command>dialog-apply</command>
+                  <object-name>speedType</object-name>
                     </binding>
                 </combo>
             </group>
