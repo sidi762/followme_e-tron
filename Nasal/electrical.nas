@@ -6,7 +6,7 @@
 io.include("library.nas");
 
 var electricalDebug = Debugger.new("Electrical");
-electricalDebug.setDebugLevel(4);
+electricalDebug.setDebugLevel(0);
 
 var kWh2kWs = func(kWh){
     return kWh * 3600;
@@ -64,11 +64,21 @@ var Series = {
         var R = me.totalResistance();
         var U = me.voltage;
         var Pout = me.totalActivePower();
-        if(U == 0) return 0;#//No voltage, no current. Trying to solve the floating point error at the next line
+        if(U == 0){
+            me.current = 0;
+            return 0;#//No voltage, no current.
+        }
 
-        # print("U ",U," R ",R," Pout ",Pout);
-        # print("delta^2 ",U*U - 4*R*Pout);
-        var delta = math.sqrt(U*U - 4*R*Pout);
+        print("U ",U," R ",R," Pout ",Pout);
+
+        var deltaSquared = U*U - 4*R*Pout;
+
+        if(deltaSquared < 0){
+            print("Electrical: Floting point error when calculating current! skipping");
+            deltaSquared = 0;
+        }
+
+        var delta = math.sqrt(deltaSquared);
 
         #//used to be minus, but adding it seems to be correct
         var result = (U+delta)/(2*R); #//Ampere
@@ -77,16 +87,6 @@ var Series = {
 
         return result;
     },
-
-	calculateTotalCounterElectromotiveForce: func(){
-		#//Total counterElectromotiveForce, calculated from UI = I^R + Power output
-		#//if(me.voltage) return me.voltage - me.current() * me.totalResistance();
-        #//else return 0;
-
-        #//now calculated right after the current is calculated
-        return me.totalCounterElectromotiveForce;
-	},
-
 
     calculateSeriesVoltage: func(){
         me.updateCurrent();
@@ -151,22 +151,6 @@ var Circuit = {
     current: 0, #//Ampere
     voltage: func(){ #//Terminal voltage
         var v = me.parallelConnection[0].units[0].electromotiveForce - me.calculateTotalParallelCurrent()*me.parallelConnection[0].units[0].resistance;
-        #foreach(elem; me.parallelConnection){
-        #    if(elem.isSwitch()){
-        #       continue;
-        #    }
-		#	v -= elem.calculateTotalCounterElectromotiveForce();#//All counterElectromotiveForce is substracted
-        #}
-
-        #if(me.calculateTotalParallelCurrent()){
-        #   v = me.parallelConnection[0].units[0].electromotiveForce - me.calculateTotalParallelCurrent()*me.parallelConnection[0].units[0].resistance;
-        #}
-        #foreach(elem; me.parallelConnection){
-        #    if(elem.voltage != v){
-        #        v = elem.voltage;
-        #        break;
-        #    }
-        #}
         return v
     }, #//Volt
 
@@ -202,7 +186,7 @@ var Circuit = {
       return total;
     },
 
-    updateInterval: 1, #//Seconds between each update
+    updateInterval: 0.1, #//Seconds between each update
 
     loopCount: 0,
 
@@ -211,6 +195,8 @@ var Circuit = {
 
         me.calculateParallelVoltage();
         electricalDebug.debugPrint("Parallel Voltage Calculated", 2);
+
+        electricalDebug.debugPrint("Power: "~me.calculateTotalPower(), 1);
 
         me.calculateSeriesCurrentAndVoltage();
         electricalDebug.debugPrint("Series Current and Voltage Calculated", 2);
@@ -229,7 +215,6 @@ var Circuit = {
             }
         }
         electricalDebug.debugPrint("Power Calculated", 2);
-        electricalDebug.debugPrint("Power: "~me.calculateTotalPower(), 1);
 
         props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
@@ -239,7 +224,7 @@ var Circuit = {
         vehicleInformation.systems.electrical.getMainBatteryRemainingPercentageFloat = me.parallelConnection[0].units[0].getRemainingPercentageFloat();
 
         electricalDebug.debugPrint("current: "~me.current, 1);
-        electricalDebug.debugPrint("voltage: "~me.voltage(), 1);
+        electricalDebug.debugPrint("terminal voltage: "~me.voltage(), 1);
         electricalDebug.debugPrint("Main Battery Remaining: "~me.parallelConnection[0].units[0].remaining, 1);
         #//if(me.debugMode)
         #//print("Secondery Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
@@ -407,7 +392,7 @@ var Cable = {
     }
 };
 
-var cSource = CurrentSource.new(0.0136, 402, kWh2kWs(82), "Battery");#//Battery for engine, 82kWh, 402V
+var cSource = CurrentSource.new(0.0136, 450, kWh2kWs(82), "Battery");#//Battery for engine, 82kWh, 450V
 var circuit_1 = Circuit.new(cSource);#//Engine circuit
 
 var cSource_small = CurrentSource.new(0.0136, 12, kWh2kWs(0.72), "Battery");#//Battery for other systems, 60Ah, 12V
