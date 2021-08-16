@@ -708,8 +708,7 @@ var Safety = {
 
     reset: func(){
         #resetting stops the safety system
-        me.safetySystemTimer.stop();
-        if(me.aebEnabled) me.disableAEB();;#//disable AEB
+        me.stop();
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
         me.aebStateProp.setValue(0);
@@ -728,7 +727,7 @@ var Safety = {
     stop: func(){
         me.isOn = 0;
         me.aebStateProp.setValue(0);
-        me.disableAEB();
+        if(me.aebEnabled) me.disableAEB();
         me.safetySystemTimer.stop();
         print("Safety system stoped");
     },
