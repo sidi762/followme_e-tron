@@ -53,7 +53,7 @@ var SmartInstruments = {
                                .setText("SELF TEST NORMAL")
                                .show();
         m.warningText = m.group.createChild("text", "optional-id-for element")
-                                    .setTranslation(530, 140)      # The origin is in the top left corner
+                                    .setTranslation(780, 140)      # The origin is in the top left corner
                                     .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                                     .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
                                     .setFontSize(50)        # Set fontsize and optionally character aspect ratio
@@ -198,6 +198,8 @@ var SmartInstruments = {
             }else{
                 me.warningText.hide();
             }
+        }else{
+            me.warningText.hide();
         }
     },
 
@@ -223,7 +225,6 @@ var SmartInstruments = {
         me.gearDisplay.enableUpdate();
         me.tempDisplay.enableUpdate();
         me.timeDisplay.enableUpdate();
-        me.warningText.enableUpdate();
 
         if(me.startupSound and me.startupSoundIsEnabled) followme.playAudio(me.startupSound, 1, me.startupSoundPath);
 
@@ -242,6 +243,7 @@ var SmartInstruments = {
         me.welcomeGroup.hide();
     },
     showWarningMessage:func(msg){
+        me.warningText.enableUpdate();
         me.warningText.updateText(msg);
         me.showingWarningMessage = 1;
     },
