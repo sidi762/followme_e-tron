@@ -74,7 +74,7 @@ var Series = {
         var deltaSquared = U*U - 4*R*Pout;
 
         if(deltaSquared < 0){
-            print("Electrical: Floting point error when calculating current! skipping");
+            electricalDebug.debugPrint("Electrical: Floting point error when calculating current! skipping", 1);
             deltaSquared = 0;
         }
 
