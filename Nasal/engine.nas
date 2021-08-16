@@ -15,6 +15,10 @@ var Engine = {
 
     new: func(mTorque, mPower, rpmAtMPower) {
         var m = { parents:[Engine, followme.Appliance.new()]};
+
+        m.applianceName = "Engine Module";
+        m.applianceDescription = "This is the engine for the vehicle";
+
         m.engineNode = followme.vehicleInformation.engine;
         m.engineNode.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
         m.engineNode.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
@@ -28,11 +32,14 @@ var Engine = {
         m.maxTorque = mTorque;
         m.ratedPower = mPower;
         m.rpmAtMaxPower = rpmAtMPower;
+        m.ratedVoltage = 402;#//Rated voltage, use this fixed value for now
+        m.ratedCurrent = 659.21; #//Rated Current, calculated using https://www.jcalc.net/motor-current-calculator
         return m;
     },
 
     motorResistance: 0.2,#//No datasource, based on guess
     resistance: 0.2,
+    protectionResistance: 0.5, #//temp solution
 
     runningState: 0,
 
@@ -85,15 +92,8 @@ var Engine = {
     wheelSpeedNode: props.getNode("/gear/gear/rollspeed-ms", 1),
 
     debugMode: 0,
-
-    calculateRatedCurrent: func(){ #//Returns the rated current
-          var a = me.motorResistance;
-          var ratedVoltage = 760;#//Rated voltage, use this fixed value for now
-  		#//print(ratedVoltage * ratedVoltage - 4 * me.resistance * me.ratedPower);
-          var c = math.sqrt(ratedVoltage * ratedVoltage - 4 * me.motorResistance * me.ratedPower);
-          var d = ratedVoltage + c;
-          return d / (2 * a); #//Ampere
-  	},
+    ratedVoltage: 0, #//Rated voltage
+    ratedCurrent: 0, #//Rated Current, calculated when initializing
 
     rpm_calculate: func(angularAcceleration){
 
@@ -175,21 +175,24 @@ var Engine = {
         #print("throttle:" ~throttle);
 
         me.controlResistance = (0 - throttle * 3000000000000) + 3000000000000;#//We do this for now as I still can't find out how is the speed of motor being controlled. Imagine this is a tunable resistor
-        me.resistance = me.controlResistance + me.motorResistance;
+        me.resistance = me.controlResistance + me.motorResistance + me.protectionResistance;
 
-        var actualMaxTorque = me.current * (me.maxTorque / me.calculateRatedCurrent()); #//We can do this because torque is directly proportional to the current
+        var actualMaxTorque = me.current * (me.maxTorque / me.ratedCurrent); #//We can do this because torque is directly proportional to the current
 
         var cmdRpm = throttle * me.rpmAtMaxPower;
         #print("cmdRpm: "~cmdRpm);
 
         #var cmdPower = throttle * me.ratedPower;
         #print("cmdPower: "~cmdPower);
+
         me.cmdTorque = throttle * me.maxTorque;
+        #//me.cmdTorque = actualMaxTorque;
         me.cmdPower = math.abs(me.rpm * me.cmdTorque / 9549);
         if(me.cmdPower >= me.ratedPower){
           me.cmdPower = me.ratedPower;
         }
 
+        #//var cmdAngularAcceleration = me.cmdTorque / me.rotor_moi; #rad/s^2
         var angularAcceleration = me.cmdTorque / me.rotor_moi; #rad/s^2
         me.rpm = me.rpm_calculate(angularAcceleration);
         if(me.rpm) me.torque = ((9549 * me.cmdPower) / me.rpm) * direction;
@@ -239,6 +242,7 @@ var Engine = {
     },
 
     stopEngine: func(){
+        me.engineSwitch.switchDisconnect();
         me.engineTimer.stop();
         me.rpm = 0;
         me.torque = 0;
@@ -246,7 +250,6 @@ var Engine = {
         outputForce(0);
         me.activePower_kW = 0;
         me.runningState = 0;
-        me.engineSwitch.switchDisconnect();
         me.engineNode.isStarted.setValue(0);
     },
 
