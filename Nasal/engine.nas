@@ -229,7 +229,7 @@ var Engine = {
         outputForce(me.outputForce * N2LBS);
 
         if(me.errorMessage){
-            smartInstruments.smartInstruments.showWarningMessage(err);
+            smartInstruments.smartInstruments.showWarningMessage(me.errorMessage);
         }else{
             smartInstruments.smartInstruments.hideWarningMessage();
         }

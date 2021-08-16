@@ -58,7 +58,8 @@ var SmartInstruments = {
                                     .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
                                     .setFontSize(50)        # Set fontsize and optionally character aspect ratio
                                     .setColor(1,0,0)             # Text color
-                                    .setText("WARNING MESSAGE");
+                                    .setText("WARNING MESSAGE")
+                                    .hide();
         #//speedometer
         m.speedometer = m.group.createChild("text", "optional-id-for element")
                                .setTranslation(1205, 380)      # The origin is in the top left corner
