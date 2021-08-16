@@ -241,7 +241,7 @@ var SmartInstruments = {
         me.welcomeGroup.hide();
     },
     showWarningMessage:func(msg){
-        me.warningText.setText(msg);
+        me.warningText.updateText(msg);
         me.showingWarningMessage = 1;
     },
     hideWarningMessage:func(){

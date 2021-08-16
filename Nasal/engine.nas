@@ -166,10 +166,13 @@ var Engine = {
         var mode = me.engineNode.mode.getValue();
         me.mode = mode;
 
-        if(me.voltage <= 0){
+        if(me.voltage <= 50){
             me.stopEngine();
+            print("No Power");
             me.errorMessage = "NO POWER";
             return 0;
+        }else{
+            me.errorMessage = nil;
         }
 
         throttle = throttle * mode;
@@ -305,13 +308,15 @@ var outputForce = func(force){
 }
 
 props.getNode("systems/welcome-message", 1).setValue(3);
+var mainSwitchStarted = 0;
 var startEngine = func(my_engine){
+    mainSwitchStarted = 1;
+    smartInstruments.smartInstruments.startUp();
     if(!props.getNode("/controls/is-recharging").getValue()){
         var signal = my_engine.startEngine();
         if(signal){
             print("Engine started");
             followme.safety.init();
-            smartInstruments.smartInstruments.startUp();
             #//followme.safety.enableFrontRadar();
             if(props.getNode("systems/welcome-message", 1).getValue() == 1){
                 props.getNode("/sim/messages/copilot", 1).setValue("Beijing di san tsui jiao tong wei ti xing nin, Dao lu tsian wan tiao, ann tsuan di yi tiao, xing che bull gui fun, tsin ren liang hang lei");
@@ -322,6 +327,7 @@ var startEngine = func(my_engine){
             }
         }else{
             print("Engine start failed");
+            my_engine.errorMessage = "START FAIL";
         }
 
     }else if(followme.chargeTimer.isRunning){
@@ -331,6 +337,7 @@ var startEngine = func(my_engine){
 }
 
 var stopEngine = func(my_engine){
+    mainSwitchStarted = 0;
     my_engine.stopEngine();
     smartInstruments.smartInstruments.shutDown();
     followme.safety.stop();
@@ -338,7 +345,7 @@ var stopEngine = func(my_engine){
 }
 
 var toggleEngine = func(my_engine){
-    if(my_engine.runningState == 0){
+    if(mainSwitchStarted == 0){
         startEngine(my_engine);
     }else{
         stopEngine(my_engine);
