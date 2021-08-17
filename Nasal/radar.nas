@@ -175,6 +175,7 @@ var Radar = {
         me.radarTimer.start();
         me.multiplayerManager.start();
         me.initialized = 1;
+        me.isRunning = 1;
         if(me.warnEnabled){
             print("Parking radar initialized and started!");
             playAudio("parking_radar_init.wav");
