@@ -177,17 +177,17 @@
 			<repeatable>false</repeatable>
 			<binding>
 				<command>nasal</command>
-				<script>followme.parkingRadar.toggle()</script>
+				<script>followme.toggleParkingRadar()</script>
 			</binding>
 		</action>
 </animation>
-<!--
+
 <animation>
     <type>material</type>
     <object-name>reversing_radar_switch</object-name>
     <condition>
 	       <equals>
-		             <property>sim/multiplay/generic/bool[2]</property>
+		             <property>sim/multiplay/generic/bool[12]</property>
 	                 <value>1</value>
 	       </equals>
     </condition>
@@ -195,16 +195,17 @@
 </animation>
 <animation>
      <type>material</type>
-     <object-name>autohold_switch</object-name>
+     <object-name>reversing_radar_switch</object-name>
      <condition>
          <equals>
-	 	     <property>sim/multiplay/generic/bool[2]</property>
+	 	     <property>sim/multiplay/generic/bool[12]</property>
 	 	     <value>0</value>
 	     </equals>
      </condition>
      <texture>control.png</texture>
 </animation>
--->
+
+
 
 
 

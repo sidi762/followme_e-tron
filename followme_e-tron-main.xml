@@ -119,7 +119,9 @@
             <bool n="8" alias="/systems/safety/aeb_on"/>
             <bool n="9" alias="/controls/lighting/indicator/left_switch"/>
             <bool n="10" alias="/controls/lighting/indicator/right_switch"/>
-						<bool n="11" alias="/controls/lighting/reverse_indicator"/>
+            <bool n="11" alias="/controls/lighting/reverse_indicator"/>
+            <bool n="12" alias="/systems/isParkingRadarActive"/>
+
 
             <int n="0" alias="/sim/model/lights/indicator-left/state"/>
             <int n="1" alias="/sim/model/lights/indicator-right/state"/>

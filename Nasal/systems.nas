@@ -514,6 +514,11 @@ var brakesABS = func(){
 }
 
 var parkingRadar = Radar.new(0.3, 0, 3.8, 3, 3);
+var isParkingRadarActive = Variable.new("isParkingRadarActive", 0, "Indicates the status of the parking radar", 0, 1, 0, "/systems/isParkingRadarActive");
+var toggleParkingRadar = func(){
+    parkingRadar.toggle();
+    isParkingRadarActive.setValue(parkingRadar.isRunning);
+}
 
 var Safety = {
     new: func(airbagAccelerationLimit=140, sideAirbagAccelerationLimit=75){
