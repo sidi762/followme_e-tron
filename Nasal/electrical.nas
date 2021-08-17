@@ -398,7 +398,7 @@ var Cable = {
     }
 };
 
-var cSource = CurrentSource.new(0.0136, 405, kWh2kWs(82), "Battery");#//Battery for engine, 82kWh, 405V
+var cSource = CurrentSource.new(0.0136, 405, kWh2kWs(90), "Battery");#//Battery for engine, 90kWh, 405V
 var circuit_1 = Circuit.new(cSource);#//Engine circuit
 
 var cSource_small = CurrentSource.new(0.0136, 12, kWh2kWs(0.72), "Battery");#//Battery for other systems, 60Ah, 12V
