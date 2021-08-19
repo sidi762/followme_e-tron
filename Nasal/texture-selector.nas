@@ -27,6 +27,11 @@
 #//texturePropertyBase: The texture property base in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "sim/model/livery/".
 #//textureProp: The texture property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "livery".
 #//textureNameProp: The texture name property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "name".
+#//textureDataNode:
+#//enableMultiplayer:
+#//multiplayerProperty:
+#//texturePrePath:must end with /
+#//defaultValue:
 #//WIP
 
 var TextureSelector = {
@@ -198,7 +203,7 @@ var TextureSelectorDialog = {
         m.closeScript = m.nasal.getNode("close", 1);
         m.openScript.setValue('print("' ~ m.title ~ ' dialog opened");
         props.getNode(cmdarg().getPath()).getNode("opened"), 1).setValue(1);');
-        m.closeScript.setValue('followme.playAudio("repair.wav");
+        #//m.closeScript.setValue('followme.playAudio("repair.wav");
         props.getNode(cmdarg().getPath()).getNode("opened", 1).setValue(0);');
         m.reload();
         #Reload when the GUI is reloaded
