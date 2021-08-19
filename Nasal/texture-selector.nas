@@ -203,8 +203,7 @@ var TextureSelectorDialog = {
         m.closeScript = m.nasal.getNode("close", 1);
         m.openScript.setValue('print("' ~ m.title ~ ' dialog opened");
         props.getNode(cmdarg().getPath()).getNode("opened"), 1).setValue(1);');
-        #//m.closeScript.setValue('followme.playAudio("repair.wav");
-        props.getNode(cmdarg().getPath()).getNode("opened", 1).setValue(0);');
+        m.closeScript.setValue('props.getNode(cmdarg().getPath()).getNode("opened", 1).setValue(0);');
         m.reload();
         #Reload when the GUI is reloaded
         m.reload_listener = setlistener("/sim/signals/reinit-gui", func(n) m.reload());
