@@ -14,8 +14,6 @@
 <!-- Decoration -->
 <animation>
  <type>select</type>
- <object-name>etc</object-name>
- <object-name>card</object-name>
  <object-name>baowenbei</object-name>
  <condition>
 
