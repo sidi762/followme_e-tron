@@ -743,16 +743,6 @@ var Safety = {
 };
 var safety = Safety.new(140, 75);
 
-var brakeWithABS = func(){ #//Doesn't seems to work because it seems that jsbsim wheels never overbrake?
-#//abondoned since the new safety system
-    var brakeCmd = props.getNode("/",1).getValue("/controls/gear/brake-left");
-    if(brakeCmd){
-        absTimer.start();
-    }else{
-        absTimer.stop();
-    }
-}
-
 #//Service Staion
 io.include("service.nas");
 #var stationPath = getprop("sim/aircraft-dir")~'/Models/Service-Station/Service-Staion.ac';
