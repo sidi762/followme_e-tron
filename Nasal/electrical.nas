@@ -121,10 +121,10 @@ var Series = {
 var Circuit = {
     #//Class for any circuit
     #//Currently must be initalized with a source
-    #//Currently only support one current source in a circuit
-    new: func(cSource) {
+    #//Currently only support one voltage source in a circuit
+    new: func(vSource) {
         var new_circuit = { parents:[Circuit] };
-        new_circuit.addNewSeriesWithUnitToParallel(cSource);
+        new_circuit.addNewSeriesWithUnitToParallel(vSource);
         return new_circuit;
     },
 
@@ -217,7 +217,7 @@ var Circuit = {
 
         foreach(elem; me.parallelConnection){
             foreach(unit; elem.units){
-                if(unit.isCurrentSource()) unit.currentSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Update the current source. Pass in negetive power in case of charging
+                if(unit.isVoltageSource()) unit.voltageSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Update the voltage source. Pass in negetive power in case of charging
             }
         }
         electricalDebug.debugPrint("Power Calculated", 2);
@@ -247,7 +247,7 @@ var Appliance = {
         return { parents:[Appliance] };
     },
 
-    isCurrentSource: func(){
+    isVoltageSource: func(){
         return 0;
     },
 
@@ -290,16 +290,16 @@ var Appliance = {
     },
 };
 
-var CurrentSource = {
-    #//Class for any current source
+var VoltageSource = {
+    #//Class for any voltage source
     #//eR: Internal resistance of the source, eF: Electromotive force of the source, eC: Electrical capacity of the source, name: Name of the source.
-    new: func(eR, eF, eC, name = "CurrentSource") {
-        var newCS = { parents:[CurrentSource, Appliance.new()], resistance: eR, ratedElectromotiveForce:eF, electromotiveForce:eF, electricalCapacity:eC, applianceName: name };
-        newCS.resetRemainingToFull();
-        return newCS;
+    new: func(eR, eF, eC, name = "VoltageSource") {
+        var newVS = { parents:[VoltageSource, Appliance.new()], resistance: eR, ratedElectromotiveForce:eF, electromotiveForce:eF, electricalCapacity:eC, applianceName: name };
+        newVS.resetRemainingToFull();
+        return newVS;
     },
 
-    isCurrentSource: func(){
+    isVoltageSource: func(){
         return 1;
     },
 
@@ -310,7 +310,7 @@ var CurrentSource = {
     remaining: 0, #//kWs
 
 
-    currentSourceUpdate: func(power, interval){
+    voltageSourceUpdate: func(power, interval){
         me.remaining -= power * 0.001 * interval; #//Pass in negetive power for charging
         if(me.remaining <= 0){
             me.electromotiveForce = 0;
@@ -398,10 +398,10 @@ var Cable = {
     }
 };
 
-var cSource = CurrentSource.new(0.0136, 405, kWh2kWs(90), "Battery");#//Battery for engine, 90kWh, 405V
+var cSource = VoltageSource.new(0.0136, 405, kWh2kWs(90), "Battery");#//Battery for engine, 90kWh, 405V
 var circuit_1 = Circuit.new(cSource);#//Engine circuit
 
-var cSource_small = CurrentSource.new(0.0136, 12, kWh2kWs(0.72), "Battery");#//Battery for other systems, 60Ah, 12V
+var cSource_small = VoltageSource.new(0.0136, 12, kWh2kWs(0.72), "Battery");#//Battery for other systems, 60Ah, 12V
 cSource_small.resetRemainingToZero();
 #circuit_1.addNewSeriesWithUnitToParallel(cSource_small);
 
