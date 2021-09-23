@@ -1,7 +1,7 @@
 #//Followme EV electric engine by Sidi Liang
 #//Contact: sidi.liang@gmail.com
 
-#//Bug log: engine still runs after battary drains up
+#//Bug log:
 #//Switching between D and R might fail?
 #//Goes crazy when attampt to drive with brakes not released
 #//Electrical system error message
@@ -37,7 +37,7 @@ var Engine = {
         return m;
     },
 
-    motorResistance: 0.2,#//No datasource, based on guess
+    motorResistance: 0.5,#//No datasource, based on guess
     resistance: 0.2,
     protectionResistance: 0.5, #//temp solution
 
