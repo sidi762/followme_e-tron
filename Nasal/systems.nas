@@ -341,7 +341,7 @@ var BrakeController = {
         me.rightBrakeValue = value;
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
-        if(value == 1) settimer(func{if(me.applyingFeetBrake) safety.emergencyMode();}, 1);
+        if(value == 1) settimer(func{if(me.applyingFeetBrake) safety.emergencyMode();}, 0.6);
     },
 
     activeHandBrake: func(){
