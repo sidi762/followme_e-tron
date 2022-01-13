@@ -335,13 +335,13 @@ var BrakeController = {
     },
     applyFeetBrakes: func(value){
         #For feet brakes
-        if(value) applyingFeetBrake = 1;
-        else applyingFeetBrake = 0;
+        if(value) me.applyingFeetBrake = 1;
+        else me.applyingFeetBrake = 0;
         me.rightBrakeNode.setValue(value);
         me.rightBrakeValue = value;
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
-        if(value == 1) settimer(func{if(applyingFeetBrake == 1) safety.emergencyMode();}, 2);
+        if(value == 1) settimer(func{if(me.applyingFeetBrake) safety.emergencyMode();}, 1);
     },
 
     activeHandBrake: func(){
