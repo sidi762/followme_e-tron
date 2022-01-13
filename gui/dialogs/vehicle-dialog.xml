@@ -143,6 +143,39 @@
         </group>
 
         <hrule/>
+        <text>
+            <label>Keyboard braking intensity</label>
+        </text>
+        <group>
+            <layout>hbox</layout>
+            <slider>
+                <property>/systems/BrakeController/keyboardBrakeIntensity</property>
+                <min>0.1</min>
+                <max>1</max>
+                <binding>
+        			<command>dialog-apply</command>
+                </binding>
+                <live>true</live>
+            </slider>
+            <text>
+                <label>0.8</label> <!-- placeholder for width -->
+                <format>0.4f</format>
+                <property>systems/BrakeController/keyboardBrakeIntensity</property>
+                <live>true</live>
+            </text>
+            <button>
+                <legend>Default</legend>
+                <pref-width>60</pref-width>
+                <pref-height>28</pref-height>
+                <binding>
+                    <command>property-assign</command>
+        			<property>systems/BrakeController/keyboardBrakeIntensity</property>
+                    <value>0.8</value>
+                </binding>
+            </button>
+        </group>
+
+        <hrule/>
 
         <group>
         <layout>vbox</layout>

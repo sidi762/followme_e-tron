@@ -314,6 +314,8 @@ var BrakeController = {
     leftBrakeValue: 0,
     rightBrakeValue: 0,
 
+    keyboardBrakeIntensity: Variable.new("keyboardBrakeIntensity", 0.8, "Braking Intensity when using s key", 0, 1, 1, "/systems/BrakeController/keyboardBrakeIntensity"), #//Decides how much brakings to be applied, can be adjusted via GUI and defaults to be 0.8
+
     applyLeftBrake: func(value){
         #For internal use
         me.leftBrakeNode.setValue(value);
@@ -386,10 +388,11 @@ var BrakeController = {
         safety.emergencyMode();
     },
     keyboardBrake: func(){
-        me.applyFeetBrakes(0.8);
+        me.applyFeetBrakes(me.keyboardBrakeIntensity.getValue());
     },
     keyboardBrakeRelease: func(){
         me.applyFeetBrakes(0);
+        if(vehicleInformation.getSpeedKMH() > 10 and safety.emergencyModeState) safety.disableEmergencyMode();
     },
     releaseBrake: func(){
         me.applyLeftBrake(0);
@@ -537,6 +540,7 @@ var Safety = {
     aebActivated: 0,
     lastRadarOutput:10000,
     throttleNode: vehicleInformation.engine.throttleNode,
+    emergencyModeState: 0,
     #Airbag
     accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
     accYProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-y-ft_sec2", 1),
@@ -705,10 +709,16 @@ var Safety = {
     },
 
     emergencyMode: func(){
+        me.emergencyModeState = 1;
         indicatorController.setMode(3); #Active malfunction light
         indicatorController.falseLight = 1;
         if(autospeed.autoSpeedTimer.isRunning) autospeed.stopAutoSpeed();
         if(autopilot.road_check_timer.isRunning) autopilot.road_check_timer.stop();
+    },
+    disableEmergencyMode: func(){
+        me.emergencyModeState = 0;
+        indicatorController.setMode(0); #Deactive malfunction light
+        indicatorController.falseLight = 0;
     },
 
     reset: func(){
