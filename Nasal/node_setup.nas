@@ -23,13 +23,18 @@ var Variable = {
             m._propertyNode = props.getNode(property, 1);
             m._propertyNode.setValue(value);
             m._propertyNodeInitialized = 1;
-            if(listenPropertyTree) m._propertyListener = setlistener(property, func m._updateValueFromProperty, 0, 1);
+            universalVariableDebug.debugPrint(m._name~" : Property Initialized", 2);
+            if(listenPropertyTree){
+                m._propertyListener = setlistener(property, func m._updateValueFromProperty(), 0, 1);
+                universalVariableDebug.debugPrint(m._name~" : listener Initialized", 2);
+            }
         }
         return m;
     },
     _updateValueFromProperty: func(){
         if(!me._readOnly){
             me._value = me._propertyNode.getValue();
+            universalVariableDebug.debugPrint(me._name~" Value updated from property", 1);
             return 1;
         }else{
             universalVariableDebug.debugPrint("Error when updating "~me._name~" from property: Cannot write to a read only node", 1);
