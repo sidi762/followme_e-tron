@@ -341,7 +341,7 @@ var BrakeController = {
         me.rightBrakeValue = value;
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
-        if(value == 1) safety.emergencyMode();
+        if(value == 1) settimer(func{if(applyingFeetBrake == 1) safety.emergencyMode();}, 2);
     },
 
     activeHandBrake: func(){
@@ -709,6 +709,7 @@ var Safety = {
     },
 
     emergencyMode: func(){
+        print("Safety system emergency mode!");
         me.emergencyModeState = 1;
         indicatorController.setMode(3); #Active malfunction light
         indicatorController.falseLight = 1;
@@ -716,9 +717,10 @@ var Safety = {
         if(autopilot.road_check_timer.isRunning) autopilot.road_check_timer.stop();
     },
     disableEmergencyMode: func(){
+        print("Safety system emergency mode disabled!");
         me.emergencyModeState = 0;
-        indicatorController.setMode(0); #Deactive malfunction light
         indicatorController.falseLight = 0;
+        indicatorController.setMode(0); #Deactive malfunction light
     },
 
     reset: func(){
