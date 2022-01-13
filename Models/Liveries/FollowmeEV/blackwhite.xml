@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">Black White</name>
+			<texture-fuse>Liveries/FollowmeEV/blackwhite.png</texture-fuse>
+		</livery>
+	</model>
+</sim>
+</PropertyList>
