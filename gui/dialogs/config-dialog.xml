@@ -61,11 +61,13 @@
                 <halign>left</halign>
                 <name>Interior Style</name>
                 <property>/systems/interior/type</property>
-                <value>Default</value>
-                <value>404Design</value>
-                <value>Sport</value>
+                <value>404Design (Default)</value>
+                <value>404Design 2.0</value>
                 <value>Luxury</value>
+                <value>Luxury 2.0</value>
                 <value>Race</value>
+                <value>Sport (Legacy)</value>
+                <value>Followme Original</value>
                 <binding>
         			<command>dialog-apply</command>
         			<object-name>interiorStyle</object-name>
