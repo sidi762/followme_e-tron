@@ -97,8 +97,8 @@ vehicleInformation.lighting.indicator.right.setValue(0);
 
 #//Systems
 vehicleInformation.systems.welcomeMessage.setValue(0);
-vehicleInformation.systems.speedometer.type.setValue("Type_A");
-vehicleInformation.systems.batteryGauge.type.setValue("Type_A");
+vehicleInformation.systems.speedometer.type.setValue("None");
+vehicleInformation.systems.batteryGauge.type.setValue("None");
 
 vehicleInformation.systems.safety.aebActivated.setValue("0");
 vehicleInformation.systems.safety.isAebOn.setValue("0");
@@ -126,7 +126,7 @@ props.getNode("systems/codriver-enable", 1).setValue(0);
 props.getNode("systems/screen-enable", 1).setValue(0);
 props.getNode("systems/pmodel-enable", 1).setValue(1);
 props.getNode("systems/decorations-enable", 1).setValue(0);
-props.getNode("systems/interior/type", 1).setValue("Default");
+props.getNode("systems/interior/type", 1).setValue("404Design (Default)");
 
 
 #Keep or abandon?
