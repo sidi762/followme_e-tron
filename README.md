@@ -2,6 +2,8 @@
 The Follow me e-tron or Follow me EV is a semi-fictional Follow-me vehicle based on Gijs's work, but an electric-powered version with Chinese characteristics. It was made just for fun.    
 See More: https://wiki.flightgear.org/Follow_me_e-tron
 
+![Preview](https://github.com/WEIHAOLEE/followme_e-tron/raw/master/preview-etron.png)
+
 ## Features  
 Being the very first electric car in FlightGear, the Follow me e-tron features a realistic electric supercar driving experience while having an exterior of the classic Renault Kangoo I Follow me vehicle.  
 
@@ -34,6 +36,4 @@ Sidi Liang(FGPRC-0762): FDM, Engine, Nasal, Systems, Instruments, Models, Textur
 Qiyuan Luo(FGPRC-0404): Instruments, Models, Textures
 ValKmjolnir(FGPRC-0818): 'Auto Crash' System, Nasal  
 Weihao Lee(FGPRC-0405): Models, Textures, Effects   
-Marsdolphin(Mars006): Models, Lights, Instruments, Textures, Tutorials
-
-![Preview](https://github.com/WEIHAOLEE/followme_e-tron/raw/master/preview-etron.png)
+Marsdolphin(Mars006): Models, Lights, Instruments, Textures, Tutorials  
