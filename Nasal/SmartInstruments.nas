@@ -18,6 +18,7 @@ var SmartInstruments = {
         m.group = m.instrumentCanvas.createGroup();#//Main group
         m.signGroup = m.instrumentCanvas.createGroup();#//sign group
         m.welcomeGroup = m.instrumentCanvas.createGroup();
+        m.iconGroup = m.instrumentCanvas.createGroup(); #//group for icons
         m.mapGroup = m.instrumentCanvas.createGroup(); #//map group
         m.instrumentCanvas.addPlacement({"node": placement});
         #Sign svg
@@ -43,6 +44,32 @@ var SmartInstruments = {
                              .setFile(m.infoImagePath[m.infoImageIndex])
                              .setTranslation(0, 0)
                              .setSize(1509, 736);
+        m.doorsNotShutImage = m.group.createChild("image")
+                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door.png")
+                             .setTranslation(0, 0)
+                             .setSize(1509, 736)
+                             .hide();
+        m.doorFLIcon = m.iconGroup.createChild("image")
+                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_FL.png")
+                             .setTranslation(0, 0)
+                             .setSize(1509, 736)
+                             .hide();
+        m.doorFRIcon = m.iconGroup.createChild("image")
+                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_FR.png")
+                             .setTranslation(0, 0)
+                             .setSize(1509, 736)
+                             .hide();
+        m.doorRLIcon = m.iconGroup.createChild("image")
+                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_RL.png")
+                             .setTranslation(0, 0)
+                             .setSize(1509, 736)
+                             .hide();
+        m.doorRRIcon = m.iconGroup.createChild("image")
+                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_RR.png")
+                             .setTranslation(0, 0)
+                             .setSize(1509, 736)
+                             .hide();
+        m.doorIcons = [m.doorFLIcon, m.doorFRIcon, m.doorRLIcon, m.doorRRIcon];
         # Create a text element and set some values(Self test)
         m.selfTestText = m.welcomeGroup.createChild("text", "optional-id-for element")
                                .setTranslation(530, 140)      # The origin is in the top left corner
@@ -128,6 +155,9 @@ var SmartInstruments = {
     initialized: 0,
     loopCount:0,
     showingWarningMessage: 0,
+    isCenterScreenInfoShown: 1,
+    isDoorsNotShut: 0,
+    doorsNotShut: [0,0,0,0],
 
     enableStartupSound: func(){
         me.startupSoundIsEnabled = 1;
@@ -191,6 +221,30 @@ var SmartInstruments = {
         if(minute < 10) minute = "0"~minute;
         me.timeDisplay.updateText(hour~":"~minute);
 
+        #//Check for doors
+        doors = [followme.frontleft_door, followme.frontright_door, followme.rearleft_door, followme.rearright_door];
+        me.isDoorsNotShut = 0;
+        for(var i = 0; i <= 3; i += 1){
+            if(doors[i].getpos()){
+                me.isDoorsNotShut = 1;
+                me.doorsNotShut[i] = 1;
+            }else{
+                me.doorIcons[i].hide();
+                me.doorsNotShut[i] = 0;
+            }
+        }
+        if(me.isDoorsNotShut){
+            me.infoImage.hide();
+            me.isCenterScreenInfoShown = 0;
+            me.doorsNotShutImage.show();
+            for(var i = 0; i <= 3; i += 1){
+                if(me.doorsNotShut[i]) me.doorIcons[i].show();
+            }
+        }else{
+            me.doorsNotShutImage.hide();
+            if(!me.isCenterScreenInfoShown) me.infoImage.show();
+        }
+
         #//Warning MESSAGE
         if(me.showingWarningMessage){
             if(math.mod(me.loopCount, 10) < 5){
@@ -208,6 +262,7 @@ var SmartInstruments = {
         if(me.updateTimer == nil) me.updateTimer = maketimer(0.1, func me.update());
         me.group.hide();
         me.welcomeGroup.hide();
+        me.iconGroup.hide();
         me.initialized = 1;
     },
     startUp:func(){
@@ -218,6 +273,7 @@ var SmartInstruments = {
     },
     startSequence: func(){
         me.group.show();
+        me.iconGroup.show();
         me.speedometer.enableUpdate();
         me.power.enableUpdate();
         me.batteryRemainingDisplay.enableUpdate();

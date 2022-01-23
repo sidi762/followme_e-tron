@@ -56,6 +56,13 @@ vehicleInformation.engine.mode = props.getNode("/controls/mode", 1);
 #//Controls
 vehicleInformation.controls = props.getNode("/controls", 1);
 vehicleInformation.controls.lighting = vehicleInformation.controls.getNode("lighting", 1);
+vehicleInformation.controls.doors = vehicleInformation.controls.getNode("doors", 1);
+
+#//Doors
+vehicleInformation.controls.doors.FL = vehicleInformation.controls.getNode("FL", 1);
+vehicleInformation.controls.doors.FR = vehicleInformation.controls.getNode("FR", 1);
+vehicleInformation.controls.doors.RL = vehicleInformation.controls.getNode("RL", 1);
+vehicleInformation.controls.doors.RR = vehicleInformation.controls.getNode("RR", 1);
 
 #//Shortcut for Lignting
 vehicleInformation.lighting = vehicleInformation.controls.lighting;
@@ -105,6 +112,13 @@ vehicleInformation.systems.safety.isAebOn.setValue("0");
 
 vehicleInformation.systems.isAutoholdEnabled.setValue("0");
 vehicleInformation.systems.isAutoholdWorking.setValue("0");
+
+#//Doors
+vehicleInformation.controls.doors.FL.setValue(0);
+vehicleInformation.controls.doors.FR.setValue(0);
+vehicleInformation.controls.doors.RL.setValue(0);
+vehicleInformation.controls.doors.RR.setValue(0);
+
 
 props.getNode("/",1).setValue("/controls/mode", 1);
 props.getNode("/",1).setValue("/controls/direction", 1);

@@ -14,11 +14,16 @@ var tyreSmoke_3 = aircraft.tyresmoke.new(3, auto = 1, diff_norm = 0.4, check_vsp
 
 
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
+frontleft_door.informationNode = vehicleInformation.controls.doors.FL;
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
+frontright_door.informationNode = vehicleInformation.controls.doors.FR;
 var rearleft_door = aircraft.door.new("/controls/doors/rearleft", 1);
+rearleft_door.informationNode = vehicleInformation.controls.doors.RL;
 var rearright_door = aircraft.door.new("/controls/doors/rearright", 1);
+rearright_door.informationNode = vehicleInformation.controls.doors.RR;
 aircraft.door.toggle = func(){
     var pos = me.getpos();
+    me.informationNode.setValue(1 - me.getpos());
     if(pos == 0){
         me.open();
         playAudio('door_open.wav');
