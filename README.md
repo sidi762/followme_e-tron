@@ -1,5 +1,6 @@
-# followme_e-tron    
+# Followme_e-tron    
 The Follow me e-tron or Follow me EV is a semi-fictional Follow-me vehicle based on Gijs's work, but an electric-powered version with Chinese characteristics. It was made just for fun.    
+See More: https://wiki.flightgear.org/Follow_me_e-tron
 
 ## Features  
 Being the very first electric car in FlightGear, the Follow me e-tron features a realistic electric supercar driving experience while having an exterior of the classic Renault Kangoo I Follow me vehicle.  
