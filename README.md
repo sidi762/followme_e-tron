@@ -1,4 +1,4 @@
-# Followme_e-tron    
+# Follow me_e-tron    
 The Follow me e-tron or Follow me EV is a semi-fictional Follow-me vehicle based on Gijs's work, but an electric-powered version with Chinese characteristics. It was made just for fun.    
 See More: https://wiki.flightgear.org/Follow_me_e-tron
 
