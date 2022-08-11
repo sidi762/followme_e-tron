@@ -418,6 +418,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre1</object-name>
+ <object-name>kaqian1</object-name>
  <property>sim/multiplay/generic/float[4]</property>
  <factor>-45</factor>
  <center>
@@ -435,6 +436,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre1</object-name>
+ <object-name>kaqian1</object-name>
  <property>sim/multiplay/generic/float[5]</property>
  <interpolation>
   <entry>
@@ -459,9 +461,9 @@
  <property>sim/multiplay/generic/float[6]</property>
  <factor>-15</factor>
  <center>
-  <x-m>0.682</x-m>
-  <y-m>0.627</y-m>
-  <z-m>0.291</z-m>
+  <x-m>0.677</x-m>
+  <y-m>0.667</y-m>
+  <z-m>0.292</z-m>
  </center>
  <axis>
   <x>0.0</x>
@@ -475,6 +477,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre2</object-name>
+ <object-name>kaqian2</object-name>
  <property>sim/multiplay/generic/float[7]</property>
  <factor>-45</factor>
  <center>
@@ -492,6 +495,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre2</object-name>
+ <object-name>kaqian2</object-name>
  <property>sim/multiplay/generic/float[8]</property>
  <interpolation>
   <entry>
@@ -516,9 +520,9 @@
  <property>sim/multiplay/generic/float[9]</property>
  <factor>-15</factor>
  <center>
-  <x-m>0.682</x-m>
-  <y-m>-0.627</y-m>
-  <z-m>0.291</z-m>
+  <x-m>0.677</x-m>
+  <y-m>-0.667</y-m>
+  <z-m>0.292</z-m>
  </center>
  <axis>
   <x>0.0</x>
@@ -532,6 +536,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre3</object-name>
+ <object-name>kaqian3</object-name>
  <property>sim/multiplay/generic/float[20]</property>
  <factor>5</factor>
  <center>
@@ -549,6 +554,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre3</object-name>
+ <object-name>kaqian3</object-name>
  <property>sim/multiplay/generic/float[10]</property>
  <interpolation>
   <entry>
@@ -573,9 +579,9 @@
  <property>sim/multiplay/generic/float[11]</property>
  <factor>-15</factor>
  <center>
-  <x-m>3.17</x-m>
-  <y-m>0.625</y-m>
-  <z-m>0.282</z-m>
+  <x-m>3.156</x-m>
+  <y-m>0.667</y-m>
+  <z-m>0.281</z-m>
  </center>
  <axis>
   <x>0.0</x>
@@ -589,6 +595,7 @@
 <animation>
  <type>rotate</type>
  <object-name>Tyre4</object-name>
+ <object-name>kaqian4</object-name>
  <property>sim/multiplay/generic/float[21]</property>
  <factor>5</factor>
  <center>
@@ -606,6 +613,7 @@
 <animation>
  <type>translate</type>
  <object-name>Tyre4</object-name>
+ <object-name>kaqian4</object-name>
  <property>sim/multiplay/generic/float[12]</property>
  <interpolation>
   <entry>
@@ -630,9 +638,9 @@
  <property>sim/multiplay/generic/float[13]</property>
  <factor>-15</factor>
  <center>
-  <x-m>3.17</x-m>
-  <y-m>-0.625</y-m>
-  <z-m>0.282</z-m>
+  <x-m>3.156</x-m>
+  <y-m>-0.667</y-m>
+  <z-m>0.281</z-m>
  </center>
  <axis>
   <x>0.0</x>
