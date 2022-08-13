@@ -79,6 +79,16 @@
     <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2.xml</path>
 </model>
 
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
+			<value>404Design 2022</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design5.xml</path>
+</model>
+
 <animation>
  <type>material</type>
  <object-name>sign</object-name>
@@ -151,6 +161,50 @@
  </offsets>
 </model>
 
+<!-- Decoration -->
+<animation>
+ <type>select</type>
+ <object-name>ldoor_baowenbei</object-name>
+ <condition>
+
+     <equals>
+         <property>sim/multiplay/generic/bool[0]</property>
+         <value>1</value>
+     </equals>
+
+ </condition>
+</animation>
+
+
+<!-- charging_cap -->
+<animation>
+ <type>pick</type>
+  <object-name>chargegai</object-name>
+ <action>
+  <button>0</button>
+  <repeatable>false</repeatable>
+  <binding>
+   <command>nasal</command>
+   <script>followme.charging_cap.toggle()</script>
+  </binding>
+ </action>
+</animation>
+<animation>
+ <type>rotate</type>
+ <object-name>chargegai</object-name>
+ <property>sim/multiplay/generic/float[26]</property>
+ <factor>75</factor>
+ <center>
+  <x-m>0.111</x-m>
+  <y-m>0</y-m>
+  <z-m>0.787</z-m>
+ </center>
+ <axis>
+  <x>0.0</x>
+  <y>1.0</y>
+  <z>0.0</z>
+ </axis>
+</animation>
 <!-- PLATE -->
 <model>
 	<condition>

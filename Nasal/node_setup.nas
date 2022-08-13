@@ -63,6 +63,7 @@ vehicleInformation.controls.doors.FL = vehicleInformation.controls.doors.getNode
 vehicleInformation.controls.doors.FR = vehicleInformation.controls.doors.getNode("FR", 1);
 vehicleInformation.controls.doors.RL = vehicleInformation.controls.doors.getNode("RL", 1);
 vehicleInformation.controls.doors.RR = vehicleInformation.controls.doors.getNode("RR", 1);
+vehicleInformation.controls.doors.charging_cap = vehicleInformation.controls.doors.getNode("charging_cap", 1);
 
 #//Shortcut for Lignting
 vehicleInformation.lighting = vehicleInformation.controls.lighting;

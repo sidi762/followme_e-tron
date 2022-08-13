@@ -140,11 +140,12 @@
     	    <int n="15" alias="/systems/instruments/enable_switches"/>
             <int n="16" alias="/warninglight/start"/>
 
-            <!--float current num:25 -->
+            <!--float current num:26 -->
             <float n="0" alias="/controls/doors/rearright/position-norm"/>
             <float n="1" alias="/controls/doors/rearleft/position-norm"/>
             <float n="2" alias="/controls/doors/frontright/position-norm"/>
             <float n="3" alias="/controls/doors/frontleft/position-norm"/>
+            <float n="26" alias="/controls/doors/charging_cap/position-norm"/>
 
             <float n="4" alias="/gear/gear[0]/steering-norm"/>
             <float n="5" alias="/gear/gear[0]/compression-norm"/>
