@@ -220,7 +220,50 @@
               <label>To repair Airbag, reinitialize safety system</label>
           </text>
         </group>
+
         <hrule/>
+        <text>
+            <label>Magic Bush Tyre</label>
+        </text>
+        <group>
+            <layout>hbox</layout>
+            <button>
+                <halign>left</halign>
+                <legend>Enable</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <and>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                    </and>
+                </enable>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.reduceRollingFriction()</script>
+                </binding>
+            </button>
+            <button>
+                <halign>left</halign>
+                <legend>Disable</legend>
+                <pref-width>120</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <and>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                    </and>
+                </enable>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.resumeRollingFriction()</script>
+                </binding>
+            </button>
+        </group>
+        <hrule/>
+
         <group>
             <layout>vbox</layout>
             <text><label>Plate</label></text>

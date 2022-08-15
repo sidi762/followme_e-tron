@@ -97,12 +97,13 @@
     </button>
 
 
+
         </group>
         <text>
-            <label>Advanced Steering</label>
+            <label>*Experimental Features</label>
         </text>
         <text>
-            <label>*Experimental</label>
+            <label>Advanced Steering</label>
         </text>
         <group>
             <layout>hbox</layout>
@@ -141,7 +142,50 @@
                 </binding>
             </button>
         </group>
-
+        <!--
+        <text>
+            <label>L Gear</label>
+        </text>
+        <group>
+            <layout>hbox</layout>
+            <button>
+                <halign>left</halign>
+                <legend>Enable</legend>
+                <pref-width>150</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <and>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                        <not>
+                            <property>/controls/engines/engine/isInLGear</property>
+                        </not>
+                    </and>
+                </enable>
+                <binding>
+                    <command>enableLGear</command>
+                </binding>
+            </button>
+            <button>
+                <halign>left</halign>
+                <legend>Disable</legend>
+                <pref-width>150</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
+                    <and>
+                        <not>
+                            <property>/sim/freeze/replay-state</property>
+                        </not>
+                        <property>/controls/engines/engine/isInLGear</property>
+                    </and>
+                </enable>
+                <binding>
+                    <command>disableLGear</command>
+                </binding>
+            </button>
+        </group>
+    -->
         <hrule/>
         <text>
             <label>Keyboard braking intensity</label>
