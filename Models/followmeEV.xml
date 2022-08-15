@@ -193,7 +193,7 @@
  <type>rotate</type>
  <object-name>chargegai</object-name>
  <property>sim/multiplay/generic/float[26]</property>
- <factor>75</factor>
+ <factor>80</factor>
  <center>
   <x-m>0.111</x-m>
   <y-m>0</y-m>
