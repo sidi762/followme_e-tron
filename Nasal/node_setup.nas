@@ -6,7 +6,8 @@ var VehicleInformationManager = {
     new: func(){
         var m = {parents:[VehicleInformationManager]};
         m._speedKTSNode = props.getNode("/sim/multiplay/generic/float[15]", 1);
-        m._headingNode = props.getNode("/orientation/heading-deg",1);
+        m._odometerNMNode = props.getNode("instrumentation/gps/odometer", 1);
+        m._headingNode = props.getNode("orientation/heading-deg",1);
         m._altitudeFTNode = props.getNode("/position/altitude-ft",1);
 		m._timeHourNode = props.getNode("sim/time/real/hour", 1);
 		m._timeMinuteNode = props.getNode("sim/time/real/minute", 1);
@@ -20,6 +21,9 @@ var VehicleInformationManager = {
     },
     getSpeedKTS: func(){
         return me._speedKTSNode.getValue();
+    },
+    getOdometerKM: func(){
+        return me._odometerNMNode.getValue()*1.852;
     },
     getHeadingDEG: func(){
         return me._headingNode.getValue();
