@@ -6,7 +6,7 @@
 #//Goes crazy when attampt to drive with brakes not released
 #//Electrical system error message
 #//Drain battary too fast?
-
+io.include("library.nas");
 var N2LBS = 0.2248089;
 var Engine = {
     #//Class for any electric engine
@@ -73,6 +73,7 @@ var Engine = {
     },
 
     mode: 1,
+    isInLGear: Variable.new("isInLGear", 0, "isInLGear", 0, 1, 1, "/controls/engines/engine/isInLGear"),
 
     rotor_moi: 2.3,
     wheel_moi: 0.9,
@@ -124,10 +125,10 @@ var Engine = {
                 angularSpeed += angularAcceleration * 0.1;
             }
         }else if(direction == -1){
-            if(angularSpeed + totalAcceleration * 0.1 < -10){
-                angularSpeed += totalAcceleration * 0.1;
-            }else if(angularSpeed + totalAcceleration * 0.1 > -10){
-                angularSpeed += angularAcceleration * 0.1;
+            if(angularSpeed - totalAcceleration * 0.1 < -10){
+                angularSpeed -= totalAcceleration * 0.1;
+            }else if(angularSpeed - totalAcceleration * 0.1 > -10){
+                angularSpeed -= angularAcceleration * 0.1;
             }
         }
 
@@ -136,11 +137,14 @@ var Engine = {
         var wheelSpeed_ms = me.wheelSpeedNode.getValue();
         var wheelAngularSpeed = wheelSpeed_ms / me.wheel_radius;
 
-        var targetAngularSpeed = math.abs(wheelAngularSpeed) * me.gear;
+        var targetAngularSpeed = math.abs(wheelAngularSpeed) * me.gear * direction;
 
         #print("WheelAngularSpeed x gear " ~ wheelAngularSpeed * me.gear);
 
-        if(math.abs(angularSpeed) < targetAngularSpeed) angularSpeed = targetAngularSpeed;
+        if((direction == 1 and angularSpeed >= 0) or (direction == -1 and angularSpeed < 0)){
+            if(math.abs(angularSpeed) < math.abs(targetAngularSpeed)) angularSpeed = targetAngularSpeed;
+        }
+
         #print("AngularSpeed " ~ angularSpeed);
 
 
@@ -148,9 +152,9 @@ var Engine = {
         rpm = angularSpeed * 9.5492966; #//rps * 60
 
         #//Prevent the rpm goes too small
-        #if(math.abs(rpm) < 50){
-        #    rpm = 50 * direction;
-        #}
+        if(math.abs(rpm) < 100){
+            rpm = 100 * direction;
+        }
 
 
         me.rpm = rpm;
@@ -201,8 +205,9 @@ var Engine = {
         #//var cmdAngularAcceleration = me.cmdTorque / me.rotor_moi; #rad/s^2
         var angularAcceleration = me.cmdTorque / me.rotor_moi; #rad/s^2
         me.rpm = me.rpm_calculate(angularAcceleration);
-        if(me.rpm) me.torque = ((9549 * me.cmdPower) / me.rpm) * direction;
-
+        #//MAGIC
+        if(direction * me.rpm > 0) me.torque = ((9549 * me.cmdPower) / me.rpm);
+        else if(direction * me.rpm < 0) me.torque = ((9549 * me.cmdPower) / math.abs(me.rpm)) * direction;
         me.activePower_kW = math.abs(me.rpm * me.torque / 9549);
 
         #if(math.abs(me.rpm) < cmdRpm){
@@ -354,3 +359,14 @@ var toggleEngine = func(my_engine){
         stopEngine(my_engine);
     }
 }
+
+addcommand("enableLGear", func() {
+    engine_1.setGear(150);
+    engine_1.isInLGear.setValue(1);
+    print("Engine: L Gear Enabled");
+});
+addcommand("disableLGear", func() {
+    engine_1.setGear(9.73);
+    engine_1.isInLGear.setValue(0);
+    print("Engine: L Gear disabled");
+});
