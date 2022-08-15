@@ -777,6 +777,22 @@ io.include("service.nas");
 #//var model = geo.put_model(stationPath, stationCoord, stationCourse); # Place the default glider
 
 
+var reduceRollingFriction = func(){
+    print("rolling_friction-coeff reduced to 0.006");
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit/rolling_friction_coeff", 0.006);
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit[1]/rolling_friction_coeff", 0.006);
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit[2]/rolling_friction_coeff", 0.006);
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit[3]/rolling_friction_coeff", 0.006);
+}
+
+var resumeRollingFriction = func(){
+    print("rolling_friction-coeff resumed to 0.06");
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit/rolling_friction_coeff", 0.06);
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit[1]/rolling_friction_coeff", 0.06);
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit[2]/rolling_friction_coeff", 0.06);
+    props.getNode("/",1).setValue("/fdm/jsbsim/gear/unit[3]/rolling_friction_coeff", 0.06);
+}
+
 #//Testing
 var testingProgram_1_Entry = func(){
     autospeed.startAutoSpeed();
