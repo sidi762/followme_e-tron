@@ -127,6 +127,7 @@
             <int n="1" alias="/sim/model/lights/indicator-right/state"/>
             <int n="2" alias="/systems/horn"/>
             <int n="3" alias="/controls/lighting/headlight"/>
+			<int n="4" alias="/services/service-truck/connect"/>
             <int n="5" alias="/services/service-truck/enable"/>
             <int n="6" alias="/systems/screen-enable"/>
             <int n="7" alias="/gear/gear[0]/tyre-smoke"/>
