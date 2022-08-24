@@ -22,7 +22,7 @@
 	<object-name>fuel_pipe_disconnected</object-name>
 	<condition>
 		<equals>
-			<property>services/service-truck/connect</property>
+			<property>sim/multiplay/generic/int[4]</property>
 			<value>0</value>
 		</equals>
 	</condition>
@@ -32,7 +32,7 @@
 	<object-name>fuel_pipe</object-name>
 	<condition>
 		<equals>
-			<property>services/service-truck/connect</property>
+			<property>sim/multiplay/generic/int[4]</property>
 			<value>1</value>
 		</equals>
 	</condition>
@@ -42,7 +42,7 @@
 	<object-name>box</object-name>
 	<condition>
 		<equals>
-			<property>services/service-truck/connect</property>
+			<property>sim/multiplay/generic/int[4]</property>
 			<value>1</value>
 		</equals>
 	</condition>
