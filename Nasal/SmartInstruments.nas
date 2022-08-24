@@ -297,6 +297,8 @@ var SmartInstruments = {
         if(me.updateTimer != nil) me.updateTimer.stop();
         me.group.hide();
         me.welcomeGroup.hide();
+        me.iconGroup.hide();
+        me.signGroup.hide();
     },
     showWarningMessage:func(msg){
         me.warningText.enableUpdate();
