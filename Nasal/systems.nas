@@ -15,16 +15,16 @@ var tyreSmoke_3 = aircraft.tyresmoke.new(3, auto = 1, diff_norm = 0.4, check_vsp
 
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
 frontleft_door.informationNode = vehicleInformation.controls.doors.FL;
-frontleft_door.isDoor = 1;
+frontleft_door.doorNum = "1";
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
 frontright_door.informationNode = vehicleInformation.controls.doors.FR;
-frontright_door.isDoor = 1;
+frontright_door.doorNum = "2";
 var rearleft_door = aircraft.door.new("/controls/doors/rearleft", 1);
 rearleft_door.informationNode = vehicleInformation.controls.doors.RL;
-rearleft_door.isDoor = 1;
+rearleft_door.doorNum = "3";
 var rearright_door = aircraft.door.new("/controls/doors/rearright", 1);
 rearright_door.informationNode = vehicleInformation.controls.doors.RR;
-rearright_door.isDoor = 1;
+rearright_door.doorNum = "4";
 
 var charging_cap = aircraft.door.new("/controls/doors/charging_cap", 1);
 charging_cap.informationNode = vehicleInformation.controls.doors.charging_cap;
@@ -34,11 +34,11 @@ aircraft.door.toggle = func(){
     me.informationNode.setValue(1 - me.getpos());
     if(pos == 0){
         me.open();
-        if(me.isDoor) playAudio('door_open.wav');
+        if(me.doorNum) playAudio(file: 'door_open.wav', queue: 'fx_door_'~me.doorNum);
     }
     if(pos == 1){
         me.close();
-        if(me.isDoor) playAudio('door_shut.wav');
+        if(me.doorNum) playAudio(file: 'door_shut.wav', queue: 'fx_door_'~me.doorNum);
     }
 }
 
@@ -587,7 +587,7 @@ var Safety = {
     toggleAEB: func(){
         if(!me.aebEnabled){
             me.enableAEB();
-            playAudio("parking_radar_init.wav");
+            playAudio(file: "parking_radar_init.wav", queue: "fx_aeb");
         }
         else me.disableAEB();
     },
@@ -633,9 +633,9 @@ var Safety = {
         brakeController.releaseAllBrakes();
     },
     aebWarning: func(){
-        playAudio("parking_radar_high.wav");
-        playAudio("parking_radar_high.wav");
-        playAudio("parking_radar_high.wav");
+        playAudio(file: "parking_radar_high.wav", queue: "fx_aeb");
+        playAudio(file: "parking_radar_high.wav", queue: "fx_aeb");
+        playAudio(file: "parking_radar_high.wav", queue: "fx_aeb");
     },
     aebFullBrake: func(){
         brakeController.activeEmergencyBrake();

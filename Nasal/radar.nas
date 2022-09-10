@@ -201,7 +201,7 @@ var Radar = {
         me.isRunning = 1;
         if(me.warnEnabled){
             print("Parking radar started!");
-            playAudio("parking_radar_init.wav");
+            playAudio(file: "parking_radar_init.wav", queue: "fx_radar");
         }else{
             #print("Radar initialized!");
         }
@@ -250,7 +250,7 @@ var Radar = {
     getElevByCoord: func(coord){
         return geo.elevation(coord.lat(), coord.lon());
     },
-    position_change: func(position_val,value){
+    position_change: func(position_val, value){
         if(position_val+value>180)
             position_val += value-360;
         else if(position_val+value<-180)
@@ -272,7 +272,7 @@ var Radar = {
     },
     warn: func(){
         me.warningTimer.restart(me.warningInterval);
-        playAudio(me.warningSound);
+        playAudio(file: me.warningSound, queue: "fx_radar");
     },
     warnControl: func(meters){
         if(meters == 10000){
