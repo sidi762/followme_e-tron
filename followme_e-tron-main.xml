@@ -5,12 +5,12 @@
 
 		<author>Gijs de Rooy, 梁思地/Sidi Liang, 罗启元/Qiyuan Luo, ValKmjolnir, 李维昊/Weihao Li, Marsdolphin</author>
 
-		<status>early production</status>
+		<status>Production</status>
 
         <rating>
     		<FDM type="int">4</FDM>
     		<systems type="int">3</systems>
-    		<cockpit type="int">4</cockpit>
+    		<cockpit type="int">5</cockpit>
     		<model type="int">4</model>
     	</rating>
 
