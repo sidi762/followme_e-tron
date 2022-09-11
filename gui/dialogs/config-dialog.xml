@@ -14,11 +14,15 @@
          #print(cmdarg().getPath());
          var nameNode = props.getNode("systems/plate/name", 1);
          var fileNode = props.getNode("systems/plate/file", 1);
+         var rearNameNode = props.getNode("systems/rear_plate/name", 1);
+         var rearFileNode = props.getNode("systems/rear_plate/file", 1);
          var lis = setlistener(nameNode, func(){
             if(nameNode.getValue() != "NONE"){
                 fileNode.setValue("texture/" ~ nameNode.getValue() ~ ".png");
+                rearFileNode.setValue("plate/texture/" ~ nameNode.getValue() ~ ".png");
             }else{
                 fileNode.setValue(nameNode.getValue());
+                rearFileNode.setValue("plate/texture/" ~ "e-tron.png");
             }
          });
      </open>

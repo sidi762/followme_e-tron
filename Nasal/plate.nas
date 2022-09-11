@@ -8,6 +8,10 @@
 
 var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
 var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[6]/combo/");
+var rearNameNode = props.getNode("systems/rear_plate/name", 1);
+var rearFileNode = props.getNode("systems/rear_plate/file", 1);
+rearFileNode.setValue("plate/texture/" ~ "e-tron.png");
+
 
 var Plate = {
     new: func() {

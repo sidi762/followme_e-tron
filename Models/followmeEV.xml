@@ -222,6 +222,20 @@
      <z-m> 0.39</z-m>
     </offsets>
 </model>
+<animation>
+    <condition>
+	    <not>
+			<equals>
+				<property>sim/multiplay/generic/string[7]</property>
+				<value>NONE</value>
+			</equals>
+        </not>
+	</condition>
+    <type>material</type>
+    <object-name>back_plate</object-name>
+    <property-base>sim/multiplay/generic</property-base>
+    <texture-prop>string[7]</texture-prop>
+</animation>
 
 <model>
   <path>Aircraft/followme_e-tron/Models/Interior/Instruments/indicater/inside_indicater.ac</path>
