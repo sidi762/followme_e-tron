@@ -185,10 +185,10 @@
     <type>material</type>
     <object-name>reversing_radar_switch</object-name>
     <condition>
-	       <equals>
-		             <property>sim/multiplay/generic/bool[12]</property>
-	                 <value>1</value>
-	       </equals>
+        <equals>
+            <property>sim/multiplay/generic/bool[12]</property>
+            <value>1</value>
+        </equals>
     </condition>
     <texture>control_LIT.png</texture>
 </animation>
