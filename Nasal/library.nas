@@ -23,8 +23,9 @@ universalVariableDebug.setDebugLevel(2);
 
 var Variable = {
     #//The class for a "universal variable"
-    #//testingVariable = Variable.new("test", "testing", "This is a node for testing", 0, 1, 1, "/systems/testingNode");
-    new: func(name, value = 0, note = nil, readOnly = 0, usePropertyTree = 0, listenPropertyTree = 1, property = nil){
+    #//testingVariable = Variable.new("test", "testing", "This is a node for testing", 0, 1, 1, "/systems/testingNode", nil);
+    new: func(name, value = 0, note = nil, readOnly = 0, usePropertyTree = 0,
+        listenPropertyTree = 1, property = nil, callback=nil){
         var m = {parents:[Variable]};
         m._name = name;
         m._value = value;
@@ -34,6 +35,7 @@ var Variable = {
         m._listenPropertyTree = listenPropertyTree;
         m._property = property;
         m._propertyNodeInitialized = 0;
+        m._callback = callback; #//Called when the property value is changed
 
         if(usePropertyTree){
             m._propertyNode = props.getNode(property, 1);
@@ -48,6 +50,9 @@ var Variable = {
         return m;
     },
     _updateValueFromProperty: func(){
+        if(me._callback != nil){
+            call(me._callback);
+        }
         if(!me._readOnly){
             me._value = me._propertyNode.getValue();
             universalVariableDebug.debugPrint(me._name~" Value updated from property", 1);
