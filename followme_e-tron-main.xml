@@ -246,7 +246,7 @@
     			<desc>Toggle Parking Radar</desc>
                 <binding>
                     <command>nasal</command>
-                    <script>followme.parkingRadar.toggle()</script>
+                    <script>followme.toggleParkingRadar()</script>
                 </binding>
     		</key>
     	    <key n="119">
