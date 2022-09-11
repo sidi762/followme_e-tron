@@ -286,8 +286,9 @@
                 </binding>
             </combo>
         </group>
+        <hrule/>
         <group>
-            <layout>vbox</layout>
+            <layout>hbox</layout>
             <button>
                 <halign>left</halign>
                 <legend>Select Livery</legend>
@@ -309,6 +310,10 @@
 				</binding>
             </button>
         </group>
+        <hrule/>
+        <text>
+            <label>Miscellaneous</label>
+        </text>
         <group>
             <layout>vbox</layout>
             <checkbox>

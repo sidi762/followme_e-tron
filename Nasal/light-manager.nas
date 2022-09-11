@@ -8,9 +8,18 @@
 var als_on = props.globals.getNode("/sim/rendering/shaders/skydome");
 var alt_agl = props.globals.getNode("/position/altitude-agl-ft");
 var cur_alt = 0;
+var toggleALSLight = func(){
+	if(!light.light_manager.run){
+		light.light_manager.init();
+		print("ALS light enabled");
+	}else{
+		light.light_manager.stop();
+		print("ALS light disabled");
+	}
+}
+var isALSLightEnabled = followme.Variable.new("isALSLightEnabled", 0, "isALSLightEnabled", 0, 1, 1, "/systems/enable_als_lights", toggleALSLight);
 
 var light_manager = {
-
 	run: 0,
 
 	lat_to_m: 110952.0,
@@ -176,6 +185,11 @@ var light_manager = {
 	},
 
 	stop: func {
+		me.light1_off();
+		me.light2_off();
+		me.light3_off();
+		me.light4_off();
+		me.light5_off();
 		me.run = 0;
 	},
 
@@ -188,7 +202,8 @@ var light_manager = {
 		if (als_on.getValue() == 1 and alt_agl.getValue() < 100.0) {
 
             highBeam = getprop("controls/lighting/highBeam");
-			headlight = getprop("controls/lighting/headlight-als");
+			#//headlight = getprop("controls/lighting/headlight-als");
+			headlight = getprop("controls/lighting/headlight");
 
             ll3 = getprop("sim/model/lights/nose-lights");
 			nav = getprop("/sim/model/lights/nav-lights");
@@ -220,18 +235,18 @@ var light_manager = {
                 me.light2_xpos =  5.0;
 				me.light2_setSize(2);
 				me.light2_on();
-                props.getNode("/controls/lighting/headlight", 1).setValue(1);
+                #//props.getNode("/controls/lighting/headlight", 1).setValue(1); #//Legacy code for ancient cone light
 			} else if(headlight == 2){
 				me.light2_ypos =  0.0;
                 me.light2_xpos =  10.0;
 				me.light2_setSize(4.5);
 				me.light2_on();
-                props.getNode("/controls/lighting/headlight", 1).setValue(1);
+                #//props.getNode("/controls/lighting/headlight", 1).setValue(1); #//Legacy code for ancient cone light
 			} else if(headlight == 0){
 			    me.light2_off();
-                if(highBeam != 1){
-                    props.getNode("/controls/lighting/headlight", 1).setValue(0);
-                }
+                #//if(highBeam != 1){
+                    #//props.getNode("/controls/lighting/headlight", 1).setValue(0); #//Legacy code for ancient cone light
+                #//}
 			}
 
 

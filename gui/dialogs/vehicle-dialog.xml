@@ -506,5 +506,23 @@
         </group>
 
         <hrule/>
-
+        <text>
+            <label>Miscellaneous</label>
+        </text>
+        <group>
+            <layout>vbox</layout>
+            <checkbox>
+                <halign>left</halign>
+                <label>  Enable ALS procedural lights</label>
+                <property>/systems/enable_als_lights</property>
+                <live>true</live>
+                <binding>
+                    <command>dialog-apply</command>
+                </binding>
+            </checkbox>
+            <text>
+                <halign>left</halign>
+                <label>(for older FG versions without Compositor support)</label>
+            </text>
+        </group>
 </PropertyList>
