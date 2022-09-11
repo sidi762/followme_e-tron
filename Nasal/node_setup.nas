@@ -78,6 +78,7 @@ vehicleInformation.lighting.indicator.leftSwitch = vehicleInformation.lighting.i
 vehicleInformation.lighting.indicator.rightSwitch = vehicleInformation.lighting.indicator.getNode("right_switch", 1);
 vehicleInformation.lighting.indicator.left = vehicleInformation.lighting.getNode("indicator-left", 1);
 vehicleInformation.lighting.indicator.right = vehicleInformation.lighting.getNode("indicator-right", 1);
+vehicleInformation.lighting.warningLight = props.getNode("/warninglight/start");
 
 #//Systems
 vehicleInformation.systems = props.getNode("/systems", 1);
@@ -106,6 +107,7 @@ vehicleInformation.lighting.indicator.left.setValue(0);
 vehicleInformation.lighting.indicator.right.setValue(0);
 vehicleInformation.lighting.indicator.left.setValue(0);
 vehicleInformation.lighting.indicator.right.setValue(0);
+vehicleInformation.lighting.warningLight.setValue(0);
 
 #//Systems
 vehicleInformation.systems.welcomeMessage.setValue(0);
