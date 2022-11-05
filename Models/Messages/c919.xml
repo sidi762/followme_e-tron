@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<PropertyList>
+<sim>
+	<model>
+		<livery>
+			<name type="string">C919</name>
+			<texture>Messages/C919.png</texture>
+		</livery>
+	</model>
+</sim>
+</PropertyList>
