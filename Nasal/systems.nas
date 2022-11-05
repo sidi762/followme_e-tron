@@ -501,17 +501,23 @@ var calculateSpeed = func(){
 var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
 
 var resetOnPosition = func(){
-    var latProp = props.getNode("/position/latitude-deg");
-    var lonProp = props.getNode("/position/longitude-deg");
-    var lat = latProp.getValue();
-    var lon = lonProp.getValue();
-    setprop("/fdm/jsbsim/simulation/pause", 1);
-    setprop("/fdm/jsbsim/simulation/reset", 1);
-    var groundAlt = props.getNode("/position/ground-elev-ft").getValue();
-    props.getNode("/position/altitude-ft").setValue(groundAlt+7);
-    latProp.setValue(lat);
-    lonProp.setValue(lon);
-    setprop("/fdm/jsbsim/simulation/pause", 0);
+    var lat = props.getNode("/position/latitude-deg").getValue();
+    var lon = props.getNode("/position/longitude-deg").getValue();
+    setprop("/sim/presets/carrier", "");
+    setprop("/sim/presets/parkpos", "");
+    setprop("/sim/presets/airport-id", "");
+    setprop("/sim/presets/runway", "");
+    setprop("/sim/presets/runway-requested", 0);
+    props.getNode("/sim/presets/latitude-deg").setValue(lat);
+    props.getNode("/sim/presets/longitude-deg").setValue(lon);
+    fgcommand("reposition");
+
+    #//The old method, kept for educational purposes
+    #//var groundAlt = props.getNode("/position/ground-elev-ft").getValue();
+    #//setprop("/fdm/jsbsim/simulation/reset", 1); #This will position the aircraft back to the initial spawn point
+    #//props.getNode("/position/altitude-ft").setValue(groundAlt+7);
+    #latProp.setValue(lat);
+    #lonProp.setValue(lon);
 }
 
 var brakesABS = func(){
