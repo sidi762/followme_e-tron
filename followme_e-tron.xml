@@ -92,7 +92,7 @@
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
             <max_steer unit="DEG"> 45 </max_steer>
-            <brake_group> RIGHT </brake_group>
+            <brake_group> LEFT </brake_group>
             <retractable>0</retractable>
         </contact>
         <contact type="BOGEY" name="BL">
@@ -115,7 +115,7 @@
             <spring_coeff unit="LBS/FT"> 5400 </spring_coeff>
             <damping_coeff unit="LBS/FT/SEC"> 1600 </damping_coeff>
             <max_steer unit="DEG"> 0 </max_steer>
-            <brake_group> LEFT </brake_group>
+            <brake_group> RIGHT </brake_group>
             <retractable>0</retractable>
         </contact>
         <contact type="BOGEY" name="BR">
