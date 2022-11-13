@@ -553,6 +553,7 @@ var Safety = {
         return newSafety;
     },
     isOn: 0,
+    isEnabled: 1,
     safetySystemTimer: nil,
     updateInterval: 0.01,
     aebEnabled: 0,
@@ -743,20 +744,22 @@ var Safety = {
     },
 
     reset: func(){
-        #resetting stops the safety system
+        #resetting stops and disables the safety system
         me.stop();
+        me.isEnabled = 0;
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
         me.aebStateProp.setValue(0);
     },
     init: func(){
-        #initialize or reinitialize
+        #initialize or reinitialize (which re-enables the system if disabled earlier)
         me.frontAirbagProp.setValue(0);
         me.sideAirbagProp.setValue(0);
         me.aebStateProp.setValue(0);
         if(me.safetySystemTimer == nil) me.safetySystemTimer = maketimer(me.updateInterval, func me.update());
         me.safetySystemTimer.start();
         #if(me.aebEnabled) me.enableAEB();
+        me.isEnabled = 1;
         me.isOn = 1;
         print("Safety system initialized");
     },
