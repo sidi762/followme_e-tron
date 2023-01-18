@@ -48,7 +48,6 @@
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/luxury2.xml</path>
 </model>
-
 <model>
     <condition>
 		<equals>
@@ -58,7 +57,6 @@
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/race/interior.xml</path>
 </model>
-
 <model>
     <condition>
 		<equals>
@@ -68,7 +66,6 @@
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design.xml</path>
 </model>
-
 <model>
     <condition>
 		<equals>
@@ -78,7 +75,6 @@
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2.xml</path>
 </model>
-
 <model>
     <condition>
 		<equals>
@@ -88,6 +84,8 @@
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design5.xml</path>
 </model>
+
+
 
 <animation>
  <type>material</type>

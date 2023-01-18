@@ -16,7 +16,7 @@
     <condition>
 		<equals>
 			<property>sim/multiplay/generic/string[3]</property>
-			<value>Default</value>
+			<value>Followme Original</value>
 		</equals>
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/default/interior.xml</path>
@@ -25,7 +25,7 @@
     <condition>
 		<equals>
 			<property>sim/multiplay/generic/string[3]</property>
-			<value>Sport</value>
+			<value>Sport (Legacy)</value>
 		</equals>
 	</condition>
     <path>Aircraft/followme_e-tron/Models/Interior/sport/interior.xml</path>
@@ -43,6 +43,15 @@
     <condition>
 		<equals>
 			<property>sim/multiplay/generic/string[3]</property>
+			<value>Luxury 2.0</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/luxury2.xml</path>
+</model>
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
 			<value>Race</value>
 		</equals>
 	</condition>
@@ -52,10 +61,28 @@
     <condition>
 		<equals>
 			<property>sim/multiplay/generic/string[3]</property>
-			<value>404Design</value>
+			<value>404Design (Default)</value>
 		</equals>
 	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/404Design/interior.xml</path>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design.xml</path>
+</model>
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
+			<value>404Design 2.0</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2.xml</path>
+</model>
+<model>
+    <condition>
+		<equals>
+			<property>sim/multiplay/generic/string[3]</property>
+			<value>404Design 2022</value>
+		</equals>
+	</condition>
+    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design5.xml</path>
 </model>
 
 <animation>

@@ -3,7 +3,7 @@
 <PropertyList include="followme_e-tron-main.xml">
 <sim>
 
-	<description>Follow Me e-tron LIMO</description>
+    <description>Follow Me e-tron LIMO</description>
     <variant-of>followme_e-tron</variant-of>
     <long-description>
         An electronic, fictional limousine version of a follow me car (Renault Kangoo I) with Chinese characteristics.
