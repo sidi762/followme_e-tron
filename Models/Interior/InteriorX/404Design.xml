@@ -67,7 +67,7 @@
 
 
 <!-- MUG -->
-<model>
+<!-- <model>
    <condition>
 		<equals>
 			<property>sim/multiplay/generic/bool[0]</property>
@@ -82,6 +82,7 @@
       <z-m>0.755</z-m>
   </offsets>
 </model>
+-->
 
 <!-- GEAR HANDLE -->
 <animation>
