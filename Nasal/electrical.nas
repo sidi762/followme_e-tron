@@ -226,9 +226,6 @@ var Circuit = {
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
         props.getNode("/systems/electrical/e-tron/battery-remaining-percent-float", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentageFloat());
 
-        vehicleInformation.systems.electrical.getMainBatteryRemainingPercentage = me.parallelConnection[0].units[0].getRemainingPercentage();
-        vehicleInformation.systems.electrical.getMainBatteryRemainingPercentageFloat = me.parallelConnection[0].units[0].getRemainingPercentageFloat();
-
         electricalDebug.debugPrint("current: "~me.current, 1);
         electricalDebug.debugPrint("terminal voltage: "~me.voltage(), 1);
         electricalDebug.debugPrint("Main Battery Remaining: "~me.parallelConnection[0].units[0].remaining, 1);

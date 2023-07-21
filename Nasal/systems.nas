@@ -14,20 +14,20 @@ var tyreSmoke_3 = aircraft.tyresmoke.new(3, auto = 1, diff_norm = 0.4, check_vsp
 
 
 var frontleft_door = aircraft.door.new("/controls/doors/frontleft", 1);
-frontleft_door.informationNode = vehicleInformation.controls.doors.FL;
+frontleft_door.informationNode = vInfo.controls.doors.FL;
 frontleft_door.doorNum = "1";
 var frontright_door = aircraft.door.new("/controls/doors/frontright", 1);
-frontright_door.informationNode = vehicleInformation.controls.doors.FR;
+frontright_door.informationNode = vInfo.controls.doors.FR;
 frontright_door.doorNum = "2";
 var rearleft_door = aircraft.door.new("/controls/doors/rearleft", 1);
-rearleft_door.informationNode = vehicleInformation.controls.doors.RL;
+rearleft_door.informationNode = vInfo.controls.doors.RL;
 rearleft_door.doorNum = "3";
 var rearright_door = aircraft.door.new("/controls/doors/rearright", 1);
-rearright_door.informationNode = vehicleInformation.controls.doors.RR;
+rearright_door.informationNode = vInfo.controls.doors.RR;
 rearright_door.doorNum = "4";
 
 var charging_cap = aircraft.door.new("/controls/doors/charging_cap", 1);
-charging_cap.informationNode = vehicleInformation.controls.doors.charging_cap;
+charging_cap.informationNode = vInfo.controls.doors.charging_cap;
 
 aircraft.door.toggle = func(){
     var pos = me.getpos();
@@ -51,28 +51,27 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5]
 
 #//Wiper
 var wiperMode = 0;
-var wiper = aircraft.light.new( "/controls/wiper/frontwiper", [1, 1], "/controls/wiper/frontwiper_switch");
+var wiperSwitchNode = props.globals.getNode("/controls/wiper/frontwiper_switch", 1);
+var wiper = aircraft.light.new( "/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
+
 var wiperStop = func(){
-    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
+    wiperSwitchNode.setValue(0);
     wiperMode = 0;
 }
 var wiperFast = func(){
-    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 1);
+    wiper.pattern = [0.5, 0.5];
+    wiperSwitchNode.setValue(1);
     wiperMode = 1;
-    wiper.del();
-    wiper = aircraft.light.new( "/controls/wiper/frontwiper", [1, 1], "/controls/wiper/frontwiper_switch");
 }
 var wiperMid = func(){
-    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 1);
+    wiper.pattern = [0.7, 0.7];
+    wiperSwitchNode.setValue(1);
     wiperMode = 2;
-    wiper.del();
-    wiper = aircraft.light.new( "/controls/wiper/frontwiper", [2, 1], "/controls/wiper/frontwiper_switch");
 }
 var wiperSlow = func(){
-    props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 1);
+    wiper.pattern = [0.7, 2];
+    wiperSwitchNode.setValue(1);
     wiperMode = 3;
-    wiper.del();
-    wiper = aircraft.light.new( "/controls/wiper/frontwiper", [2, 1, 4], "/controls/wiper/frontwiper_switch");
 }
 var toggleWiper = func(){
     if(wiperMode == 0){
@@ -157,8 +156,8 @@ var IndicatorController = {
     leftIndicator : Indicator.new("left"),
     rightIndicator : Indicator.new("right"),
 
-    leftIndicatorSwitchNode: vehicleInformation.lighting.indicator.leftSwitch,
-    rightIndicatorSwitchNode: vehicleInformation.lighting.indicator.rightSwitch,
+    leftIndicatorSwitchNode: vInfo.lighting.indicator.leftSwitch,
+    rightIndicatorSwitchNode: vInfo.lighting.indicator.rightSwitch,
 
     mode:0,
 
@@ -405,7 +404,7 @@ var BrakeController = {
     },
     keyboardBrakeRelease: func(){
         me.applyFeetBrakes(0);
-        if(vehicleInformation.getSpeedKMH() > 10 and safety.emergencyModeState) safety.disableEmergencyMode();
+        if(vInfo.getSpeedKMH() > 10 and safety.emergencyModeState) safety.disableEmergencyMode();
     },
     releaseBrake: func(){
         me.applyLeftBrake(0);
@@ -479,7 +478,7 @@ var chargeBatteryStop = func(bef){
 }
 
 var calculateSpeed = func(){
-    var speedKmh = vehicleInformation.getSpeedKMH();
+    var speedKmh = vInfo.getSpeedKMH();
     var calculated = 0;
     var output = 0;
     if(speedKmh <= 0){
@@ -559,7 +558,7 @@ var Safety = {
     aebEnabled: 0,
     aebActivated: 0,
     lastRadarOutput:10000,
-    throttleNode: vehicleInformation.engine.throttleNode,
+    throttleNode: vInfo.engine.throttleNode,
     emergencyModeState: 0,
     #Airbag
     accXProp: props.getNode("/fdm/jsbsim/accelerations/a-pilot-x-ft_sec2", 1),
@@ -653,7 +652,7 @@ var Safety = {
     aebUpdate: func(){
         #//AEB Loop
 
-        var currentSpeed = vehicleInformation.getSpeedKMH();#In km/h
+        var currentSpeed = vInfo.getSpeedKMH();#In km/h
         var radarOutput = me.frontRadar.radarOutput;
         #print("radar output: " ~ radarOutput);
         #print("last radar output: " ~ me.lastRadarOutput);

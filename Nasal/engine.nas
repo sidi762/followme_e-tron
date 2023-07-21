@@ -7,27 +7,30 @@
 #//Electrical system error message
 #//Drain battary too fast?
 io.include("library.nas");
+io.include("electrical.nas");
 var N2LBS = 0.2248089;
 var Engine = {
-    #//Class for any electric engine
+    #//Class for any electric power unit (engine and gear box)
     #//mTorque: Max torque, mPower: Max Power, rpmAtMPower: RPM at max power
     #//For this vehicle: maxPower: 375kW
 
     new: func(mTorque, mPower, rpmAtMPower) {
-        var m = { parents:[Engine, followme.Appliance.new()]};
+        var m = { parents:[Engine, Appliance]};
 
         m.applianceName = "Engine Module";
         m.applianceDescription = "This is the engine for the vehicle";
 
-        m.engineNode = followme.vehicleInformation.engine;
+        m.engineSwitch = Switch.new(0);
+
+        m.engineNode = followme.vInfo.engine;
         m.engineNode.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
         m.engineNode.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
         m.engineNode.isStarted = props.getNode("/controls/engines/engine/started",1);
         m.engineNode.direction = props.getNode("/controls/direction", 1);
         m.engineNode.mode = props.getNode("/controls/mode", 1);
 
-        followme.vehicleInformation.lighting.reverseIndicator = props.getNode("/controls/lighting/reverse_indicator", 1);;
-        m.reverseIndicatorNode = followme.vehicleInformation.lighting.reverseIndicator;
+        followme.vInfo.lighting.reverseIndicator = props.getNode("/controls/lighting/reverse_indicator", 1);;
+        m.reverseIndicatorNode = followme.vInfo.lighting.reverseIndicator;
 
         m.maxTorque = mTorque;
         m.ratedPower = mPower;
@@ -42,8 +45,6 @@ var Engine = {
     protectionResistance: 0.5, #//temp solution
 
     runningState: 0,
-
-    engineSwitch: followme.Switch.new(0),
 
     isRunning: func(){
         return me.runningState;

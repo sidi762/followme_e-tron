@@ -42,90 +42,96 @@ var VehicleInformationManager = {
 	},
 };
 
-var vehicleInformation = VehicleInformationManager.new();
+#// vehicle information
+var vInfo = VehicleInformationManager.new();
 
 
 #//Environment
-vehicleInformation.environment = props.getNode("/environment", 1);
-vehicleInformation.environment.temperature = props.getNode("/environment/temperature-degc", 1);
+vInfo.environment = props.getNode("/environment", 1);
+vInfo.environment.temperature = props.getNode("/environment/temperature-degc", 1);
 
 #//Engine
-vehicleInformation.engine = {};
-vehicleInformation.engine.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
-vehicleInformation.engine.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
-vehicleInformation.engine.isStarted = props.getNode("/controls/engines/engine/started",1);
-vehicleInformation.engine.direction = props.getNode("/controls/direction", 1);
-vehicleInformation.engine.mode = props.getNode("/controls/mode", 1);
+vInfo.engine = {};
+vInfo.engine.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
+vInfo.engine.rpmNode = props.getNode("/controls/engines/engine/rpma",1);
+vInfo.engine.isStarted = props.getNode("/controls/engines/engine/started",1);
+vInfo.engine.direction = props.getNode("/controls/direction", 1);
+vInfo.engine.mode = props.getNode("/controls/mode", 1);
 
 #//Controls
-vehicleInformation.controls = props.getNode("/controls", 1);
-vehicleInformation.controls.lighting = vehicleInformation.controls.getNode("lighting", 1);
-vehicleInformation.controls.doors = vehicleInformation.controls.getNode("doors", 1);
+vInfo.controls = props.getNode("/controls", 1);
+vInfo.controls.lighting = vInfo.controls.getNode("lighting", 1);
+vInfo.controls.doors = vInfo.controls.getNode("doors", 1);
 
 #//Doors
-vehicleInformation.controls.doors.FL = vehicleInformation.controls.doors.getNode("FL", 1);
-vehicleInformation.controls.doors.FR = vehicleInformation.controls.doors.getNode("FR", 1);
-vehicleInformation.controls.doors.RL = vehicleInformation.controls.doors.getNode("RL", 1);
-vehicleInformation.controls.doors.RR = vehicleInformation.controls.doors.getNode("RR", 1);
-vehicleInformation.controls.doors.charging_cap = vehicleInformation.controls.doors.getNode("charging_cap", 1);
+vInfo.controls.doors.FL = vInfo.controls.doors.getNode("FL", 1);
+vInfo.controls.doors.FR = vInfo.controls.doors.getNode("FR", 1);
+vInfo.controls.doors.RL = vInfo.controls.doors.getNode("RL", 1);
+vInfo.controls.doors.RR = vInfo.controls.doors.getNode("RR", 1);
+vInfo.controls.doors.charging_cap = vInfo.controls.doors.getNode("charging_cap", 1);
 
 #//Shortcut for Lignting
-vehicleInformation.lighting = vehicleInformation.controls.lighting;
-vehicleInformation.lighting.reverseIndicator = vehicleInformation.lighting.getNode("reverse_indicator", 1);
-vehicleInformation.lighting.highBeam = vehicleInformation.lighting.getNode("highBeam", 1);
-vehicleInformation.lighting.indicator = vehicleInformation.lighting.getNode("indicator", 1);
-vehicleInformation.lighting.indicator.leftSwitch = vehicleInformation.lighting.indicator.getNode("left_switch", 1);
-vehicleInformation.lighting.indicator.rightSwitch = vehicleInformation.lighting.indicator.getNode("right_switch", 1);
-vehicleInformation.lighting.indicator.left = vehicleInformation.lighting.getNode("indicator-left", 1);
-vehicleInformation.lighting.indicator.right = vehicleInformation.lighting.getNode("indicator-right", 1);
-vehicleInformation.lighting.warningLight = props.getNode("/warninglight/start");
+vInfo.lighting = vInfo.controls.lighting;
+vInfo.lighting.reverseIndicator = vInfo.lighting.getNode("reverse_indicator", 1);
+vInfo.lighting.highBeam = vInfo.lighting.getNode("highBeam", 1);
+vInfo.lighting.indicator = vInfo.lighting.getNode("indicator", 1);
+vInfo.lighting.indicator.leftSwitch = vInfo.lighting.indicator.getNode("left_switch", 1);
+vInfo.lighting.indicator.rightSwitch = vInfo.lighting.indicator.getNode("right_switch", 1);
+vInfo.lighting.indicator.left = vInfo.lighting.getNode("indicator-left", 1);
+vInfo.lighting.indicator.right = vInfo.lighting.getNode("indicator-right", 1);
+vInfo.lighting.warningLight = props.getNode("/warninglight/start");
 
 #//Systems
-vehicleInformation.systems = props.getNode("/systems", 1);
-vehicleInformation.systems.welcomeMessage = vehicleInformation.systems.getNode("welcome-message", 1);
-vehicleInformation.systems.horn = vehicleInformation.systems.getNode("horn", 1);
-vehicleInformation.systems.speedometer = vehicleInformation.systems.getNode("speedometer", 1);
-vehicleInformation.systems.speedometer.type = vehicleInformation.systems.speedometer.getNode("type", 1);
-vehicleInformation.systems.batteryGauge = vehicleInformation.systems.getNode("battery-gauge", 1);
-vehicleInformation.systems.batteryGauge.type = vehicleInformation.systems.batteryGauge.getNode("type", 1);
-vehicleInformation.systems.electrical = {};
+vInfo.systems = props.getNode("/systems", 1);
+vInfo.systems.welcomeMessage = vInfo.systems.getNode("welcome-message", 1);
+vInfo.systems.horn = vInfo.systems.getNode("horn", 1);
+vInfo.systems.speedometer = vInfo.systems.getNode("speedometer", 1);
+vInfo.systems.speedometer.type = vInfo.systems.speedometer.getNode("type", 1);
+vInfo.systems.batteryGauge = vInfo.systems.getNode("battery-gauge", 1);
+vInfo.systems.batteryGauge.type = vInfo.systems.batteryGauge.getNode("type", 1);
+
+#//Electrical
+vInfo.systems.electrical = props.getNode("/systems/electrical/", 1);
+vInfo.systems.electrical.etron = vInfo.systems.electrical.getNode("e-tron", 1);
+vInfo.electrical = vInfo.systems.electrical.etron; #Shortcut
+vInfo.electrical.batteryRemainingPercent = vInfo.electrical.getNode("battery-remaining-percent", 1);
+vInfo.electrical.batteryRemainingPercentFloat = vInfo.electrical.getNode("battery-remaining-percent-float", 1);
 
 #//Safety
-vehicleInformation.systems.safety = vehicleInformation.systems.getNode("safety", 1);
-vehicleInformation.systems.safety.aebActivated = vehicleInformation.systems.safety.getNode("aeb_activated", 1);
-vehicleInformation.systems.safety.isAebOn = vehicleInformation.systems.safety.getNode("aeb_on", 1);
+vInfo.systems.safety = vInfo.systems.getNode("safety", 1);
+vInfo.systems.safety.aebActivated = vInfo.systems.safety.getNode("aeb_activated", 1);
+vInfo.systems.safety.isAebOn = vInfo.systems.safety.getNode("aeb_on", 1);
 #//Automatic driving
-vehicleInformation.systems.isAutoholdEnabled = vehicleInformation.systems.getNode("auto_hold_enabled", 1);
-vehicleInformation.systems.isAutoholdWorking = vehicleInformation.systems.getNode("auto_hold_working", 1);
+vInfo.systems.isAutoholdEnabled = vInfo.systems.getNode("auto_hold_enabled", 1);
+vInfo.systems.isAutoholdWorking = vInfo.systems.getNode("auto_hold_working", 1);
 
 
 #//Initialization
 #//Lignting
-vehicleInformation.lighting.reverseIndicator.setValue(0);
-vehicleInformation.lighting.highBeam.setValue(0);
-vehicleInformation.lighting.indicator.left.setValue(0);
-vehicleInformation.lighting.indicator.right.setValue(0);
-vehicleInformation.lighting.indicator.left.setValue(0);
-vehicleInformation.lighting.indicator.right.setValue(0);
-vehicleInformation.lighting.warningLight.setValue(0);
+vInfo.lighting.reverseIndicator.setValue(0);
+vInfo.lighting.highBeam.setValue(0);
+vInfo.lighting.indicator.left.setValue(0);
+vInfo.lighting.indicator.right.setValue(0);
+vInfo.lighting.indicator.left.setValue(0);
+vInfo.lighting.indicator.right.setValue(0);
+vInfo.lighting.warningLight.setValue(0);
 
 #//Systems
-vehicleInformation.systems.welcomeMessage.setValue(0);
-vehicleInformation.systems.speedometer.type.setValue("None");
-vehicleInformation.systems.batteryGauge.type.setValue("None");
+vInfo.systems.welcomeMessage.setValue(0);
+vInfo.systems.speedometer.type.setValue("None");
+vInfo.systems.batteryGauge.type.setValue("None");
 
-vehicleInformation.systems.safety.aebActivated.setValue("0");
-vehicleInformation.systems.safety.isAebOn.setValue("0");
+vInfo.systems.safety.aebActivated.setValue("0");
+vInfo.systems.safety.isAebOn.setValue("0");
 
-vehicleInformation.systems.isAutoholdEnabled.setValue("0");
-vehicleInformation.systems.isAutoholdWorking.setValue("0");
+vInfo.systems.isAutoholdEnabled.setValue("0");
+vInfo.systems.isAutoholdWorking.setValue("0");
 
 #//Doors
-vehicleInformation.controls.doors.FL.setValue(0);
-vehicleInformation.controls.doors.FR.setValue(0);
-vehicleInformation.controls.doors.RL.setValue(0);
-vehicleInformation.controls.doors.RR.setValue(0);
-
+vInfo.controls.doors.FL.setValue(0);
+vInfo.controls.doors.FR.setValue(0);
+vInfo.controls.doors.RL.setValue(0);
+vInfo.controls.doors.RR.setValue(0);
 
 props.getNode("/",1).setValue("/controls/mode", 1);
 props.getNode("/",1).setValue("/controls/direction", 1);

@@ -11,7 +11,7 @@ var SmartInstruments = {
             }),
         };
 
-        m.information = followme.vehicleInformation;
+        m.information = followme.vInfo;
         m.startupSoundIsEnabled = 0;
         m.startupSound = nil;#//The startup sound
         m.startupSoundPath = nil;#//Path to the startup sound
@@ -194,8 +194,8 @@ var SmartInstruments = {
         #//Power
         me.power.updateText(sprintf("%i", engine.engine_1.activePower_kW));
         #//Battery
-        me.batteryRemainingDisplay.updateText(me.information.systems.electrical.getMainBatteryRemainingPercentage);
-        if(me.information.systems.electrical.getMainBatteryRemainingPercentageFloat <= 20.0) me.batteryRemainingDisplay.setColor(1,0,0);
+        me.batteryRemainingDisplay.updateText(me.information.electrical.batteryRemainingPercent.getValue());
+        if(me.information.electrical.batteryRemainingPercentFloat.getValue() <= 20.0) me.batteryRemainingDisplay.setColor(1,0,0);
         else me.batteryRemainingDisplay.setColor(0.58,0.894,1);
         #//runtimeTextAdjust(me.batteryRemainingDisplay);
         #//Gear
