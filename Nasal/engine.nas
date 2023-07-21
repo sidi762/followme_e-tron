@@ -7,7 +7,7 @@
 #//Electrical system error message
 #//Drain battary too fast?
 io.include("library.nas");
-io.include("electrical.nas");
+io.include("lib_elec.nas");
 var N2LBS = 0.2248089;
 var Engine = {
     #//Class for any electric power unit (engine and gear box)
