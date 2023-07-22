@@ -69,7 +69,12 @@ var SmartInstruments = {
                              .setTranslation(0, 0)
                              .setSize(1509, 736)
                              .hide();
-        m.doorIcons = [m.doorFLIcon, m.doorFRIcon, m.doorRLIcon, m.doorRRIcon];
+        m.doorRCIcon = m.iconGroup.createChild("image")
+                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_RechargeCap.png")
+                             .setTranslation(0, 0)
+                             .setSize(1509, 736)
+                             .hide();
+        m.doorIcons = [m.doorFLIcon, m.doorFRIcon, m.doorRLIcon, m.doorRRIcon, m.doorRCIcon];
         # Create a text element and set some values(Self test)
         m.selfTestText = m.welcomeGroup.createChild("text", "optional-id-for element")
                                .setTranslation(530, 140)      # The origin is in the top left corner
@@ -157,7 +162,7 @@ var SmartInstruments = {
     showingWarningMessage: 0,
     isCenterScreenInfoShown: 1,
     isDoorsNotShut: 0,
-    doorsNotShut: [0,0,0,0],
+    doorsNotShut: [0,0,0,0,0],
 
     enableStartupSound: func(){
         me.startupSoundIsEnabled = 1;
@@ -222,9 +227,9 @@ var SmartInstruments = {
         me.timeDisplay.updateText(hour~":"~minute);
 
         #//Check for doors
-        doors = [followme.frontleft_door, followme.frontright_door, followme.rearleft_door, followme.rearright_door];
+        doors = [followme.frontleft_door, followme.frontright_door, followme.rearleft_door, followme.rearright_door, followme.charging_cap];
         me.isDoorsNotShut = 0;
-        for(var i = 0; i <= 3; i += 1){
+        for(var i = 0; i <= 4; i += 1){
             if(doors[i].getpos()){
                 me.isDoorsNotShut = 1;
                 me.doorsNotShut[i] = 1;
@@ -237,7 +242,7 @@ var SmartInstruments = {
             me.infoImage.hide();
             me.isCenterScreenInfoShown = 0;
             me.doorsNotShutImage.show();
-            for(var i = 0; i <= 3; i += 1){
+            for(var i = 0; i <= 4; i += 1){
                 if(me.doorsNotShut[i]) me.doorIcons[i].show();
             }
         }else{

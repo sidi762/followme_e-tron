@@ -41,7 +41,7 @@
 	</button>
 	</group>
 	<hrule/>
-    
+
 	<group>
 	    <layout>vbox</layout>
 	    <padding>6</padding>
@@ -77,16 +77,16 @@
                      <binding>
                          <command>nasal</command>
  		                <script>
-                            
+
                             if(getprop("services/service-truck/enable")){
                                 setprop("/sim/sound/voices/pilot", "Hey there! How can I help?");
                             }else{
                                 setprop("/sim/sound/voices/pilot", "Goodbye, drive safe!");
                                 settimer(func{setprop("/sim/sound/voices/copilot", "Thanks comrade!");}, 2)
-                                
+
                             }
-                        
-                        
+
+
                         </script>
                       </binding>
 	                 <binding>
@@ -117,6 +117,10 @@
                     <binding>
                         <command>property-toggle</command>
 		                <property>services/service-truck/connect</property>
+                     </binding>
+                     <binding>
+                         <command>nasal</command>
+                         <script>followme.charging_cap.open();</script>
                      </binding>
 	                 <binding>
                          <command>dialog-update</command>

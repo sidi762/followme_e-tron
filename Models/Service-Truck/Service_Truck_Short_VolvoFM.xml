@@ -31,10 +31,16 @@
 	<type>select</type>
 	<object-name>fuel_pipe</object-name>
 	<condition>
-		<equals>
-			<property>sim/multiplay/generic/int[4]</property>
-			<value>1</value>
-		</equals>
+		<and>
+			<equals>
+				<property>sim/multiplay/generic/int[4]</property>
+				<value>1</value>
+			</equals>
+			<equals>
+				<property>sim/multiplay/generic/float[26]</property>
+				<value>1</value>
+			</equals>
+		</and>
 	</condition>
 </animation>
 <animation>

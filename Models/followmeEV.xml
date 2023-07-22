@@ -169,6 +169,12 @@
     <animation>
         <type>pick</type>
         <object-name>chargegai</object-name>
+        <condition>
+            <equals>
+                <property>services/service-truck/connect</property>
+                <value>false</value>
+            </equals>
+        </condition>
         <action>
             <button>0</button>
             <repeatable>false</repeatable>

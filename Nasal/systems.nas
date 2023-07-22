@@ -27,6 +27,7 @@ rearright_door.informationNode = vInfo.controls.doors.RR;
 rearright_door.doorNum = "4";
 
 var charging_cap = aircraft.door.new("/controls/doors/charging_cap", 1);
+charging_cap.doorNum = 0;
 charging_cap.informationNode = vInfo.controls.doors.charging_cap;
 
 aircraft.door.toggle = func(){
