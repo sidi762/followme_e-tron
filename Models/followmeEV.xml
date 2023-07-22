@@ -1,1339 +1,1260 @@
 <PropertyList>
-
-<path>followme.ac</path>
-
-<sound>
-    <path>Aircraft/followme_e-tron/Sounds/followme-sound_mp.xml</path>
-</sound>
-
-<!-- Airbag -->
-<model>
-    <path>Aircraft/followme_e-tron/Models/Interior/airbags.xml</path>
-</model>
-
-<!-- Interior -->
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>Followme Original</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/default/interior.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>Sport (Legacy)</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/sport/interior.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>Luxury</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/luxury/interior.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>Luxury 2.0</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/luxury2.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>Race</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/race/interior.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>404Design (Default)</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>404Design 2.0</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>404Design 2022</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design5.xml</path>
-</model>
-<model>
-    <condition>
-		<equals>
-			<property>sim/multiplay/generic/string[3]</property>
-			<value>404Design 2023</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2023.xml</path>
-</model>
-
-
-
-<animation>
- <type>material</type>
- <object-name>sign</object-name>
- <property-base>sim/multiplay/generic</property-base>
- <texture-prop>string[18]</texture-prop>
- <texture>blanco.png</texture>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>Mesh76.004</object-name>
- <object-name>door.rl</object-name>
- <object-name>door.rr</object-name>
- <object-name>rdoor</object-name>
- <object-name>ldoor</object-name>
- <!--<property-base>sim/model/livery</property-base>
+    <path>followme.ac</path>
+    <sound>
+        <path>Aircraft/followme_e-tron/Sounds/followme-sound_mp.xml</path>
+    </sound>
+    <!-- Airbag -->
+    <model>
+        <path>Aircraft/followme_e-tron/Models/Interior/airbags.xml</path>
+    </model>
+    <!-- Interior -->
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>Followme Original</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/default/interior.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>Sport (Legacy)</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/sport/interior.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>Luxury</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/luxury/interior.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>Luxury 2.0</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/luxury2.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>Race</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/race/interior.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>404Design (Default)</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>404Design 2.0</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>404Design 2022</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design5.xml</path>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[3]</property>
+                <value>404Design 2023</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/InteriorX/404Design2023.xml</path>
+    </model>
+    <animation>
+        <type>material</type>
+        <object-name>sign</object-name>
+        <property-base>sim/multiplay/generic</property-base>
+        <texture-prop>string[18]</texture-prop>
+        <texture>blanco.png</texture>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>Mesh76.004</object-name>
+        <object-name>door.rl</object-name>
+        <object-name>door.rr</object-name>
+        <object-name>rdoor</object-name>
+        <object-name>ldoor</object-name>
+        <!--<property-base>sim/model/livery</property-base>
  <texture-prop>texture-fuse</texture-prop>-->
- <property-base>sim/multiplay/generic</property-base>
- <texture-prop>string[19]</texture-prop>
- <texture>followmeoutside.png</texture>
-</animation>
-
-
-<model>
- <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
- <offsets>
-  <x-m> 3.4</x-m>
-  <y-m>-0.4</y-m>
-  <z-m> 1.7</z-m>
- </offsets>
-</model>
-
-<model>
- <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
- <offsets>
-  <x-m> 3.4</x-m>
-  <y-m> 0.4</y-m>
-  <z-m> 1.7</z-m>
- </offsets>
-</model>
-
-<!-- People -->
-<model>
- <condition>
-	<equals>
-		<property>sim/multiplay/generic/int[12]</property>
-		<value>1</value>
-	</equals>
- </condition>
- <path>Aircraft/followme_e-tron/Models/people/people.ac</path>
- <offsets>
-  <x-m> 2.62</x-m>
-  <y-m> 0</y-m>
-  <z-m> 1.255</z-m>
- </offsets>
-</model>
-
-<model>
- <condition>
-	<equals>
-		<property>sim/multiplay/generic/int[12]</property>
-		<value>1</value>
-	</equals>
- </condition>
- <path>Aircraft/followme_e-tron/Models/people/people2.ac</path>
- <offsets>
-  <x-m> 1.7</x-m>
-  <y-m> -0.17</y-m>
-  <z-m> 0.8</z-m>
- </offsets>
-</model>
-
-<!-- Decoration -->
-<animation>
- <type>select</type>
- <object-name>ldoor_baowenbei</object-name>
- <condition>
-
-     <equals>
-         <property>sim/multiplay/generic/bool[0]</property>
-         <value>1</value>
-     </equals>
-
- </condition>
-</animation>
-
-
-<!-- charging_cap -->
-<animation>
- <type>pick</type>
-  <object-name>chargegai</object-name>
- <action>
-  <button>0</button>
-  <repeatable>false</repeatable>
-  <binding>
-   <command>nasal</command>
-   <script>followme.charging_cap.toggle()</script>
-  </binding>
- </action>
-</animation>
-<animation>
- <type>rotate</type>
- <object-name>chargegai</object-name>
- <property>sim/multiplay/generic/float[26]</property>
- <factor>80</factor>
- <center>
-  <x-m>0.111</x-m>
-  <y-m>0</y-m>
-  <z-m>0.787</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>1.0</y>
-  <z>0.0</z>
- </axis>
-</animation>
-<!-- PLATE -->
-<model>
-	<condition>
-	    <not>
-			<equals>
-				<property>sim/multiplay/generic/string[5]</property>
-				<value>NONE</value>
-			</equals>
-        </not>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/plate/plate.xml</path>
-    <offsets>
-     <x-m> 0.01</x-m>
-     <y-m> 0.0</y-m>
-     <z-m> 0.39</z-m>
-    </offsets>
-</model>
-<animation>
-    <condition>
-	    <not>
-			<equals>
-				<property>sim/multiplay/generic/string[7]</property>
-				<value>NONE</value>
-			</equals>
-        </not>
-	</condition>
-    <type>material</type>
-    <object-name>back_plate</object-name>
-    <property-base>sim/multiplay/generic</property-base>
-    <texture-prop>string[7]</texture-prop>
-</animation>
-
-<model>
-  <path>Aircraft/followme_e-tron/Models/Interior/Instruments/indicater/inside_indicater.ac</path>
-  <offsets>
-  <x-m>-0.0265</x-m>
-  <y-m>-0.043</y-m>
-  <z-m>0.06</z-m>
-  </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_A</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_A/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.23</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_A</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_A/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.44</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_M</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.23</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_M</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.44</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_BT</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.23</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Type_BT</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.44</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Original</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.23</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Original</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.44</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Concept</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.23</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[1]</property>
-			<value>Concept</value>
-		</equals>
-	</condition>
- <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.44</y-m>
-  <z-m>1.01</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[2]</property>
-			<value>Type_A</value>
-		</equals>
-	</condition>
-     <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_A/speedometer.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.335</y-m>
-  <z-m>1.03</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[2]</property>
-			<value>Original</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_O/speedometer.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.335</y-m>
-  <z-m>1.03</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[2]</property>
-			<value>Type_M</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_M/speedometer.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.335</y-m>
-  <z-m>1.03</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[2]</property>
-			<value>Type_B</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_B/speedometer.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.335</y-m>
-  <z-m>1.03</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[2]</property>
-			<value>Type_BT</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_BT/speedometer.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.335</y-m>
-  <z-m>1.03</z-m>
- </offsets>
-</model>
-
-<model>
-	<condition>
-		<equals>
-			<property>sim/multiplay/generic/string[2]</property>
-			<value>Concept</value>
-		</equals>
-	</condition>
-    <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Concept/speedometer.xml</path>
- <offsets>
-  <x-m>1.31</x-m>
-  <y-m>-0.335</y-m>
-  <z-m>1.03</z-m>
- </offsets>
-</model>
-
-<!-- FRONT WHEEL LEFT -->
-
-<animation>
- <type>rotate</type>
- <object-name>Tyre1</object-name>
- <object-name>kaqian1</object-name>
- <property>sim/multiplay/generic/float[4]</property>
- <factor>-45</factor>
- <center>
-  <x-m> 0.681</x-m>
-  <y-m>-0.557</y-m>
-  <z-m> 0.289</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-<animation>
- <type>translate</type>
- <object-name>Tyre1</object-name>
- <object-name>kaqian1</object-name>
- <property>sim/multiplay/generic/float[5]</property>
- <interpolation>
-  <entry>
-   <ind>0.0</ind>
-   <dep>0</dep>
-  </entry>
-  <entry>
-	<ind>1.00</ind>
-	<dep>0.2</dep>
-  </entry>
- </interpolation>
- <axis>
-  <x>0</x>
-  <y>0</y>
-  <z>1</z>
- </axis>
-</animation>
-
-<animation>
- <type>spin</type>
- <object-name>Tyre1</object-name>
- <property>sim/multiplay/generic/float[6]</property>
- <factor>-15</factor>
- <center>
-  <x-m>0.677</x-m>
-  <y-m>0.667</y-m>
-  <z-m>0.292</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>1.0</y>
-  <z>0.0</z>
- </axis>
-</animation>
-
-<!-- FRONT WHEEL RIGHT -->
-
-<animation>
- <type>rotate</type>
- <object-name>Tyre2</object-name>
- <object-name>kaqian2</object-name>
- <property>sim/multiplay/generic/float[7]</property>
- <factor>-45</factor>
- <center>
-  <x-m> 0.681</x-m>
-  <y-m> 0.557</y-m>
-  <z-m> 0.289</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-<animation>
- <type>translate</type>
- <object-name>Tyre2</object-name>
- <object-name>kaqian2</object-name>
- <property>sim/multiplay/generic/float[8]</property>
- <interpolation>
-  <entry>
-   <ind>0.0</ind>
-   <dep>0</dep>
-  </entry>
-  <entry>
-   <ind>1.00</ind>
-   <dep>0.2</dep>
-  </entry>
- </interpolation>
- <axis>
-  <x>0</x>
-  <y>0</y>
-  <z>1</z>
- </axis>
-</animation>
-
-<animation>
- <type>spin</type>
- <object-name>Tyre2</object-name>
- <property>sim/multiplay/generic/float[9]</property>
- <factor>-15</factor>
- <center>
-  <x-m>0.677</x-m>
-  <y-m>-0.667</y-m>
-  <z-m>0.292</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>1.0</y>
-  <z>0.0</z>
- </axis>
-</animation>
-
-<!-- REAR WHEEL LEFT -->
-
-<animation>
- <type>rotate</type>
- <object-name>Tyre3</object-name>
- <object-name>kaqian3</object-name>
- <property>sim/multiplay/generic/float[20]</property>
- <factor>5</factor>
- <center>
-  <x-m> 3.17</x-m>
-  <y-m> -0.557</y-m>
-  <z-m> 0.289</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-<animation>
- <type>translate</type>
- <object-name>Tyre3</object-name>
- <object-name>kaqian3</object-name>
- <property>sim/multiplay/generic/float[10]</property>
- <interpolation>
-  <entry>
-   <ind>0.0</ind>
-   <dep>0</dep>
-  </entry>
-  <entry>
-   <ind>1.00</ind>
-   <dep>0.2</dep>
-  </entry>
- </interpolation>
- <axis>
-  <x>0</x>
-  <y>0</y>
-  <z>1</z>
- </axis>
-</animation>
-
-<animation>
- <type>spin</type>
- <object-name>Tyre3</object-name>
- <property>sim/multiplay/generic/float[11]</property>
- <factor>-15</factor>
- <center>
-  <x-m>3.156</x-m>
-  <y-m>0.667</y-m>
-  <z-m>0.281</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>1.0</y>
-  <z>0.0</z>
- </axis>
-</animation>
-
-<!-- REAR WHEEL RIGHT -->
-
-<animation>
- <type>rotate</type>
- <object-name>Tyre4</object-name>
- <object-name>kaqian4</object-name>
- <property>sim/multiplay/generic/float[21]</property>
- <factor>5</factor>
- <center>
-  <x-m> 3.15</x-m>
-  <y-m> 0.557</y-m>
-  <z-m> 0.289</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-<animation>
- <type>translate</type>
- <object-name>Tyre4</object-name>
- <object-name>kaqian4</object-name>
- <property>sim/multiplay/generic/float[12]</property>
- <interpolation>
-  <entry>
-   <ind>0.0</ind>
-   <dep>0</dep>
-  </entry>
-  <entry>
-   <ind>1.00</ind>
-   <dep>0.2</dep>
-  </entry>
- </interpolation>
- <axis>
-  <x>0</x>
-  <y>0</y>
-  <z>1</z>
- </axis>
-</animation>
-
-<animation>
- <type>spin</type>
- <object-name>Tyre4</object-name>
- <property>sim/multiplay/generic/float[13]</property>
- <factor>-15</factor>
- <center>
-  <x-m>3.156</x-m>
-  <y-m>-0.667</y-m>
-  <z-m>0.281</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>1.0</y>
-  <z>0.0</z>
- </axis>
-</animation>
-
-<!-- DOOR ANIMATIONS -->
-
-<!-- LEFT FRONT DOOR -->
-
-<animation>
- <type>pick</type>
- <object-name>ldoor</object-name>
- <object-name>lmirror</object-name>
- <object-name>indicater_ldoor</object-name>
- <object-name>ldoor_inside</object-name>
- <action>
-  <button>0</button>
-  <repeatable>false</repeatable>
-  <binding>
-   <command>nasal</command>
-   <script>followme.frontleft_door.toggle()</script>
-  </binding>
- </action>
-</animation>
-
-<animation>
- <type>rotate</type>
- <object-name>ldoor</object-name>
- <object-name>lmirror</object-name>
- <object-name>indicater_ldoor</object-name>
- <object-name>lbose</object-name>
- <object-name>ldoor_inside</object-name>
- <property>sim/multiplay/generic/float[3]</property>
- <factor>-75</factor>
- <center>
-  <x-m> 1</x-m>
-  <y-m>-0.78</y-m>
-  <z-m> 0</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-<!-- RIGHT FRONT DOOR -->
-
-<animation>
- <type>pick</type>
- <object-name>rdoor</object-name>
- <object-name>rmirror</object-name>
- <object-name>indicater_rdoor</object-name>
- <object-name>rdoor_inside</object-name>
- <action>
-  <button>0</button>
-  <repeatable>false</repeatable>
-  <binding>
-   <command>nasal</command>
-   <script>followme.frontright_door.toggle()</script>
-  </binding>
- </action>
-</animation>
-
-<animation>
- <type>rotate</type>
- <object-name>rdoor</object-name>
- <object-name>rmirror</object-name>
- <object-name>indicater_rdoor</object-name>
- <object-name>rbose</object-name>
- <object-name>rdoor_inside</object-name>
- <property>sim/multiplay/generic/float[2]</property>
- <factor>75</factor>
- <center>
-  <x-m>1</x-m>
-  <y-m>0.78</y-m>
-  <z-m>0</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-<!--LEFT REAR DOOR -->
-
-<animation>
- <type>pick</type>
- <object-name>door.rl</object-name>
- <action>
-  <button>0</button>
-  <repeatable>false</repeatable>
-  <binding>
-   <command>nasal</command>
-   <script>followme.rearleft_door.toggle()</script>
-  </binding>
- </action>
-</animation>
-
-<animation>
- <type>rotate</type>
- <object-name>door.rl</object-name>
- <object-name>rearwiper</object-name>
- <object-name>back_plate</object-name>
- <object-name>back_plate_back</object-name>
- <object-name>high_braking_lights</object-name>
- <property>sim/multiplay/generic/float[1]</property>
- <factor>-90</factor>
- <center>
-  <x-m> 3.7</x-m>
-  <y-m>-0.6</y-m>
-  <z-m> 0</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-
-<!-- RIGHT REAR DOOR -->
-
-<animation>
- <type>pick</type>
- <object-name>door.rr</object-name>
- <action>
-  <button>0</button>
-  <repeatable>false</repeatable>
-  <binding>
-   <command>nasal</command>
-   <script>followme.rearright_door.toggle()</script>
-  </binding>
- </action>
-</animation>
-
-<animation>
- <type>rotate</type>
- <object-name>door.rr</object-name>
- <property>sim/multiplay/generic/float[0]</property>
- <factor>90</factor>
- <center>
-  <x-m>3.7</x-m>
-  <y-m>0.6</y-m>
-  <z-m>0</z-m>
- </center>
- <axis>
-  <x>0.0</x>
-  <y>0.0</y>
-  <z>1.0</z>
- </axis>
-</animation>
-
-<!-- COMPOSITOR LIGHTS -->
-<light>
-  <name>left-headlight-compositor</name>
-  <type>spot</type>
-  <position>
-      <x-m>0.15</x-m>
-      <y-m>0.57</y-m>
-      <z-m>0.7</z-m>
-  </position>
-  <direction>
-      <pitch-deg>90</pitch-deg>
-      <roll-deg>0</roll-deg>
-      <heading-deg>0</heading-deg>
-  </direction>
-  <ambient>
-    <r>0.6</r>
-    <g>0.6</g>
-    <b>0.6</b>
-    <a>1</a>
-  </ambient>
-  <diffuse>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </diffuse>
-  <specular>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </specular>
-  <attenuation>
-    <c>1.0</c>
-    <l>0.07</l>
-    <q>0.017</q>
-  </attenuation>
-  <spot-exponent>10</spot-exponent>
-  <spot-cutoff>50</spot-cutoff>
-  <range-m>50</range-m>
-</light>
-<light>
-  <name>right-headlight-compositor</name>
-  <type>spot</type>
-  <position>
-      <x-m>0.15</x-m>
-      <y-m>-0.57</y-m>
-      <z-m>0.7</z-m>
-  </position>
-  <direction>
-      <pitch-deg>90</pitch-deg>
-      <roll-deg>0</roll-deg>
-      <heading-deg>0</heading-deg>
-  </direction>
-  <ambient>
-    <r>0.6</r>
-    <g>0.6</g>
-    <b>0.6</b>
-    <a>1</a>
-  </ambient>
-  <diffuse>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </diffuse>
-  <specular>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </specular>
-  <attenuation>
-    <c>1.0</c>
-    <l>0.07</l>
-    <q>0.017</q>
-  </attenuation>
-  <spot-exponent>10</spot-exponent>
-  <spot-cutoff>50</spot-cutoff>
-  <range-m>50</range-m>
-</light>
-<light>
-  <name>left-highbeam-compositor</name>
-  <type>spot</type>
-  <position>
-      <x-m>0.15</x-m>
-      <y-m>0.57</y-m>
-      <z-m>0.7</z-m>
-  </position>
-  <direction>
-      <pitch-deg>90</pitch-deg>
-      <roll-deg>0</roll-deg>
-      <heading-deg>0</heading-deg>
-  </direction>
-  <ambient>
-    <r>0.6</r>
-    <g>0.6</g>
-    <b>0.6</b>
-    <a>1</a>
-  </ambient>
-  <diffuse>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </diffuse>
-  <specular>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </specular>
-  <attenuation>
-    <c>1.0</c>
-    <l>0.027</l>
-    <q>0.0028</q>
-  </attenuation>
-  <spot-exponent>40</spot-exponent>
-  <spot-cutoff>30</spot-cutoff>
-  <range-m>150</range-m>
-</light>
-<light>
-  <name>right-highbeam-compositor</name>
-  <type>spot</type>
-  <position>
-      <x-m>0.15</x-m>
-      <y-m>-0.57</y-m>
-      <z-m>0.7</z-m>
-  </position>
-  <direction>
-      <pitch-deg>90</pitch-deg>
-      <roll-deg>0</roll-deg>
-      <heading-deg>0</heading-deg>
-  </direction>
-  <ambient>
-    <r>0.6</r>
-    <g>0.6</g>
-    <b>0.6</b>
-    <a>1</a>
-  </ambient>
-  <diffuse>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </diffuse>
-  <specular>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </specular>
-  <attenuation>
-    <c>1.0</c>
-    <l>0.027</l>
-    <q>0.0028</q>
-  </attenuation>
-  <spot-exponent>40</spot-exponent>
-  <spot-cutoff>30</spot-cutoff>
-  <range-m>150</range-m>
-</light>
-
-<light>
-  <name>left-marker-compositor</name>
-  <type>spot</type>
-  <position>
-      <x-m>0.15</x-m>
-      <y-m>0.57</y-m>
-      <z-m>0.7</z-m>
-  </position>
-  <direction>
-      <pitch-deg>90</pitch-deg>
-      <roll-deg>0</roll-deg>
-      <heading-deg>0</heading-deg>
-  </direction>
-  <ambient>
-    <r>0.6</r>
-    <g>0.6</g>
-    <b>0.6</b>
-    <a>1</a>
-  </ambient>
-  <diffuse>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </diffuse>
-  <specular>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </specular>
-  <attenuation>
-    <c>1.0</c>
-    <l>0.22</l>
-    <q>0.20</q>
-  </attenuation>
-  <spot-exponent>10</spot-exponent>
-  <spot-cutoff>50</spot-cutoff>
-  <range-m>20</range-m>
-</light>
-<light>
-  <name>right-marker-compositor</name>
-  <type>spot</type>
-  <position>
-      <x-m>0.15</x-m>
-      <y-m>-0.57</y-m>
-      <z-m>0.7</z-m>
-  </position>
-  <direction>
-      <pitch-deg>90</pitch-deg>
-      <roll-deg>0</roll-deg>
-      <heading-deg>0</heading-deg>
-  </direction>
-  <ambient>
-    <r>0.6</r>
-    <g>0.6</g>
-    <b>0.6</b>
-    <a>1</a>
-  </ambient>
-  <diffuse>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </diffuse>
-  <specular>
-    <r>0.95</r>
-    <g>0.9</g>
-    <b>0.9</b>
-    <a>1</a>
-  </specular>
-  <attenuation>
-    <c>1.0</c>
-    <l>0.22</l>
-    <q>0.20</q>
-  </attenuation>
-  <spot-exponent>10</spot-exponent>
-  <spot-cutoff>50</spot-cutoff>
-  <range-m>20</range-m>
-</light>
-<!-- LIGHTS -->
-
-<effect>
- <inherits-from>front-light</inherits-from>
- <object-name>Cone</object-name>
-</effect>
-
-<animation>
- <type>select</type>
- <object-name>Cone</object-name>
- <object-name>Cone-texture</object-name>
- <condition>
-     <and>
-         <not>
-             <equals>
-                 <property>sim/rendering/shaders/skydome</property>
-                 <value>1</value>
-             </equals>
-         </not>
-         <equals>
-             <property>sim/multiplay/generic/int[3]</property>
-             <value>100</value>
-         </equals>
-     </and>
- </condition>
-</animation>
-
-<animation>
- <type>select</type>
- <object-name>left-marker-compositor</object-name>
- <object-name>right-marker-compositor</object-name>
- <condition>
-     <and>
-         <equals>
-             <property>sim/multiplay/generic/int[3]</property>
-             <value>1</value>
-         </equals>
-     </and>
- </condition>
-</animation>
-
-<animation>
- <type>select</type>
- <object-name>left-headlight-compositor</object-name>
- <object-name>right-headlight-compositor</object-name>
- <condition>
-     <and>
-         <equals>
-             <property>sim/multiplay/generic/int[3]</property>
-             <value>2</value>
-         </equals>
-     </and>
- </condition>
-</animation>
-
-<animation>
- <type>select</type>
- <object-name>left-highbeam-compositor</object-name>
- <object-name>right-highbeam-compositor</object-name>
- <condition>
-     <and>
-         <equals>
-             <property>sim/multiplay/generic/bool[5]</property>
-             <value>1</value>
-         </equals>
-     </and>
- </condition>
-</animation>
-
-
-<animation>
- <type>material</type>
- <object-name>indicater_left</object-name>
- <emission>
-  <red>1.0</red>
-  <green>0.8</green>
-  <blue>0.2</blue>
-  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
- </emission>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>inside_indicater_left</object-name>
- <emission>
-  <red>0.33</red>
-  <green>1.0</green>
-  <blue>0</blue>
-  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
- </emission>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>indicater_ldoor</object-name>
- <emission>
-  <red>1.0</red>
-  <green>0.8</green>
-  <blue>0.2</blue>
-  <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
- </emission>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>indicater_right</object-name>
- <emission>
-  <red>1.0</red>
-  <green>0.8</green>
-  <blue>0.2</blue>
-  <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
- </emission>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>inside_indicater_right</object-name>
- <emission>
-  <red>0.33</red>
-  <green>1.0</green>
-  <blue>0</blue>
-  <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
- </emission>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>indicater_rdoor</object-name>
- <emission>
-  <red>1.0</red>
-  <green>0.8</green>
-  <blue>0.2</blue>
-  <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
- </emission>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>braking_lights</object-name>
- <object-name>high_braking_lights</object-name>
- <emission>
-  <red>1.0</red>
-  <green>0.0</green>
-  <blue>0.0</blue>
-  <factor-prop>sim/multiplay/generic/float[25]</factor-prop>
- </emission>
- <condition>
-  <greater-than>
-   <property>sim/multiplay/generic/float[25]</property>
-   <value>0.3</value>
-  </greater-than>
- </condition>
-</animation>
-
-<animation>
- <type>material</type>
- <object-name>reverse_right</object-name>
- <object-name>reverse_left</object-name>
- <emission>
-  <red>1</red>
-  <green>1</green>
-  <blue>1</blue>
-  <factor-prop>sim/multiplay/generic/bool[11]</factor-prop>
- </emission>
-</animation>
-
-<!-- Fuel Truck -->
-
-<model>
-	<path>Aircraft/followme_e-tron/Models/Service-Truck/Service_Truck_Short_VolvoFM.xml</path>
-	<condition>
-	    <and>
-			<equals>
-				<property>sim/multiplay/generic/int[5]</property>
-				<value>1</value>
-			</equals>
-			<less-than>
-				<property>velocities/groundspeed-kt</property>
-				<value>1</value>
-			</less-than>
-		</and>
-	</condition>
-</model>
-
-<!-- Tyre smoke -->
-<model>
-  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke.xml</path>
-  <name>tyre-smoke-n</name>
-  <offsets>
-      <x-m>0.682</x-m>
-      <y-m>0.627</y-m>
-      <z-m>0.291</z-m>
-  </offsets>
-</model>
-<model>
-  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-1.xml</path>
-  <name>tyre-smoke-n</name>
-  <offsets>
-      <x-m>0.682</x-m>
-      <y-m>-0.627</y-m>
-      <z-m>0.291</z-m>
-  </offsets>
-</model>
-<model>
-  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-2.xml</path>
-  <name>tyre-smoke-n</name>
-  <offsets>
-      <x-m>3.17</x-m>
-      <y-m>0.625</y-m>
-      <z-m>0.282</z-m>
-  </offsets>
-</model>
-<model>
-  <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-3.xml</path>
-  <name>tyre-smoke-n</name>
-  <offsets>
-      <x-m>3.17</x-m>
-      <y-m>-0.625</y-m>
-      <z-m>0.282</z-m>
-  </offsets>
-</model>
+        <property-base>sim/multiplay/generic</property-base>
+        <texture-prop>string[19]</texture-prop>
+        <texture>followmeoutside.png</texture>
+    </animation>
+    <model>
+        <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
+        <offsets>
+            <x-m>3.4</x-m>
+            <y-m>-0.4</y-m>
+            <z-m>1.7</z-m>
+        </offsets>
+    </model>
+    <model>
+        <path>Aircraft/followme_e-tron/Models/warninglight.xml</path>
+        <offsets>
+            <x-m>3.4</x-m>
+            <y-m>0.4</y-m>
+            <z-m>1.7</z-m>
+        </offsets>
+    </model>
+    <!-- People -->
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/int[12]</property>
+                <value>1</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/people/people.ac</path>
+        <offsets>
+            <x-m>2.62</x-m>
+            <y-m>0</y-m>
+            <z-m>1.255</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/int[12]</property>
+                <value>1</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/people/people2.ac</path>
+        <offsets>
+            <x-m>1.7</x-m>
+            <y-m>-0.17</y-m>
+            <z-m>0.8</z-m>
+        </offsets>
+    </model>
+    <!-- Decoration -->
+    <animation>
+        <type>select</type>
+        <object-name>ldoor_baowenbei</object-name>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/bool[0]</property>
+                <value>1</value>
+            </equals>
+        </condition>
+    </animation>
+    <!-- charging_cap -->
+    <animation>
+        <type>pick</type>
+        <object-name>chargegai</object-name>
+        <action>
+            <button>0</button>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>followme.charging_cap.toggle()</script>
+            </binding>
+        </action>
+    </animation>
+    <animation>
+        <type>rotate</type>
+        <object-name>chargegai</object-name>
+        <property>sim/multiplay/generic/float[26]</property>
+        <factor>80</factor>
+        <center>
+            <x-m>0.111</x-m>
+            <y-m>0</y-m>
+            <z-m>0.787</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>1.0</y>
+            <z>0.0</z>
+        </axis>
+    </animation>
+    <!-- PLATE -->
+    <model>
+        <condition>
+            <not>
+                <equals>
+                    <property>sim/multiplay/generic/string[5]</property>
+                    <value>NONE</value>
+                </equals>
+            </not>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/plate/plate.xml</path>
+        <offsets>
+            <x-m>0.01</x-m>
+            <y-m>0.0</y-m>
+            <z-m>0.39</z-m>
+        </offsets>
+    </model>
+    <animation>
+        <condition>
+            <not>
+                <equals>
+                    <property>sim/multiplay/generic/string[7]</property>
+                    <value>NONE</value>
+                </equals>
+            </not>
+        </condition>
+        <type>material</type>
+        <object-name>back_plate</object-name>
+        <property-base>sim/multiplay/generic</property-base>
+        <texture-prop>string[7]</texture-prop>
+    </animation>
+    <model>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/indicater/inside_indicater.ac</path>
+        <offsets>
+            <x-m>-0.0265</x-m>
+            <y-m>-0.043</y-m>
+            <z-m>0.06</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Type_A</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_A/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.23</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Type_A</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_A/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.44</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Type_M</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.23</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Type_M</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_M/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.44</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Type_BT</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.23</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Type_BT</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_BT/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.44</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Original</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.23</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Original</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Type_O/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.44</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Concept</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.23</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[1]</property>
+                <value>Concept</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/fuelgauge/Concept/fuelgauge.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.44</y-m>
+            <z-m>1.01</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[2]</property>
+                <value>Type_A</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_A/speedometer.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.335</y-m>
+            <z-m>1.03</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[2]</property>
+                <value>Original</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_O/speedometer.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.335</y-m>
+            <z-m>1.03</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[2]</property>
+                <value>Type_M</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_M/speedometer.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.335</y-m>
+            <z-m>1.03</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[2]</property>
+                <value>Type_B</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_B/speedometer.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.335</y-m>
+            <z-m>1.03</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[2]</property>
+                <value>Type_BT</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Type_BT/speedometer.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.335</y-m>
+            <z-m>1.03</z-m>
+        </offsets>
+    </model>
+    <model>
+        <condition>
+            <equals>
+                <property>sim/multiplay/generic/string[2]</property>
+                <value>Concept</value>
+            </equals>
+        </condition>
+        <path>Aircraft/followme_e-tron/Models/Interior/Instruments/speedometer/Concept/speedometer.xml</path>
+        <offsets>
+            <x-m>1.31</x-m>
+            <y-m>-0.335</y-m>
+            <z-m>1.03</z-m>
+        </offsets>
+    </model>
+    <!-- FRONT WHEEL LEFT -->
+    <animation>
+        <type>rotate</type>
+        <object-name>Tyre1</object-name>
+        <object-name>kaqian1</object-name>
+        <property>sim/multiplay/generic/float[4]</property>
+        <factor>-45</factor>
+        <center>
+            <x-m>0.681</x-m>
+            <y-m>-0.557</y-m>
+            <z-m>0.289</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>translate</type>
+        <object-name>Tyre1</object-name>
+        <object-name>kaqian1</object-name>
+        <property>sim/multiplay/generic/float[5]</property>
+        <interpolation>
+            <entry>
+                <ind>0.0</ind>
+                <dep>0</dep>
+            </entry>
+            <entry>
+                <ind>1.00</ind>
+                <dep>0.2</dep>
+            </entry>
+        </interpolation>
+        <axis>
+            <x>0</x>
+            <y>0</y>
+            <z>1</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>spin</type>
+        <object-name>Tyre1</object-name>
+        <property>sim/multiplay/generic/float[6]</property>
+        <factor>-15</factor>
+        <center>
+            <x-m>0.677</x-m>
+            <y-m>0.667</y-m>
+            <z-m>0.292</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>1.0</y>
+            <z>0.0</z>
+        </axis>
+    </animation>
+    <!-- FRONT WHEEL RIGHT -->
+    <animation>
+        <type>rotate</type>
+        <object-name>Tyre2</object-name>
+        <object-name>kaqian2</object-name>
+        <property>sim/multiplay/generic/float[7]</property>
+        <factor>-45</factor>
+        <center>
+            <x-m>0.681</x-m>
+            <y-m>0.557</y-m>
+            <z-m>0.289</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>translate</type>
+        <object-name>Tyre2</object-name>
+        <object-name>kaqian2</object-name>
+        <property>sim/multiplay/generic/float[8]</property>
+        <interpolation>
+            <entry>
+                <ind>0.0</ind>
+                <dep>0</dep>
+            </entry>
+            <entry>
+                <ind>1.00</ind>
+                <dep>0.2</dep>
+            </entry>
+        </interpolation>
+        <axis>
+            <x>0</x>
+            <y>0</y>
+            <z>1</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>spin</type>
+        <object-name>Tyre2</object-name>
+        <property>sim/multiplay/generic/float[9]</property>
+        <factor>-15</factor>
+        <center>
+            <x-m>0.677</x-m>
+            <y-m>-0.667</y-m>
+            <z-m>0.292</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>1.0</y>
+            <z>0.0</z>
+        </axis>
+    </animation>
+    <!-- REAR WHEEL LEFT -->
+    <animation>
+        <type>rotate</type>
+        <object-name>Tyre3</object-name>
+        <object-name>kaqian3</object-name>
+        <property>sim/multiplay/generic/float[20]</property>
+        <factor>5</factor>
+        <center>
+            <x-m>3.17</x-m>
+            <y-m>-0.557</y-m>
+            <z-m>0.289</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>translate</type>
+        <object-name>Tyre3</object-name>
+        <object-name>kaqian3</object-name>
+        <property>sim/multiplay/generic/float[10]</property>
+        <interpolation>
+            <entry>
+                <ind>0.0</ind>
+                <dep>0</dep>
+            </entry>
+            <entry>
+                <ind>1.00</ind>
+                <dep>0.2</dep>
+            </entry>
+        </interpolation>
+        <axis>
+            <x>0</x>
+            <y>0</y>
+            <z>1</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>spin</type>
+        <object-name>Tyre3</object-name>
+        <property>sim/multiplay/generic/float[11]</property>
+        <factor>-15</factor>
+        <center>
+            <x-m>3.156</x-m>
+            <y-m>0.667</y-m>
+            <z-m>0.281</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>1.0</y>
+            <z>0.0</z>
+        </axis>
+    </animation>
+    <!-- REAR WHEEL RIGHT -->
+    <animation>
+        <type>rotate</type>
+        <object-name>Tyre4</object-name>
+        <object-name>kaqian4</object-name>
+        <property>sim/multiplay/generic/float[21]</property>
+        <factor>5</factor>
+        <center>
+            <x-m>3.15</x-m>
+            <y-m>0.557</y-m>
+            <z-m>0.289</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>translate</type>
+        <object-name>Tyre4</object-name>
+        <object-name>kaqian4</object-name>
+        <property>sim/multiplay/generic/float[12]</property>
+        <interpolation>
+            <entry>
+                <ind>0.0</ind>
+                <dep>0</dep>
+            </entry>
+            <entry>
+                <ind>1.00</ind>
+                <dep>0.2</dep>
+            </entry>
+        </interpolation>
+        <axis>
+            <x>0</x>
+            <y>0</y>
+            <z>1</z>
+        </axis>
+    </animation>
+    <animation>
+        <type>spin</type>
+        <object-name>Tyre4</object-name>
+        <property>sim/multiplay/generic/float[13]</property>
+        <factor>-15</factor>
+        <center>
+            <x-m>3.156</x-m>
+            <y-m>-0.667</y-m>
+            <z-m>0.281</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>1.0</y>
+            <z>0.0</z>
+        </axis>
+    </animation>
+    <!-- DOOR ANIMATIONS -->
+    <!-- LEFT FRONT DOOR -->
+    <animation>
+        <type>pick</type>
+        <object-name>ldoor</object-name>
+        <object-name>lmirror</object-name>
+        <object-name>indicater_ldoor</object-name>
+        <object-name>ldoor_inside</object-name>
+        <action>
+            <button>0</button>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>followme.frontleft_door.toggle()</script>
+            </binding>
+        </action>
+    </animation>
+    <animation>
+        <type>rotate</type>
+        <object-name>ldoor</object-name>
+        <object-name>lmirror</object-name>
+        <object-name>indicater_ldoor</object-name>
+        <object-name>lbose</object-name>
+        <object-name>ldoor_inside</object-name>
+        <property>sim/multiplay/generic/float[3]</property>
+        <factor>-75</factor>
+        <center>
+            <x-m>1</x-m>
+            <y-m>-0.78</y-m>
+            <z-m>0</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <!-- RIGHT FRONT DOOR -->
+    <animation>
+        <type>pick</type>
+        <object-name>rdoor</object-name>
+        <object-name>rmirror</object-name>
+        <object-name>indicater_rdoor</object-name>
+        <object-name>rdoor_inside</object-name>
+        <action>
+            <button>0</button>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>followme.frontright_door.toggle()</script>
+            </binding>
+        </action>
+    </animation>
+    <animation>
+        <type>rotate</type>
+        <object-name>rdoor</object-name>
+        <object-name>rmirror</object-name>
+        <object-name>indicater_rdoor</object-name>
+        <object-name>rbose</object-name>
+        <object-name>rdoor_inside</object-name>
+        <property>sim/multiplay/generic/float[2]</property>
+        <factor>75</factor>
+        <center>
+            <x-m>1</x-m>
+            <y-m>0.78</y-m>
+            <z-m>0</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <!--LEFT REAR DOOR -->
+    <animation>
+        <type>pick</type>
+        <object-name>door.rl</object-name>
+        <action>
+            <button>0</button>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>followme.rearleft_door.toggle()</script>
+            </binding>
+        </action>
+    </animation>
+    <animation>
+        <type>rotate</type>
+        <object-name>door.rl</object-name>
+        <object-name>rearwiper</object-name>
+        <object-name>back_plate</object-name>
+        <object-name>back_plate_back</object-name>
+        <object-name>high_braking_lights</object-name>
+        <property>sim/multiplay/generic/float[1]</property>
+        <factor>-90</factor>
+        <center>
+            <x-m>3.7</x-m>
+            <y-m>-0.6</y-m>
+            <z-m>0</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <!-- RIGHT REAR DOOR -->
+    <animation>
+        <type>pick</type>
+        <object-name>door.rr</object-name>
+        <action>
+            <button>0</button>
+            <repeatable>false</repeatable>
+            <binding>
+                <command>nasal</command>
+                <script>followme.rearright_door.toggle()</script>
+            </binding>
+        </action>
+    </animation>
+    <animation>
+        <type>rotate</type>
+        <object-name>door.rr</object-name>
+        <property>sim/multiplay/generic/float[0]</property>
+        <factor>90</factor>
+        <center>
+            <x-m>3.7</x-m>
+            <y-m>0.6</y-m>
+            <z-m>0</z-m>
+        </center>
+        <axis>
+            <x>0.0</x>
+            <y>0.0</y>
+            <z>1.0</z>
+        </axis>
+    </animation>
+    <!-- COMPOSITOR LIGHTS -->
+    <light>
+        <name>left-headlight-compositor</name>
+        <type>spot</type>
+        <position>
+            <x-m>0.15</x-m>
+            <y-m>0.57</y-m>
+            <z-m>0.7</z-m>
+        </position>
+        <direction>
+            <pitch-deg>90</pitch-deg>
+            <roll-deg>0</roll-deg>
+            <heading-deg>0</heading-deg>
+        </direction>
+        <ambient>
+            <r>0.6</r>
+            <g>0.6</g>
+            <b>0.6</b>
+            <a>1</a>
+        </ambient>
+        <diffuse>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </diffuse>
+        <specular>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </specular>
+        <attenuation>
+            <c>1.0</c>
+            <l>0.07</l>
+            <q>0.017</q>
+        </attenuation>
+        <spot-exponent>10</spot-exponent>
+        <spot-cutoff>50</spot-cutoff>
+        <range-m>50</range-m>
+    </light>
+    <light>
+        <name>right-headlight-compositor</name>
+        <type>spot</type>
+        <position>
+            <x-m>0.15</x-m>
+            <y-m>-0.57</y-m>
+            <z-m>0.7</z-m>
+        </position>
+        <direction>
+            <pitch-deg>90</pitch-deg>
+            <roll-deg>0</roll-deg>
+            <heading-deg>0</heading-deg>
+        </direction>
+        <ambient>
+            <r>0.6</r>
+            <g>0.6</g>
+            <b>0.6</b>
+            <a>1</a>
+        </ambient>
+        <diffuse>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </diffuse>
+        <specular>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </specular>
+        <attenuation>
+            <c>1.0</c>
+            <l>0.07</l>
+            <q>0.017</q>
+        </attenuation>
+        <spot-exponent>10</spot-exponent>
+        <spot-cutoff>50</spot-cutoff>
+        <range-m>50</range-m>
+    </light>
+    <light>
+        <name>left-highbeam-compositor</name>
+        <type>spot</type>
+        <position>
+            <x-m>0.15</x-m>
+            <y-m>0.57</y-m>
+            <z-m>0.7</z-m>
+        </position>
+        <direction>
+            <pitch-deg>90</pitch-deg>
+            <roll-deg>0</roll-deg>
+            <heading-deg>0</heading-deg>
+        </direction>
+        <ambient>
+            <r>0.6</r>
+            <g>0.6</g>
+            <b>0.6</b>
+            <a>1</a>
+        </ambient>
+        <diffuse>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </diffuse>
+        <specular>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </specular>
+        <attenuation>
+            <c>1.0</c>
+            <l>0.027</l>
+            <q>0.0028</q>
+        </attenuation>
+        <spot-exponent>40</spot-exponent>
+        <spot-cutoff>30</spot-cutoff>
+        <range-m>150</range-m>
+    </light>
+    <light>
+        <name>right-highbeam-compositor</name>
+        <type>spot</type>
+        <position>
+            <x-m>0.15</x-m>
+            <y-m>-0.57</y-m>
+            <z-m>0.7</z-m>
+        </position>
+        <direction>
+            <pitch-deg>90</pitch-deg>
+            <roll-deg>0</roll-deg>
+            <heading-deg>0</heading-deg>
+        </direction>
+        <ambient>
+            <r>0.6</r>
+            <g>0.6</g>
+            <b>0.6</b>
+            <a>1</a>
+        </ambient>
+        <diffuse>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </diffuse>
+        <specular>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </specular>
+        <attenuation>
+            <c>1.0</c>
+            <l>0.027</l>
+            <q>0.0028</q>
+        </attenuation>
+        <spot-exponent>40</spot-exponent>
+        <spot-cutoff>30</spot-cutoff>
+        <range-m>150</range-m>
+    </light>
+    <light>
+        <name>left-marker-compositor</name>
+        <type>spot</type>
+        <position>
+            <x-m>0.15</x-m>
+            <y-m>0.57</y-m>
+            <z-m>0.7</z-m>
+        </position>
+        <direction>
+            <pitch-deg>90</pitch-deg>
+            <roll-deg>0</roll-deg>
+            <heading-deg>0</heading-deg>
+        </direction>
+        <ambient>
+            <r>0.6</r>
+            <g>0.6</g>
+            <b>0.6</b>
+            <a>1</a>
+        </ambient>
+        <diffuse>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </diffuse>
+        <specular>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </specular>
+        <attenuation>
+            <c>1.0</c>
+            <l>0.22</l>
+            <q>0.20</q>
+        </attenuation>
+        <spot-exponent>10</spot-exponent>
+        <spot-cutoff>50</spot-cutoff>
+        <range-m>20</range-m>
+    </light>
+    <light>
+        <name>right-marker-compositor</name>
+        <type>spot</type>
+        <position>
+            <x-m>0.15</x-m>
+            <y-m>-0.57</y-m>
+            <z-m>0.7</z-m>
+        </position>
+        <direction>
+            <pitch-deg>90</pitch-deg>
+            <roll-deg>0</roll-deg>
+            <heading-deg>0</heading-deg>
+        </direction>
+        <ambient>
+            <r>0.6</r>
+            <g>0.6</g>
+            <b>0.6</b>
+            <a>1</a>
+        </ambient>
+        <diffuse>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </diffuse>
+        <specular>
+            <r>0.95</r>
+            <g>0.9</g>
+            <b>0.9</b>
+            <a>1</a>
+        </specular>
+        <attenuation>
+            <c>1.0</c>
+            <l>0.22</l>
+            <q>0.20</q>
+        </attenuation>
+        <spot-exponent>10</spot-exponent>
+        <spot-cutoff>50</spot-cutoff>
+        <range-m>20</range-m>
+    </light>
+    <!-- LIGHTS -->
+    <effect>
+        <inherits-from>front-light</inherits-from>
+        <object-name>Cone</object-name>
+    </effect>
+    <animation>
+        <type>select</type>
+        <object-name>Cone</object-name>
+        <object-name>Cone-texture</object-name>
+        <condition>
+            <and>
+                <not>
+                    <equals>
+                        <property>sim/rendering/shaders/skydome</property>
+                        <value>1</value>
+                    </equals>
+                </not>
+                <equals>
+                    <property>sim/multiplay/generic/int[3]</property>
+                    <value>100</value>
+                </equals>
+            </and>
+        </condition>
+    </animation>
+    <animation>
+        <type>select</type>
+        <object-name>left-marker-compositor</object-name>
+        <object-name>right-marker-compositor</object-name>
+        <condition>
+            <and>
+                <equals>
+                    <property>sim/multiplay/generic/int[3]</property>
+                    <value>1</value>
+                </equals>
+            </and>
+        </condition>
+    </animation>
+    <animation>
+        <type>select</type>
+        <object-name>left-headlight-compositor</object-name>
+        <object-name>right-headlight-compositor</object-name>
+        <condition>
+            <and>
+                <equals>
+                    <property>sim/multiplay/generic/int[3]</property>
+                    <value>2</value>
+                </equals>
+            </and>
+        </condition>
+    </animation>
+    <animation>
+        <type>select</type>
+        <object-name>left-highbeam-compositor</object-name>
+        <object-name>right-highbeam-compositor</object-name>
+        <condition>
+            <and>
+                <equals>
+                    <property>sim/multiplay/generic/bool[5]</property>
+                    <value>1</value>
+                </equals>
+            </and>
+        </condition>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>indicater_left</object-name>
+        <emission>
+            <red>1.0</red>
+            <green>0.8</green>
+            <blue>0.2</blue>
+            <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
+        </emission>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>inside_indicater_left</object-name>
+        <emission>
+            <red>0.33</red>
+            <green>1.0</green>
+            <blue>0</blue>
+            <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
+        </emission>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>indicater_ldoor</object-name>
+        <emission>
+            <red>1.0</red>
+            <green>0.8</green>
+            <blue>0.2</blue>
+            <factor-prop>sim/multiplay/generic/int[0]</factor-prop>
+        </emission>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>indicater_right</object-name>
+        <emission>
+            <red>1.0</red>
+            <green>0.8</green>
+            <blue>0.2</blue>
+            <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
+        </emission>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>inside_indicater_right</object-name>
+        <emission>
+            <red>0.33</red>
+            <green>1.0</green>
+            <blue>0</blue>
+            <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
+        </emission>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>indicater_rdoor</object-name>
+        <emission>
+            <red>1.0</red>
+            <green>0.8</green>
+            <blue>0.2</blue>
+            <factor-prop>sim/multiplay/generic/int[1]</factor-prop>
+        </emission>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>braking_lights</object-name>
+        <object-name>high_braking_lights</object-name>
+        <emission>
+            <red>1.0</red>
+            <green>0.0</green>
+            <blue>0.0</blue>
+            <factor-prop>sim/multiplay/generic/float[25]</factor-prop>
+        </emission>
+        <condition>
+            <greater-than>
+                <property>sim/multiplay/generic/float[25]</property>
+                <value>0.3</value>
+            </greater-than>
+        </condition>
+    </animation>
+    <animation>
+        <type>material</type>
+        <object-name>reverse_right</object-name>
+        <object-name>reverse_left</object-name>
+        <emission>
+            <red>1</red>
+            <green>1</green>
+            <blue>1</blue>
+            <factor-prop>sim/multiplay/generic/bool[11]</factor-prop>
+        </emission>
+    </animation>
+    <!-- Fuel Truck -->
+    <model>
+        <path>Aircraft/followme_e-tron/Models/Service-Truck/Service_Truck_Short_VolvoFM.xml</path>
+        <condition>
+            <and>
+                <equals>
+                    <property>sim/multiplay/generic/int[5]</property>
+                    <value>1</value>
+                </equals>
+                <less-than>
+                    <property>velocities/groundspeed-kt</property>
+                    <value>1</value>
+                </less-than>
+            </and>
+        </condition>
+    </model>
+    <!-- Tyre smoke -->
+    <model>
+        <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke.xml</path>
+        <name>tyre-smoke-n</name>
+        <offsets>
+            <x-m>0.682</x-m>
+            <y-m>0.627</y-m>
+            <z-m>0.291</z-m>
+        </offsets>
+    </model>
+    <model>
+        <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-1.xml</path>
+        <name>tyre-smoke-n</name>
+        <offsets>
+            <x-m>0.682</x-m>
+            <y-m>-0.627</y-m>
+            <z-m>0.291</z-m>
+        </offsets>
+    </model>
+    <model>
+        <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-2.xml</path>
+        <name>tyre-smoke-n</name>
+        <offsets>
+            <x-m>3.17</x-m>
+            <y-m>0.625</y-m>
+            <z-m>0.282</z-m>
+        </offsets>
+    </model>
+    <model>
+        <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke-3.xml</path>
+        <name>tyre-smoke-n</name>
+        <offsets>
+            <x-m>3.17</x-m>
+            <y-m>-0.625</y-m>
+            <z-m>0.282</z-m>
+        </offsets>
+    </model>
 </PropertyList>
