@@ -83,6 +83,110 @@
   </offsets>
 </model>-->
 
+
+<!-- Armrest Box -->
+<animation>
+    <type>pick</type>
+    <object-name>armrest_button</object-name>
+    <action>
+      <button>0</button>
+      <binding>
+          <command>property-assign</command>
+          <property>controls/interior/armrest_cover_pos</property>
+          <value type="double">1</value>
+      </binding>
+      <binding>
+          <command>property-assign</command>
+          <property>controls/interior/armrest_button_pos</property>
+          <value type="double">1</value>
+      </binding>
+      <mod-up>
+          <binding>
+              <command>property-assign</command>
+              <property>controls/interior/armrest_button_pos</property>
+              <value type="double">0</value>
+          </binding>
+      </mod-up>
+    </action>
+</animation>
+<animation>
+    <type>translate</type>
+    <object-name>armrest_button</object-name>
+    <property>controls/interior/armrest_button_pos</property>
+    <factor>0.00043</factor>
+    <axis>
+        <x>0</x>
+        <y>0</y>
+        <z>-1</z>
+    </axis>
+</animation>
+<animation>
+    <type>pick</type>
+    <object-name>armrest_box_cover</object-name>
+    <action>
+      <button>0</button>
+      <binding>
+          <command>property-assign</command>
+          <property>controls/interior/armrest_cover_pos</property>
+          <value type="double">0</value>
+      </binding>
+    </action>
+</animation>
+<animation>
+    <type>rotate</type>
+    <object-name>armrest_box_cover</object-name>
+    <property>sim/multiplay/generic/float[27]</property>
+    <interpolation>
+        <entry>
+            <ind> 0.0 </ind>
+            <dep> 0.0 </dep>
+        </entry>
+        <entry>
+            <ind> 0.02 </ind>
+            <dep> 0.0 </dep>
+        </entry>
+        <entry>
+            <ind> 0.1</ind>
+            <dep> 40 </dep>
+        </entry>
+        <entry>
+            <ind> 0.3</ind>
+            <dep> 50 </dep>
+        </entry>
+        <entry>
+            <ind> 0.6</ind>
+            <dep> 61</dep>
+        </entry>
+        <entry>
+            <ind> 0.75</ind>
+            <dep> 62</dep>
+        </entry>
+        <entry>
+            <ind> 0.8</ind>
+            <dep> 63</dep>
+        </entry>
+        <entry>
+            <ind> 0.95</ind>
+            <dep> 64</dep>
+        </entry>
+        <entry>
+            <ind> 1.0 </ind>
+            <dep> 65.0 </dep>
+        </entry>
+    </interpolation>
+    <offset-m>0</offset-m>
+    <center>
+        <x-m>1.949</x-m>
+        <y-m>0</y-m>
+        <z-m>0.766</z-m>
+    </center>
+    <axis>
+        <x>0</x>
+        <y>1</y>
+        <z>0</z>
+    </axis>
+</animation>
+
 <!-- GEAR HANDLE -->
 <animation>
     <type>pick</type>

@@ -80086,7 +80086,7 @@ refs 4
 11 0 0
 kids 0
 OBJECT poly
-name "box"
+name "armrest_box_cover"
 loc 1.60366 0.652268 0
 texture "leather3.png"
 crease 45.000000
@@ -89527,7 +89527,7 @@ refs 4
 8 0.0468411 0.0500996
 kids 0
 OBJECT poly
-name "box"
+name "armrest_button"
 loc 1.65394 0.778713 0.0377785
 texture "leather3.png"
 crease 45.000000
