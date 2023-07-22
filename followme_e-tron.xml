@@ -580,49 +580,68 @@
     <system name="Followme EV animations">
         <channel name="Stroage" execrate="2">
             <fcs_function name="animation/storage_nul">
-			<function>
-				<table>
-					<independentVar lookup="row">/controls/interior/luxury/storage_cover_pos</independentVar>
-					<tableData>
-						0.00  0.0
-                        0.05  0.1
-                        0.10  0.1
-                        0.30  0.2
-						0.75  0.7
-						0.95  1.0
-					</tableData>
-				</table>
-			</function>
-		</fcs_function>
+			    <function>
+			    	<table>
+				    	<independentVar lookup="row">/controls/interior/luxury/storage_cover_pos</independentVar>
+				    	<tableData>
+				    		0.00  0.0
+                            0.05  0.1
+                            0.10  0.1
+                            0.30  0.2
+				    		0.75  0.7
+				    		0.95  1.0
+				    	</tableData>
+				    </table>
+			    </function>
+		    </fcs_function>
 
-		<lag_filter name="animation/storage_cover_pos">
-			<input>animation/storage_nul</input>
-			<c1>3</c1>
-		</lag_filter>
+		    <lag_filter name="animation/storage_cover_pos">
+		        <input>animation/storage_nul</input>
+			    <c1>3</c1>
+		    </lag_filter>
         </channel>
+
+        <channel name="Armrest" execrate="2">
+            <fcs_function name="animation/armrest_nul">
+			    <function>
+				    <table>
+					    <independentVar lookup="row">/controls/interior/armrest_cover_pos</independentVar>
+					    <tableData>
+						    0.00  0.0
+						    0.95  1.0
+					    </tableData>
+				    </table>
+			    </function>
+		    </fcs_function>
+            <lag_filter name="animation/armrest_cover_pos">
+		        <input>animation/armrest_nul</input>
+			    <c1>8</c1>
+		    </lag_filter>
+        </channel>
+
 
         <channel name="Wiper" execrate="2">
             <fcs_function name="animation/wiper">
-			<function>
-				<table>
-					<independentVar lookup="row">/controls/wiper/frontwiper/state</independentVar>
-					<tableData>
-						0.00  0.0
-                        0.05  0.1
-                        0.10  0.1
-                        0.30  0.2
-						0.75  0.7
-						0.95  1.0
-                        1.0  1.0
-					</tableData>
-				</table>
-			</function>
-		</fcs_function>
+			    <function>
+			    	<table>
+			    		<independentVar lookup="row">/controls/wiper/frontwiper/state</independentVar>
+			    		<tableData>
+			    			0.00  0.0
+                            0.05  0.1
+                            0.10  0.1
+                            0.30  0.2
+				    		0.75  0.7
+					    	0.95  1.0
+                            1.0  1.0
+				    	</tableData>
+			    	</table>
+			    </function>
+		    </fcs_function>
 
-		<lag_filter name="animation/wiper_pos">
-			<input>animation/wiper</input>
-			<c1>5</c1>
-		</lag_filter>
+	    	<lag_filter name="animation/wiper_pos">
+		    	<input>animation/wiper</input>
+		    	<c1>6</c1>
+		    </lag_filter>
         </channel>
 
         <channel name="SteeringWheel">

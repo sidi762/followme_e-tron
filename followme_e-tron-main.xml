@@ -141,7 +141,7 @@
     	    <int n="15" alias="/systems/instruments/enable_switches"/>
             <int n="16" alias="/warninglight/start"/>
 
-            <!--float current num:26 -->
+            <!--float current num:28 -->
             <float n="0" alias="/controls/doors/rearright/position-norm"/>
             <float n="1" alias="/controls/doors/rearleft/position-norm"/>
             <float n="2" alias="/controls/doors/frontright/position-norm"/>
@@ -178,6 +178,8 @@
 
             <float n="23" alias="/fdm/jsbsim/animation/storage_cover_pos"/>
             <float n="24" alias="/controls/interior/luxury/storage_cover_pos"/>
+			<float n="27" alias="/fdm/jsbsim/animation/armrest_cover_pos"/>
+            <float n="28" alias="/controls/interior/armrest_cover_pos"/>
 
 
             <!--<string n="0" alias="/systems/plate"/>-->
@@ -421,6 +423,15 @@
                     <script>smartInstruments.smartInstruments.previousCenterScreen();</script>
                     <value type="double">1</value>
                 </binding>
+            </key>
+            <key n="121">
+                <name>y</name>
+                <desc>toggle_wiper</desc>
+                <repeatable>false</repeatable>
+    			<binding>
+    				<command>nasal</command>
+                    <script>followme.toggleWiper();</script>
+    			</binding>
             </key>
             <key n="66">
                 <name>B</name>

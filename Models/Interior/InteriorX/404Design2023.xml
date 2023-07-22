@@ -25,8 +25,58 @@
  </condition>
 </animation>
 
-
-
+<!-- Armrest Box -->
+<animation>
+    <type>pick</type>
+    <object-name>armrest_box_cover</object-name>
+    <action>
+      <button>0</button>
+      <binding>
+          <command>property-cycle</command>
+          <property>controls/interior/armrest_cover_pos</property>
+          <value type="double">0</value>
+          <value type="double">1</value>
+      </binding>
+    </action>
+</animation>
+<animation>
+    <type>rotate</type>
+    <object-name>armrest_box_cover</object-name>
+    <property>sim/multiplay/generic/float[27]</property>
+    <interpolation>
+        <entry>
+            <ind> 0.0 </ind>
+            <dep> 0.0 </dep>
+        </entry>
+        <entry>
+            <ind> 0.1 </ind>
+            <dep> 0.0 </dep>
+        </entry>
+        <entry>
+            <ind> 0.2</ind>
+            <dep> 3 </dep>
+        </entry>
+        <entry>
+            <ind> 0.3</ind>
+            <dep> 18 </dep>
+        </entry>
+        <entry>
+            <ind> 1.0 </ind>
+            <dep> 60.0 </dep>
+        </entry>
+    </interpolation>
+    <offset-m>0</offset-m>
+    <center>
+        <x-m>1.949</x-m>
+        <y-m>0</y-m>
+        <z-m>0.766</z-m>
+    </center>
+    <axis>
+        <x>0</x>
+        <y>1</y>
+        <z>0</z>
+    </axis>
+</animation>
 <!-- STEERINGWHEEL -->
 
 <animation>
