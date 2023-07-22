@@ -1,59 +1,54 @@
-<?xml version="1.0"?>
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <PropertyList>
-
- <fx>
-
-  <engine>
-   <name>motor</name>
-   <mode>looped</mode>
-   <path>Sounds/motor.wav</path>
-   <property>sim/multiplay/generic/float[15]</property>
-   <!--><condition>
+    <fx>
+        <engine>
+            <name>motor</name>
+            <mode>looped</mode>
+            <path>Sounds/motor.wav</path>
+            <property>sim/multiplay/generic/float[15]</property>
+            <!--><condition>
    	<equals>
  			<property>sim/current-view/internal</property>
  			<value>1</value>
  	</equals>
    </condition>-->
-   <condition>
-   	<equals>
- 			<property>/controls/engines/engine/started</property>
- 			<value>1</value>
- 		</equals>
- 	 </condition>
-   <volume>
-    <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.015</factor>
-    <min>0</min>
-    <max>2</max>
-    <offset>0</offset>
-   </volume>
-   <pitch>
-    <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.015</factor>
-    <offset>0.45</offset>
-   </pitch>
-  </engine>
-
-  <wind>
-   <name>rumble</name>
-   <mode>looped</mode>
-   <path>Sounds/rumble.wav</path>
-   <property>sim/multiplay/generic/float[15]</property>
-   <volume>
-    <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.003</factor>
-    <min>0.0</min>
-    <max>1.0</max>
-   </volume>
-   <pitch>
-    <property>sim/multiplay/generic/float[15]</property>
-    <factor>0.005</factor>
-    <offset>1.5</offset>
-   </pitch>
-  </wind>
-
-  <!-- Removed due to copyright issues
+            <condition>
+                <equals>
+                    <property>/controls/engines/engine/started</property>
+                    <value>1</value>
+                </equals>
+            </condition>
+            <volume>
+                <property>sim/multiplay/generic/float[15]</property>
+                <factor>0.015</factor>
+                <min>0</min>
+                <max>2</max>
+                <offset>0</offset>
+            </volume>
+            <pitch>
+                <property>sim/multiplay/generic/float[15]</property>
+                <factor>0.015</factor>
+                <offset>0.45</offset>
+            </pitch>
+        </engine>
+        <wind>
+            <name>rumble</name>
+            <mode>looped</mode>
+            <path>Sounds/rumble.wav</path>
+            <property>sim/multiplay/generic/float[15]</property>
+            <volume>
+                <property>sim/multiplay/generic/float[15]</property>
+                <factor>0.003</factor>
+                <min>0.0</min>
+                <max>1.0</max>
+            </volume>
+            <pitch>
+                <property>sim/multiplay/generic/float[15]</property>
+                <factor>0.005</factor>
+                <offset>1.5</offset>
+            </pitch>
+        </wind>
+        <!-- Removed due to copyright issues
     <safety>
 	<name>safety</name>
 	<mode>once</mode>
@@ -69,76 +64,72 @@
 		<factor>5</factor>
 	</volume>
   </safety>-->
-
-  <brake>
-      <name>brake</name>
-      <mode>once</mode>
-      <path>Aircraft/followme_e-tron/Sounds/Renault4-brake.wav</path>
-      <condition>
-          <and>
-              <greater-than>
-                  <property>sim/multiplay/generic/float[15]</property>
-                  <value>7</value>
-              </greater-than>
-              <equals>
-                  <property>sim/multiplay/generic/float[19]</property>
-                  <value>1</value>
-              </equals>
-         </and>
-      </condition>
-      <volume>
-          <property>sim/multiplay/generic/float[19]</property>
-		  <factor>0.5</factor>
-     </volume>
-      <reference-dist>100</reference-dist>
-      <max-dist>1000</max-dist>
-  </brake>
-
-  <horn>
-	<name>horn</name>
-	<mode>looped</mode>
-	<path>Aircraft/followme_e-tron/Sounds/horn.wav</path>
-    <condition>
-		<equals>
-		     <property>sim/multiplay/generic/int[2]</property>
-             <value>1</value>
-		</equals>
-	</condition>
-	<volume>
-	  <factor>0.8</factor>
-    </volume>
-    <reference-dist>100</reference-dist>
-	<max-dist>1000</max-dist>
-  </horn>
-
-  <indicator>
-	<name>indicator</name>
-	<mode>looped</mode>
-	<path>Aircraft/followme_e-tron/Sounds/indicatorFlashing.wav</path>
-	<condition>
-      	<and>
-          	<or>
-              	<equals>
-            			<property>controls/lighting/indicator-left</property>
-            			<value>1</value>
-            	</equals>
-              	<equals>
-            			<property>controls/lighting/indicator-right</property>
-            			<value>1</value>
-            	</equals>
-            </or>
-          	<equals>
-        			<property>sim/current-view/internal</property>
-        			<value>1</value>
-        	</equals>
-        </and>
-	</condition>
-	<volume>
-        <value>0.4</value>
-	</volume>
-  </indicator>
-
-  <!-- Switched to nasal to prevent bug
+        <brake>
+            <name>brake</name>
+            <mode>once</mode>
+            <path>Aircraft/followme_e-tron/Sounds/Renault4-brake.wav</path>
+            <condition>
+                <and>
+                    <greater-than>
+                        <property>sim/multiplay/generic/float[15]</property>
+                        <value>7</value>
+                    </greater-than>
+                    <equals>
+                        <property>sim/multiplay/generic/float[19]</property>
+                        <value>1</value>
+                    </equals>
+                </and>
+            </condition>
+            <volume>
+                <property>sim/multiplay/generic/float[19]</property>
+                <factor>0.5</factor>
+            </volume>
+            <reference-dist>100</reference-dist>
+            <max-dist>1000</max-dist>
+        </brake>
+        <horn>
+            <name>horn</name>
+            <mode>looped</mode>
+            <path>Aircraft/followme_e-tron/Sounds/horn.wav</path>
+            <condition>
+                <equals>
+                    <property>sim/multiplay/generic/int[2]</property>
+                    <value>1</value>
+                </equals>
+            </condition>
+            <volume>
+                <factor>0.8</factor>
+            </volume>
+            <reference-dist>100</reference-dist>
+            <max-dist>1000</max-dist>
+        </horn>
+        <indicator>
+            <name>indicator</name>
+            <mode>looped</mode>
+            <path>Aircraft/followme_e-tron/Sounds/indicatorFlashing.wav</path>
+            <condition>
+                <and>
+                    <or>
+                        <equals>
+                            <property>controls/lighting/indicator-left</property>
+                            <value>1</value>
+                        </equals>
+                        <equals>
+                            <property>controls/lighting/indicator-right</property>
+                            <value>1</value>
+                        </equals>
+                    </or>
+                    <equals>
+                        <property>sim/current-view/internal</property>
+                        <value>1</value>
+                    </equals>
+                </and>
+            </condition>
+            <volume>
+                <value>0.4</value>
+            </volume>
+        </indicator>
+        <!-- Switched to nasal to prevent bug
     <indicatorStart>
 	<name>indicatorStartLeft</name>
 	<mode>once</mode>
@@ -210,8 +201,7 @@
 	</volume>
   </indicatorEnd>
   -->
-
-  <!--<music>
+        <!--<music>
 	<name>music</name>
 	<mode>once</mode>
 	<path>Aircraft/followme_e-tron/MusicPlayer/Music/Example/Inspiration_mono.wav</path>
@@ -225,8 +215,5 @@
         <property>/controls/music_player/volume</property>
 	</volume>
   </music>-->
-
-
-</fx>
-
+    </fx>
 </PropertyList>
