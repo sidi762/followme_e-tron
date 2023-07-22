@@ -7,7 +7,7 @@
 io.include("library.nas");
 
 var electricalDebug = Debugger.new("Electrical");
-electricalDebug.setDebugLevel(1);
+electricalDebug.setDebugLevel(0);
 
 var kWh2kWs = func(kWh){
     return kWh * 3600;
