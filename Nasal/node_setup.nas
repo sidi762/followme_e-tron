@@ -140,7 +140,7 @@ props.getNode("/",1).setValue("/systems/instruments/enable_switches", 0);
 
 props.getNode("/",1).setValue("services/service-truck/enable", 0);
 props.getNode("controls/is-recharging", 1).setValue(0);
-
+props.getNode("services/service-truck/connect", 1).setValue(0);
 
 
 props.getNode("systems/plate/file", 1).setValue("NONE");
