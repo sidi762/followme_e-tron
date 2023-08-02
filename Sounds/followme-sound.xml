@@ -129,6 +129,64 @@
                 <value>0.4</value>
             </volume>
         </indicator>
+        <armrest_box_open>
+            <name>armrest_box_open</name>
+            <mode>in-transit</mode>
+            <path>Aircraft/followme_e-tron/Sounds/armrestbox_open.wav</path>
+            <condition>
+                <and>
+                    <less-than>
+                        <property>sim/multiplay/generic/float[27]</property>
+                        <value>0.99</value>
+                    </less-than>
+                    <greater-than>
+                        <property>sim/multiplay/generic/float[27]</property>
+                        <value>0.01</value>
+                    </greater-than>
+                    <equals>
+                        <property>controls/interior/armrest_cover_pos</property>
+                        <value>1</value>
+                    </equals>
+                </and>
+            </condition>
+            <position>
+                <x>1.91</x>
+                <y>0</y>
+                <z>0.75</z>
+            </position>
+            <volume>
+                <factor>1</factor>
+            </volume>
+        </armrest_box_open>
+        <armrest_box_close>
+            <name>armrest_box_close</name>
+            <mode>in-transit</mode>
+            <path>Aircraft/followme_e-tron/Sounds/armrestbox_close.wav</path>
+            <condition>
+                <and>
+                    <less-than>
+                        <property>sim/multiplay/generic/float[27]</property>
+                        <value>0.99</value>
+                    </less-than>
+                    <greater-than>
+                        <property>sim/multiplay/generic/float[27]</property>
+                        <value>0.01</value>
+                    </greater-than>
+                    <equals>
+                        <property>controls/interior/armrest_cover_pos</property>
+                        <value>0</value>
+                    </equals>
+                </and>
+            </condition>
+            <position>
+                <x>1.70</x>
+                <y>0</y>
+                <z>0.75</z>
+            </position>
+            <volume>
+                <factor>1</factor>
+            </volume>
+        </armrest_box_close>
         <!-- Switched to nasal to prevent bug
     <indicatorStart>
 	<name>indicatorStartLeft</name>

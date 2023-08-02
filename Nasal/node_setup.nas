@@ -148,6 +148,7 @@ props.getNode("systems/plate/name", 1).setValue("NONE");
 
 props.getNode("/controls/steering_wheel", 1).setValue(0);
 props.getNode("controls/interior/luxury/storage_cover_pos", 1).setValue(0);
+props.getNode("controls/interior/armrest_cover_pos", 1).setValue(0);
 props.getNode("sim/remote/pilot-callsign", 1).setValue("");
 props.getNode("systems/codriver-enable", 1).setValue(0);
 props.getNode("systems/screen-enable", 1).setValue(0);
