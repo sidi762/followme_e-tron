@@ -28,11 +28,11 @@ var Steering = {
         print("Steering system initialized!");
         var steering = { parents:[Steering] };
         props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steering.steeringLimit * R2D);
-        steering.debugNodeB.setValue(15);
-        steering.debugNodeC.setValue(2);
-        steering.debugNodeD.setValue(14000);
+        steering.debugNodeB.setValue(20);
+        steering.debugNodeC.setValue(2.1);
+        steering.debugNodeD.setValue(16000);
         steering.debugNodeE.setValue(0.97);
-        steering.debugNodeFactor.setValue(0.012);
+        steering.debugNodeFactor.setValue(0.02);
         return steering;
     },
 
@@ -72,8 +72,10 @@ var Steering = {
     steeringStep:func(rad){
         var speed = me.velocityNode.getValue();
         var ret = 0.1 * me.powPointOne.lookup(sprintf("%.1f", math.abs(rad)));
-        ret -= 0.023 * me.powPointThree.lookup(sprintf("%.1f", math.abs(speed)));
-        ret += 0.015;
+        ret -= 0.022 * me.powPointThree.lookup(sprintf("%.1f", math.abs(speed)));
+        #ret = math.min(ret, 0);
+        ret *= 1.1;
+        ret = math.max(ret, 0.011);
         return ret;
     },
     # neutralStep: func(rad){
@@ -86,14 +88,14 @@ var Steering = {
         var tireStiffness = 3000; # in N/rad, adjust based on tire properties
         var tireWidth = 0.225; # in meters, approximate value for tire width
         # Constants for the tire model (empirical parameters)
-        #var B = 15.0;
-        #var C = 2;
-        #var D = 14000;
-        #var E = 0.97;
-        var B = me.debugNodeB.getValue();
-        var C = me.debugNodeC.getValue();
-        var D = me.debugNodeD.getValue();
-        var E = me.debugNodeE.getValue();
+        var B = 20;
+        var C = 2.1;
+        var D = 16000;
+        var E = 0.97;
+        #var B = me.debugNodeB.getValue();
+        #var C = me.debugNodeC.getValue();
+        #var D = me.debugNodeD.getValue();
+        #var E = me.debugNodeE.getValue();
 
         # Vehicle Speed
         var speed = me.velocityNode.getValue(); # in kts
@@ -101,7 +103,7 @@ var Steering = {
 
         # Tire Properties
         var tireSlipAngle = 0;
-        if(speed > 0.1){
+        if(speed > 1.5){
             tireSlipAngle = math.abs(me.slipAngleNode.getValue()) * D2R; # use the absolute value of the slip angle in radians
         }
 
@@ -117,7 +119,8 @@ var Steering = {
         # Self-centering force calculation
         var Fsc = Mz / 0.3; # 0.3 is approx. for steering wheel radius
 
-        var factor = me.debugNodeFactor.getValue();
+        #var factor = me.debugNodeFactor.getValue();
+        var factor = 0.02;
         # Calculate steering change based on self-centering force and tire stiffness
         var steeringChange = (Fsc / tireStiffness) * factor; # adjust the factor to control the self-centering strength
 
@@ -126,51 +129,52 @@ var Steering = {
     },
 
     mainLoop: func(){
+        var steeringAngle = me.steeringAngle;
         if(me.input == 0)
         {
-            if(math.abs(me.steeringAngle) <= 0.01)
+            if(math.abs(steeringAngle) <= 0.01)
             {
-                me.steeringAngle = 0;
-                me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
+                steeringAngle = 0;
+                me.command = steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
                 me.commandNode.setValue(me.command);
                 #me.steeringAngleDeg = me.steeringAngle * R2D;
                 #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
             }
-            if(me.steeringAngle == 0)
+            if(steeringAngle == 0)
             {
                 me.stopTimer();
                 return 0;
             }
-            else if(me.steeringAngle >= 0.01)
-                me.steeringAngle -= math.min(me.neutralStep(me.steeringAngle), me.steeringAngle);
+            else if(steeringAngle >= 0.01)
+                steeringAngle -= math.min(me.neutralStep(steeringAngle), steeringAngle);
             else if(me.steeringAngle <= -0.01)
-                me.steeringAngle += math.min(me.neutralStep(me.steeringAngle), -me.steeringAngle);
+                steeringAngle += math.min(me.neutralStep(steeringAngle), -steeringAngle);
         }
-        else if(me.input == 1 and me.steeringAngle < me.steeringLimit)
+        else if(me.input == 1 and steeringAngle < me.steeringLimit)
         {
-            if(me.steeringAngle < 0)
+            if(steeringAngle < 0)
             {
-                me.steeringAngle += me.neutralStep(me.steeringAngle);
-                me.steeringAngle += 0.2;
+                steeringAngle += me.neutralStep(steeringAngle);
+                steeringAngle += math.min(0.15, -steeringAngle);
             }
             else
-                me.steeringAngle += me.steeringStep(me.steeringAngle);
+                steeringAngle += me.steeringStep(steeringAngle);
         }
-        else if(me.input == -1 and me.steeringAngle > (-me.steeringLimit))
+        else if(me.input == -1 and steeringAngle > (-me.steeringLimit))
         {
-            if(me.steeringAngle > 0)
+            if(steeringAngle > 0)
             {
-                me.steeringAngle -= me.neutralStep(me.steeringAngle);
-                me.steeringAngle -= 0.2;
+                steeringAngle -= me.neutralStep(steeringAngle);
+                steeringAngle -= math.min(0.15, steeringAngle);
             }
             else
-                me.steeringAngle -= me.steeringStep(me.steeringAngle);
+                steeringAngle -= me.steeringStep(steeringAngle);
         }
 
-        me.command = me.steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
+        me.command = steeringAngle / me.steeringLimit; #//The steering wheel could rotate for two circles and a half
         #me.steeringAngleDeg = me.steeringAngle * R2D;
         me.commandNode.setValue(me.command);
-        #props.getNode("/",1).setValue("/controls/steering_wheel", me.steeringAngleDeg);
+        me.steeringAngle = steeringAngle;
         if(me.debugMode)
         {
             print("Steering system command:" ~ me.command);
