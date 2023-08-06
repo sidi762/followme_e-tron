@@ -103,7 +103,10 @@
             <label>*Experimental Features</label>
         </text>
         <text>
-            <label>Advanced Steering</label>
+            <label>Realistic Steering</label>
+        </text>
+        <text>
+            <label>Tips: It is STRONGLY recommended to set the max travel to Normal in Configuration dialog (default is Long)</label>
         </text>
         <group>
             <layout>hbox</layout>
