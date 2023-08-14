@@ -1,38 +1,44 @@
 #//Sidi Liang, 2020
-#//Docs WIP
-#//Texture Selector for Followme EV
-#//Quick start:
-#//Aircraft liveries with dedicated selection dialog: (The same applies to any texture defined in PropertyList XML):
-#//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/FollowmeEV/";
-#//     var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
-#//     Dialog:YourNameSpace.liverySelector.dialog.open()
-#//Pure texture, dedicated dialog with MP：
-#//     var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/Limo/";
-#//     var liverySelector = TextureSelector.new(name: "Livery-Selector-Limo", path: liveryPath, fileType: ".png", enableMultiplayer: 1, texturePrePath: "Liveries/Limo/", defaultValue: "limo-fgprc");
-#//     Dialog:Same as above
-#//Pure texture, custom dialog(without multiplayer):
-#//     var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
-#//     var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
+#// Docs WIP
+#// Texture Selector for Followme EV
+#// Quick start:
+#// Aircraft liveries with dedicated selection dialog: (The same applies to any texture defined in PropertyList XML):
+#//      var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/FollowmeEV/";
+#//      var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
+#//      Dialog:YourNameSpace.liverySelector.dialog.open()
+#// Pure texture, dedicated dialog with MP：
+#//      var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/Limo/";
+#//      var liverySelector = TextureSelector.new(name: "Livery-Selector-Limo", path: liveryPath, fileType: ".png", enableMultiplayer: 1, texturePrePath: "Liveries/Limo/", defaultValue: "limo-fgprc");
+#//      Dialog:Same as above
+#// Pure texture, custom dialog(without multiplayer):
+#//      var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
+#//      var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
 #//
-#//Documentation:
-#//new():
-#//     new(name, path[, fileType[, enableNone[, customDialog[, customDialogBase[, customDialogPosition[, texturePropertyBase[, textureProp[, textureNameProp[, textureDataNode[, enableMultiplayer[, multiplayerProperty[, texturePrePath[, defaultValue]]]]]]]]]]]]);
-#//name: The name of the Texture Selector (must be identical)
-#//path: The path which contains texture files
-#//fileType: The type of file to scan, eg. ".png" for png files and ".xml" for xml files. Defaults to nil.
-#//enableNone: Set to 1 to enable the item "NONE" in the selection dialog. Defaults to 0.
-#//customDialog: Set to 1 to disable the dedicated built in dialog so that you can make the TextureSelector to use your custom dialog. Defaults to 0.
-#//customDialogBase: The property base for the custom dialog(see the plate selection of the followmeEV for example). Defaults to "".
-#//customDialogPosition: The element which serves to select the texture in the custom dialog. eg. "group[4]/combo/". Defaults to "".
-#//texturePropertyBase: The texture property base in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "sim/model/livery/".
-#//textureProp: The texture property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "livery".
-#//textureNameProp: The texture name property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "name".
-#//textureDataNode:
-#//enableMultiplayer:
-#//multiplayerProperty:
-#//texturePrePath:must end with /
-#//defaultValue:
-#//WIP
+#// Documentation:
+
+#// Constructor: new()
+#// Creates a new Texture Selector instance.
+#//      new(name, path[, fileType[, enableNone[, customDialog[, customDialogBase[, customDialogPosition[, texturePropertyBase[, textureProp[, textureNameProp[, textureDataNode[, enableMultiplayer[, multiplayerProperty[, texturePrePath[, defaultValue]]]]]]]]]]]]);
+#// name: The name of the Texture Selector (must be identical)
+#// path: The path which contains texture files
+#// fileType: The type of file to scan, eg. ".png" for png files and ".xml" for xml files. Defaults to nil.
+#// enableNone: Set to 1 to enable the item "NONE" in the selection dialog. Defaults to 0.
+#// customDialog: Set to 1 to disable the dedicated built in dialog so that you can make the TextureSelector to use your custom dialog. Defaults to 0.
+#// customDialogBase: The property base for the custom dialog(see the plate selection of the followmeEV for example). Defaults to "".
+#// customDialogPosition: The element which serves to select the texture in the custom dialog. eg. "group[4]/combo/". Defaults to "".
+#// texturePropertyBase: The texture property base in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "sim/model/livery/".
+#// textureProp: The texture property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "livery".
+#// textureNameProp: The texture name property in the texture xml files. Only used if fileType is set to ".xml". This is added to support most livery files in FG. Defaults to "name".
+#// textureDataNode: The node in the property tree where texture data is stored (for .xml files). Defaults to "/TextureSelector/liveries/".
+#// enableMultiplayer: Set to 1 to enable multiplayer synchronization for the selected texture. Defaults to 0.
+#// multiplayerProperty: The multiplayer property. Only be used if enableMultiplayer is set to 1. Default to be /sim/multiplay/generic/string[19] (The last string property in the MP Protocol).
+#// texturePrePath: The prefix path for texture files. Must end with '/'. Defaults to "".
+#// defaultValue: The default texture value to set. Defaults to "".
+#// Returns the TextureSelector instance.
+#// Example usage:
+#// var liveryPath = props.getNode("sim/aircraft-dir").getValue() ~ "/Models/Liveries/FollowmeEV/";
+#// var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
+#// Dialog: YourNameSpace.liverySelector.dialog.open()
 
 var TextureSelector = {
     new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
@@ -187,6 +193,16 @@ var TextureSelector = {
         }
     },
 };
+
+#// Constructor: new()
+#// Creates a new Texture Selector Dialog instance. Note that this is already handled by TextureSelector internally and there is no need to create it yourself.
+#// dialogBase: The base node for the custom dialog.
+#// dialogFile: The path to the XML file that defines the dialog layout. Defaults to "Aircraft/followme_e-tron/gui/dialogs/livery-select.xml".
+#// defaultV: The default value for the texture selection. Defaults to an empty string.
+#// name: The name of the dialog. Defaults to "Texture selection".
+#// Returns the TextureSelectorDialog instance.
+#// Example usage:
+#// var customDialog = TextureSelectorDialog.new(dialogBase, "path/to/custom_dialog.xml", "defaultTextureName", "Custom Dialog Title");
 
 var TextureSelectorDialog = {
     new: func(dialogBase, dialogFile = "Aircraft/followme_e-tron/gui/dialogs/livery-select.xml", defaultV = "", name = "Texture selection"){
