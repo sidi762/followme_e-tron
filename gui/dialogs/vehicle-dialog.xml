@@ -94,13 +94,10 @@
     <text>
         <label>Realistic Steering</label>
     </text>
-    <text>
-        <label>Tips: It is STRONGLY recommended to set the max travel to Normal in Configuration dialog (default is Long)</label>
-    </text>
     <group>
         <layout>hbox</layout>
         <button>
-            <halign>left</halign>
+            <halign>middle</halign>
             <legend>Enable</legend>
             <pref-width>150</pref-width>
             <pref-height>28</pref-height>
@@ -116,7 +113,7 @@
             </binding>
         </button>
         <button>
-            <halign>left</halign>
+            <halign>middle</halign>
             <legend>Disable</legend>
             <pref-width>150</pref-width>
             <pref-height>28</pref-height>
@@ -133,6 +130,21 @@
             </binding>
         </button>
     </group>
+    <text>
+        <label>Tips: When this is enabled, it is STRONGLY</label>
+    </text>
+    <text>
+        <label>recommended to set the max travel to Normal</label>
+    </text>
+    <text>
+        <label>in Configuration dialog (default is Long).</label>
+    </text>
+    <text>
+        <label>By enabling Realistic Steering, the drifting sound </label>
+    </text>
+    <text>
+        <label>effect will be enabled automatically </label>
+    </text>
     <!--
         <text>
             <label>L Gear</label>
@@ -256,89 +268,50 @@
         </button>
     </group>
     <group>
+        <layout>vbox</layout>
+        <padding>6</padding>
+        <text>
+            <label>Drifting Sound Effect</label>
+        </text>
         <layout>hbox</layout>
         <padding>2</padding>
-        <button>
-            <halign>left</halign>
-            <legend>Enable Chinese</legend>
-            <pref-width>100</pref-width>
-            <pref-height>28</pref-height>
-            <enable>
-                <or>
+        <group>
+            <layout>hbox</layout>
+            <button>
+                <halign>middle</halign>
+                <legend>Enable</legend>
+                <pref-width>150</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
                     <equals>
-                        <property>systems/welcome-message</property>
+                        <property>systems/drifting-sound</property>
                         <value>0</value>
                     </equals>
+                </enable>
+                <binding>
+                    <command>property-assign</command>
+                    <property>systems/drifting-sound</property>
+                    <value>1</value>
+                </binding>
+            </button>
+            <button>
+                <halign>middle</halign>
+                <legend>Disable</legend>
+                <pref-width>150</pref-width>
+                <pref-height>28</pref-height>
+                <enable>
                     <equals>
-                        <property>systems/welcome-message</property>
-                        <value>2</value>
-                    </equals>
-                    <equals>
-                        <property>systems/welcome-message</property>
-                        <value>3</value>
-                    </equals>
-                </or>
-            </enable>
-            <binding>
-                <command>property-assign</command>
-                <property>systems/welcome-message</property>
-                <value>1</value>
-            </binding>
-        </button>
-        <button>
-            <halign>left</halign>
-            <legend>Enable English</legend>
-            <pref-width>100</pref-width>
-            <pref-height>28</pref-height>
-            <enable>
-                <or>
-                    <equals>
-                        <property>systems/welcome-message</property>
-                        <value>0</value>
-                    </equals>
-                    <equals>
-                        <property>systems/welcome-message</property>
+                        <property>systems/drifting-sound</property>
                         <value>1</value>
                     </equals>
-                    <equals>
-                        <property>systems/welcome-message</property>
-                        <value>3</value>
-                    </equals>
-                </or>
-            </enable>
-            <binding>
-                <command>property-assign</command>
-                <property>systems/welcome-message</property>
-                <value>2</value>
-            </binding>
-        </button>
-        <button>
-            <halign>left</halign>
-            <legend>Enable Special</legend>
-            <pref-width>100</pref-width>
-            <pref-height>28</pref-height>
-            <enable>
-                <or>
-                    <equals>
-                        <property>systems/welcome-message</property>
-                        <value>0</value>
-                    </equals>
-                    <equals>
-                        <property>systems/welcome-message</property>
-                        <value>1</value>
-                    </equals>
-                    <equals>
-                        <property>systems/welcome-message</property>
-                        <value>2</value>
-                    </equals>
-                </or>
-            </enable>
-            <binding>
-                <command>property-assign</command>
-                <property>systems/welcome-message</property>
-                <value>3</value>
-            </binding>
-        </button>
+                </enable>
+                <binding>
+                    <command>property-assign</command>
+                    <property>systems/drifting-sound</property>
+                    <value>0</value>
+                </binding>
+            </button>
+        </group>
     </group>
     <hrule></hrule>
     <button>
