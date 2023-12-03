@@ -1,8 +1,22 @@
-#//Sidi Liang, 2020
-#// Docs WIP
+#// Sidi Liang, 2020
+
+#// This program is free software: you can redistribute it and/or modify
+#// it under the terms of the GNU General Public License as published by
+#// the Free Software Foundation, either version 2 of the License, or
+#// (at your option) any later version.
+
+#// This program is distributed in the hope that it will be useful,
+#// but WITHOUT ANY WARRANTY; without even the implied warranty of
+#// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#// GNU General Public License for more details.
+
+#// You should have received a copy of the GNU General Public License
+#// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #// Texture Selector for Followme EV
 #// Quick start:
-#// Aircraft liveries with dedicated selection dialog: (The same applies to any texture defined in PropertyList XML):
+#// Aircraft liveries with dedicated selection dialog: (The same behavior
+#// as the FG default livery selector, and applies to any texture defined in PropertyList XML):
 #//      var liveryPath = props.getNode("sim/aircraft-dir").getValue()~"/Models/Liveries/FollowmeEV/";
 #//      var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
 #//      Dialog:YourNameSpace.liverySelector.dialog.open()
@@ -15,7 +29,8 @@
 #//      var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
 #//
 #// Documentation:
-
+#//
+#// Class: TextureSelector
 #// Constructor: new()
 #// Creates a new Texture Selector instance.
 #//      new(name, path[, fileType[, enableNone[, customDialog[, customDialogBase[, customDialogPosition[, texturePropertyBase[, textureProp[, textureNameProp[, textureDataNode[, enableMultiplayer[, multiplayerProperty[, texturePrePath[, defaultValue]]]]]]]]]]]]);
@@ -34,11 +49,22 @@
 #// multiplayerProperty: The multiplayer property. Only be used if enableMultiplayer is set to 1. Default to be /sim/multiplay/generic/string[19] (The last string property in the MP Protocol).
 #// texturePrePath: The prefix path for texture files. Must end with '/'. Defaults to "".
 #// defaultValue: The default texture value to set. Defaults to "".
+#//
 #// Returns the TextureSelector instance.
+#//
 #// Example usage:
 #// var liveryPath = props.getNode("sim/aircraft-dir").getValue() ~ "/Models/Liveries/FollowmeEV/";
 #// var liverySelector = TextureSelector.new(name: "Livery-Selector", path: liveryPath, fileType: ".xml", textureProp: "texture-fuse", enableMultiplayer: 1, defaultValue: "Yellow(Default)");
 #// Dialog: YourNameSpace.liverySelector.dialog.open()
+
+#// Notes on Multiplayer: This texture selector implements the MP in a different
+#// way than the current default behavior used by FG aircrafts, which does
+#// polling on a livery property. Instead, a generic MP property is used to
+#// transmit the livery (or other textures) information. I'm personally not sure
+#// about the impact on performacne by doing this, but this will at least improve
+#// the user experience as any changes on the livery (or other textures) will be
+#// reflected over MP at real time. This is a big part of the reason I wrote
+#// this system instead of using the existing one.
 
 var TextureSelector = {
     new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
@@ -194,8 +220,11 @@ var TextureSelector = {
     },
 };
 
+#// Class: TextureSelectorDialog
 #// Constructor: new()
-#// Creates a new Texture Selector Dialog instance. Note that this is already handled by TextureSelector internally and there is no need to create it yourself.
+#// Creates a new Texture Selector Dialog instance.
+#// Note that this is already handled by TextureSelector internally and there
+#// is no need to create it yourself.
 #// dialogBase: The base node for the custom dialog.
 #// dialogFile: The path to the XML file that defines the dialog layout. Defaults to "Aircraft/followme_e-tron/gui/dialogs/livery-select.xml".
 #// defaultV: The default value for the texture selection. Defaults to an empty string.
