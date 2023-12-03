@@ -1,5 +1,5 @@
-# Follow me_e-tron    
-The Follow me e-tron or Follow me EV is a semi-fictional Follow-me vehicle based on Gijs's work, but an electric-powered version with Chinese characteristics. It was made just for fun.    
+# Follow Me EV (formerly Follow me e-tron)  
+The Follow Me EV or Follow me e-tron is a semi-fictional Follow-me vehicle based on Gijs's work, but an electric-powered version with Chinese characteristics. It was made just for fun.    
 See More: https://wiki.flightgear.org/Follow_me_e-tron
 
 ![Preview](https://github.com/WEIHAOLEE/followme_e-tron/raw/master/preview-etron.png)
@@ -16,7 +16,7 @@ Being the very first electric car in FlightGear, the Follow me e-tron features a
 * Parking radar that detects terrain and alerts driver.  
 * Working airbags.  
 * Experimental AEB system.  
-* Configurable interior with several fully remodeled interior and working switches.  
+* Configurable interior with several fully remodelled interior and working switches.  
 * Configurable instruments with several styles to choose from.  
 * Canvas glass display instrument for certain interior styles.  
 * Compositor light support.  
@@ -32,8 +32,8 @@ Being the very first electric car in FlightGear, the Follow me e-tron features a
 * Save / Resume function.  
 
 Authors:     
-Sidi Liang(FGPRC-0762): FDM, Engine, Nasal, Systems, Instruments, Models, Textures, Effects  
-Qiyuan Luo(FGPRC-0404): Instruments, Models, Textures
+Sidi Liang(FGPRC-0762, sidi.liang@gmail.com): FDM, Engine, Nasal, Systems, Instruments, Models, Textures, Effects  
+Qiyuan Luo(FGPRC-0404): Instruments, Models, Interiors, Textures  
 ValKmjolnir(FGPRC-0818): 'Auto Crash' System, Nasal  
 Weihao Lee(FGPRC-0405): Models, Textures, Effects   
 Marsdolphin(Mars006): Models, Lights, Instruments, Textures, Tutorials  
