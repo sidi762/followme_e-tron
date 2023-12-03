@@ -1,4 +1,4 @@
-#light-manager modified from IDG-A32X
+# Light-manager modified from A320-family
 
 # provides relative vectors from eye-point to aircraft lights
 # in east/north/up coordinates the renderer uses
