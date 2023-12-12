@@ -501,9 +501,9 @@ var calculateSpeed = func(){
     }
 
     if(calculated <= 120){
-        output = calculated * 3/2;
+        output = calculated * 1.5; #// 1.5: 3/2
     }else if(calculated > 120){
-        output = calculated * 3/4;
+        output = calculated * 0.75; #// 0.75: 3/4
     }
 
     props.getNode("systems/display-speed", 1).setValue(output);
@@ -513,11 +513,15 @@ var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
 var resetOnPosition = func(){
     var lat = props.getNode("/position/latitude-deg").getValue();
     var lon = props.getNode("/position/longitude-deg").getValue();
-    setprop("/sim/presets/carrier", "");
-    setprop("/sim/presets/parkpos", "");
-    setprop("/sim/presets/airport-id", "");
-    setprop("/sim/presets/runway", "");
-    setprop("/sim/presets/runway-requested", 0);
+    #// Clear the other presets to prevent issues
+    props.getNode("/sim/presets/carrier").setValue("");
+    props.getNode("/sim/presets/parkpos").setValue("");
+    props.getNode("/sim/presets/airport-id").setValue("");
+    props.getNode("/sim/presets/runway").setValue("");
+    props.getNode("/sim/presets/runway-requested").setValue(0);
+    props.getNode("/sim/presets/altitude-ft").setValue("-9999");
+    props.getNode("/sim/presets/airspeed-kt").setValue(0);
+    #// Set the latlon in the presets
     props.getNode("/sim/presets/latitude-deg").setValue(lat);
     props.getNode("/sim/presets/longitude-deg").setValue(lon);
     fgcommand("reposition");
