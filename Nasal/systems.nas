@@ -137,11 +137,7 @@ var Indicator = {
         return me.state;
     },
     isOff: func(){
-        if(me.state){
-            return 0;
-        }else{
-            return 1;
-        }
+        return !me.state;
     },
 };
 
@@ -222,11 +218,9 @@ var IndicatorController = {
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
-
             if(me.falseLight == 1){
                 me.setMode(3);
             }
-
         }else if(targetMode == 1){
             me.resumeLedMessage();
             me.rightIndicator.switchOn();
@@ -243,26 +237,18 @@ var IndicatorController = {
             me.leftIndicator.switchOn();
             me.mode = targetMode;
         }else if(targetMode == 4){
-
             me.resumeLedMessage();
             me.saveLedMessage();
-
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOff();
-
             me.setLedMessage(me.textureRight);
-
             me.mode = targetMode;
         }else if(targetMode == 5){
-
             me.resumeLedMessage();
             me.saveLedMessage();
-
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
-
             me.setLedMessage(me.textureLeft);
-
             me.mode = targetMode;
         }else if(targetMode == 6){
             me.mode = targetMode;
