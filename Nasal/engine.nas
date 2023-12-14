@@ -14,11 +14,6 @@
 #// You should have received a copy of the GNU General Public License
 #// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#//Bug log:
-#//Switching between D and R might fail?
-#//Goes crazy when attampt to drive with brakes not released
-#//Electrical system error message
-#//Drain battary too fast?
 io.include("library.nas");
 io.include("lib_elec.nas");
 var N2LBS = 0.2248089;
