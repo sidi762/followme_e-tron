@@ -379,32 +379,44 @@
 		</key>
         <key>
 			<name>e</name>
-			<desc>Toggle auto-pilot system</desc>
+			<desc>Toggle the 'Auto Crash' auto-pilot system</desc>
 		</key>
         <key>
 			<name>c</name>
-			<desc>Toggle auto-cruise system</desc>
+			<desc>Toggle the 'Auto Speeding' auto-cruise system</desc>
 		</key>
         <key>
 			<name>r</name>
-			<desc>Toggle parking radar system</desc>
+			<desc>Toggle parking radar</desc>
 		</key>
 		<!-- Start text -->
 		<text>
-        Follow me e-tron Brought to you by FGPRC.
+        Follow me EV, brought to you by FGPRC.
 
-		You can select the message to be displayed on the bar, through the "Follow Me EV > Select message" menu.
+		You can customize the displayed message on the bar through the "Follow Me EV > Select message" menu.
+		You can also select a license plate in Chinese style and choose from various liveries to customize the appearance of your vehicle.
+		There are several well designed and modeled interior styles to choose from. Some of them are equipped with screen display,
+		so you should select 'None' for the speedometer and battery gauge.
 		For more options, see "Follow Me EV > Show Options" menu.
 
-        Instructions:
-        Auto Crash system: An auto pilot that keeps the vehicle on the road. It's not 100% reliable and make sure you keep monitoring the road!
-        Auto Speed system: Keeps the vehicle on a certain speed.
-        Auto Hold system: This realisticlly implemented auto hold system will prevent the vehicle from unintented moving.
-        It will turn off switch to parking brake in certain conditions, as the real one does.
-        Only avilable in Luxury interior style and the switch is next to the parking brake.
+		There are three driving mode available: Performance, Economy and Low-Power. You can switch between them in the Vehicle Options menu,
+		or using buttons in some of the interiors.
+
+		By default the simple steering mode is used. Press 'a' or 'd' to steer to a fixed angle.
+		Do note that this can cause massive understeering even when driving non-aggressively.
+		You can also try out the realistic steering mode in Vehicle Options menu, which may or may not help.
+
+        Instructions for certain driving-assistance systems:
+        - 'Auto Crash' system: An autopilot that keeps the vehicle on the road. It's not 100% reliable, so always monitor the road. Does not work on OSM2City roads.
+		- 'Auto Speeding' system: Maintains the vehicle at a certain speed. Automatically deactivated when driver steps on either the accerlate or brake pedal.
+        - Auto Hold system: Realistically implemented auto-hold system prevents unintended movement.
+          It will turn itself off and enables the parking brake in certain conditions, as the real one does.
+          Not avilable in some of the legacy interior style. The switch is often next to the parking brake, depending on different interior style.
 
         Safety system:
-        AEB: Automatically brakes the vehicle to prevent crashes. Not very reliable, disabled as default.
+		- Airbags: Front and/or side airbags will be activated when crash is detected. Can be reinstalled or disabled in Vehicle Configuration menu.
+		  Note that you must reinitialize the safety system to enable the airbags again once they are released.
+        - AEB (Automatic Emergency Braking): Automatically brakes the vehicle to prevent crashes. Not very reliable, disabled by default.
         Note: The entire safety system will be disabled when resetting airbags. Reinitialize the system to make them work again.
 
         Drive safe!
