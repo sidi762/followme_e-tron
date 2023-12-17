@@ -92,89 +92,76 @@
 		<!-- Legacy -->
 	    <!-- Start G4 Tour splash -->
 
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/0.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/1.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/2.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/3.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/4.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/5.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/6.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/7.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/8.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/9.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/10.jpg</path>
-            </preview>
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/11.jpg</path>
-            </preview>
-	        <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/G4_Tour/12.jpg</path>
-            </preview>
-            <preview>
-                   <type>exterior</type>
-                   <splash type="bool">true</splash>
-                   <path>Splash/G4_Tour/13.jpg</path>
-            </preview>
-
-		    <preview>
-	                <type>exterior</type>
-	                <splash type="bool">true</splash>
-	                <path>Splash/Legacy/Sunrise/21.jpg</path>
-	            </preview>
-
-		    <preview>
-	                <type>exterior</type>
-	                <splash type="bool">true</splash>
-	                <path>Splash/Legacy/Sunrise/22.jpg</path>
-	        </preview>
-
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/0.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/1.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/2.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/3.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/4.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/5.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/6.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/7.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/8.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/9.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/10.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/11.jpg</path>
+        </preview>
+        <preview>
+            <type>exterior</type>
+            <splash type="bool">true</splash>
+            <path>Splash/G4_Tour/12.jpg</path>
+        </preview>
+        <preview>
+               <type>exterior</type>
+               <splash type="bool">true</splash>
+               <path>Splash/G4_Tour/13.jpg</path>
+        </preview>
 
     </previews>
 	<!-- Splash ends here -->
