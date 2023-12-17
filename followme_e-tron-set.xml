@@ -23,7 +23,73 @@
 
     <previews>
 	    <!-- Splash starts here -->
+		<preview>
+			<type>interior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/1.jpg</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/2.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/3.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/4.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/5.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/6.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/7.png</path>
+		</preview>
+		<preview>
+			<type>interior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/8.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/9.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/10.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/11.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/12.png</path>
+		</preview>
+		<preview>
+			<type>exterior</type>
+			<splash type="bool">true</splash>
+			<path>Splash/13.png</path>
+		</preview>
 
+		<!-- Legacy -->
 	    <!-- Start G4 Tour splash -->
 
             <preview>
@@ -97,140 +163,18 @@
                    <path>Splash/G4_Tour/13.jpg</path>
             </preview>
 
-			<!-- Start sunrise splash -->
-
 		    <preview>
 	                <type>exterior</type>
 	                <splash type="bool">true</splash>
-	                <path>Splash/Sunrise/21.jpg</path>
+	                <path>Splash/Legacy/Sunrise/21.jpg</path>
 	            </preview>
 
 		    <preview>
 	                <type>exterior</type>
 	                <splash type="bool">true</splash>
-	                <path>Splash/Sunrise/22.jpg</path>
+	                <path>Splash/Legacy/Sunrise/22.jpg</path>
 	        </preview>
 
-			<!-- Legacy -->
-			<preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/01.png</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/02.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/03.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/04.png</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/05.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/06.jpg</path>
-            </preview>
-
-            <preview>
-                <type>interior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/07.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/08.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/09.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/10.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/11.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/12.png</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/13.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/14.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/15.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/16.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/17.jpg</path>
-            </preview>
-
-            <preview>
-                <type>interior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/18.jpg</path>
-            </preview>
-
-            <preview>
-                <type>interior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/19.jpg</path>
-            </preview>
-
-            <preview>
-                <type>exterior</type>
-                <splash type="bool">true</splash>
-                <path>Splash/Legacy/20.jpg</path>
-            </preview>
 
     </previews>
 	<!-- Splash ends here -->
