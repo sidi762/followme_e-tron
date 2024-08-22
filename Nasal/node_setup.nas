@@ -89,6 +89,7 @@ vInfo.systems.speedometer = vInfo.systems.getNode("speedometer", 1);
 vInfo.systems.speedometer.type = vInfo.systems.speedometer.getNode("type", 1);
 vInfo.systems.batteryGauge = vInfo.systems.getNode("battery-gauge", 1);
 vInfo.systems.batteryGauge.type = vInfo.systems.batteryGauge.getNode("type", 1);
+vInfo.systems.driftSoundEnabled = vInfo.systems.getNode("drifting-sound", 1);
 
 #//Electrical
 vInfo.systems.electrical = props.getNode("/systems/electrical/", 1);
@@ -126,6 +127,8 @@ vInfo.systems.safety.isAebOn.setValue("0");
 
 vInfo.systems.isAutoholdEnabled.setValue("0");
 vInfo.systems.isAutoholdWorking.setValue("0");
+
+vInfo.systems.driftSoundEnabled.setValue(0);
 
 #//Doors
 vInfo.controls.doors.FL.setValue(0);

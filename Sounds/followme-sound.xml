@@ -112,6 +112,10 @@
 						<property>/velocities/groundspeed-kt</property>
 						<value>5</value>
 					</greater-than>
+					<equals>
+						<property>systems/drifting-sound</property>
+						<value>1</value>
+					</equals>
                 </and>
             </condition>
             <position>
@@ -148,6 +152,10 @@
 						<property>/velocities/groundspeed-kt</property>
 						<value>5</value>
 					</greater-than>
+                    <equals>
+						<property>systems/drifting-sound</property>
+						<value>1</value>
+					</equals>
                 </and>
             </condition>
             <position>
@@ -184,6 +192,10 @@
 						<property>/velocities/groundspeed-kt</property>
 						<value>5</value>
 					</greater-than>
+					<equals>
+						<property>systems/drifting-sound</property>
+						<value>1</value>
+					</equals>
                 </and>
             </condition>
             <position>
@@ -220,6 +232,10 @@
 						<property>/velocities/groundspeed-kt</property>
 						<value>5</value>
 					</greater-than>
+					<equals>
+						<property>systems/drifting-sound</property>
+						<value>1</value>
+					</equals>                    
                 </and>
             </condition>
             <position>
