@@ -66,7 +66,7 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5]
 #//Wiper
 var wiperMode = 0;
 var wiperSwitchNode = props.globals.getNode("/controls/wiper/frontwiper_switch", 1);
-var wiper = aircraft.light.new( "/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
+var wiper = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
 
 var wiperStop = func(){
     wiperSwitchNode.setValue(0);
@@ -315,54 +315,72 @@ var indicatorController = IndicatorController.new();
 var BrakeController = {
     new: func() { return { parents:[BrakeController]}; },
     leftBrakeNode: props.getNode("/controls/gear/brake-left",1),
-    rightBrakeNode: props.getNode("/controls/gear/brake-right",1),
+    rightBrakeNode: props.getNode("/controls/gear/brake-right",1), # These are the rear brakes since the last FDM update
     parkingBrakeNode: props.getNode("/controls/gear/brake-parking",1),
 
     applyingFeetBrake: 0,
     handBrakeIsOn: 0,
+    manualHandBrakeIsPulled: 0,
     leftBrakeValue: 0,
     rightBrakeValue: 0,
+    
+    #//Decides how much brakings to be applied, can be adjusted via GUI and defaults to be 0.8
+    keyboardBrakeIntensity: Variable.new("keyboardBrakeIntensity", 0.8, 
+                                          "Braking Intensity when using s key", 
+                                          0, 1, 1, 
+                                          "/systems/BrakeController/keyboardBrakeIntensity"), 
 
-    keyboardBrakeIntensity: Variable.new("keyboardBrakeIntensity", 0.8, "Braking Intensity when using s key", 0, 1, 1, "/systems/BrakeController/keyboardBrakeIntensity"), #//Decides how much brakings to be applied, can be adjusted via GUI and defaults to be 0.8
-
-    applyLeftBrake: func(value){
-        #For internal use
+    _applyLeftBrake: func(value){
+        # For internal use
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
     },
-    applyRightBrake: func(value){
-        #For internal use
+    _applyRightBrake: func(value){
+        # For internal use
         me.rightBrakeNode.setValue(value);
         me.rightBrakeValue = value;
     },
-    applyBrakes: func(value){
-        #For internal use
+    _applyBrakes: func(value){
+        # For internal use
         me.rightBrakeNode.setValue(value);
         me.rightBrakeValue = value;
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
     },
     applyFeetBrakes: func(value){
-        #For feet brakes
+        # For feet brakes
         if(value) me.applyingFeetBrake = 1;
         else me.applyingFeetBrake = 0;
         me.rightBrakeNode.setValue(value);
         me.rightBrakeValue = value;
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
+        # Double blink when applying full brakes, should look for a better solution
         if(value == 1) settimer(func{if(me.applyingFeetBrake) safety.emergencyMode();}, 0.6);
     },
 
-    activeHandBrake: func(){
-        #for internal use
+    manualHandBrakePull: func(){
+        me.manualHandBrakeIsPulled = 1;
+        # Right Brakes are the rear brakes since the last FDM update
+        me._applyRightBrake(1); 
+    },
+
+    manualHandBrakeRelease: func(){
+        me.manualHandBrakeIsPulled = 0;
+        # Right Brakes are the rear brakes since the last FDM update
+        me._applyRightBrake(0);
+    },
+
+    _activeHandBrake: func(){
+        # for internal use
         me.handBrakeIsOn = 1;
         if(isInternalView()) playAudio("handbrake_on.wav");
         settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(1);
         }, 0.5);
     },
-    deactiveHandBrake: func(){
-        #for internal use
+    _deactiveHandBrake: func(){
+        # for internal use
         me.handBrakeIsOn = 0;
         if(isInternalView()) playAudio("handbrake_off.wav");
         settimer(func(){ #Delay for 0.5 seconds
@@ -370,19 +388,19 @@ var BrakeController = {
         }, 0.5);
     },
     enableHandBrake: func(){
-        #enable handbrake from button
+        # enable handbrake from button
         if(!me.handBrakeIsOn){
-            me.activeHandBrake();
+            me._activeHandBrake();
         }
     },
     disableHandBrake: func(){
-        #disable handbrake from button
+        # disable handbrake from button
         if(me.handBrakeIsOn){
-            me.deactiveHandBrake();
+            me._deactiveHandBrake();
         }
     },
     toggleHandBrake: func(){
-        #Toggle handbrake from button
+        # Toggle handbrake from button
         if(isInternalView()) playAudio("electric_handbrake.wav");
         if(!me.handBrakeIsOn){
             me.enableHandBrake();
@@ -391,8 +409,8 @@ var BrakeController = {
         }
     },
     activeEmergencyBrake: func(){
-        me.applyLeftBrake(1);
-        me.applyRightBrake(1);
+        me._applyLeftBrake(1);
+        me._applyRightBrake(1);
         me.enableHandBrake();
         safety.emergencyMode();
     },
@@ -404,27 +422,17 @@ var BrakeController = {
         if(vInfo.getSpeedKMH() > 10 and safety.emergencyModeState) safety.disableEmergencyMode();
     },
     releaseBrake: func(){
-        me.applyLeftBrake(0);
-        me.applyRightBrake(0);
+        me._applyLeftBrake(0);
+        me._applyRightBrake(0);
     },
     releaseAllBrakes: func(){
-        me.applyLeftBrake(0);
-        me.applyRightBrake(0);
+        me._applyLeftBrake(0);
+        me._applyRightBrake(0);
         me.disableHandBrake();
     },
 };
 
 var brakeController = BrakeController.new();
-
-var toggleHandBrake = func(){
-    #//Depreciated as BrakeController has it internally now
-    if(isInternalView()) playAudio("electric_handbrake.wav");
-    if(!brakeController.handBrakeIsOn){
-        brakeController.enableHandBrake();
-    }else{
-        brakeController.disableHandBrake();
-    }
-}
 
 var chargeBatterySec = func(){
     #//var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
@@ -626,7 +634,7 @@ var Safety = {
     aebActive: func(){
         me.aebActivated = 1;
         #engine.engine_1.engineSwitch.switchDisconnect();
-        brakeController.applyBrakes(0.8);#//Pre brake
+        brakeController._applyBrakes(0.8);#//Pre brake
         me.throttleNode.setValue(0);
         me.aebWarning();
         me.aebStateProp.setValue(1);

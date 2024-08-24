@@ -298,6 +298,21 @@
         			</binding>
                 </mod-up>
             </key>
+            <key n="98">
+                <name>b</name>
+                <desc>pull_manual_handbreak</desc>
+                <repeatable>false</repeatable>
+                <binding>
+                    <command>nasal</command>
+                    <script>followme.brakeController.manualHandBrakePull();</script>
+                </binding>
+                <mod-up>
+                    <binding>
+                        <command>nasal</command>
+                        <script>followme.brakeController.manualHandBrakeRelease();</script>
+                    </binding>
+                </mod-up>
+            </key>
             <key n="99">
                 <name>c</name>
                 <desc>toggleSpeedHold</desc>
