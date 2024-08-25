@@ -20,7 +20,7 @@ var SmartInstruments = {
             parents:[SmartInstruments],
             instrumentCanvas: canvas.new({
               "name": "smartInstruments",   # The name is optional but allow for easier identification
-              "size": [1024, 1024], # Size of the underlying texture (should be a power of 2, required) [Resolution]
+              "size": [8192, 4096], # Size of the underlying texture (should be a power of 2, required) [Resolution]
               "view": [1509, 736],  # Virtual resolution (Defines the coordinate system of the canvas [Dimensions]
                                     # which will be stretched the size of the texture, required)
               "mipmapping": 0       # Enable mipmapping (optional)
@@ -34,6 +34,7 @@ var SmartInstruments = {
         m.group = m.instrumentCanvas.createGroup();#//Main group
         m.signGroup = m.instrumentCanvas.createGroup();#//sign group
         m.welcomeGroup = m.instrumentCanvas.createGroup();
+        m.gaugeGroup = m.instrumentCanvas.createGroup();#//gauge group
         m.iconGroup = m.instrumentCanvas.createGroup(); #//group for icons
         m.mapGroup = m.instrumentCanvas.createGroup(); #//map group
         m.instrumentCanvas.addPlacement({"node": placement});
@@ -42,6 +43,15 @@ var SmartInstruments = {
                 m.signGroup,
                 "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard.svg",
         );
+        m.airbagSign = m.signGroup.getElementById("airbag_sign");
+        m.handBrakeSign = m.signGroup.getElementById("handbrake_sign");
+        m.autoholdSign = m.signGroup.getElementById("autohold_sign");
+        m.headlightSign = m.signGroup.getElementById("headlight_sign");
+        m.positionLightSign = m.signGroup.getElementById("positionlight_sign");
+        m.highbeamSign = m.signGroup.getElementById("highbeam_sign");
+        m.foglightSign = m.signGroup.getElementById("foglight_sign");
+        m.foglightSign.hide(); #// Not implemented yet
+
         m.signGroup.hide();
         #Background
         m.backgroundPath = "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard0.png";
@@ -60,6 +70,11 @@ var SmartInstruments = {
                              .setFile(m.infoImagePath[m.infoImageIndex])
                              .setTranslation(0, 0)
                              .setSize(1509, 736);
+        m.chargingImage = m.group.createChild("image")
+                        .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard_charge.png")
+                        .setTranslation(0, 0)
+                        .setSize(1509, 736)
+                        .hide();
         m.doorsNotShutImage = m.group.createChild("image")
                              .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door.png")
                              .setTranslation(0, 0)
@@ -109,7 +124,7 @@ var SmartInstruments = {
                                     .setText("WARNING MESSAGE")
                                     .hide();
         #//speedometer
-        m.speedometer = m.group.createChild("text", "optional-id-for element")
+        m.speedometer = m.gaugeGroup.createChild("text", "optional-id-for element")
                                .setTranslation(1205, 380)      # The origin is in the top left corner
                                .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                                .setFont("trueno-font/Trueno-wml2.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
@@ -118,7 +133,7 @@ var SmartInstruments = {
                                .setText("--");
 
         #//power
-        m.power = m.group.createChild("text", "optional-id-for element")
+        m.power = m.gaugeGroup.createChild("text", "optional-id-for element")
                          .setTranslation(295, 380)      # The origin is in the top left corner
                          .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                          .setFont("trueno-font/Trueno-wml2.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
@@ -126,7 +141,7 @@ var SmartInstruments = {
                          .setColor(1,1,1)             # Text color
                          .setText("--");
         #//Battery remaining
-        m.batteryRemainingDisplay = m.group.createChild("text", "optional-id-for element")
+        m.batteryRemainingDisplay = m.gaugeGroup.createChild("text", "optional-id-for element")
                          .setTranslation(312, 542)      # The origin is in the top left corner
                          .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                          .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
@@ -135,7 +150,7 @@ var SmartInstruments = {
                          .setText("--");
 
         #//Drive Mode
-        m.driveMode = m.group.createChild("text", "optional-id-for element")
+        m.driveMode = m.gaugeGroup.createChild("text", "optional-id-for element")
                              .setTranslation(780, 628)      # The origin is in the top left corner
                              .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                              .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
@@ -143,7 +158,7 @@ var SmartInstruments = {
                              .setColor(1,1,1)             # Text color
                              .setText("Performance");
         #//Gear
-        m.gearDisplay = m.group.createChild("text", "optional-id-for element")
+        m.gearDisplay = m.gaugeGroup.createChild("text", "optional-id-for element")
                                .setTranslation(940, 620)      # The origin is in the top left corner
                                .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                                .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
@@ -151,7 +166,7 @@ var SmartInstruments = {
                                .setColor(1,1,1)             # Text color
                                .setText("D");
         #//Temperature
-        m.tempDisplay = m.group.createChild("text", "optional-id-for element")
+        m.tempDisplay = m.gaugeGroup.createChild("text", "optional-id-for element")
                                .setTranslation(420, 220)      # The origin is in the top left corner
                                .setAlignment("left-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
                                .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
@@ -242,6 +257,41 @@ var SmartInstruments = {
         if(minute < 10) minute = "0"~minute;
         me.timeDisplay.updateText(hour~":"~minute);
 
+        #//Signs
+        if(!followme.safety.isOn){
+            settimer(func me.airbagSign.show(), 1);
+        }else{
+            settimer(func me.airbagSign.hide(), 1);
+        }
+
+        if(followme.brakeController.handBrakeIsOn()){
+            me.handBrakeSign.show();
+        }else{
+            me.handBrakeSign.hide();
+        }
+
+        if(me.information.systems.isAutoholdWorking.getValue()){
+            me.autoholdSign.show();
+        }else{
+            me.autoholdSign.hide();
+        }
+
+        if(me.information.lighting.headlight.getValue() == 1){
+            me.positionLightSign.show();
+        }else if(me.information.lighting.headlight.getValue() == 2){
+            me.positionLightSign.show();
+            me.headlightSign.show();
+        }else if(me.information.lighting.headlight.getValue() == 0){
+            me.positionLightSign.hide();
+            me.headlightSign.hide();
+        }
+
+        if(me.information.lighting.highBeam.getValue()){
+            me.highbeamSign.show();
+        }else{
+            me.highbeamSign.hide();
+        }
+
         #//Check for doors
         doors = [followme.frontleft_door, followme.frontright_door, followme.rearleft_door, followme.rearright_door, followme.charging_cap];
         me.isDoorsNotShut = 0;
@@ -266,6 +316,19 @@ var SmartInstruments = {
             if(!me.isCenterScreenInfoShown) me.infoImage.show();
         }
 
+
+        #//Charging page
+        #//Needs refactoring
+        # if(me.information.electrical.isRecharging.getValue()){
+        #     me.infoImage.hide();
+        #     me.doorsNotShutImage.hide();
+        #     me.isCenterScreenInfoShown = 0;
+        #     me.chargingImage.show();
+        # }else{
+        #     me.chargingImage.hide();
+        #     if(!me.isCenterScreenInfoShown) me.infoImage.show();
+        # }
+
         #//Warning MESSAGE
         if(me.showingWarningMessage){
             if(math.mod(me.loopCount, 10) < 5){
@@ -282,12 +345,24 @@ var SmartInstruments = {
     init: func(){
         if(me.updateTimer == nil) me.updateTimer = maketimer(0.1, func me.update());
         me.group.hide();
+        me.gaugeGroup.hide();
+        me.infoImage.hide();
         me.welcomeGroup.hide();
-        me.iconGroup.hide();
         me.initialized = 1;
     },
+    selfTest: func(){
+        me.airbagSign.show();
+        me.handBrakeSign.show();
+        me.autoholdSign.show();
+        me.headlightSign.show();
+        me.positionLightSign.show();
+        me.highbeamSign.show();
+    },
     startUp:func(){
-        if(!me.showingWarningMessage) me.welcomeGroup.show();
+        # if(!me.showingWarningMessage) me.welcomeGroup.show();
+        me.selfTest();
+        me.group.show();
+        me.signGroup.show();
         var startScreenTimer = maketimer(1, func me.startSequence());
         startScreenTimer.singleShot = 1;
         startScreenTimer.start();
@@ -295,6 +370,8 @@ var SmartInstruments = {
     startSequence: func(){
         me.group.show();
         me.iconGroup.show();
+        me.gaugeGroup.show();
+        me.infoImage.show();
         me.speedometer.enableUpdate();
         me.power.enableUpdate();
         me.batteryRemainingDisplay.enableUpdate();
@@ -305,14 +382,14 @@ var SmartInstruments = {
 
         if(me.startupSound and me.startupSoundIsEnabled) followme.playAudio(me.startupSound, 1, me.startupSoundPath);
 
-        var timer2 = maketimer(2, func(){
-            me.welcomeGroup.hide();
-        });
-        timer2.singleShot = 1;
-        timer2.start();
+        # var selfTestTimer = maketimer(2, func(){
+        #     me.welcomeGroup.hide();
+        # });
+        # selfTestTimer.singleShot = 1;
+        # selfTestTimer.start();
 
         if(!me.initialized) me.init();
-        me.updateTimer.start();
+        settimer(func me.updateTimer.start(), 0.5);
     },
     shutDown:func(){
         if(me.updateTimer != nil) me.updateTimer.stop();
@@ -320,6 +397,8 @@ var SmartInstruments = {
         me.welcomeGroup.hide();
         me.iconGroup.hide();
         me.signGroup.hide();
+        me.infoImage.hide();
+        me.gaugeGroup.hide();
     },
     showWarningMessage:func(msg){
         me.warningText.enableUpdate();

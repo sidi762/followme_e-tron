@@ -72,6 +72,7 @@ vInfo.controls.doors.charging_cap = vInfo.controls.doors.getNode("charging_cap",
 
 #//Shortcut for Lignting
 vInfo.lighting = vInfo.controls.lighting;
+vInfo.lighting.headlight = vInfo.lighting.getNode("headlight", 1);
 vInfo.lighting.reverseIndicator = vInfo.lighting.getNode("reverse_indicator", 1);
 vInfo.lighting.highBeam = vInfo.lighting.getNode("highBeam", 1);
 vInfo.lighting.indicator = vInfo.lighting.getNode("indicator", 1);
@@ -97,6 +98,7 @@ vInfo.systems.electrical.etron = vInfo.systems.electrical.getNode("e-tron", 1);
 vInfo.electrical = vInfo.systems.electrical.etron; #Shortcut
 vInfo.electrical.batteryRemainingPercent = vInfo.electrical.getNode("battery-remaining-percent", 1);
 vInfo.electrical.batteryRemainingPercentFloat = vInfo.electrical.getNode("battery-remaining-percent-float", 1);
+vInfo.electrical.isRecharging = props.globals.getNode("controls/is-recharging", 1);
 
 #//Safety
 vInfo.systems.safety = vInfo.systems.getNode("safety", 1);

@@ -9,7 +9,8 @@ var cSource = VoltageSource.new(0.0136, 405, kWh2kWs(90), "Battery");#//Battery 
 var circuit_1 = Circuit.new(cSource);#//Engine circuit
 
 var cSource_small = VoltageSource.new(0.0136, 12, kWh2kWs(0.72), "12V Battery");#//Battery for other systems, 60Ah, 12V
-cSource_small.resetRemainingToZero();
+var circuit_low = Circuit.new(cSource_small);#//Low voltage circuit
+# cSource_small.resetRemainingToZero();
 #circuit_1.addNewSeriesWithUnitToParallel(cSource_small);
 
 

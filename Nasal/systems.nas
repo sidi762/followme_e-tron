@@ -319,8 +319,8 @@ var BrakeController = {
     parkingBrakeNode: props.getNode("/controls/gear/brake-parking",1),
 
     applyingFeetBrake: 0,
-    handBrakeIsOn: 0,
-    manualHandBrakeIsPulled: 0,
+    _handBrakeIsOn: 0,
+    _manualHandBrakeIsPulled: 0,
     leftBrakeValue: 0,
     rightBrakeValue: 0,
     
@@ -347,6 +347,9 @@ var BrakeController = {
         me.leftBrakeNode.setValue(value);
         me.leftBrakeValue = value;
     },
+    applyBrakes: func(value){
+        me._applyBrakes(value);
+    },
     applyFeetBrakes: func(value){
         # For feet brakes
         if(value) me.applyingFeetBrake = 1;
@@ -360,20 +363,20 @@ var BrakeController = {
     },
 
     manualHandBrakePull: func(){
-        me.manualHandBrakeIsPulled = 1;
+        me._manualHandBrakeIsPulled = 1;
         # Right Brakes are the rear brakes since the last FDM update
         me._applyRightBrake(1); 
     },
 
     manualHandBrakeRelease: func(){
-        me.manualHandBrakeIsPulled = 0;
+        me._manualHandBrakeIsPulled = 0;
         # Right Brakes are the rear brakes since the last FDM update
         me._applyRightBrake(0);
     },
 
     _activeHandBrake: func(){
         # for internal use
-        me.handBrakeIsOn = 1;
+        me._handBrakeIsOn = 1;
         if(isInternalView()) playAudio("handbrake_on.wav");
         settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(1);
@@ -381,7 +384,7 @@ var BrakeController = {
     },
     _deactiveHandBrake: func(){
         # for internal use
-        me.handBrakeIsOn = 0;
+        me._handBrakeIsOn = 0;
         if(isInternalView()) playAudio("handbrake_off.wav");
         settimer(func(){ #Delay for 0.5 seconds
             me.parkingBrakeNode.setValue(0);
@@ -389,20 +392,20 @@ var BrakeController = {
     },
     enableHandBrake: func(){
         # enable handbrake from button
-        if(!me.handBrakeIsOn){
+        if(!me._handBrakeIsOn){
             me._activeHandBrake();
         }
     },
     disableHandBrake: func(){
         # disable handbrake from button
-        if(me.handBrakeIsOn){
+        if(me._handBrakeIsOn){
             me._deactiveHandBrake();
         }
     },
     toggleHandBrake: func(){
         # Toggle handbrake from button
         if(isInternalView()) playAudio("electric_handbrake.wav");
-        if(!me.handBrakeIsOn){
+        if(!me._handBrakeIsOn){
             me.enableHandBrake();
         }else{
             me.disableHandBrake();
@@ -429,6 +432,12 @@ var BrakeController = {
         me._applyLeftBrake(0);
         me._applyRightBrake(0);
         me.disableHandBrake();
+    },
+    handBrakeIsOn: func(){
+        return me._handBrakeIsOn;
+    },
+    manualHandBrakeIsPulled: func(){
+        return me._manualHandBrakeIsPulled;
     },
 };
 
