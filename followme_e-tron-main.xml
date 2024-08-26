@@ -445,7 +445,8 @@
                 <repeatable>false</repeatable>
     			<binding>
     				<command>nasal</command>
-                    <script>followme.toggleWiper();</script>
+                    <!-- <script>followme.toggleWiper();</script> -->
+                    <script>followme.frontWiper.toggleMode();</script>
     			</binding>
             </key>
             <key n="66">

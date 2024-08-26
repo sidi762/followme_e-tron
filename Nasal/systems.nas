@@ -63,43 +63,104 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-left", [0.5, 0.5],
 beacon_switch = props.globals.getNode("controls/switches/indicator-right", 2);
 var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5], "/controls/lighting/indicator-right");
 
-#//Wiper
-var wiperMode = 0;
-var wiperSwitchNode = props.globals.getNode("/controls/wiper/frontwiper_switch", 1);
-var wiper = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
+# //Wiper
+var wiper = {
+    # var wiperMode = 0;
+    # var wiperSwitchNode = props.globals.getNode("/controls/wiper/frontwiper_switch", 1);
+    # var wiper = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
+    WIPER_MODE : {
+        STOP: 0,
+        FAST: 1,
+        MID: 2,
+        SLOW: 3,
+    },
+    mode: 0,
+    controller : nil,
+    pattern: [1, 1],
+    switchNode: nil,
+    
+    new : func(controllerNode){
+        var m = {parents:[wiper]};
+        me.switchNode = props.globals.getNode("/controls/wiper/frontwiper/switch", 1);
+        me.controller = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], me.switchNode);
+        me.controller.stateN = me.controller.node.initNode("state", 0, "DOUBLE");
+        props.getNode("/",1).setValue("/controls/wiper/frontwiper/switch", 0);
+        # print("test passed");
+        return m;
+    },
+    Stop : func(){
+        me.switchNode.setValue(0);
+        mode = me.WIPER_MODE.STOP;
+    },
+    Fast : func(){
+        me.controller.pattern = [0.5, 0.5];
+        me.switchNode.setValue(1);
+        me.mode = me.WIPER_MODE.FAST;
+    },
+    Mid : func(){
+        me.controller.pattern = [0.7, 0.7];
+        me.switchNode.setValue(1);
+        me.mode = me.WIPER_MODE.MID;
+    },
+    Slow : func(){
+        me.controller.pattern = [0.7, 2];
+        me.switchNode.setValue(1);
+        me.mode = me.WIPER_MODE.SLOW;
+    },
+    toggleMode : func(){
+        if(me.mode == me.WIPER_MODE.STOP){
+            me.Slow();
+        }else if(me.mode == me.WIPER_MODE.SLOW){
+            me.Mid();
+        }else if(me.mode == me.WIPER_MODE.MID){
+            me.Fast();
+        }else if(me.mode == me.WIPER_MODE.FAST){
+            me.Stop();
+        }
+    },
 
-var wiperStop = func(){
-    wiperSwitchNode.setValue(0);
-    wiperMode = 0;
-}
-var wiperFast = func(){
-    wiper.pattern = [0.5, 0.5];
-    wiperSwitchNode.setValue(1);
-    wiperMode = 1;
-}
-var wiperMid = func(){
-    wiper.pattern = [0.7, 0.7];
-    wiperSwitchNode.setValue(1);
-    wiperMode = 2;
-}
-var wiperSlow = func(){
-    wiper.pattern = [0.7, 2];
-    wiperSwitchNode.setValue(1);
-    wiperMode = 3;
-}
-var toggleWiper = func(){
-    if(wiperMode == 0){
-        wiperSlow();
-    }else if(wiperMode == 1){
-        wiperStop();
-    }else if(wiperMode == 2){
-        wiperFast();
-    }else if(wiperMode == 3){
-        wiperMid();
-    }
-}
-wiper.stateN = wiper.node.initNode("state", 0, "DOUBLE");
-props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
+};
+frontWiper = wiper.new("/controls/wiper/frontwiper");
+
+# var wiperMode = 0;
+# var wiperSwitchNode = props.globals.getNode("/controls/wiper/frontwiper_switch", 1);
+# var wiper = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
+
+# var wiperStop = func(){
+#     wiperSwitchNode.setValue(0);
+#     wiperMode = 0;
+# }
+# var wiperFast = func(){
+#     wiper.pattern = [0.5, 0.5];
+#     wiperSwitchNode.setValue(1);
+#     wiperMode = 1;
+# }
+# var wiperMid = func(){
+#     wiper.pattern = [0.7, 0.7];
+#     wiperSwitchNode.setValue(1);
+#     wiperMode = 2;
+# }
+# var wiperSlow = func(){
+#     wiper.pattern = [0.7, 2];
+#     wiperSwitchNode.setValue(1);
+#     wiperMode = 3;
+# }
+# var toggleWiper = func(){
+#     if(wiperMode == 0){
+#         wiperSlow();
+#     }else if(wiperMode == 1){
+#         wiperStop();
+#     }else if(wiperMode == 2){
+#         wiperFast();
+#     }else if(wiperMode == 3){
+#         wiperMid();
+#     }
+# }
+# wiper.stateN = wiper.node.initNode("state", 0, "DOUBLE");
+# props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
+
+
+
 #var Led = {
 #
 #    new: func() { return { parents:[Led] },
