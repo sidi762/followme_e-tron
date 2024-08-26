@@ -158,6 +158,16 @@ var IndicatorController = {
     #
     #
 
+    INDICATOR_MODE : {
+        off: 0,
+        right_without_led: 1,
+        left_without_led: 2,
+        both_without_led: 3,
+        right_with_led: 4,
+        left_with_led: 5,
+        both_with_led: 6
+    },
+
     new: func() { return { parents:[IndicatorController]}; },
 
     leftIndicator : Indicator.new("left"),
@@ -213,44 +223,44 @@ var IndicatorController = {
         return me.mode;
     },
     setMode: func(targetMode){
-        if(targetMode == 0){
+        if(targetMode == me.INDICATOR_MODE.off){
             me.resumeLedMessage();
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
             if(me.falseLight == 1){
-                me.setMode(3);
+                me.setMode(me.INDICATOR_MODE.both_without_led);
             }
-        }else if(targetMode == 1){
+        }else if(targetMode == me.INDICATOR_MODE.right_without_led){
             me.resumeLedMessage();
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
-        }else if(targetMode == 2){
+        }else if(targetMode == me.INDICATOR_MODE.left_without_led){
             me.resumeLedMessage();
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
             me.mode = targetMode;
-        }else if(targetMode == 3){
+        }else if(targetMode == me.INDICATOR_MODE.both_without_led){
             me.resumeLedMessage();
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOn();
             me.mode = targetMode;
-        }else if(targetMode == 4){
+        }else if(targetMode == me.INDICATOR_MODE.right_with_led){
             me.resumeLedMessage();
             me.saveLedMessage();
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOff();
             me.setLedMessage(me.textureRight);
             me.mode = targetMode;
-        }else if(targetMode == 5){
+        }else if(targetMode == me.INDICATOR_MODE.left_with_led){
             me.resumeLedMessage();
             me.saveLedMessage();
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
             me.setLedMessage(me.textureLeft);
             me.mode = targetMode;
-        }else if(targetMode == 6){
+        }else if(targetMode == me.INDICATOR_MODE.both_with_led){
             me.mode = targetMode;
         }else{
             return 0;
