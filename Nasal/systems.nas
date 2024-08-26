@@ -491,42 +491,20 @@ var chargeBatteryStop = func(bef){
    props.getNode("/controls/is-recharging", 1).setValue(0);
 }
 
-var calculateSpeed = func(){
-    var speedKmh = vInfo.getSpeedKMH();
-    var calculated = 0;
-    var output = 0;
-    if(speedKmh <= 0){
-        calculated = speedKmh * -1;
-    }else if(speedKmh < 280){
-        calculated = speedKmh;
-    }else if(speedKmh >= 280){
-        calculated = 280;
-    }
-
-    if(calculated <= 120){
-        output = calculated * 1.5; #// 1.5: 3/2
-    }else if(calculated > 120){
-        output = calculated * 0.75; #// 0.75: 3/4
-    }
-
-    props.getNode("systems/display-speed", 1).setValue(output);
-}
-var calculateSpeedTimer = maketimer(0.1, calculateSpeed);
-
 var resetOnPosition = func(){
     var lat = props.getNode("/position/latitude-deg").getValue();
     var lon = props.getNode("/position/longitude-deg").getValue();
     #// Clear the other presets to prevent issues
-    props.getNode("/sim/presets/carrier").setValue("");
-    props.getNode("/sim/presets/parkpos").setValue("");
-    props.getNode("/sim/presets/airport-id").setValue("");
-    props.getNode("/sim/presets/runway").setValue("");
-    props.getNode("/sim/presets/runway-requested").setValue(0);
-    props.getNode("/sim/presets/altitude-ft").setValue("-9999");
-    props.getNode("/sim/presets/airspeed-kt").setValue(0);
+    props.getNode("/sim/presets/carrier", 1).setValue("");
+    props.getNode("/sim/presets/parkpos", 1).setValue("");
+    props.getNode("/sim/presets/airport-id", 1).setValue("");
+    props.getNode("/sim/presets/runway", 1).setValue("");
+    props.getNode("/sim/presets/runway-requested", 1).setValue(0);
+    props.getNode("/sim/presets/altitude-ft", 1).setValue("-9999");
+    props.getNode("/sim/presets/airspeed-kt", 1).setValue(0);
     #// Set the latlon in the presets
-    props.getNode("/sim/presets/latitude-deg").setValue(lat);
-    props.getNode("/sim/presets/longitude-deg").setValue(lon);
+    props.getNode("/sim/presets/latitude-deg", 1).setValue(lat);
+    props.getNode("/sim/presets/longitude-deg", 1).setValue(lon);
     fgcommand("reposition");
 
     #//The old method, kept for educational purposes
