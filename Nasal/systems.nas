@@ -65,9 +65,6 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5]
 
 # //Wiper
 var wiper = {
-    # var wiperMode = 0;
-    # var wiperSwitchNode = props.globals.getNode("/controls/wiper/frontwiper_switch", 1);
-    # var wiper = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
     WIPER_MODE : {
         STOP: 0,
         FAST: 1,
@@ -79,13 +76,12 @@ var wiper = {
     pattern: [1, 1],
     switchNode: nil,
     
-    new : func(controllerNode){
+    new : func(wiperNode){
         var m = {parents:[wiper]};
-        me.switchNode = props.globals.getNode("/controls/wiper/frontwiper/switch", 1);
-        me.controller = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], me.switchNode);
+        me.switchNode = props.globals.getNode(wiperNode~"/switch", 1);
+        me.controller = aircraft.light.new(wiperNode, [1, 1], me.switchNode);
         me.controller.stateN = me.controller.node.initNode("state", 0, "DOUBLE");
-        props.getNode("/",1).setValue("/controls/wiper/frontwiper/switch", 0);
-        # print("test passed");
+        props.getNode(wiperNode,1).setValue("/switch", 0);
         return m;
     },
     Stop : func(){
@@ -122,42 +118,6 @@ var wiper = {
 };
 frontWiper = wiper.new("/controls/wiper/frontwiper");
 
-# var wiperMode = 0;
-# var wiperSwitchNode = props.globals.getNode("/controls/wiper/frontwiper_switch", 1);
-# var wiper = aircraft.light.new("/controls/wiper/frontwiper", [1, 1], wiperSwitchNode);
-
-# var wiperStop = func(){
-#     wiperSwitchNode.setValue(0);
-#     wiperMode = 0;
-# }
-# var wiperFast = func(){
-#     wiper.pattern = [0.5, 0.5];
-#     wiperSwitchNode.setValue(1);
-#     wiperMode = 1;
-# }
-# var wiperMid = func(){
-#     wiper.pattern = [0.7, 0.7];
-#     wiperSwitchNode.setValue(1);
-#     wiperMode = 2;
-# }
-# var wiperSlow = func(){
-#     wiper.pattern = [0.7, 2];
-#     wiperSwitchNode.setValue(1);
-#     wiperMode = 3;
-# }
-# var toggleWiper = func(){
-#     if(wiperMode == 0){
-#         wiperSlow();
-#     }else if(wiperMode == 1){
-#         wiperStop();
-#     }else if(wiperMode == 2){
-#         wiperFast();
-#     }else if(wiperMode == 3){
-#         wiperMid();
-#     }
-# }
-# wiper.stateN = wiper.node.initNode("state", 0, "DOUBLE");
-# props.getNode("/",1).setValue("/controls/wiper/frontwiper_switch", 0);
 
 
 
