@@ -65,18 +65,18 @@ var beacon = aircraft.light.new( "/sim/model/lights/indicator-right", [0.5, 0.5]
 
 # //Wiper
 var wiper = {
-    WIPER_MODE : {
+    WIPER_MODE: {
         STOP: 0,
         FAST: 1,
         MID: 2,
         SLOW: 3,
     },
     mode: 0,
-    controller : nil,
+    controller: nil,
     pattern: [1, 1],
     switchNode: nil,
     
-    new : func(wiperNode){
+    new: func(wiperNode){
         var m = {parents:[wiper]};
         me.switchNode = props.globals.getNode(wiperNode~"/switch", 1);
         me.controller = aircraft.light.new(wiperNode, [1, 1], me.switchNode);
@@ -84,26 +84,26 @@ var wiper = {
         props.getNode(wiperNode,1).setValue("/switch", 0);
         return m;
     },
-    Stop : func(){
+    Stop: func(){
         me.switchNode.setValue(0);
         mode = me.WIPER_MODE.STOP;
     },
-    Fast : func(){
+    Fast: func(){
         me.controller.pattern = [0.5, 0.5];
         me.switchNode.setValue(1);
         me.mode = me.WIPER_MODE.FAST;
     },
-    Mid : func(){
+    Mid: func(){
         me.controller.pattern = [0.7, 0.7];
         me.switchNode.setValue(1);
         me.mode = me.WIPER_MODE.MID;
     },
-    Slow : func(){
+    Slow: func(){
         me.controller.pattern = [0.7, 2];
         me.switchNode.setValue(1);
         me.mode = me.WIPER_MODE.SLOW;
     },
-    toggleMode : func(){
+    cycleMode: func(){
         if(me.mode == me.WIPER_MODE.STOP){
             me.Slow();
         }else if(me.mode == me.WIPER_MODE.SLOW){
@@ -163,36 +163,26 @@ var Indicator = {
 };
 
 var IndicatorController = {
-
-    #
     #   Usage:
-    #       mode:
-    #           0:Off
-    #           1:Right without led
-    #           2:Left without led
-    #           3:both without led
-    #           4:Right with led
-    #           5:Left with led
-    #           6:both with led(WIP)
+    #       mode:see IND_MODES
     #       getMode(): Get currrent mode
-    #       setMode(mode): Set mode(0,1,2), return 0 if fail
-    #
-    #
+    #       setMode(mode): Set mode, return 0 if fail
+    #                      args can be 0, 1, 2, or better, use IND_MODES
 
-    INDICATOR_MODE : {
+    IND_MODES: {   # Indicator modes
         OFF: 0,
         RIGHT_WITHOUT_LED: 1,
         LEFT_WITHOUT_LED: 2,
         BOTH_WITHOUT_LED: 3,
         RIGHT_WITH_LED: 4,
         LEFT_WITH_LED: 5,
-        BOTH_WITH_LED: 6
+        BOTH_WITH_LED: 6 # WIP
     },
 
     new: func() { return { parents:[IndicatorController]}; },
 
-    leftIndicator : Indicator.new("left"),
-    rightIndicator : Indicator.new("right"),
+    leftIndicator: Indicator.new("left"),
+    rightIndicator: Indicator.new("right"),
 
     leftIndicatorSwitchNode: vInfo.lighting.indicator.leftSwitch,
     rightIndicatorSwitchNode: vInfo.lighting.indicator.rightSwitch,
@@ -244,108 +234,109 @@ var IndicatorController = {
         return me.mode;
     },
     setMode: func(targetMode){
-        if(targetMode == me.INDICATOR_MODE.OFF){
+        if(targetMode == me.IND_MODES.OFF){
             me.resumeLedMessage();
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
             if(me.falseLight == 1){
-                me.setMode(me.INDICATOR_MODE.BOTH_WITHOUT_LED);
+                me.setMode(me.IND_MODES.BOTH_WITHOUT_LED);
             }
-        }else if(targetMode == me.INDICATOR_MODE.RIGHT_WITHOUT_LED){
+        }else if(targetMode == me.IND_MODES.RIGHT_WITHOUT_LED){
             me.resumeLedMessage();
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
-        }else if(targetMode == me.INDICATOR_MODE.LEFT_WITHOUT_LED){
+        }else if(targetMode == me.IND_MODES.LEFT_WITHOUT_LED){
             me.resumeLedMessage();
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
             me.mode = targetMode;
-        }else if(targetMode == me.INDICATOR_MODE.BOTH_WITHOUT_LED){
+        }else if(targetMode == me.IND_MODES.BOTH_WITHOUT_LED){
             me.resumeLedMessage();
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOn();
             me.mode = targetMode;
-        }else if(targetMode == me.INDICATOR_MODE.RIGHT_WITH_LED){
+        }else if(targetMode == me.IND_MODES.RIGHT_WITH_LED){
             me.resumeLedMessage();
             me.saveLedMessage();
             me.rightIndicator.switchOn();
             me.leftIndicator.switchOff();
             me.setLedMessage(me.textureRight);
             me.mode = targetMode;
-        }else if(targetMode == me.INDICATOR_MODE.LEFT_WITH_LED){
+        }else if(targetMode == me.IND_MODES.LEFT_WITH_LED){
             me.resumeLedMessage();
             me.saveLedMessage();
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
             me.setLedMessage(me.textureLeft);
             me.mode = targetMode;
-        }else if(targetMode == me.INDICATOR_MODE.BOTH_WITH_LED){
+        }else if(targetMode == me.IND_MODES.BOTH_WITH_LED){
+            # WIP
             me.mode = targetMode;
         }else{
             die("Invalid mode");
         }
     },
 
-    right_indicator_toggle : func(){
+    right_indicator_toggle: func(){
         if(isInternalView()) playAudio('IndicatorEnd.wav');
 
-        if(me.getMode() != me.INDICATOR_MODE.RIGHT_WITH_LED){
-            me.setMode(me.INDICATOR_MODE.RIGHT_WITH_LED);
+        if(me.getMode() != me.IND_MODES.RIGHT_WITH_LED){
+            me.setMode(me.IND_MODES.RIGHT_WITH_LED);
             me.rightIndicatorSwitchNode.setValue(1);
             me.leftIndicatorSwitchNode.setValue(0);
             return 0;
-        }else if(me.getMode() == me.INDICATOR_MODE.RIGHT_WITH_LED){
-            me.setMode(me.INDICATOR_MODE.OFF);
+        }else if(me.getMode() == me.IND_MODES.RIGHT_WITH_LED){
+            me.setMode(me.IND_MODES.OFF);
             me.rightIndicatorSwitchNode.setValue(0);
             return 0;
         }else{
             return -1;
         }
     },
-    left_indicator_toggle : func(){
+    left_indicator_toggle: func(){
         if(isInternalView()) playAudio('IndicatorEnd.wav');
-        if(me.getMode() != me.INDICATOR_MODE.LEFT_WITH_LED){
-            me.setMode(me.INDICATOR_MODE.LEFT_WITH_LED);
+        if(me.getMode() != me.IND_MODES.LEFT_WITH_LED){
+            me.setMode(me.IND_MODES.LEFT_WITH_LED);
             me.leftIndicatorSwitchNode.setValue(1);
             me.rightIndicatorSwitchNode.setValue(0);
-        }else if(me.getMode() == me.INDICATOR_MODE.LEFT_WITH_LED){
-            me.setMode(me.INDICATOR_MODE.OFF);
+        }else if(me.getMode() == me.IND_MODES.LEFT_WITH_LED){
+            me.setMode(me.IND_MODES.OFF);
             me.leftIndicatorSwitchNode.setValue(0);
         }
     },
 
-    falseLightOn : func(){
+    falseLightOn: func(){
         if(isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 1;
         #//origin: 1,2,4,5
-        if(me.mode == me.INDICATOR_MODE.RIGHT_WITHOUT_LED or
-           me.mode == me.INDICATOR_MODE.LEFT_WITHOUT_LED  or 
-           me.mode == me.INDICATOR_MODE.RIGHT_WITH_LED    or 
-           me.mode == me.INDICATOR_MODE.LEFT_WITH_LED){
+        if(me.mode == me.IND_MODES.RIGHT_WITHOUT_LED or
+           me.mode == me.IND_MODES.LEFT_WITHOUT_LED  or 
+           me.mode == me.IND_MODES.RIGHT_WITH_LED    or 
+           me.mode == me.IND_MODES.LEFT_WITH_LED){
            print("falseLight mode on");
         }else{
-            me.setMode(me.INDICATOR_MODE.BOTH_WITHOUT_LED);
+            me.setMode(me.IND_MODES.BOTH_WITHOUT_LED);
             print("falseLight turned on");
         }
 
     },
-    falseLightOff : func(){
+    falseLightOff: func(){
         if(isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 0;
         #//origin: 1,2,4,5
-        if(me.mode == me.INDICATOR_MODE.RIGHT_WITHOUT_LED or
-           me.mode == me.INDICATOR_MODE.LEFT_WITHOUT_LED  or 
-           me.mode == me.INDICATOR_MODE.RIGHT_WITH_LED    or 
-           me.mode == me.INDICATOR_MODE.LEFT_WITH_LED){
+        if(me.mode == me.IND_MODES.RIGHT_WITHOUT_LED or
+           me.mode == me.IND_MODES.LEFT_WITHOUT_LED  or 
+           me.mode == me.IND_MODES.RIGHT_WITH_LED    or 
+           me.mode == me.IND_MODES.LEFT_WITH_LED){
            print("falseLight mode off");
         }else{
             me.setMode(0);
             print("falseLight turned off");
         }
     },
-    false_light_toggle : func(){
+    false_light_toggle: func(){
         if(me.falseLight == 0){
             me.falseLightOn();
         }else if(me.falseLight == 1){
