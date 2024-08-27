@@ -232,7 +232,7 @@
                 <repeatable>false</repeatable>
     			<binding>
     				<command>nasal</command>
-                    <script>followme.indicatorController.false_light_toggle();</script>
+                    <script>followme.indicatorController.hazardLights_toggle();</script>
     			</binding>
             </key>
     		<key n="109">

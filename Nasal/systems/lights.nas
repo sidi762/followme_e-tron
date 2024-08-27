@@ -75,7 +75,7 @@ var IndicatorController = {
 
     mode:0,
 
-    falseLight: 0,
+    hazardLights: 0,
 
     ledMessage: props.getNode("/sim/model/livery/texture",1),
     ledMessageName: props.getNode("/sim/model/livery/name",1),
@@ -125,7 +125,7 @@ var IndicatorController = {
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
-            if(me.falseLight == 1){
+            if(me.hazardLights == 1){
                 me.setMode(me.IND_MODES.BOTH_WITHOUT_LED);
             }
         }else if(targetMode == me.IND_MODES.RIGHT_WITHOUT_LED){
@@ -193,40 +193,40 @@ var IndicatorController = {
         }
     },
 
-    falseLightOn: func(){
+    hazardLightsOn: func(){
         if(isInternalView()) playAudio("electric_handbrake.wav");
-        me.falseLight = 1;
+        me.hazardLights = 1;
         #//origin: 1,2,4,5
         if(me.mode == me.IND_MODES.RIGHT_WITHOUT_LED or
            me.mode == me.IND_MODES.LEFT_WITHOUT_LED  or 
            me.mode == me.IND_MODES.RIGHT_WITH_LED    or 
            me.mode == me.IND_MODES.LEFT_WITH_LED){
-           print("falseLight mode on");
+           print("hazard Lights armed");
         }else{
             me.setMode(me.IND_MODES.BOTH_WITHOUT_LED);
-            print("falseLight turned on");
+            print("hazard Lights turned on");
         }
 
     },
-    falseLightOff: func(){
+    hazardLightsOff: func(){
         if(isInternalView()) playAudio("electric_handbrake.wav");
-        me.falseLight = 0;
+        me.hazardLights = 0;
         #//origin: 1,2,4,5
         if(me.mode == me.IND_MODES.RIGHT_WITHOUT_LED or
            me.mode == me.IND_MODES.LEFT_WITHOUT_LED  or 
            me.mode == me.IND_MODES.RIGHT_WITH_LED    or 
            me.mode == me.IND_MODES.LEFT_WITH_LED){
-           print("falseLight mode off");
+           print("hazard Lights disarmed");
         }else{
             me.setMode(0);
-            print("falseLight turned off");
+            print("hazard Lights turned off");
         }
     },
-    false_light_toggle: func(){
-        if(me.falseLight == 0){
-            me.falseLightOn();
-        }else if(me.falseLight == 1){
-            me.falseLightOff();
+    hazardLights_toggle: func(){
+        if(me.hazardLights == 0){
+            me.hazardLightsOn();
+        }else if(me.hazardLights == 1){
+            me.hazardLightsOff();
         }
     },
 };
