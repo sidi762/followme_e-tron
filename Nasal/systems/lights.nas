@@ -70,8 +70,8 @@ var IndicatorController = {
     leftIndicator: Indicator.new("left"),
     rightIndicator: Indicator.new("right"),
 
-    leftIndicatorSwitchNode: vInfo.lighting.indicator.leftSwitch,
-    rightIndicatorSwitchNode: vInfo.lighting.indicator.rightSwitch,
+    leftIndicatorLeverPosNode: vInfo.lighting.indicator.leftSwitch, 
+    rightIndicatorLeverPosNode: vInfo.lighting.indicator.rightSwitch,
 
     mode:0,
 
@@ -170,12 +170,12 @@ var IndicatorController = {
 
         if(me.getMode() != me.IND_MODES.RIGHT_WITH_LED){
             me.setMode(me.IND_MODES.RIGHT_WITH_LED);
-            me.rightIndicatorSwitchNode.setValue(1);
-            me.leftIndicatorSwitchNode.setValue(0);
+            me.rightIndicatorLeverPosNode.setValue(1);
+            me.leftIndicatorLeverPosNode.setValue(0);
             return 0;
         }else if(me.getMode() == me.IND_MODES.RIGHT_WITH_LED){
             me.setMode(me.IND_MODES.OFF);
-            me.rightIndicatorSwitchNode.setValue(0);
+            me.rightIndicatorLeverPosNode.setValue(0);
             return 0;
         }else{
             return -1;
@@ -185,11 +185,11 @@ var IndicatorController = {
         if(isInternalView()) playAudio('IndicatorEnd.wav');
         if(me.getMode() != me.IND_MODES.LEFT_WITH_LED){
             me.setMode(me.IND_MODES.LEFT_WITH_LED);
-            me.leftIndicatorSwitchNode.setValue(1);
-            me.rightIndicatorSwitchNode.setValue(0);
+            me.leftIndicatorLeverPosNode.setValue(1);
+            me.rightIndicatorLeverPosNode.setValue(0);
         }else if(me.getMode() == me.IND_MODES.LEFT_WITH_LED){
             me.setMode(me.IND_MODES.OFF);
-            me.leftIndicatorSwitchNode.setValue(0);
+            me.leftIndicatorLeverPosNode.setValue(0);
         }
     },
 
