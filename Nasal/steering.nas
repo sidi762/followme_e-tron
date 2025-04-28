@@ -14,6 +14,8 @@
 #// You should have received a copy of the GNU General Public License
 #// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#// Namespace: followme
+
 var cache = {
     new: func return { parents:[cache] };
 };
@@ -283,27 +285,44 @@ var frontWheelListener = setlistener("/controls/flight/rudder", func(n){ # creat
     calculateFWForce(n.getValue());
 });
 
-#// FGCommands for setting the steering system
-addcommand("enableAdvancedSteering", func() {
+#// API for setting the steering system mode
+var enableAdvancedSteering = func() {
     steeringAssistance.mode = 1;
     print("Advanced Steering Enabled");
-});
-addcommand("disableAdvancedSteering", func() {
+};
+var disableAdvancedSteering = func() {
     steeringAssistance.mode = 0;
     print("Advanced Steering Disabled");
-});
-addcommand("setSteeringTravelToMin", func() {
+};
+var setSteeringTravelToMin = func() {
     steeringAssistance.steeringLimit = 0.78359815;
     props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steeringAssistance.steeringLimit * R2D);
     print("Steering Travel Set To 1 : 1");
-});
-addcommand("setSteeringTravelToNormal", func() {
+};
+var setSteeringTravelToNormal = func() {
     steeringAssistance.steeringLimit = 7.8539815;
     props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steeringAssistance.steeringLimit * R2D);
     print("Steering Travel Set To Normal");
-});
-addcommand("setSteeringTravelToMax", func() {
+};
+var setSteeringTravelToMax = func() {
     steeringAssistance.steeringLimit = 15.707963;
     props.getNode("/controls/steering_wheel/steering_limit-deg", 1).setValue(steeringAssistance.steeringLimit * R2D);
     print("Steering Travel Set To Max");
+};
+
+#// FGCommands for setting the steering system
+addcommand("enableAdvancedSteering", func() {
+   enableAdvancedSteering();
+});
+addcommand("disableAdvancedSteering", func() {
+    disableAdvancedSteering();
+});
+addcommand("setSteeringTravelToMin", func() {
+    setSteeringTravelToMin();
+});
+addcommand("setSteeringTravelToNormal", func() {
+    setSteeringTravelToNormal();
+});
+addcommand("setSteeringTravelToMax", func() {
+    setSteeringTravelToMax();
 });
