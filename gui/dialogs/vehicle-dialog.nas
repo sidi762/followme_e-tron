@@ -3,7 +3,7 @@
 # Manages the vehicle configuration and control dialog
 ###############################################################################
 
-# io.include("gui/dialogs/base/window.nas");
+io.include("gui/dialogs/base/window.nas");
 io.include("gui/dialogs/base/widget.nas");
 
 var VehicleDialogClass = {
@@ -66,202 +66,202 @@ var VehicleDialogClass = {
     },
 
     _createUI: func() {
-        var main_widget = UIWidget.new(me, me._group, "main");
-        var y_pos = 0;
-        var available_width = 380;
+        var mainWidget = UIWidget.new(me, me._group, "main");
+        var yPos = 0;
+        var availableWidth = 380;
 
         # Title - create a centered title directly
-        main_widget.createCenteredLabel(available_width / 2, y_pos + 10, "Vehicle Options", 18);
-        y_pos += 25;
+        mainWidget.createCenteredLabel(availableWidth / 2, yPos + 10, "Vehicle Options", 18);
+        yPos += 25;
 
-        main_widget.createSeparator(0, y_pos, available_width);
-        y_pos += 15;
+        mainWidget.createSeparator(0, yPos, availableWidth);
+        yPos += 15;
 
         # Create sections
-        y_pos = me._createVehicleModesSection(main_widget, y_pos, available_width);
-        y_pos = me._createSteeringSection(main_widget, y_pos, available_width);
-        y_pos = me._createBrakingSection(main_widget, y_pos, available_width);
-        y_pos = me._createWelcomeSection(main_widget, y_pos, available_width);
-        y_pos = me._createDriftingSection(main_widget, y_pos, available_width);
-        y_pos = me._createConfigSection(main_widget, y_pos, available_width);
-        y_pos = me._createRescueSection(main_widget, y_pos, available_width);
-        y_pos = me._createEngineSection(main_widget, y_pos, available_width);
-        y_pos = me._createMiscSection(main_widget, y_pos, available_width);
+        yPos = me._createVehicleModesSection(mainWidget, yPos, availableWidth);
+        yPos = me._createSteeringSection(mainWidget, yPos, availableWidth);
+        yPos = me._createBrakingSection(mainWidget, yPos, availableWidth);
+        yPos = me._createWelcomeSection(mainWidget, yPos, availableWidth);
+        yPos = me._createDriftingSection(mainWidget, yPos, availableWidth);
+        yPos = me._createConfigSection(mainWidget, yPos, availableWidth);
+        yPos = me._createRescueSection(mainWidget, yPos, availableWidth);
+        yPos = me._createEngineSection(mainWidget, yPos, availableWidth);
+        yPos = me._createMiscSection(mainWidget, yPos, availableWidth);
 
-        me._widgets.main = main_widget;
-        main_widget.init();
+        me._widgets.main = mainWidget;
+        mainWidget.init();
     },
 
-    _createVehicleModesSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Vehicle Modes:", 16);
-        y_pos += 15;
+    _createVehicleModesSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Vehicle Modes:", 16);
+        yPos += 15;
 
         # Performance/Comfort Mode
-        widget.createButton(5, y_pos, 180, 30, "Enable Performance Mode", 
+        widget.createButton(5, yPos, 180, 30, "Enable Performance Mode", 
             func setprop("/controls/mode", 1));
-        widget.createButton(200, y_pos, 180, 30, "Enable Comfort Mode", 
+        widget.createButton(200, yPos, 180, 30, "Enable Comfort Mode", 
             func setprop("/controls/mode", 0.65));
-        y_pos += 40;
+        yPos += 40;
 
         # Low Power Mode
-        widget.createButton(5, y_pos, 180, 30, "Enable Low Power Mode", 
+        widget.createButton(5, yPos, 180, 30, "Enable Low Power Mode", 
             func setprop("/controls/mode", 0.4));
-        y_pos += 38;
+        yPos += 38;
 
-        widget.createSeparator(5, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(5, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createSteeringSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Realistic Steering (*Experimental):", 16);
-        y_pos += 15;
+    _createSteeringSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Realistic Steering (*Experimental):", 16);
+        yPos += 15;
 
-        widget.createButton(5, y_pos, 180, 30, "Enable", 
+        widget.createButton(5, yPos, 180, 30, "Enable", 
             func followme.enableAdvancedSteering());
-        widget.createButton(200, y_pos, 180, 30, "Disable", 
+        widget.createButton(200, yPos, 180, 30, "Disable", 
             func followme.disableAdvancedSteering());
-        y_pos += 50;
+        yPos += 50;
 
         # Tips
-        widget.createLabel(5, y_pos, "Tips: When this is enabled, it is STRONGLY", 12);
-        y_pos += 15;
-        widget.createLabel(5, y_pos, "recommended to set the max travel to Normal", 12);
-        y_pos += 15;
-        widget.createLabel(5, y_pos, "in Configuration dialog (default is Long).", 12);
-        y_pos += 15;
-        widget.createLabel(5, y_pos, "By enabling Realistic Steering, the drifting sound", 12);
-        y_pos += 15;
-        widget.createLabel(5, y_pos, "effect will be enabled automatically.", 12);
-        y_pos += 15;
+        widget.createLabel(5, yPos, "Tips: When this is enabled, it is STRONGLY", 12);
+        yPos += 15;
+        widget.createLabel(5, yPos, "recommended to set the max travel to Normal", 12);
+        yPos += 15;
+        widget.createLabel(5, yPos, "in Configuration dialog (default is Long).", 12);
+        yPos += 15;
+        widget.createLabel(5, yPos, "By enabling Realistic Steering, the drifting sound", 12);
+        yPos += 15;
+        widget.createLabel(5, yPos, "effect will be enabled automatically.", 12);
+        yPos += 15;
 
-        widget.createSeparator(0, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(0, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createBrakingSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Keyboard braking intensity:", 16);
-        y_pos += 10;
+    _createBrakingSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Keyboard braking intensity:", 16);
+        yPos += 10;
 
-        widget.createSlider(0, y_pos, 260, 
+        widget.createSlider(0, yPos, 260, 
             "/systems/BrakeController/keyboardBrakeIntensity", 0.1, 1, 0.8);
-        y_pos += 35;
+        yPos += 35;
 
-        widget.createSeparator(0, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(0, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createWelcomeSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Welcome message/Startup Sound:", 16);
-        y_pos += 15;
+    _createWelcomeSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Welcome message/Startup Sound:", 16);
+        yPos += 15;
 
-        widget.createButton(5, y_pos, 180, 30, "Set Startup Sound", 
+        widget.createButton(5, yPos, 180, 30, "Set Startup Sound", 
             func smartInstruments.setStartupSound_dlg.open());
-        widget.createButton(200, y_pos, 180, 30, "Disable welcome message", 
+        widget.createButton(200, yPos, 180, 30, "Disable welcome message", 
             func setprop("systems/welcome-message", 0));
-        y_pos += 35;
+        yPos += 35;
 
-        widget.createButton(5, y_pos, 116, 30, "Enable Chinese", 
+        widget.createButton(5, yPos, 116, 30, "Enable Chinese", 
             func setprop("systems/welcome-message", 1));
-        widget.createButton(133.9, y_pos, 116, 30, "Enable English", 
+        widget.createButton(133.9, yPos, 116, 30, "Enable English", 
             func setprop("systems/welcome-message", 2));
-        widget.createButton(262.8, y_pos, 116, 30, "Enable Special", 
+        widget.createButton(262.8, yPos, 116, 30, "Enable Special", 
             func setprop("systems/welcome-message", 3));
-        y_pos += 35;
+        yPos += 35;
 
-        widget.createSeparator(0, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(0, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createDriftingSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Drifting Sound Effect:", 16);
-        y_pos += 15;
+    _createDriftingSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Drifting Sound Effect:", 16);
+        yPos += 15;
 
-        widget.createButton(5, y_pos, 180, 30, "Enable", 
+        widget.createButton(5, yPos, 180, 30, "Enable", 
             func setprop("systems/drifting-sound", 1));
-        widget.createButton(200, y_pos, 180, 30, "Disable", 
+        widget.createButton(200, yPos, 180, 30, "Disable", 
             func setprop("systems/drifting-sound", 0));
-        y_pos += 35;
+        yPos += 35;
 
-        widget.createSeparator(0, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(0, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createConfigSection: func(widget, y_pos, width) {
-        widget.createButton((width - 300) / 2, y_pos, 300, 30, "Vehicle Configuration", 
+    _createConfigSection: func(widget, yPos, width) {
+        widget.createButton((width - 300) / 2, yPos, 300, 30, "Vehicle Configuration", 
             func followme.configDialog.open());
-        y_pos += 35;
+        yPos += 35;
 
-        widget.createSeparator(0, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(0, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createRescueSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Rescue:", 16);
-        y_pos += 15;
+    _createRescueSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Rescue:", 16);
+        yPos += 15;
 
-        widget.createButton(5, y_pos, 180, 30, "Flip Vehicle", func {
+        widget.createButton(5, yPos, 180, 30, "Flip Vehicle", func {
             setprop("/orientation/roll-deg", 0);
             setprop("velocities/groundspeed-kt", 0);
         });
-        widget.createButton(200, y_pos, 180, 30, "Quick Recharge", 
+        widget.createButton(200, yPos, 180, 30, "Quick Recharge", 
             func followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull());
-        y_pos += 35;
+        yPos += 35;
 
-        widget.createButton(5, y_pos, 180, 30, "Reset/Disable Airbag", 
+        widget.createButton(5, yPos, 180, 30, "Reset/Disable Airbag", 
             func followme.safety.reset());
-        widget.createButton(200, y_pos, 180, 30, "Reset Here", 
+        widget.createButton(200, yPos, 180, 30, "Reset Here", 
             func followme.resetOnPosition());
-        y_pos += 40;
+        yPos += 40;
 
-        widget.createLabel(5, y_pos, "Resetting Airbag stops the entire safety system!", 12);
-        y_pos += 10;
+        widget.createLabel(5, yPos, "Resetting Airbag stops the entire safety system!", 12);
+        yPos += 10;
 
-        widget.createSeparator(0, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(0, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createEngineSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Engine Controls:", 16);
-        y_pos += 15;
+    _createEngineSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Engine Controls:", 16);
+        yPos += 15;
 
-        widget.createButton(5, y_pos, 180, 30, "Start Engine", 
+        widget.createButton(5, yPos, 180, 30, "Start Engine", 
             func engine.startEngine(engine.engine_1));
-        widget.createButton(200, y_pos, 180, 30, "Stop Engine", 
+        widget.createButton(200, yPos, 180, 30, "Stop Engine", 
             func engine.stopEngine(engine.engine_1));
-        y_pos += 35;
+        yPos += 35;
 
-        widget.createSeparator(0, y_pos, width);
-        y_pos += 15;
+        widget.createSeparator(0, yPos, width);
+        yPos += 15;
 
-        return y_pos;
+        return yPos;
     },
 
-    _createMiscSection: func(widget, y_pos, width) {
-        widget.createLabel(5, y_pos, "Miscellaneous:", 16);
-        y_pos += 15;
+    _createMiscSection: func(widget, yPos, width) {
+        widget.createLabel(5, yPos, "Miscellaneous:", 16);
+        yPos += 15;
 
-        widget.createCheckbox(5, y_pos, "Enable ALS procedural lights", 
+        widget.createCheckbox(5, yPos, "Enable ALS procedural lights", 
             "/systems/enable_als_lights");
-        y_pos += 28;
+        yPos += 28;
 
-        widget.createLabel(5, y_pos, "(for older FG versions without Compositor support)", 12);
-        y_pos += 20;
+        widget.createLabel(5, yPos, "(for older FG versions without Compositor support)", 12);
+        yPos += 20;
 
-        return y_pos;
+        return yPos;
     }
 };
 
