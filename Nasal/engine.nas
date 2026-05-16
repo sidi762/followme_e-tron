@@ -319,7 +319,7 @@ var outputForce = func(force){
     if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit[3]/compression-ft") > 0){
         props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BR/magnitude", force/4);
     }else{
-        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/FR/magnitude", 0);
+        props.getNode("/",1).setValue("/fdm/jsbsim/external_reactions/BR/magnitude", 0);
     }
 }
 
