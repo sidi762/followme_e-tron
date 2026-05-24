@@ -147,7 +147,7 @@
                 <value>1</value>
             </equals>
         </condition>
-        <path>Aircraft/followme_e-tron/Models/people/people2.ac</path>
+        <path>Aircraft/followme_e-tron/Models/people/people.ac</path> <!-- people2.ac -->
         <offsets>
             <x-m>1.7</x-m>
             <y-m>-0.17</y-m>

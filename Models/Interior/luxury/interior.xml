@@ -395,7 +395,7 @@
  <!-- storage -->
 <animation>
     <type>select</type>
-    <object-name>stroage</object-name>
+    <object-name>storage</object-name>
     <condition>
         <equals>
             <property>sim/multiplay/generic/float[24]</property>
