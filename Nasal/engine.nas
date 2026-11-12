@@ -17,6 +17,26 @@
 io.include("library.nas");
 io.include("lib_elec.nas");
 var N2LBS = 0.2248089;
+
+#//Link to the tyre and driveline model inside the FDM, see dev/tyre-model/README.md
+#//These properties only exist with the followme_e-tron-tyre FDM. With any other FDM
+#//tyreModel stays nil and the engine drives the car the classic way, by writing
+#//forces straight into external_reactions.
+var tyreModel = nil;
+if(props.getNode("/fdm/jsbsim/driveline/in/throttle_norm") != nil){
+    tyreModel = {
+        throttle: props.getNode("/fdm/jsbsim/driveline/in/throttle_norm"),
+        direction: props.getNode("/fdm/jsbsim/driveline/in/direction"),
+        motorOn: props.getNode("/fdm/jsbsim/driveline/in/motor_on"),
+        gear: props.getNode("/fdm/jsbsim/driveline/par/gear"),
+        maxTorque: props.getNode("/fdm/jsbsim/driveline/par/max_torque_nm"),
+        maxPower: props.getNode("/fdm/jsbsim/driveline/par/max_power_w"),
+        motorSpeed: props.getNode("/fdm/jsbsim/driveline/motor_rad_sec"),
+    };
+    tyreModel.motorOn.setValue(0);#//The motor stays off until the engine is started
+    print("Engine: using the tyre and driveline model of the FDM");
+}
+
 var Engine = {
     #//Class for any electric power unit (engine and gear box)
     #//mTorque: Max torque, mPower: Max Power, rpmAtMPower: RPM at max power
@@ -111,6 +131,17 @@ var Engine = {
 
         var direction = me.getDirection();
 
+        if(tyreModel != nil){
+            #//The FDM integrates the wheels itself, so the motor speed comes from there
+            var rpm = tyreModel.motorSpeed.getValue() * 9.5492966;#//rad/s to rpm
+            #//Same floor as the classic path below: update_engine divides by the rpm
+            if(math.abs(rpm) < 100) rpm = 100 * direction;
+            me.rpm = rpm;
+            me.engineNode.rpmNode.setValue(rpm);
+            me.angularSpeed = rpm * 0.10471975;
+            return rpm;
+        }
+
         var rpm = me.rpm;
         #//var rps = rpm / 60;
 
@@ -193,6 +224,18 @@ var Engine = {
         throttle = throttle * mode;
         #print("throttle:" ~throttle);
 
+        if(tyreModel != nil){
+            #//Hand the pedal, the gearing and the motor limits to the FDM, which turns them
+            #//into wheel torque. All of it is sent on every update because FlightGear
+            #//resets the properties of the FDM whenever it repositions the car.
+            tyreModel.motorOn.setValue(1);
+            tyreModel.throttle.setValue(throttle);
+            tyreModel.direction.setValue(direction);
+            tyreModel.gear.setValue(me.gear);
+            tyreModel.maxTorque.setValue(me.maxTorque);
+            tyreModel.maxPower.setValue(me.ratedPower * 1000);
+        }
+
         me.controlResistance = (0 - throttle * 3000000000000) + 3000000000000;#//We do this for now as I still can't find out how is the speed of motor being controlled. Imagine this is a tunable resistor
         me.resistance = me.controlResistance + me.motorResistance + me.protectionResistance;
 
@@ -273,6 +316,10 @@ var Engine = {
         me.torque = 0;
         me.outputForce = 0;
         outputForce(0);
+        if(tyreModel != nil){
+            tyreModel.throttle.setValue(0);
+            tyreModel.motorOn.setValue(0);
+        }
         me.activePower_kW = 0;
         me.runningState = 0;
         me.engineNode.isStarted.setValue(0);
@@ -295,7 +342,17 @@ followme.circuit_1.addUnitToSeries(0, engine_1.engineSwitch);
 engine_1.engineSwitch.switchDisconnect();
 followme.circuit_1.addUnitToSeries(0, followme.Cable.new(5, 0.008));
 
+if(tyreModel != nil){
+    #//A rebuilt FDM (after a reposition) must not come back with the motor on while the engine is off
+    setlistener("/sim/signals/fdm-initialized", func(n){
+        if(n.getBoolValue()) tyreModel.motorOn.setValue(engine_1.isRunning());
+    });
+}
+
 var outputForce = func(force){
+    #//With the tyre model the FDM applies the drive torque itself, through the tyres
+    if(tyreModel != nil) return;
+
     #//Four wheel drive
 
     if(props.getNode("/",1).getValue("/fdm/jsbsim/gear/unit/compression-ft") > 0){

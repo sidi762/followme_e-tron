@@ -1,0 +1,2 @@
+jsbsim>=1.2
+pytest

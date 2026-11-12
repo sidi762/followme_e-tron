@@ -270,6 +270,8 @@ var Steering = {
 var flForceNode = props.getNode("/fdm/jsbsim/external_reactions/FL");
 var frForceNode = props.getNode("/fdm/jsbsim/external_reactions/FR");
 var calculateFWForce = func(input){
+    #// The tyre-model FDM has no drive forces to turn: its tyres follow the wheels
+    if(flForceNode == nil or frForceNode == nil) return;
     var rad = input * 45 * D2R;
     var x = math.cos(rad);
     var y = math.sin(rad);

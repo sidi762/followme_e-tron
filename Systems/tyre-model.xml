@@ -1,0 +1,2867 @@
+<?xml version="1.0"?>
+<!--
+	GENERATED FILE: edit dev/tyre-model/generate.py and run it again.
+
+	Tyre and driveline model for the Follow Me EV. Loaded by
+	followme_e-tron-tyre.xml; described in dev/tyre-model/README.md.
+-->
+<system name="Tyre and driveline model">
+
+	<!-- Tyre parameters -->
+	<property value="1.05">tyre/par/mu0</property> <!-- peak friction coefficient at the nominal load -->
+	<property value="0.12">tyre/par/load_sensitivity</property> <!-- fraction of mu0 lost when the load doubles -->
+	<property value="0.11">tyre/par/slip_ratio_peak</property> <!-- longitudinal slip ratio at peak force -->
+	<property value="0.14">tyre/par/slip_tan_peak</property> <!-- tan(slip angle) at peak force; 0.14 is 8 deg -->
+	<property value="1.732">tyre/par/shape_b</property> <!-- magic formula B, for slip normalised so the peak is at 1 -->
+	<property value="1.5">tyre/par/shape_c</property> <!-- magic formula C; sliding force is sin(C pi/2) of the peak -->
+	<property value="0.0">tyre/par/shape_e</property> <!-- magic formula E -->
+	<property value="0.012">tyre/par/rolling_resistance</property> <!-- rolling resistance coefficient -->
+	<property value="0.31">tyre/par/radius_m</property> <!-- rolling radius -->
+	<property value="2.1">tyre/par/wheel_inertia_kgm2</property> <!-- one wheel plus its share of the motor rotor seen through the gear -->
+	<property value="3.0">tyre/par/low_speed_mps</property> <!-- below this the slip definitions are softened; see README -->
+	<property value="0.15">tyre/par/stick_full_mps</property> <!-- a stopped wheel slower than this is held by JSBSim's static friction -->
+	<property value="0.5">tyre/par/stick_none_mps</property> <!-- above this the tyre model alone acts -->
+	<property value="3861.4">tyre/par/load_nominal_n</property> <!-- a quarter of the car's weight -->
+
+	<!-- Driveline and brake parameters -->
+	<property value="9.73">driveline/par/gear</property> <!-- motor to wheel reduction -->
+	<property value="460.0">driveline/par/max_torque_nm</property> <!-- motor torque limit -->
+	<property value="375000.0">driveline/par/max_power_w</property> <!-- motor power limit -->
+	<property value="3000.0">driveline/par/max_speed_rad_sec</property> <!-- motor speed limit; only there to stop a spinning wheel running away -->
+	<property value="0.5">driveline/par/front_torque_share</property> <!-- 0 = rear wheel drive, 1 = front wheel drive -->
+	<property value="24.0">driveline/par/coast_regen_nm</property> <!-- motor braking torque with the pedal released (matches the standard FDM's coast-down) -->
+	<property value="100.0">driveline/par/coast_regen_fade_rad_sec</property> <!-- coast regen fades out below this motor speed -->
+	<property value="2300.0">driveline/par/brake_front_nm</property> <!-- brake torque per front wheel at full pedal -->
+	<property value="580.0">driveline/par/brake_rear_nm</property> <!-- brake torque per rear wheel at full pedal -->
+	<property value="1000.0">driveline/par/park_lock_nm</property> <!-- holding torque per wheel while the motor is switched off -->
+
+	<!-- Inputs -->
+	<property value="0.0">driveline/in/throttle_norm</property> <!-- accelerator pedal, 0 to 1 -->
+	<property value="1.0">driveline/in/direction</property> <!-- 1 = forward, -1 = reverse -->
+	<property value="1.0">driveline/in/motor_on</property> <!-- 0 switches the motor off: no drive, no coast regen, park lock on -->
+
+	<!-- State: wheel speeds -->
+	<property value="0.0">tyre/fl/omega_rad_sec</property>
+	<property value="0.0">tyre/fr/omega_rad_sec</property>
+	<property value="0.0">tyre/bl/omega_rad_sec</property>
+	<property value="0.0">tyre/br/omega_rad_sec</property>
+
+	<channel name="Driveline">
+		<!-- dt_s = max(sim_dt, 0.0005) -->
+		<fcs_function name="driveline/dt_s">
+			<function>
+				<max>
+					<p>simulation/channel-dt</p>
+					<v>0.0005</v>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- u_mps = u_fps * 0.3048 -->
+		<fcs_function name="driveline/u_mps">
+			<function>
+				<product>
+					<p>velocities/u-fps</p>
+					<v>0.3048</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- v_mps = v_fps * 0.3048 -->
+		<fcs_function name="driveline/v_mps">
+			<function>
+				<product>
+					<p>velocities/v-fps</p>
+					<v>0.3048</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- motor_rad_sec = gear * (front_torque_share * (omega_fl + omega_fr) / 2.0 + (1.0 - front_torque_share) * (omega_bl + omega_br) / 2.0) -->
+		<fcs_function name="driveline/motor_rad_sec">
+			<function>
+				<product>
+					<p>driveline/par/gear</p>
+					<sum>
+						<quotient>
+							<product>
+								<p>driveline/par/front_torque_share</p>
+								<sum>
+									<p>tyre/fl/omega_rad_sec</p>
+									<p>tyre/fr/omega_rad_sec</p>
+								</sum>
+							</product>
+							<v>2.0</v>
+						</quotient>
+						<quotient>
+							<product>
+								<difference>
+									<v>1.0</v>
+									<p>driveline/par/front_torque_share</p>
+								</difference>
+								<sum>
+									<p>tyre/bl/omega_rad_sec</p>
+									<p>tyre/br/omega_rad_sec</p>
+								</sum>
+							</product>
+							<v>2.0</v>
+						</quotient>
+					</sum>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- rev_limit = max(0.0, min(1.0, (max_speed_rad_sec - abs(motor_rad_sec)) / (0.05 * max_speed_rad_sec))) -->
+		<fcs_function name="driveline/rev_limit">
+			<function>
+				<max>
+					<v>0.0</v>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<difference>
+								<p>driveline/par/max_speed_rad_sec</p>
+								<abs>
+									<p>driveline/motor_rad_sec</p>
+								</abs>
+							</difference>
+							<product>
+								<v>0.05</v>
+								<p>driveline/par/max_speed_rad_sec</p>
+							</product>
+						</quotient>
+					</min>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- drive_torque_nm = throttle_norm * direction * rev_limit * min(max_torque_nm, max_power_w / max(abs(motor_rad_sec), 1.0)) -->
+		<fcs_function name="driveline/drive_torque_nm">
+			<function>
+				<product>
+					<p>driveline/in/throttle_norm</p>
+					<p>driveline/in/direction</p>
+					<p>driveline/rev_limit</p>
+					<min>
+						<p>driveline/par/max_torque_nm</p>
+						<quotient>
+							<p>driveline/par/max_power_w</p>
+							<max>
+								<abs>
+									<p>driveline/motor_rad_sec</p>
+								</abs>
+								<v>1.0</v>
+							</max>
+						</quotient>
+					</min>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- coast_torque_nm = -1.0 * coast_regen_nm * (1.0 - min(1.0, 20.0 * throttle_norm)) * max(-1.0, min(1.0, motor_rad_sec / coast_regen_fade_rad_sec)) -->
+		<fcs_function name="driveline/coast_torque_nm">
+			<function>
+				<product>
+					<v>-1.0</v>
+					<p>driveline/par/coast_regen_nm</p>
+					<difference>
+						<v>1.0</v>
+						<min>
+							<v>1.0</v>
+							<product>
+								<v>20.0</v>
+								<p>driveline/in/throttle_norm</p>
+							</product>
+						</min>
+					</difference>
+					<max>
+						<v>-1.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<p>driveline/motor_rad_sec</p>
+								<p>driveline/par/coast_regen_fade_rad_sec</p>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- motor_torque_nm = motor_on * (drive_torque_nm + coast_torque_nm) -->
+		<fcs_function name="driveline/motor_torque_nm">
+			<function>
+				<product>
+					<p>driveline/in/motor_on</p>
+					<sum>
+						<p>driveline/drive_torque_nm</p>
+						<p>driveline/coast_torque_nm</p>
+					</sum>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- axle_torque_front_nm = motor_torque_nm * gear * front_torque_share -->
+		<fcs_function name="driveline/axle_torque_front_nm">
+			<function>
+				<product>
+					<p>driveline/motor_torque_nm</p>
+					<p>driveline/par/gear</p>
+					<p>driveline/par/front_torque_share</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- axle_torque_rear_nm = motor_torque_nm * gear * (1.0 - front_torque_share) -->
+		<fcs_function name="driveline/axle_torque_rear_nm">
+			<function>
+				<product>
+					<p>driveline/motor_torque_nm</p>
+					<p>driveline/par/gear</p>
+					<difference>
+						<v>1.0</v>
+						<p>driveline/par/front_torque_share</p>
+					</difference>
+				</product>
+			</function>
+		</fcs_function>
+	</channel>
+
+	<channel name="Tyre fl">
+		<!-- load_n = max(0.0, 5400.0 * comp_ft + 1600.0 * comp_vel_fps) * 4.4482216 -->
+		<fcs_function name="tyre/fl/load_n">
+			<function>
+				<product>
+					<max>
+						<v>0.0</v>
+						<sum>
+							<product>
+								<v>5400.0</v>
+								<p>gear/unit[0]/compression-ft</p>
+							</product>
+							<product>
+								<v>1600.0</v>
+								<p>gear/unit[0]/compression-velocity-fps</p>
+							</product>
+						</sum>
+					</max>
+					<v>4.4482216</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = 0.42 - comp_ft * 0.3048 -->
+		<fcs_function name="tyre/fl/cg_height_m">
+			<function>
+				<difference>
+					<v>0.42</v>
+					<product>
+						<p>gear/unit[0]/compression-ft</p>
+						<v>0.3048</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vx_mps = u_mps + q * cg_height_m - r * -0.66 -->
+		<fcs_function name="tyre/fl/vx_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/u_mps</p>
+						<product>
+							<p>velocities/q-rad_sec</p>
+							<p>tyre/fl/cg_height_m</p>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/r-rad_sec</p>
+						<v>-0.66</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vy_mps = v_mps + r * 0.82 - p * cg_height_m -->
+		<fcs_function name="tyre/fl/vy_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/v_mps</p>
+						<product>
+							<p>velocities/r-rad_sec</p>
+							<v>0.82</v>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/p-rad_sec</p>
+						<p>tyre/fl/cg_height_m</p>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- steer_rad = steer_deg * 0.017453293 -->
+		<fcs_function name="tyre/fl/steer_rad">
+			<function>
+				<product>
+					<p>fcs/steer-pos-deg[0]</p>
+					<v>0.017453293</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- vx_wheel_mps = vx_mps * cos(steer_rad) + vy_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/fl/vx_wheel_mps">
+			<function>
+				<sum>
+					<product>
+						<p>tyre/fl/vx_mps</p>
+						<cos>
+							<p>tyre/fl/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/fl/vy_mps</p>
+						<sin>
+							<p>tyre/fl/steer_rad</p>
+						</sin>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- vy_wheel_mps = vy_mps * cos(steer_rad) - vx_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/fl/vy_wheel_mps">
+			<function>
+				<difference>
+					<product>
+						<p>tyre/fl/vy_mps</p>
+						<cos>
+							<p>tyre/fl/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/fl/vx_mps</p>
+						<sin>
+							<p>tyre/fl/steer_rad</p>
+						</sin>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- v_ref_mps = max(abs(vx_wheel_mps), low_speed_mps) -->
+		<fcs_function name="tyre/fl/v_ref_mps">
+			<function>
+				<max>
+					<abs>
+						<p>tyre/fl/vx_wheel_mps</p>
+					</abs>
+					<p>tyre/par/low_speed_mps</p>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio_prev = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/fl/slip_ratio_prev">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/fl/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/fl/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/fl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_tan = -1.0 * vy_wheel_mps / v_ref_mps -->
+		<fcs_function name="tyre/fl/slip_tan">
+			<function>
+				<quotient>
+					<product>
+						<v>-1.0</v>
+						<p>tyre/fl/vy_wheel_mps</p>
+					</product>
+					<p>tyre/fl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- mu = mu0 * surface * max(0.6, min(1.25, 1.0 + load_sensitivity * (1.0 - load_n / load_nominal_n))) -->
+		<fcs_function name="tyre/fl/mu">
+			<function>
+				<product>
+					<p>tyre/par/mu0</p>
+					<p>ground/static-friction-factor</p>
+					<max>
+						<v>0.6</v>
+						<min>
+							<v>1.25</v>
+							<sum>
+								<v>1.0</v>
+								<product>
+									<p>tyre/par/load_sensitivity</p>
+									<difference>
+										<v>1.0</v>
+										<quotient>
+											<p>tyre/fl/load_n</p>
+											<p>tyre/par/load_nominal_n</p>
+										</quotient>
+									</difference>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- slip_norm_prev = sqrt(pow(slip_ratio_prev / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/fl/slip_norm_prev">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/fl/slip_ratio_prev</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/fl/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve_prev = sin(shape_c * atan(shape_b * slip_norm_prev - shape_e * (shape_b * slip_norm_prev - atan(shape_b * slip_norm_prev)))) / slip_norm_prev -->
+		<fcs_function name="tyre/fl/curve_prev">
+			<function>
+				<quotient>
+					<sin>
+						<product>
+							<p>tyre/par/shape_c</p>
+							<atan>
+								<difference>
+									<product>
+										<p>tyre/par/shape_b</p>
+										<p>tyre/fl/slip_norm_prev</p>
+									</product>
+									<product>
+										<p>tyre/par/shape_e</p>
+										<difference>
+											<product>
+												<p>tyre/par/shape_b</p>
+												<p>tyre/fl/slip_norm_prev</p>
+											</product>
+											<atan>
+												<product>
+													<p>tyre/par/shape_b</p>
+													<p>tyre/fl/slip_norm_prev</p>
+												</product>
+											</atan>
+										</difference>
+									</product>
+								</difference>
+							</atan>
+						</product>
+					</sin>
+					<p>tyre/fl/slip_norm_prev</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- stiffness_x_n = mu * load_n * curve_prev / slip_ratio_peak -->
+		<fcs_function name="tyre/fl/stiffness_x_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fl/mu</p>
+						<p>tyre/fl/load_n</p>
+						<p>tyre/fl/curve_prev</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- drive_torque_nm = axle_torque_front_nm / 2.0 -->
+		<fcs_function name="tyre/fl/drive_torque_nm">
+			<function>
+				<quotient>
+					<p>driveline/axle_torque_front_nm</p>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- park_torque_nm = (1.0 - motor_on) * park_lock_nm * max(0.0, min(1.0, 1.5 - abs(vx_wheel_mps))) -->
+		<fcs_function name="tyre/fl/park_torque_nm">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>driveline/in/motor_on</p>
+					</difference>
+					<p>driveline/par/park_lock_nm</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<difference>
+								<v>1.5</v>
+								<abs>
+									<p>tyre/fl/vx_wheel_mps</p>
+								</abs>
+							</difference>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = brake_front * brake_front_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<fcs_function name="tyre/fl/brake_torque_nm">
+			<function>
+				<sum>
+					<product>
+						<p>fcs/left-brake-cmd-norm</p>
+						<p>driveline/par/brake_front_nm</p>
+					</product>
+					<p>tyre/fl/park_torque_nm</p>
+					<product>
+						<p>tyre/par/rolling_resistance</p>
+						<p>ground/rolling_friction-factor</p>
+						<p>tyre/fl/load_n</p>
+						<p>tyre/par/radius_m</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- implicit_gain = radius_m * radius_m * stiffness_x_n / v_ref_mps -->
+		<fcs_function name="tyre/fl/implicit_gain">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/fl/stiffness_x_n</p>
+					</product>
+					<p>tyre/fl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- numerator = wheel_inertia_kgm2 * omega_rad_sec / dt_s + drive_torque_nm + implicit_gain * vx_wheel_mps / radius_m -->
+		<fcs_function name="tyre/fl/numerator">
+			<function>
+				<sum>
+					<quotient>
+						<product>
+							<p>tyre/par/wheel_inertia_kgm2</p>
+							<p>tyre/fl/omega_rad_sec</p>
+						</product>
+						<p>driveline/dt_s</p>
+					</quotient>
+					<p>tyre/fl/drive_torque_nm</p>
+					<quotient>
+						<product>
+							<p>tyre/fl/implicit_gain</p>
+							<p>tyre/fl/vx_wheel_mps</p>
+						</product>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- omega_rad_sec = ifthen(lt(sim_time, 0.05), vx_wheel_mps / radius_m, numerator * max(abs(numerator) - brake_torque_nm, 0.0) / (max(abs(numerator), 0.000001) * (wheel_inertia_kgm2 / dt_s + implicit_gain))) -->
+		<fcs_function name="tyre/fl/omega_rad_sec">
+			<function>
+				<ifthen>
+					<lt>
+						<p>simulation/sim-time-sec</p>
+						<v>0.05</v>
+					</lt>
+					<quotient>
+						<p>tyre/fl/vx_wheel_mps</p>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+					<quotient>
+						<product>
+							<p>tyre/fl/numerator</p>
+							<max>
+								<difference>
+									<abs>
+										<p>tyre/fl/numerator</p>
+									</abs>
+									<p>tyre/fl/brake_torque_nm</p>
+								</difference>
+								<v>0.0</v>
+							</max>
+						</product>
+						<product>
+							<max>
+								<abs>
+									<p>tyre/fl/numerator</p>
+								</abs>
+								<v>1e-06</v>
+							</max>
+							<sum>
+								<quotient>
+									<p>tyre/par/wheel_inertia_kgm2</p>
+									<p>driveline/dt_s</p>
+								</quotient>
+								<p>tyre/fl/implicit_gain</p>
+							</sum>
+						</product>
+					</quotient>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/fl/slip_ratio">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/fl/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/fl/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/fl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_norm = sqrt(pow(slip_ratio / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/fl/slip_norm">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/fl/slip_ratio</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/fl/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve = min(curve_prev, 1.0 / slip_norm) -->
+		<fcs_function name="tyre/fl/curve">
+			<function>
+				<min>
+					<p>tyre/fl/curve_prev</p>
+					<quotient>
+						<v>1.0</v>
+						<p>tyre/fl/slip_norm</p>
+					</quotient>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- fx_n = mu * load_n * curve * slip_ratio / slip_ratio_peak -->
+		<fcs_function name="tyre/fl/fx_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fl/mu</p>
+						<p>tyre/fl/load_n</p>
+						<p>tyre/fl/curve</p>
+						<p>tyre/fl/slip_ratio</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- fy_n = mu * load_n * curve * slip_tan / slip_tan_peak -->
+		<fcs_function name="tyre/fl/fy_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fl/mu</p>
+						<p>tyre/fl/load_n</p>
+						<p>tyre/fl/curve</p>
+						<p>tyre/fl/slip_tan</p>
+					</product>
+					<p>tyre/par/slip_tan_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- contact_speed_mps = sqrt(vx_wheel_mps * vx_wheel_mps + vy_wheel_mps * vy_wheel_mps) -->
+		<fcs_function name="tyre/fl/contact_speed_mps">
+			<function>
+				<sqrt>
+					<sum>
+						<product>
+							<p>tyre/fl/vx_wheel_mps</p>
+							<p>tyre/fl/vx_wheel_mps</p>
+						</product>
+						<product>
+							<p>tyre/fl/vy_wheel_mps</p>
+							<p>tyre/fl/vy_wheel_mps</p>
+						</product>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- locked = ifthen(lt(abs(omega_rad_sec), 0.000001), 1.0, 0.0) -->
+		<fcs_function name="tyre/fl/locked">
+			<function>
+				<ifthen>
+					<lt>
+						<abs>
+							<p>tyre/fl/omega_rad_sec</p>
+						</abs>
+						<v>1e-06</v>
+					</lt>
+					<v>1.0</v>
+					<v>0.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- stick = locked * max(0.0, min(1.0, (stick_none_mps - contact_speed_mps) / (stick_none_mps - stick_full_mps))) -->
+		<fcs_function name="tyre/fl/stick">
+			<function>
+				<product>
+					<p>tyre/fl/locked</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/fl/contact_speed_mps</p>
+								</difference>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/par/stick_full_mps</p>
+								</difference>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- jsb_static_mu = stick * mu -->
+		<fcs_function name="tyre/fl/jsb_static_mu">
+			<function>
+				<product>
+					<p>tyre/fl/stick</p>
+					<p>tyre/fl/mu</p>
+				</product>
+			</function>
+			<output>gear/unit[0]/static_friction_coeff</output>
+		</fcs_function>
+		<!-- jsb_rolling_mu = stick * min(mu, brake_torque_nm / (radius_m * max(load_n, 1.0))) / max(roll_factor, 0.05) -->
+		<fcs_function name="tyre/fl/jsb_rolling_mu">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fl/stick</p>
+						<min>
+							<p>tyre/fl/mu</p>
+							<quotient>
+								<p>tyre/fl/brake_torque_nm</p>
+								<product>
+									<p>tyre/par/radius_m</p>
+									<max>
+										<p>tyre/fl/load_n</p>
+										<v>1.0</v>
+									</max>
+								</product>
+							</quotient>
+						</min>
+					</product>
+					<max>
+						<p>ground/rolling_friction-factor</p>
+						<v>0.05</v>
+					</max>
+				</quotient>
+			</function>
+			<output>gear/unit[0]/rolling_friction_coeff</output>
+		</fcs_function>
+		<!-- fx_body_lbs = (1.0 - stick) * (fx_n * cos(steer_rad) - fy_n * sin(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/fl/fx_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fl/stick</p>
+					</difference>
+					<difference>
+						<product>
+							<p>tyre/fl/fx_n</p>
+							<cos>
+								<p>tyre/fl/steer_rad</p>
+							</cos>
+						</product>
+						<product>
+							<p>tyre/fl/fy_n</p>
+							<sin>
+								<p>tyre/fl/steer_rad</p>
+							</sin>
+						</product>
+					</difference>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_fl_x/magnitude</output>
+		</fcs_function>
+		<!-- fy_body_lbs = (1.0 - stick) * (fx_n * sin(steer_rad) + fy_n * cos(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/fl/fy_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fl/stick</p>
+					</difference>
+					<sum>
+						<product>
+							<p>tyre/fl/fx_n</p>
+							<sin>
+								<p>tyre/fl/steer_rad</p>
+							</sin>
+						</product>
+						<product>
+							<p>tyre/fl/fy_n</p>
+							<cos>
+								<p>tyre/fl/steer_rad</p>
+							</cos>
+						</product>
+					</sum>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_fl_y/magnitude</output>
+		</fcs_function>
+		<!-- contact_z_in = (-0.02 + comp_ft * 0.3048) / 0.0254 -->
+		<fcs_function name="tyre/fl/contact_z_in">
+			<function>
+				<quotient>
+					<sum>
+						<v>-0.02</v>
+						<product>
+							<p>gear/unit[0]/compression-ft</p>
+							<v>0.3048</v>
+						</product>
+					</sum>
+					<v>0.0254</v>
+				</quotient>
+			</function>
+			<output>external_reactions/tyre_fl_x/location-z-in</output>
+			<output>external_reactions/tyre_fl_y/location-z-in</output>
+		</fcs_function>
+		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
+		<fcs_function name="tyre/fl/squeal">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fl/stick</p>
+					</difference>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<p>tyre/fl/load_n</p>
+							<p>tyre/par/load_nominal_n</p>
+						</quotient>
+					</min>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/fl/slip_norm</p>
+									<v>0.8</v>
+								</difference>
+								<v>0.7</v>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+	</channel>
+
+	<channel name="Tyre fr">
+		<!-- load_n = max(0.0, 5400.0 * comp_ft + 1600.0 * comp_vel_fps) * 4.4482216 -->
+		<fcs_function name="tyre/fr/load_n">
+			<function>
+				<product>
+					<max>
+						<v>0.0</v>
+						<sum>
+							<product>
+								<v>5400.0</v>
+								<p>gear/unit[1]/compression-ft</p>
+							</product>
+							<product>
+								<v>1600.0</v>
+								<p>gear/unit[1]/compression-velocity-fps</p>
+							</product>
+						</sum>
+					</max>
+					<v>4.4482216</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = 0.42 - comp_ft * 0.3048 -->
+		<fcs_function name="tyre/fr/cg_height_m">
+			<function>
+				<difference>
+					<v>0.42</v>
+					<product>
+						<p>gear/unit[1]/compression-ft</p>
+						<v>0.3048</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vx_mps = u_mps + q * cg_height_m - r * 0.66 -->
+		<fcs_function name="tyre/fr/vx_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/u_mps</p>
+						<product>
+							<p>velocities/q-rad_sec</p>
+							<p>tyre/fr/cg_height_m</p>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/r-rad_sec</p>
+						<v>0.66</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vy_mps = v_mps + r * 0.82 - p * cg_height_m -->
+		<fcs_function name="tyre/fr/vy_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/v_mps</p>
+						<product>
+							<p>velocities/r-rad_sec</p>
+							<v>0.82</v>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/p-rad_sec</p>
+						<p>tyre/fr/cg_height_m</p>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- steer_rad = steer_deg * 0.017453293 -->
+		<fcs_function name="tyre/fr/steer_rad">
+			<function>
+				<product>
+					<p>fcs/steer-pos-deg[1]</p>
+					<v>0.017453293</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- vx_wheel_mps = vx_mps * cos(steer_rad) + vy_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/fr/vx_wheel_mps">
+			<function>
+				<sum>
+					<product>
+						<p>tyre/fr/vx_mps</p>
+						<cos>
+							<p>tyre/fr/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/fr/vy_mps</p>
+						<sin>
+							<p>tyre/fr/steer_rad</p>
+						</sin>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- vy_wheel_mps = vy_mps * cos(steer_rad) - vx_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/fr/vy_wheel_mps">
+			<function>
+				<difference>
+					<product>
+						<p>tyre/fr/vy_mps</p>
+						<cos>
+							<p>tyre/fr/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/fr/vx_mps</p>
+						<sin>
+							<p>tyre/fr/steer_rad</p>
+						</sin>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- v_ref_mps = max(abs(vx_wheel_mps), low_speed_mps) -->
+		<fcs_function name="tyre/fr/v_ref_mps">
+			<function>
+				<max>
+					<abs>
+						<p>tyre/fr/vx_wheel_mps</p>
+					</abs>
+					<p>tyre/par/low_speed_mps</p>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio_prev = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/fr/slip_ratio_prev">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/fr/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/fr/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/fr/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_tan = -1.0 * vy_wheel_mps / v_ref_mps -->
+		<fcs_function name="tyre/fr/slip_tan">
+			<function>
+				<quotient>
+					<product>
+						<v>-1.0</v>
+						<p>tyre/fr/vy_wheel_mps</p>
+					</product>
+					<p>tyre/fr/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- mu = mu0 * surface * max(0.6, min(1.25, 1.0 + load_sensitivity * (1.0 - load_n / load_nominal_n))) -->
+		<fcs_function name="tyre/fr/mu">
+			<function>
+				<product>
+					<p>tyre/par/mu0</p>
+					<p>ground/static-friction-factor</p>
+					<max>
+						<v>0.6</v>
+						<min>
+							<v>1.25</v>
+							<sum>
+								<v>1.0</v>
+								<product>
+									<p>tyre/par/load_sensitivity</p>
+									<difference>
+										<v>1.0</v>
+										<quotient>
+											<p>tyre/fr/load_n</p>
+											<p>tyre/par/load_nominal_n</p>
+										</quotient>
+									</difference>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- slip_norm_prev = sqrt(pow(slip_ratio_prev / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/fr/slip_norm_prev">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/fr/slip_ratio_prev</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/fr/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve_prev = sin(shape_c * atan(shape_b * slip_norm_prev - shape_e * (shape_b * slip_norm_prev - atan(shape_b * slip_norm_prev)))) / slip_norm_prev -->
+		<fcs_function name="tyre/fr/curve_prev">
+			<function>
+				<quotient>
+					<sin>
+						<product>
+							<p>tyre/par/shape_c</p>
+							<atan>
+								<difference>
+									<product>
+										<p>tyre/par/shape_b</p>
+										<p>tyre/fr/slip_norm_prev</p>
+									</product>
+									<product>
+										<p>tyre/par/shape_e</p>
+										<difference>
+											<product>
+												<p>tyre/par/shape_b</p>
+												<p>tyre/fr/slip_norm_prev</p>
+											</product>
+											<atan>
+												<product>
+													<p>tyre/par/shape_b</p>
+													<p>tyre/fr/slip_norm_prev</p>
+												</product>
+											</atan>
+										</difference>
+									</product>
+								</difference>
+							</atan>
+						</product>
+					</sin>
+					<p>tyre/fr/slip_norm_prev</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- stiffness_x_n = mu * load_n * curve_prev / slip_ratio_peak -->
+		<fcs_function name="tyre/fr/stiffness_x_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fr/mu</p>
+						<p>tyre/fr/load_n</p>
+						<p>tyre/fr/curve_prev</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- drive_torque_nm = axle_torque_front_nm / 2.0 -->
+		<fcs_function name="tyre/fr/drive_torque_nm">
+			<function>
+				<quotient>
+					<p>driveline/axle_torque_front_nm</p>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- park_torque_nm = (1.0 - motor_on) * park_lock_nm * max(0.0, min(1.0, 1.5 - abs(vx_wheel_mps))) -->
+		<fcs_function name="tyre/fr/park_torque_nm">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>driveline/in/motor_on</p>
+					</difference>
+					<p>driveline/par/park_lock_nm</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<difference>
+								<v>1.5</v>
+								<abs>
+									<p>tyre/fr/vx_wheel_mps</p>
+								</abs>
+							</difference>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = brake_front * brake_front_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<fcs_function name="tyre/fr/brake_torque_nm">
+			<function>
+				<sum>
+					<product>
+						<p>fcs/left-brake-cmd-norm</p>
+						<p>driveline/par/brake_front_nm</p>
+					</product>
+					<p>tyre/fr/park_torque_nm</p>
+					<product>
+						<p>tyre/par/rolling_resistance</p>
+						<p>ground/rolling_friction-factor</p>
+						<p>tyre/fr/load_n</p>
+						<p>tyre/par/radius_m</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- implicit_gain = radius_m * radius_m * stiffness_x_n / v_ref_mps -->
+		<fcs_function name="tyre/fr/implicit_gain">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/fr/stiffness_x_n</p>
+					</product>
+					<p>tyre/fr/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- numerator = wheel_inertia_kgm2 * omega_rad_sec / dt_s + drive_torque_nm + implicit_gain * vx_wheel_mps / radius_m -->
+		<fcs_function name="tyre/fr/numerator">
+			<function>
+				<sum>
+					<quotient>
+						<product>
+							<p>tyre/par/wheel_inertia_kgm2</p>
+							<p>tyre/fr/omega_rad_sec</p>
+						</product>
+						<p>driveline/dt_s</p>
+					</quotient>
+					<p>tyre/fr/drive_torque_nm</p>
+					<quotient>
+						<product>
+							<p>tyre/fr/implicit_gain</p>
+							<p>tyre/fr/vx_wheel_mps</p>
+						</product>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- omega_rad_sec = ifthen(lt(sim_time, 0.05), vx_wheel_mps / radius_m, numerator * max(abs(numerator) - brake_torque_nm, 0.0) / (max(abs(numerator), 0.000001) * (wheel_inertia_kgm2 / dt_s + implicit_gain))) -->
+		<fcs_function name="tyre/fr/omega_rad_sec">
+			<function>
+				<ifthen>
+					<lt>
+						<p>simulation/sim-time-sec</p>
+						<v>0.05</v>
+					</lt>
+					<quotient>
+						<p>tyre/fr/vx_wheel_mps</p>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+					<quotient>
+						<product>
+							<p>tyre/fr/numerator</p>
+							<max>
+								<difference>
+									<abs>
+										<p>tyre/fr/numerator</p>
+									</abs>
+									<p>tyre/fr/brake_torque_nm</p>
+								</difference>
+								<v>0.0</v>
+							</max>
+						</product>
+						<product>
+							<max>
+								<abs>
+									<p>tyre/fr/numerator</p>
+								</abs>
+								<v>1e-06</v>
+							</max>
+							<sum>
+								<quotient>
+									<p>tyre/par/wheel_inertia_kgm2</p>
+									<p>driveline/dt_s</p>
+								</quotient>
+								<p>tyre/fr/implicit_gain</p>
+							</sum>
+						</product>
+					</quotient>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/fr/slip_ratio">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/fr/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/fr/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/fr/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_norm = sqrt(pow(slip_ratio / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/fr/slip_norm">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/fr/slip_ratio</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/fr/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve = min(curve_prev, 1.0 / slip_norm) -->
+		<fcs_function name="tyre/fr/curve">
+			<function>
+				<min>
+					<p>tyre/fr/curve_prev</p>
+					<quotient>
+						<v>1.0</v>
+						<p>tyre/fr/slip_norm</p>
+					</quotient>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- fx_n = mu * load_n * curve * slip_ratio / slip_ratio_peak -->
+		<fcs_function name="tyre/fr/fx_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fr/mu</p>
+						<p>tyre/fr/load_n</p>
+						<p>tyre/fr/curve</p>
+						<p>tyre/fr/slip_ratio</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- fy_n = mu * load_n * curve * slip_tan / slip_tan_peak -->
+		<fcs_function name="tyre/fr/fy_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fr/mu</p>
+						<p>tyre/fr/load_n</p>
+						<p>tyre/fr/curve</p>
+						<p>tyre/fr/slip_tan</p>
+					</product>
+					<p>tyre/par/slip_tan_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- contact_speed_mps = sqrt(vx_wheel_mps * vx_wheel_mps + vy_wheel_mps * vy_wheel_mps) -->
+		<fcs_function name="tyre/fr/contact_speed_mps">
+			<function>
+				<sqrt>
+					<sum>
+						<product>
+							<p>tyre/fr/vx_wheel_mps</p>
+							<p>tyre/fr/vx_wheel_mps</p>
+						</product>
+						<product>
+							<p>tyre/fr/vy_wheel_mps</p>
+							<p>tyre/fr/vy_wheel_mps</p>
+						</product>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- locked = ifthen(lt(abs(omega_rad_sec), 0.000001), 1.0, 0.0) -->
+		<fcs_function name="tyre/fr/locked">
+			<function>
+				<ifthen>
+					<lt>
+						<abs>
+							<p>tyre/fr/omega_rad_sec</p>
+						</abs>
+						<v>1e-06</v>
+					</lt>
+					<v>1.0</v>
+					<v>0.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- stick = locked * max(0.0, min(1.0, (stick_none_mps - contact_speed_mps) / (stick_none_mps - stick_full_mps))) -->
+		<fcs_function name="tyre/fr/stick">
+			<function>
+				<product>
+					<p>tyre/fr/locked</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/fr/contact_speed_mps</p>
+								</difference>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/par/stick_full_mps</p>
+								</difference>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- jsb_static_mu = stick * mu -->
+		<fcs_function name="tyre/fr/jsb_static_mu">
+			<function>
+				<product>
+					<p>tyre/fr/stick</p>
+					<p>tyre/fr/mu</p>
+				</product>
+			</function>
+			<output>gear/unit[1]/static_friction_coeff</output>
+		</fcs_function>
+		<!-- jsb_rolling_mu = stick * min(mu, brake_torque_nm / (radius_m * max(load_n, 1.0))) / max(roll_factor, 0.05) -->
+		<fcs_function name="tyre/fr/jsb_rolling_mu">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fr/stick</p>
+						<min>
+							<p>tyre/fr/mu</p>
+							<quotient>
+								<p>tyre/fr/brake_torque_nm</p>
+								<product>
+									<p>tyre/par/radius_m</p>
+									<max>
+										<p>tyre/fr/load_n</p>
+										<v>1.0</v>
+									</max>
+								</product>
+							</quotient>
+						</min>
+					</product>
+					<max>
+						<p>ground/rolling_friction-factor</p>
+						<v>0.05</v>
+					</max>
+				</quotient>
+			</function>
+			<output>gear/unit[1]/rolling_friction_coeff</output>
+		</fcs_function>
+		<!-- fx_body_lbs = (1.0 - stick) * (fx_n * cos(steer_rad) - fy_n * sin(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/fr/fx_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fr/stick</p>
+					</difference>
+					<difference>
+						<product>
+							<p>tyre/fr/fx_n</p>
+							<cos>
+								<p>tyre/fr/steer_rad</p>
+							</cos>
+						</product>
+						<product>
+							<p>tyre/fr/fy_n</p>
+							<sin>
+								<p>tyre/fr/steer_rad</p>
+							</sin>
+						</product>
+					</difference>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_fr_x/magnitude</output>
+		</fcs_function>
+		<!-- fy_body_lbs = (1.0 - stick) * (fx_n * sin(steer_rad) + fy_n * cos(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/fr/fy_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fr/stick</p>
+					</difference>
+					<sum>
+						<product>
+							<p>tyre/fr/fx_n</p>
+							<sin>
+								<p>tyre/fr/steer_rad</p>
+							</sin>
+						</product>
+						<product>
+							<p>tyre/fr/fy_n</p>
+							<cos>
+								<p>tyre/fr/steer_rad</p>
+							</cos>
+						</product>
+					</sum>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_fr_y/magnitude</output>
+		</fcs_function>
+		<!-- contact_z_in = (-0.02 + comp_ft * 0.3048) / 0.0254 -->
+		<fcs_function name="tyre/fr/contact_z_in">
+			<function>
+				<quotient>
+					<sum>
+						<v>-0.02</v>
+						<product>
+							<p>gear/unit[1]/compression-ft</p>
+							<v>0.3048</v>
+						</product>
+					</sum>
+					<v>0.0254</v>
+				</quotient>
+			</function>
+			<output>external_reactions/tyre_fr_x/location-z-in</output>
+			<output>external_reactions/tyre_fr_y/location-z-in</output>
+		</fcs_function>
+		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
+		<fcs_function name="tyre/fr/squeal">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fr/stick</p>
+					</difference>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<p>tyre/fr/load_n</p>
+							<p>tyre/par/load_nominal_n</p>
+						</quotient>
+					</min>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/fr/slip_norm</p>
+									<v>0.8</v>
+								</difference>
+								<v>0.7</v>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+	</channel>
+
+	<channel name="Tyre bl">
+		<!-- load_n = max(0.0, 5400.0 * comp_ft + 1600.0 * comp_vel_fps) * 4.4482216 -->
+		<fcs_function name="tyre/bl/load_n">
+			<function>
+				<product>
+					<max>
+						<v>0.0</v>
+						<sum>
+							<product>
+								<v>5400.0</v>
+								<p>gear/unit[2]/compression-ft</p>
+							</product>
+							<product>
+								<v>1600.0</v>
+								<p>gear/unit[2]/compression-velocity-fps</p>
+							</product>
+						</sum>
+					</max>
+					<v>4.4482216</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = 0.43 - comp_ft * 0.3048 -->
+		<fcs_function name="tyre/bl/cg_height_m">
+			<function>
+				<difference>
+					<v>0.43</v>
+					<product>
+						<p>gear/unit[2]/compression-ft</p>
+						<v>0.3048</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vx_mps = u_mps + q * cg_height_m - r * -0.66 -->
+		<fcs_function name="tyre/bl/vx_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/u_mps</p>
+						<product>
+							<p>velocities/q-rad_sec</p>
+							<p>tyre/bl/cg_height_m</p>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/r-rad_sec</p>
+						<v>-0.66</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vy_mps = v_mps + r * -1.67 - p * cg_height_m -->
+		<fcs_function name="tyre/bl/vy_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/v_mps</p>
+						<product>
+							<p>velocities/r-rad_sec</p>
+							<v>-1.67</v>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/p-rad_sec</p>
+						<p>tyre/bl/cg_height_m</p>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- steer_rad = 0.0 -->
+		<fcs_function name="tyre/bl/steer_rad">
+			<function>
+				<v>0.0</v>
+			</function>
+		</fcs_function>
+		<!-- vx_wheel_mps = vx_mps * cos(steer_rad) + vy_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/bl/vx_wheel_mps">
+			<function>
+				<sum>
+					<product>
+						<p>tyre/bl/vx_mps</p>
+						<cos>
+							<p>tyre/bl/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/bl/vy_mps</p>
+						<sin>
+							<p>tyre/bl/steer_rad</p>
+						</sin>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- vy_wheel_mps = vy_mps * cos(steer_rad) - vx_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/bl/vy_wheel_mps">
+			<function>
+				<difference>
+					<product>
+						<p>tyre/bl/vy_mps</p>
+						<cos>
+							<p>tyre/bl/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/bl/vx_mps</p>
+						<sin>
+							<p>tyre/bl/steer_rad</p>
+						</sin>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- v_ref_mps = max(abs(vx_wheel_mps), low_speed_mps) -->
+		<fcs_function name="tyre/bl/v_ref_mps">
+			<function>
+				<max>
+					<abs>
+						<p>tyre/bl/vx_wheel_mps</p>
+					</abs>
+					<p>tyre/par/low_speed_mps</p>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio_prev = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/bl/slip_ratio_prev">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/bl/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/bl/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/bl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_tan = -1.0 * vy_wheel_mps / v_ref_mps -->
+		<fcs_function name="tyre/bl/slip_tan">
+			<function>
+				<quotient>
+					<product>
+						<v>-1.0</v>
+						<p>tyre/bl/vy_wheel_mps</p>
+					</product>
+					<p>tyre/bl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- mu = mu0 * surface * max(0.6, min(1.25, 1.0 + load_sensitivity * (1.0 - load_n / load_nominal_n))) -->
+		<fcs_function name="tyre/bl/mu">
+			<function>
+				<product>
+					<p>tyre/par/mu0</p>
+					<p>ground/static-friction-factor</p>
+					<max>
+						<v>0.6</v>
+						<min>
+							<v>1.25</v>
+							<sum>
+								<v>1.0</v>
+								<product>
+									<p>tyre/par/load_sensitivity</p>
+									<difference>
+										<v>1.0</v>
+										<quotient>
+											<p>tyre/bl/load_n</p>
+											<p>tyre/par/load_nominal_n</p>
+										</quotient>
+									</difference>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- slip_norm_prev = sqrt(pow(slip_ratio_prev / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/bl/slip_norm_prev">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/bl/slip_ratio_prev</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/bl/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve_prev = sin(shape_c * atan(shape_b * slip_norm_prev - shape_e * (shape_b * slip_norm_prev - atan(shape_b * slip_norm_prev)))) / slip_norm_prev -->
+		<fcs_function name="tyre/bl/curve_prev">
+			<function>
+				<quotient>
+					<sin>
+						<product>
+							<p>tyre/par/shape_c</p>
+							<atan>
+								<difference>
+									<product>
+										<p>tyre/par/shape_b</p>
+										<p>tyre/bl/slip_norm_prev</p>
+									</product>
+									<product>
+										<p>tyre/par/shape_e</p>
+										<difference>
+											<product>
+												<p>tyre/par/shape_b</p>
+												<p>tyre/bl/slip_norm_prev</p>
+											</product>
+											<atan>
+												<product>
+													<p>tyre/par/shape_b</p>
+													<p>tyre/bl/slip_norm_prev</p>
+												</product>
+											</atan>
+										</difference>
+									</product>
+								</difference>
+							</atan>
+						</product>
+					</sin>
+					<p>tyre/bl/slip_norm_prev</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- stiffness_x_n = mu * load_n * curve_prev / slip_ratio_peak -->
+		<fcs_function name="tyre/bl/stiffness_x_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/bl/mu</p>
+						<p>tyre/bl/load_n</p>
+						<p>tyre/bl/curve_prev</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- drive_torque_nm = axle_torque_rear_nm / 2.0 -->
+		<fcs_function name="tyre/bl/drive_torque_nm">
+			<function>
+				<quotient>
+					<p>driveline/axle_torque_rear_nm</p>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- park_torque_nm = (1.0 - motor_on) * park_lock_nm * max(0.0, min(1.0, 1.5 - abs(vx_wheel_mps))) -->
+		<fcs_function name="tyre/bl/park_torque_nm">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>driveline/in/motor_on</p>
+					</difference>
+					<p>driveline/par/park_lock_nm</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<difference>
+								<v>1.5</v>
+								<abs>
+									<p>tyre/bl/vx_wheel_mps</p>
+								</abs>
+							</difference>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = brake_rear * brake_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<fcs_function name="tyre/bl/brake_torque_nm">
+			<function>
+				<sum>
+					<product>
+						<p>fcs/right-brake-cmd-norm</p>
+						<p>driveline/par/brake_rear_nm</p>
+					</product>
+					<p>tyre/bl/park_torque_nm</p>
+					<product>
+						<p>tyre/par/rolling_resistance</p>
+						<p>ground/rolling_friction-factor</p>
+						<p>tyre/bl/load_n</p>
+						<p>tyre/par/radius_m</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- implicit_gain = radius_m * radius_m * stiffness_x_n / v_ref_mps -->
+		<fcs_function name="tyre/bl/implicit_gain">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/bl/stiffness_x_n</p>
+					</product>
+					<p>tyre/bl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- numerator = wheel_inertia_kgm2 * omega_rad_sec / dt_s + drive_torque_nm + implicit_gain * vx_wheel_mps / radius_m -->
+		<fcs_function name="tyre/bl/numerator">
+			<function>
+				<sum>
+					<quotient>
+						<product>
+							<p>tyre/par/wheel_inertia_kgm2</p>
+							<p>tyre/bl/omega_rad_sec</p>
+						</product>
+						<p>driveline/dt_s</p>
+					</quotient>
+					<p>tyre/bl/drive_torque_nm</p>
+					<quotient>
+						<product>
+							<p>tyre/bl/implicit_gain</p>
+							<p>tyre/bl/vx_wheel_mps</p>
+						</product>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- omega_rad_sec = ifthen(lt(sim_time, 0.05), vx_wheel_mps / radius_m, numerator * max(abs(numerator) - brake_torque_nm, 0.0) / (max(abs(numerator), 0.000001) * (wheel_inertia_kgm2 / dt_s + implicit_gain))) -->
+		<fcs_function name="tyre/bl/omega_rad_sec">
+			<function>
+				<ifthen>
+					<lt>
+						<p>simulation/sim-time-sec</p>
+						<v>0.05</v>
+					</lt>
+					<quotient>
+						<p>tyre/bl/vx_wheel_mps</p>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+					<quotient>
+						<product>
+							<p>tyre/bl/numerator</p>
+							<max>
+								<difference>
+									<abs>
+										<p>tyre/bl/numerator</p>
+									</abs>
+									<p>tyre/bl/brake_torque_nm</p>
+								</difference>
+								<v>0.0</v>
+							</max>
+						</product>
+						<product>
+							<max>
+								<abs>
+									<p>tyre/bl/numerator</p>
+								</abs>
+								<v>1e-06</v>
+							</max>
+							<sum>
+								<quotient>
+									<p>tyre/par/wheel_inertia_kgm2</p>
+									<p>driveline/dt_s</p>
+								</quotient>
+								<p>tyre/bl/implicit_gain</p>
+							</sum>
+						</product>
+					</quotient>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/bl/slip_ratio">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/bl/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/bl/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/bl/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_norm = sqrt(pow(slip_ratio / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/bl/slip_norm">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/bl/slip_ratio</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/bl/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve = min(curve_prev, 1.0 / slip_norm) -->
+		<fcs_function name="tyre/bl/curve">
+			<function>
+				<min>
+					<p>tyre/bl/curve_prev</p>
+					<quotient>
+						<v>1.0</v>
+						<p>tyre/bl/slip_norm</p>
+					</quotient>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- fx_n = mu * load_n * curve * slip_ratio / slip_ratio_peak -->
+		<fcs_function name="tyre/bl/fx_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/bl/mu</p>
+						<p>tyre/bl/load_n</p>
+						<p>tyre/bl/curve</p>
+						<p>tyre/bl/slip_ratio</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- fy_n = mu * load_n * curve * slip_tan / slip_tan_peak -->
+		<fcs_function name="tyre/bl/fy_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/bl/mu</p>
+						<p>tyre/bl/load_n</p>
+						<p>tyre/bl/curve</p>
+						<p>tyre/bl/slip_tan</p>
+					</product>
+					<p>tyre/par/slip_tan_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- contact_speed_mps = sqrt(vx_wheel_mps * vx_wheel_mps + vy_wheel_mps * vy_wheel_mps) -->
+		<fcs_function name="tyre/bl/contact_speed_mps">
+			<function>
+				<sqrt>
+					<sum>
+						<product>
+							<p>tyre/bl/vx_wheel_mps</p>
+							<p>tyre/bl/vx_wheel_mps</p>
+						</product>
+						<product>
+							<p>tyre/bl/vy_wheel_mps</p>
+							<p>tyre/bl/vy_wheel_mps</p>
+						</product>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- locked = ifthen(lt(abs(omega_rad_sec), 0.000001), 1.0, 0.0) -->
+		<fcs_function name="tyre/bl/locked">
+			<function>
+				<ifthen>
+					<lt>
+						<abs>
+							<p>tyre/bl/omega_rad_sec</p>
+						</abs>
+						<v>1e-06</v>
+					</lt>
+					<v>1.0</v>
+					<v>0.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- stick = locked * max(0.0, min(1.0, (stick_none_mps - contact_speed_mps) / (stick_none_mps - stick_full_mps))) -->
+		<fcs_function name="tyre/bl/stick">
+			<function>
+				<product>
+					<p>tyre/bl/locked</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/bl/contact_speed_mps</p>
+								</difference>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/par/stick_full_mps</p>
+								</difference>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- jsb_static_mu = stick * mu -->
+		<fcs_function name="tyre/bl/jsb_static_mu">
+			<function>
+				<product>
+					<p>tyre/bl/stick</p>
+					<p>tyre/bl/mu</p>
+				</product>
+			</function>
+			<output>gear/unit[2]/static_friction_coeff</output>
+		</fcs_function>
+		<!-- jsb_rolling_mu = stick * min(mu, brake_torque_nm / (radius_m * max(load_n, 1.0))) / max(roll_factor, 0.05) -->
+		<fcs_function name="tyre/bl/jsb_rolling_mu">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/bl/stick</p>
+						<min>
+							<p>tyre/bl/mu</p>
+							<quotient>
+								<p>tyre/bl/brake_torque_nm</p>
+								<product>
+									<p>tyre/par/radius_m</p>
+									<max>
+										<p>tyre/bl/load_n</p>
+										<v>1.0</v>
+									</max>
+								</product>
+							</quotient>
+						</min>
+					</product>
+					<max>
+						<p>ground/rolling_friction-factor</p>
+						<v>0.05</v>
+					</max>
+				</quotient>
+			</function>
+			<output>gear/unit[2]/rolling_friction_coeff</output>
+		</fcs_function>
+		<!-- fx_body_lbs = (1.0 - stick) * (fx_n * cos(steer_rad) - fy_n * sin(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/bl/fx_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/bl/stick</p>
+					</difference>
+					<difference>
+						<product>
+							<p>tyre/bl/fx_n</p>
+							<cos>
+								<p>tyre/bl/steer_rad</p>
+							</cos>
+						</product>
+						<product>
+							<p>tyre/bl/fy_n</p>
+							<sin>
+								<p>tyre/bl/steer_rad</p>
+							</sin>
+						</product>
+					</difference>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_bl_x/magnitude</output>
+		</fcs_function>
+		<!-- fy_body_lbs = (1.0 - stick) * (fx_n * sin(steer_rad) + fy_n * cos(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/bl/fy_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/bl/stick</p>
+					</difference>
+					<sum>
+						<product>
+							<p>tyre/bl/fx_n</p>
+							<sin>
+								<p>tyre/bl/steer_rad</p>
+							</sin>
+						</product>
+						<product>
+							<p>tyre/bl/fy_n</p>
+							<cos>
+								<p>tyre/bl/steer_rad</p>
+							</cos>
+						</product>
+					</sum>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_bl_y/magnitude</output>
+		</fcs_function>
+		<!-- contact_z_in = (-0.03 + comp_ft * 0.3048) / 0.0254 -->
+		<fcs_function name="tyre/bl/contact_z_in">
+			<function>
+				<quotient>
+					<sum>
+						<v>-0.03</v>
+						<product>
+							<p>gear/unit[2]/compression-ft</p>
+							<v>0.3048</v>
+						</product>
+					</sum>
+					<v>0.0254</v>
+				</quotient>
+			</function>
+			<output>external_reactions/tyre_bl_x/location-z-in</output>
+			<output>external_reactions/tyre_bl_y/location-z-in</output>
+		</fcs_function>
+		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
+		<fcs_function name="tyre/bl/squeal">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/bl/stick</p>
+					</difference>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<p>tyre/bl/load_n</p>
+							<p>tyre/par/load_nominal_n</p>
+						</quotient>
+					</min>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/bl/slip_norm</p>
+									<v>0.8</v>
+								</difference>
+								<v>0.7</v>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+	</channel>
+
+	<channel name="Tyre br">
+		<!-- load_n = max(0.0, 5400.0 * comp_ft + 1600.0 * comp_vel_fps) * 4.4482216 -->
+		<fcs_function name="tyre/br/load_n">
+			<function>
+				<product>
+					<max>
+						<v>0.0</v>
+						<sum>
+							<product>
+								<v>5400.0</v>
+								<p>gear/unit[3]/compression-ft</p>
+							</product>
+							<product>
+								<v>1600.0</v>
+								<p>gear/unit[3]/compression-velocity-fps</p>
+							</product>
+						</sum>
+					</max>
+					<v>4.4482216</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = 0.43 - comp_ft * 0.3048 -->
+		<fcs_function name="tyre/br/cg_height_m">
+			<function>
+				<difference>
+					<v>0.43</v>
+					<product>
+						<p>gear/unit[3]/compression-ft</p>
+						<v>0.3048</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vx_mps = u_mps + q * cg_height_m - r * 0.66 -->
+		<fcs_function name="tyre/br/vx_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/u_mps</p>
+						<product>
+							<p>velocities/q-rad_sec</p>
+							<p>tyre/br/cg_height_m</p>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/r-rad_sec</p>
+						<v>0.66</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- vy_mps = v_mps + r * -1.67 - p * cg_height_m -->
+		<fcs_function name="tyre/br/vy_mps">
+			<function>
+				<difference>
+					<sum>
+						<p>driveline/v_mps</p>
+						<product>
+							<p>velocities/r-rad_sec</p>
+							<v>-1.67</v>
+						</product>
+					</sum>
+					<product>
+						<p>velocities/p-rad_sec</p>
+						<p>tyre/br/cg_height_m</p>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- steer_rad = 0.0 -->
+		<fcs_function name="tyre/br/steer_rad">
+			<function>
+				<v>0.0</v>
+			</function>
+		</fcs_function>
+		<!-- vx_wheel_mps = vx_mps * cos(steer_rad) + vy_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/br/vx_wheel_mps">
+			<function>
+				<sum>
+					<product>
+						<p>tyre/br/vx_mps</p>
+						<cos>
+							<p>tyre/br/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/br/vy_mps</p>
+						<sin>
+							<p>tyre/br/steer_rad</p>
+						</sin>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- vy_wheel_mps = vy_mps * cos(steer_rad) - vx_mps * sin(steer_rad) -->
+		<fcs_function name="tyre/br/vy_wheel_mps">
+			<function>
+				<difference>
+					<product>
+						<p>tyre/br/vy_mps</p>
+						<cos>
+							<p>tyre/br/steer_rad</p>
+						</cos>
+					</product>
+					<product>
+						<p>tyre/br/vx_mps</p>
+						<sin>
+							<p>tyre/br/steer_rad</p>
+						</sin>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- v_ref_mps = max(abs(vx_wheel_mps), low_speed_mps) -->
+		<fcs_function name="tyre/br/v_ref_mps">
+			<function>
+				<max>
+					<abs>
+						<p>tyre/br/vx_wheel_mps</p>
+					</abs>
+					<p>tyre/par/low_speed_mps</p>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio_prev = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/br/slip_ratio_prev">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/br/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/br/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/br/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_tan = -1.0 * vy_wheel_mps / v_ref_mps -->
+		<fcs_function name="tyre/br/slip_tan">
+			<function>
+				<quotient>
+					<product>
+						<v>-1.0</v>
+						<p>tyre/br/vy_wheel_mps</p>
+					</product>
+					<p>tyre/br/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- mu = mu0 * surface * max(0.6, min(1.25, 1.0 + load_sensitivity * (1.0 - load_n / load_nominal_n))) -->
+		<fcs_function name="tyre/br/mu">
+			<function>
+				<product>
+					<p>tyre/par/mu0</p>
+					<p>ground/static-friction-factor</p>
+					<max>
+						<v>0.6</v>
+						<min>
+							<v>1.25</v>
+							<sum>
+								<v>1.0</v>
+								<product>
+									<p>tyre/par/load_sensitivity</p>
+									<difference>
+										<v>1.0</v>
+										<quotient>
+											<p>tyre/br/load_n</p>
+											<p>tyre/par/load_nominal_n</p>
+										</quotient>
+									</difference>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- slip_norm_prev = sqrt(pow(slip_ratio_prev / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/br/slip_norm_prev">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/br/slip_ratio_prev</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/br/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve_prev = sin(shape_c * atan(shape_b * slip_norm_prev - shape_e * (shape_b * slip_norm_prev - atan(shape_b * slip_norm_prev)))) / slip_norm_prev -->
+		<fcs_function name="tyre/br/curve_prev">
+			<function>
+				<quotient>
+					<sin>
+						<product>
+							<p>tyre/par/shape_c</p>
+							<atan>
+								<difference>
+									<product>
+										<p>tyre/par/shape_b</p>
+										<p>tyre/br/slip_norm_prev</p>
+									</product>
+									<product>
+										<p>tyre/par/shape_e</p>
+										<difference>
+											<product>
+												<p>tyre/par/shape_b</p>
+												<p>tyre/br/slip_norm_prev</p>
+											</product>
+											<atan>
+												<product>
+													<p>tyre/par/shape_b</p>
+													<p>tyre/br/slip_norm_prev</p>
+												</product>
+											</atan>
+										</difference>
+									</product>
+								</difference>
+							</atan>
+						</product>
+					</sin>
+					<p>tyre/br/slip_norm_prev</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- stiffness_x_n = mu * load_n * curve_prev / slip_ratio_peak -->
+		<fcs_function name="tyre/br/stiffness_x_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/br/mu</p>
+						<p>tyre/br/load_n</p>
+						<p>tyre/br/curve_prev</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- drive_torque_nm = axle_torque_rear_nm / 2.0 -->
+		<fcs_function name="tyre/br/drive_torque_nm">
+			<function>
+				<quotient>
+					<p>driveline/axle_torque_rear_nm</p>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- park_torque_nm = (1.0 - motor_on) * park_lock_nm * max(0.0, min(1.0, 1.5 - abs(vx_wheel_mps))) -->
+		<fcs_function name="tyre/br/park_torque_nm">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>driveline/in/motor_on</p>
+					</difference>
+					<p>driveline/par/park_lock_nm</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<difference>
+								<v>1.5</v>
+								<abs>
+									<p>tyre/br/vx_wheel_mps</p>
+								</abs>
+							</difference>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = brake_rear * brake_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<fcs_function name="tyre/br/brake_torque_nm">
+			<function>
+				<sum>
+					<product>
+						<p>fcs/right-brake-cmd-norm</p>
+						<p>driveline/par/brake_rear_nm</p>
+					</product>
+					<p>tyre/br/park_torque_nm</p>
+					<product>
+						<p>tyre/par/rolling_resistance</p>
+						<p>ground/rolling_friction-factor</p>
+						<p>tyre/br/load_n</p>
+						<p>tyre/par/radius_m</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- implicit_gain = radius_m * radius_m * stiffness_x_n / v_ref_mps -->
+		<fcs_function name="tyre/br/implicit_gain">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/par/radius_m</p>
+						<p>tyre/br/stiffness_x_n</p>
+					</product>
+					<p>tyre/br/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- numerator = wheel_inertia_kgm2 * omega_rad_sec / dt_s + drive_torque_nm + implicit_gain * vx_wheel_mps / radius_m -->
+		<fcs_function name="tyre/br/numerator">
+			<function>
+				<sum>
+					<quotient>
+						<product>
+							<p>tyre/par/wheel_inertia_kgm2</p>
+							<p>tyre/br/omega_rad_sec</p>
+						</product>
+						<p>driveline/dt_s</p>
+					</quotient>
+					<p>tyre/br/drive_torque_nm</p>
+					<quotient>
+						<product>
+							<p>tyre/br/implicit_gain</p>
+							<p>tyre/br/vx_wheel_mps</p>
+						</product>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- omega_rad_sec = ifthen(lt(sim_time, 0.05), vx_wheel_mps / radius_m, numerator * max(abs(numerator) - brake_torque_nm, 0.0) / (max(abs(numerator), 0.000001) * (wheel_inertia_kgm2 / dt_s + implicit_gain))) -->
+		<fcs_function name="tyre/br/omega_rad_sec">
+			<function>
+				<ifthen>
+					<lt>
+						<p>simulation/sim-time-sec</p>
+						<v>0.05</v>
+					</lt>
+					<quotient>
+						<p>tyre/br/vx_wheel_mps</p>
+						<p>tyre/par/radius_m</p>
+					</quotient>
+					<quotient>
+						<product>
+							<p>tyre/br/numerator</p>
+							<max>
+								<difference>
+									<abs>
+										<p>tyre/br/numerator</p>
+									</abs>
+									<p>tyre/br/brake_torque_nm</p>
+								</difference>
+								<v>0.0</v>
+							</max>
+						</product>
+						<product>
+							<max>
+								<abs>
+									<p>tyre/br/numerator</p>
+								</abs>
+								<v>1e-06</v>
+							</max>
+							<sum>
+								<quotient>
+									<p>tyre/par/wheel_inertia_kgm2</p>
+									<p>driveline/dt_s</p>
+								</quotient>
+								<p>tyre/br/implicit_gain</p>
+							</sum>
+						</product>
+					</quotient>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- slip_ratio = (omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps -->
+		<fcs_function name="tyre/br/slip_ratio">
+			<function>
+				<quotient>
+					<difference>
+						<product>
+							<p>tyre/br/omega_rad_sec</p>
+							<p>tyre/par/radius_m</p>
+						</product>
+						<p>tyre/br/vx_wheel_mps</p>
+					</difference>
+					<p>tyre/br/v_ref_mps</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- slip_norm = sqrt(pow(slip_ratio / slip_ratio_peak, 2.0) + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001) -->
+		<fcs_function name="tyre/br/slip_norm">
+			<function>
+				<sqrt>
+					<sum>
+						<pow>
+							<quotient>
+								<p>tyre/br/slip_ratio</p>
+								<p>tyre/par/slip_ratio_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<pow>
+							<quotient>
+								<p>tyre/br/slip_tan</p>
+								<p>tyre/par/slip_tan_peak</p>
+							</quotient>
+							<v>2.0</v>
+						</pow>
+						<v>1e-08</v>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- curve = min(curve_prev, 1.0 / slip_norm) -->
+		<fcs_function name="tyre/br/curve">
+			<function>
+				<min>
+					<p>tyre/br/curve_prev</p>
+					<quotient>
+						<v>1.0</v>
+						<p>tyre/br/slip_norm</p>
+					</quotient>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- fx_n = mu * load_n * curve * slip_ratio / slip_ratio_peak -->
+		<fcs_function name="tyre/br/fx_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/br/mu</p>
+						<p>tyre/br/load_n</p>
+						<p>tyre/br/curve</p>
+						<p>tyre/br/slip_ratio</p>
+					</product>
+					<p>tyre/par/slip_ratio_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- fy_n = mu * load_n * curve * slip_tan / slip_tan_peak -->
+		<fcs_function name="tyre/br/fy_n">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/br/mu</p>
+						<p>tyre/br/load_n</p>
+						<p>tyre/br/curve</p>
+						<p>tyre/br/slip_tan</p>
+					</product>
+					<p>tyre/par/slip_tan_peak</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- contact_speed_mps = sqrt(vx_wheel_mps * vx_wheel_mps + vy_wheel_mps * vy_wheel_mps) -->
+		<fcs_function name="tyre/br/contact_speed_mps">
+			<function>
+				<sqrt>
+					<sum>
+						<product>
+							<p>tyre/br/vx_wheel_mps</p>
+							<p>tyre/br/vx_wheel_mps</p>
+						</product>
+						<product>
+							<p>tyre/br/vy_wheel_mps</p>
+							<p>tyre/br/vy_wheel_mps</p>
+						</product>
+					</sum>
+				</sqrt>
+			</function>
+		</fcs_function>
+		<!-- locked = ifthen(lt(abs(omega_rad_sec), 0.000001), 1.0, 0.0) -->
+		<fcs_function name="tyre/br/locked">
+			<function>
+				<ifthen>
+					<lt>
+						<abs>
+							<p>tyre/br/omega_rad_sec</p>
+						</abs>
+						<v>1e-06</v>
+					</lt>
+					<v>1.0</v>
+					<v>0.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- stick = locked * max(0.0, min(1.0, (stick_none_mps - contact_speed_mps) / (stick_none_mps - stick_full_mps))) -->
+		<fcs_function name="tyre/br/stick">
+			<function>
+				<product>
+					<p>tyre/br/locked</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/br/contact_speed_mps</p>
+								</difference>
+								<difference>
+									<p>tyre/par/stick_none_mps</p>
+									<p>tyre/par/stick_full_mps</p>
+								</difference>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- jsb_static_mu = stick * mu -->
+		<fcs_function name="tyre/br/jsb_static_mu">
+			<function>
+				<product>
+					<p>tyre/br/stick</p>
+					<p>tyre/br/mu</p>
+				</product>
+			</function>
+			<output>gear/unit[3]/static_friction_coeff</output>
+		</fcs_function>
+		<!-- jsb_rolling_mu = stick * min(mu, brake_torque_nm / (radius_m * max(load_n, 1.0))) / max(roll_factor, 0.05) -->
+		<fcs_function name="tyre/br/jsb_rolling_mu">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/br/stick</p>
+						<min>
+							<p>tyre/br/mu</p>
+							<quotient>
+								<p>tyre/br/brake_torque_nm</p>
+								<product>
+									<p>tyre/par/radius_m</p>
+									<max>
+										<p>tyre/br/load_n</p>
+										<v>1.0</v>
+									</max>
+								</product>
+							</quotient>
+						</min>
+					</product>
+					<max>
+						<p>ground/rolling_friction-factor</p>
+						<v>0.05</v>
+					</max>
+				</quotient>
+			</function>
+			<output>gear/unit[3]/rolling_friction_coeff</output>
+		</fcs_function>
+		<!-- fx_body_lbs = (1.0 - stick) * (fx_n * cos(steer_rad) - fy_n * sin(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/br/fx_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/br/stick</p>
+					</difference>
+					<difference>
+						<product>
+							<p>tyre/br/fx_n</p>
+							<cos>
+								<p>tyre/br/steer_rad</p>
+							</cos>
+						</product>
+						<product>
+							<p>tyre/br/fy_n</p>
+							<sin>
+								<p>tyre/br/steer_rad</p>
+							</sin>
+						</product>
+					</difference>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_br_x/magnitude</output>
+		</fcs_function>
+		<!-- fy_body_lbs = (1.0 - stick) * (fx_n * sin(steer_rad) + fy_n * cos(steer_rad)) * 0.22480894 -->
+		<fcs_function name="tyre/br/fy_body_lbs">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/br/stick</p>
+					</difference>
+					<sum>
+						<product>
+							<p>tyre/br/fx_n</p>
+							<sin>
+								<p>tyre/br/steer_rad</p>
+							</sin>
+						</product>
+						<product>
+							<p>tyre/br/fy_n</p>
+							<cos>
+								<p>tyre/br/steer_rad</p>
+							</cos>
+						</product>
+					</sum>
+					<v>0.22480894</v>
+				</product>
+			</function>
+			<output>external_reactions/tyre_br_y/magnitude</output>
+		</fcs_function>
+		<!-- contact_z_in = (-0.03 + comp_ft * 0.3048) / 0.0254 -->
+		<fcs_function name="tyre/br/contact_z_in">
+			<function>
+				<quotient>
+					<sum>
+						<v>-0.03</v>
+						<product>
+							<p>gear/unit[3]/compression-ft</p>
+							<v>0.3048</v>
+						</product>
+					</sum>
+					<v>0.0254</v>
+				</quotient>
+			</function>
+			<output>external_reactions/tyre_br_x/location-z-in</output>
+			<output>external_reactions/tyre_br_y/location-z-in</output>
+		</fcs_function>
+		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
+		<fcs_function name="tyre/br/squeal">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/br/stick</p>
+					</difference>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<p>tyre/br/load_n</p>
+							<p>tyre/par/load_nominal_n</p>
+						</quotient>
+					</min>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/br/slip_norm</p>
+									<v>0.8</v>
+								</difference>
+								<v>0.7</v>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+	</channel>
+
+</system>
