@@ -5,7 +5,7 @@ var styleVehicleWindow = func(win) {
 	var centerY = titleHeight / 2;
 	win._title_bar_height = titleHeight;
 	win.setInt("shadow-radius", 0).setInt("shadow-inset", 0);
-	win.set("decoration-border", "32 1 1").setBool("update", 1);
+	win.set("decoration-border", "32 2 5").setBool("update", 1);
 	# Filtered decoration texels already contain RGB multiplied by their coverage.
 	win.set("blend-source-rgb", "one").set("blend-destination-rgb", "one-minus-src-alpha");
 	var deco = win.getCanvasDecoration();
@@ -15,17 +15,17 @@ var styleVehicleWindow = func(win) {
 	var decoration = deco.getGroup("decoration");
 	var bar = decoration.getElementById("title_bar");
 	var images = getprop("/sim/aircraft-dir") ~ "/gui/images/";
-	# One image draws the header, its divider and the four edges. Skip the center:
+	# One image draws the header, its divider and the soft shadow. Skip the center:
 	# FlightGear places the content canvas inside the frame, above the decoration.
 	var surface = decoration.createChild("image", "vehicle-frame")
 		.setFile(images ~ "window-frame.png").set("z-index", -1)
-		.set("slice", "64 16 6").set("slice-width", "32 8 3")
+		.set("slice", "64 24 16").set("slice-width", "32 12 8")
 		.set("fill", "#f5f5f7");
 	var dragArea = win._title_bar_bg.set("fill-opacity", 0).set("z-index", 1);
 	win._resizeDecoration = func {
 		var (w, h) = win.getSize();
-		w += 2;
-		h += titleHeight + 1;
+		w += 4;
+		h += titleHeight + 5;
 		deco.setInt("view[0]", w).setInt("view[1]", h)
 			.setInt("size[0]", 2*w).setInt("size[1]", 2*h);
 		surface.setSize(w, h);
