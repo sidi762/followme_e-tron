@@ -26,14 +26,20 @@ var position_change = func(position_val,value){
         position_val += value;
     return position_val;
 }
+# A scenery tile can supply elevation before its material is available.
+# Return nil for an unknown sample so the controller skips that steering update.
+var road_at = func(lat, lon) {
+    var hit = geodinfo(lat, lon);
+    if (hit == nil or size(hit) < 2 or hit[1] == nil) return nil;
+    var names = hit[1]["names"];
+    if (names == nil or !size(names)) return nil;
+    return names[0] == "Freeway" or names[0] == "Road";
+};
 var road_check_func = func(){
 
     var lat = props.getNode("/position/latitude-deg",1).getValue();
     var lon = props.getNode("/position/longitude-deg",1).getValue();
-    var position_info = geodinfo(lat,lon);
-    var position_names = position_info[1].names;
-
-    if((position_names[0]=="Freeway") or (position_names[0]=="Road"))
+    if(road_at(lat, lon))
     {
         var car_heading = 0;
         var lat_change  = 0;
@@ -48,9 +54,9 @@ var road_check_func = func(){
             lon_change  = -math.cos(D2R*car_heading);
             lat = props.getNode("/position/latitude-deg",1).getValue()+0.0001*math.cos(D2R*car_heading);
             lon = props.getNode("/position/longitude-deg",1).getValue()+0.0001*math.sin(D2R*car_heading);
-            var other_position_info = geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
-            var other_names = other_position_info[1].names;
-            if((other_names[0]=="Freeway") or (other_names[0]=="Road"))
+            var on_road = road_at(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
+            if (on_road == nil) return;
+            if (on_road)
                 right_range += 1;
             else
                 break;
@@ -62,9 +68,9 @@ var road_check_func = func(){
             lon_change  = -math.cos(D2R*car_heading);
             lat = props.getNode("/position/latitude-deg",1).getValue()+0.0001*math.cos(D2R*car_heading);
             lon = props.getNode("/position/longitude-deg",1).getValue()+0.0001*math.sin(D2R*car_heading);
-            var other_position_info = geodinfo(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
-            var other_names = other_position_info[1].names;
-            if((other_names[0]=="Freeway") or (other_names[0]=="Road"))
+            var on_road = road_at(position_change(lat,i*lat_change),position_change(lon,i*lon_change));
+            if (on_road == nil) return;
+            if (on_road)
                 left_range+=1;
             else
                 break;
