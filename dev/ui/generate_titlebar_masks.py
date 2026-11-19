@@ -1,4 +1,4 @@
-"""Rebuild the two alpha masks used by gui/dialogs/base/window.nas (Pillow, NumPy)."""
+"""Rebuild the Canvas window frame and close icon (Pillow, NumPy)."""
 
 from pathlib import Path
 
@@ -19,27 +19,38 @@ def close_shape(x, y):
     return (x - nearest) ** 2 + (y - nearest) ** 2 <= 0.8 ** 2
 
 
-def titlebar_shape(x, y):
-    # Only the top corners are rounded. The nine-slice center stretches in FG.
+def frame_shape(x, y, inset=0):
+    # Both arcs are concentric; the body has square bottom corners.
     dx = np.maximum(np.maximum(8 - x, x - 24), 0)
     dy = np.maximum(8 - y, 0)
-    return dx ** 2 + dy ** 2 <= 8 ** 2
+    return ((dx ** 2 + dy ** 2 <= (8 - inset) ** 2)
+            & (x >= inset) & (x <= 32 - inset) & (y >= inset) & (y <= 64 - inset))
 
 
-def save_mask(name, size, shape, softness):
+def coverage(width, height, shape, softness):
     # All dimensions, including the filter radius, are in final window pixels.
-    side = size * SAMPLES_PER_PIXEL
-    centers = (np.arange(side) + 0.5) / SAMPLES_PER_PIXEL
-    inside = shape(centers[None, :], centers[:, None])
+    x = (np.arange(width * SAMPLES_PER_PIXEL) + 0.5) / SAMPLES_PER_PIXEL
+    y = (np.arange(height * SAMPLES_PER_PIXEL) + 0.5) / SAMPLES_PER_PIXEL
+    inside = shape(x[None, :], y[:, None])
     alpha = Image.fromarray(inside.astype(np.uint8) * 255)
     alpha = alpha.filter(ImageFilter.GaussianBlur(softness * SAMPLES_PER_PIXEL))
-    side = size * TEXTURE_SCALE
-    alpha = alpha.resize((side, side), Image.Resampling.BOX)
-    mask = Image.new("LA", alpha.size, (255, 0))
-    mask.putalpha(alpha)
-    mask.save(OUTPUT / name, optimize=True)
+    return alpha.resize((width * TEXTURE_SCALE, height * TEXTURE_SCALE), Image.Resampling.BOX)
+
+
+def window_frame():
+    outer = coverage(32, 64, frame_shape, 0.34)
+    inner = coverage(32, 64, lambda x, y: frame_shape(x, y, 1), 0.34)
+    # Store straight luminance and alpha. The outermost covered samples contain
+    # only the outline color; the interior is tinted by the Canvas image.
+    alpha = np.asarray(outer, dtype=float)
+    fill = np.divide(np.asarray(inner), alpha, out=np.zeros_like(alpha), where=alpha > 0)
+    light = np.full_like(alpha, 255)
+    light[31 * TEXTURE_SCALE : 32 * TEXTURE_SCALE] = [[226], [244]]
+    luminance = np.rint(185 + (light - 185) * np.minimum(fill, 1)).astype(np.uint8)
+    return Image.merge("LA", (Image.fromarray(luminance), outer))
 
 
 if __name__ == "__main__":
-    save_mask("close-mask.png", 16, close_shape, 0.45)
-    save_mask("titlebar-mask.png", 32, titlebar_shape, 0.34)
+    close = coverage(16, 16, close_shape, 0.45)
+    Image.merge("LA", (Image.new("L", close.size, 255), close)).save(OUTPUT / "close-mask.png", optimize=True)
+    window_frame().save(OUTPUT / "window-frame.png", optimize=True)
