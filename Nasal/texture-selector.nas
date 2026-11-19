@@ -231,7 +231,8 @@ var TextureSelectorDialog = {
     new: func(selector, title, compact=0) {
         return {parents: [TextureSelectorDialog], _parentSelector: selector,
             _title: title, _window: nil, _rowHeight: 28, _listener: nil,
-            _preferredWidth: compact ? 264 : 340, _preferredRows: compact ? 8 : 13};
+            _preferredWidth: compact ? 240 : 340, _preferredRows: compact ? 8 : 13,
+            _closeWidth: compact ? 48 : 68};
     },
 
     # Only the list scrolls. Use the actual Canvas desktop size, which can be
@@ -277,8 +278,8 @@ var TextureSelectorDialog = {
         var separator = footer.createChild("path").set("fill", "#e8e8ec");
         me._currentLabel = me._text(footer, me._rowInset, 22, "", 13).set("fill", "#494950");
         var close = footer.createChild("group", "close-button");
-        var bg = close.createChild("path").rect(0, 0, 68, 28, {"border-radius": 5}).set("fill", "#ffffff");
-        me._text(close, 34, 14, "Close", 14, "center-center").set("fill", "#365b82");
+        var bg = close.createChild("path").rect(0, 0, me._closeWidth, 28, {"border-radius": 5}).set("fill", "#ffffff");
+        me._text(close, me._closeWidth / 2, 14, "Close", 14, "center-center").set("fill", "#365b82");
         close.addEventListener("mouseenter", func bg.set("fill", "#eef3f8"));
         close.addEventListener("mouseleave", func bg.set("fill", "#ffffff"));
         close.addEventListener("mousedown", func bg.set("fill", "#e0e9f2"));
@@ -302,8 +303,9 @@ var TextureSelectorDialog = {
             dialog._scrollArea.setSize(width, dialog._listHeight);
             footer.setTranslation(0, dialog._listHeight);
             separator.reset().rect(0, 0, width, 1);
-            dialog._currentLabel.setClipByBoundingBox([0, 0, math.max(0, width - 84), footerHeight]);
-            close.setTranslation(width - 76, 8);
+            var closeX = width - 8 - dialog._closeWidth;
+            dialog._currentLabel.setClipByBoundingBox([0, 0, math.max(0, closeX - 8), footerHeight]);
+            close.setTranslation(closeX, 8);
         };
         me._window.onResize();
         me._disconnectWheel = bindVehicleScroll(me._window, host, me._scrollArea, me._rowHeight);
