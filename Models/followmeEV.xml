@@ -463,6 +463,8 @@
             <z-m>1.03</z-m>
         </offsets>
     </model>
+    <!-- Spin takes signed RPM about model +Y. Prototype sends rad/s;
+         the stock EV and older multiplayer senders use the road-speed path. -->
     <!-- FRONT WHEEL LEFT -->
     <animation>
         <type>rotate</type>
@@ -485,6 +487,7 @@
         <type>translate</type>
         <object-name>Tyre1</object-name>
         <object-name>kaqian1</object-name>
+        <object-name>tyre-smoke-FL</object-name>
         <property>sim/multiplay/generic/float[5]</property>
         <interpolation>
             <entry>
@@ -505,8 +508,19 @@
     <animation>
         <type>spin</type>
         <object-name>Tyre1</object-name>
-        <property>sim/multiplay/generic/float[6]</property>
-        <factor>-15</factor>
+        <expression>
+            <sum>
+                <product>
+                    <property>sim/multiplay/generic/bool[13]</property>
+                    <property>sim/multiplay/generic/float[29]</property>
+                    <value>-9.5492965855</value>
+                </product>
+                <product>
+                    <value>-15</value><property>sim/multiplay/generic/float[6]</property>
+                    <difference><value>1</value><property>sim/multiplay/generic/bool[13]</property></difference>
+                </product>
+            </sum>
+        </expression>
         <center>
             <x-m>0.677</x-m>
             <y-m>0.667</y-m>
@@ -540,6 +554,7 @@
         <type>translate</type>
         <object-name>Tyre2</object-name>
         <object-name>kaqian2</object-name>
+        <object-name>tyre-smoke-FR</object-name>
         <property>sim/multiplay/generic/float[8]</property>
         <interpolation>
             <entry>
@@ -560,8 +575,19 @@
     <animation>
         <type>spin</type>
         <object-name>Tyre2</object-name>
-        <property>sim/multiplay/generic/float[9]</property>
-        <factor>-15</factor>
+        <expression>
+            <sum>
+                <product>
+                    <property>sim/multiplay/generic/bool[13]</property>
+                    <property>sim/multiplay/generic/float[30]</property>
+                    <value>-9.5492965855</value>
+                </product>
+                <product>
+                    <value>-15</value><property>sim/multiplay/generic/float[9]</property>
+                    <difference><value>1</value><property>sim/multiplay/generic/bool[13]</property></difference>
+                </product>
+            </sum>
+        </expression>
         <center>
             <x-m>0.677</x-m>
             <y-m>-0.667</y-m>
@@ -595,6 +621,7 @@
         <type>translate</type>
         <object-name>Tyre3</object-name>
         <object-name>kaqian3</object-name>
+        <object-name>tyre-smoke-BL</object-name>
         <property>sim/multiplay/generic/float[10]</property>
         <interpolation>
             <entry>
@@ -615,8 +642,19 @@
     <animation>
         <type>spin</type>
         <object-name>Tyre3</object-name>
-        <property>sim/multiplay/generic/float[11]</property>
-        <factor>-15</factor>
+        <expression>
+            <sum>
+                <product>
+                    <property>sim/multiplay/generic/bool[13]</property>
+                    <property>sim/multiplay/generic/float[31]</property>
+                    <value>-9.5492965855</value>
+                </product>
+                <product>
+                    <value>-15</value><property>sim/multiplay/generic/float[11]</property>
+                    <difference><value>1</value><property>sim/multiplay/generic/bool[13]</property></difference>
+                </product>
+            </sum>
+        </expression>
         <center>
             <x-m>3.156</x-m>
             <y-m>0.667</y-m>
@@ -650,6 +688,7 @@
         <type>translate</type>
         <object-name>Tyre4</object-name>
         <object-name>kaqian4</object-name>
+        <object-name>tyre-smoke-BR</object-name>
         <property>sim/multiplay/generic/float[12]</property>
         <interpolation>
             <entry>
@@ -670,8 +709,19 @@
     <animation>
         <type>spin</type>
         <object-name>Tyre4</object-name>
-        <property>sim/multiplay/generic/float[13]</property>
-        <factor>-15</factor>
+        <expression>
+            <sum>
+                <product>
+                    <property>sim/multiplay/generic/bool[13]</property>
+                    <property>sim/multiplay/generic/float[32]</property>
+                    <value>-9.5492965855</value>
+                </product>
+                <product>
+                    <value>-15</value><property>sim/multiplay/generic/float[13]</property>
+                    <difference><value>1</value><property>sim/multiplay/generic/bool[13]</property></difference>
+                </product>
+            </sum>
+        </expression>
         <center>
             <x-m>3.156</x-m>
             <y-m>-0.667</y-m>
@@ -1226,6 +1276,35 @@
             </and>
         </condition>
     </model>
+    <!-- Dry sliding smoke originates just above each unloaded contact patch. -->
+    <particlesystem include="Effects/tyre-friction-particles.xml">
+        <name>tyre-smoke-FL</name>
+        <offsets><x-m>0.68</x-m><y-m>-0.66</y-m><z-m>0.01</z-m></offsets>
+        <counter><particles-per-sec>
+            <property>sim/multiplay/generic/float[33]</property><factor>60</factor>
+        </particles-per-sec></counter>
+    </particlesystem>
+    <particlesystem include="Effects/tyre-friction-particles.xml">
+        <name>tyre-smoke-FR</name>
+        <offsets><x-m>0.68</x-m><y-m>0.66</y-m><z-m>0.01</z-m></offsets>
+        <counter><particles-per-sec>
+            <property>sim/multiplay/generic/float[34]</property><factor>60</factor>
+        </particles-per-sec></counter>
+    </particlesystem>
+    <particlesystem include="Effects/tyre-friction-particles.xml">
+        <name>tyre-smoke-BL</name>
+        <offsets><x-m>3.17</x-m><y-m>-0.66</y-m><z-m>0.01</z-m></offsets>
+        <counter><particles-per-sec>
+            <property>sim/multiplay/generic/float[35]</property><factor>60</factor>
+        </particles-per-sec></counter>
+    </particlesystem>
+    <particlesystem include="Effects/tyre-friction-particles.xml">
+        <name>tyre-smoke-BR</name>
+        <offsets><x-m>3.17</x-m><y-m>0.66</y-m><z-m>0.01</z-m></offsets>
+        <counter><particles-per-sec>
+            <property>sim/multiplay/generic/float[36]</property><factor>60</factor>
+        </particles-per-sec></counter>
+    </particlesystem>
     <!-- Tyre smoke -->
     <model>
         <path>Aircraft/followme_e-tron/Models/Effects/tyre-smoke.xml</path>

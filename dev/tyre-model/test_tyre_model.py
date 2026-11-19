@@ -55,6 +55,40 @@ def test_launch_on_a_slippery_road_spins_the_wheels_and_is_slow():
     assert launch("stock", surface=0.3)[0]["time"] == pytest.approx(launch("stock")[0]["time"], rel=0.01)
 
 
+def test_smoke_follows_the_sliding_axle():
+    car = Car("tyre", params=REAR_DRIVE)
+    car.run(1, throttle=1, brake=1, rear_brake=0)
+    for wheel in ("fl", "fr"):
+        assert car.fdm[f"tyre/{wheel}/smoke_norm"] == 0
+    for wheel in ("bl", "br"):
+        assert car.fdm[f"tyre/{wheel}/smoke_norm"] > 0.5
+
+    car = Car("tyre", speed=20, settle=0.6)
+    car.run(0.25)
+    assert all(car.fdm[f"tyre/{wheel}/smoke_norm"] == 0 for wheel in WHEELS)
+    car.run(0.6, brake=1, rear_brake=0)
+    for wheel in ("fl", "fr"):
+        assert car.fdm[f"tyre/{wheel}/omega_rad_sec"] == pytest.approx(0, abs=1e-5)
+        assert car.fdm[f"tyre/{wheel}/smoke_norm"] > 0.5
+    for wheel in ("bl", "br"):
+        assert car.fdm[f"tyre/{wheel}/smoke_norm"] == 0
+
+
+def test_side_slip_smokes_but_an_airborne_spinning_wheel_does_not():
+    car = Car("tyre", speed=27, settle=0.4)
+    car.run(0.4, steer=0.8)
+    assert car.fdm["tyre/fl/smoke_norm"] > 0.5
+    assert car.fdm["tyre/fl/fy_n"] * car.fdm["tyre/fl/vy_wheel_mps"] < -30000
+
+    car.fdm["ic/h-agl-ft"] = 100
+    assert car.fdm.run_ic()
+    car.run(0.3, throttle=1)
+    for wheel in WHEELS:
+        assert abs(car.fdm[f"tyre/{wheel}/omega_rad_sec"]) > 10
+        assert car.fdm[f"tyre/{wheel}/load_n"] == 0
+        assert car.fdm[f"tyre/{wheel}/smoke_norm"] == 0
+
+
 def test_motor_off_means_no_drive_and_a_park_lock():
     car = Car("tyre", params={"driveline/in/motor_on": 0.0})
     assert moved(car.run(3.0, throttle=1.0)) < 0.01

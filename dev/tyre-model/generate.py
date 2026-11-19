@@ -204,6 +204,13 @@ WHEEL_EQS = [
     ("contact_z_in", "({z_struct} + comp_ft * 0.3048) / 0.0254",
      ["external_reactions/tyre_{wheel}_x/location-z-in",
       "external_reactions/tyre_{wheel}_y/location-z-in"]),
+    # Contact-patch dissipation: longitudinal force times tread slip speed,
+    # plus lateral force opposing sideslip. No sliding work in static contact.
+    ("slip_power_w", "(1.0 - stick) * max(0.0, fx_n * (omega_rad_sec * radius_m - vx_wheel_mps)"
+                     " - fy_n * vy_wheel_mps)"),
+    # Visual onset and saturation, not a rubber temperature model.
+    ("smoke_norm", "min(1.0, max(0.0, (slip_power_w - 3000.0) / 30000.0))"
+                   " * min(1.0, max(0.0, (slip_norm - 1.0) / 0.5))"),
     # 0 to 1: how far past the grip peak the tyre is sliding. For sound effects.
     ("squeal", "(1.0 - stick) * min(1.0, load_n / load_nominal_n)"
                " * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7))"),

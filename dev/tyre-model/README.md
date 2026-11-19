@@ -153,7 +153,9 @@ Outputs worth knowing, per wheel `fl`, `fr`, `bl`, `br`:
 
 | Property | |
 |---|---|
-| `tyre/<wheel>/omega_rad_sec` | wheel speed |
+| `tyre/<wheel>/omega_rad_sec` | signed wheel speed, sent to the exterior spin animation |
+| `tyre/<wheel>/slip_power_w` | contact-patch sliding power, longitudinal and lateral combined |
+| `tyre/<wheel>/smoke_norm` | visual smoke intensity after the grip peak, scaled from 3 to 33 kW of sliding power per wheel |
 | `tyre/<wheel>/slip_ratio` | -1 is a locked wheel, 0 free rolling, above 0 driving |
 | `tyre/<wheel>/slip_tan` | tangent of the slip angle |
 | `tyre/<wheel>/load_n`, `fx_n`, `fy_n` | load and tyre force, in the wheel's axes |
@@ -219,8 +221,6 @@ Not done yet:
 
 - Tyre squeal: the sounds still listen to JSBSim's `side_friction_coeff`, which is now zero while
   moving. `tyre/<wheel>/squeal` is there for them.
-- The wheel animation and multiplayer still use road speed, so spinning and locked wheels do not
-  show.
 - "Magic bush tyres" (`reduceRollingFriction`) has no effect; the equivalent is
   `tyre/par/rolling_resistance`.
 - The handbrake uses the rear service brakes, which are too weak to lock the rear wheels.

@@ -1019,6 +1019,69 @@
 			<output>external_reactions/tyre_fl_x/location-z-in</output>
 			<output>external_reactions/tyre_fl_y/location-z-in</output>
 		</fcs_function>
+		<!-- slip_power_w = (1.0 - stick) * max(0.0, fx_n * (omega_rad_sec * radius_m - vx_wheel_mps) - fy_n * vy_wheel_mps) -->
+		<fcs_function name="tyre/fl/slip_power_w">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fl/stick</p>
+					</difference>
+					<max>
+						<v>0.0</v>
+						<difference>
+							<product>
+								<p>tyre/fl/fx_n</p>
+								<difference>
+									<product>
+										<p>tyre/fl/omega_rad_sec</p>
+										<p>tyre/par/radius_m</p>
+									</product>
+									<p>tyre/fl/vx_wheel_mps</p>
+								</difference>
+							</product>
+							<product>
+								<p>tyre/fl/fy_n</p>
+								<p>tyre/fl/vy_wheel_mps</p>
+							</product>
+						</difference>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- smoke_norm = min(1.0, max(0.0, (slip_power_w - 3000.0) / 30000.0)) * min(1.0, max(0.0, (slip_norm - 1.0) / 0.5)) -->
+		<fcs_function name="tyre/fl/smoke_norm">
+			<function>
+				<product>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/fl/slip_power_w</p>
+									<v>3000.0</v>
+								</difference>
+								<v>30000.0</v>
+							</quotient>
+						</max>
+					</min>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/fl/slip_norm</p>
+									<v>1.0</v>
+								</difference>
+								<v>0.5</v>
+							</quotient>
+						</max>
+					</min>
+				</product>
+			</function>
+		</fcs_function>
 		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
 		<fcs_function name="tyre/fl/squeal">
 			<function>
@@ -1859,6 +1922,69 @@
 			<output>external_reactions/tyre_fr_x/location-z-in</output>
 			<output>external_reactions/tyre_fr_y/location-z-in</output>
 		</fcs_function>
+		<!-- slip_power_w = (1.0 - stick) * max(0.0, fx_n * (omega_rad_sec * radius_m - vx_wheel_mps) - fy_n * vy_wheel_mps) -->
+		<fcs_function name="tyre/fr/slip_power_w">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/fr/stick</p>
+					</difference>
+					<max>
+						<v>0.0</v>
+						<difference>
+							<product>
+								<p>tyre/fr/fx_n</p>
+								<difference>
+									<product>
+										<p>tyre/fr/omega_rad_sec</p>
+										<p>tyre/par/radius_m</p>
+									</product>
+									<p>tyre/fr/vx_wheel_mps</p>
+								</difference>
+							</product>
+							<product>
+								<p>tyre/fr/fy_n</p>
+								<p>tyre/fr/vy_wheel_mps</p>
+							</product>
+						</difference>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- smoke_norm = min(1.0, max(0.0, (slip_power_w - 3000.0) / 30000.0)) * min(1.0, max(0.0, (slip_norm - 1.0) / 0.5)) -->
+		<fcs_function name="tyre/fr/smoke_norm">
+			<function>
+				<product>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/fr/slip_power_w</p>
+									<v>3000.0</v>
+								</difference>
+								<v>30000.0</v>
+							</quotient>
+						</max>
+					</min>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/fr/slip_norm</p>
+									<v>1.0</v>
+								</difference>
+								<v>0.5</v>
+							</quotient>
+						</max>
+					</min>
+				</product>
+			</function>
+		</fcs_function>
 		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
 		<fcs_function name="tyre/fr/squeal">
 			<function>
@@ -2696,6 +2822,69 @@
 			<output>external_reactions/tyre_bl_x/location-z-in</output>
 			<output>external_reactions/tyre_bl_y/location-z-in</output>
 		</fcs_function>
+		<!-- slip_power_w = (1.0 - stick) * max(0.0, fx_n * (omega_rad_sec * radius_m - vx_wheel_mps) - fy_n * vy_wheel_mps) -->
+		<fcs_function name="tyre/bl/slip_power_w">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/bl/stick</p>
+					</difference>
+					<max>
+						<v>0.0</v>
+						<difference>
+							<product>
+								<p>tyre/bl/fx_n</p>
+								<difference>
+									<product>
+										<p>tyre/bl/omega_rad_sec</p>
+										<p>tyre/par/radius_m</p>
+									</product>
+									<p>tyre/bl/vx_wheel_mps</p>
+								</difference>
+							</product>
+							<product>
+								<p>tyre/bl/fy_n</p>
+								<p>tyre/bl/vy_wheel_mps</p>
+							</product>
+						</difference>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- smoke_norm = min(1.0, max(0.0, (slip_power_w - 3000.0) / 30000.0)) * min(1.0, max(0.0, (slip_norm - 1.0) / 0.5)) -->
+		<fcs_function name="tyre/bl/smoke_norm">
+			<function>
+				<product>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/bl/slip_power_w</p>
+									<v>3000.0</v>
+								</difference>
+								<v>30000.0</v>
+							</quotient>
+						</max>
+					</min>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/bl/slip_norm</p>
+									<v>1.0</v>
+								</difference>
+								<v>0.5</v>
+							</quotient>
+						</max>
+					</min>
+				</product>
+			</function>
+		</fcs_function>
 		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
 		<fcs_function name="tyre/bl/squeal">
 			<function>
@@ -3532,6 +3721,69 @@
 			</function>
 			<output>external_reactions/tyre_br_x/location-z-in</output>
 			<output>external_reactions/tyre_br_y/location-z-in</output>
+		</fcs_function>
+		<!-- slip_power_w = (1.0 - stick) * max(0.0, fx_n * (omega_rad_sec * radius_m - vx_wheel_mps) - fy_n * vy_wheel_mps) -->
+		<fcs_function name="tyre/br/slip_power_w">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>tyre/br/stick</p>
+					</difference>
+					<max>
+						<v>0.0</v>
+						<difference>
+							<product>
+								<p>tyre/br/fx_n</p>
+								<difference>
+									<product>
+										<p>tyre/br/omega_rad_sec</p>
+										<p>tyre/par/radius_m</p>
+									</product>
+									<p>tyre/br/vx_wheel_mps</p>
+								</difference>
+							</product>
+							<product>
+								<p>tyre/br/fy_n</p>
+								<p>tyre/br/vy_wheel_mps</p>
+							</product>
+						</difference>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- smoke_norm = min(1.0, max(0.0, (slip_power_w - 3000.0) / 30000.0)) * min(1.0, max(0.0, (slip_norm - 1.0) / 0.5)) -->
+		<fcs_function name="tyre/br/smoke_norm">
+			<function>
+				<product>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/br/slip_power_w</p>
+									<v>3000.0</v>
+								</difference>
+								<v>30000.0</v>
+							</quotient>
+						</max>
+					</min>
+					<min>
+						<v>1.0</v>
+						<max>
+							<v>0.0</v>
+							<quotient>
+								<difference>
+									<p>tyre/br/slip_norm</p>
+									<v>1.0</v>
+								</difference>
+								<v>0.5</v>
+							</quotient>
+						</max>
+					</min>
+				</product>
+			</function>
 		</fcs_function>
 		<!-- squeal = (1.0 - stick) * min(1.0, load_n / load_nominal_n) * max(0.0, min(1.0, (slip_norm - 0.8) / 0.7)) -->
 		<fcs_function name="tyre/br/squeal">
