@@ -337,7 +337,13 @@ var SmartInstruments = {
         me.initialized = 1;
     },
     selfTest: func(){
-        foreach (var sign; me.signGroup.getChildren()) sign.show();
+        # Visibility is cached per Canvas wrapper. Use the same ones as the live display.
+        foreach (var sign; [me.airbagSign, me.handBrakeSign, me.autoholdSign,
+                            me.positionLightSign, me.headlightSign, me.highbeamSign,
+                            me.foglightSign, me.escOffSign, me.readySign,
+                            me.autopilotSign, me.cruiseSign]) {
+            sign.show();
+        }
     },
     startUp:func(){
         # if(!me.showingWarningMessage) me.welcomeGroup.show();
