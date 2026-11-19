@@ -12,11 +12,13 @@ TEXTURE_SCALE = 2
 
 
 def close_shape(x, y):
-    # Fold the four arms onto the same segment, from the center to (13, 13).
+    # A compact multiplication sign, with flat terminals like the preview glyph.
+    # Measure along and across one arm after folding all four into one quadrant.
     x = np.abs(x - 8)
     y = np.abs(y - 8)
-    nearest = np.minimum((x + y) / 2, 5)
-    return (x - nearest) ** 2 + (y - nearest) ** 2 <= 0.8 ** 2
+    along = (x + y) / np.sqrt(2)
+    across = np.abs(x - y) / np.sqrt(2)
+    return (along <= 5.45) & (across <= 1.75 / 2)
 
 
 def frame_shape(x, y):
@@ -55,6 +57,6 @@ def window_frame():
 
 
 if __name__ == "__main__":
-    close = coverage(16, 16, close_shape, 0.45)
+    close = coverage(16, 16, close_shape, 0.15)
     Image.merge("LA", (Image.new("L", close.size, 255), close)).save(OUTPUT / "close-mask.png", optimize=True)
     window_frame().save(OUTPUT / "window-frame.png", optimize=True)
