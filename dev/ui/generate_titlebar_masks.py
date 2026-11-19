@@ -20,11 +20,13 @@ def close_shape(x, y):
 
 
 def frame_shape(x, y, inset=0):
-    # Both arcs are concentric; the body has square bottom corners.
-    dx = np.maximum(np.maximum(8 - x, x - 24), 0)
-    dy = np.maximum(8 - y, 0)
-    return ((dx ** 2 + dy ** 2 <= (8 - inset) ** 2)
-            & (x >= inset) & (x <= 32 - inset) & (y >= inset) & (y <= 64 - inset))
+    # A small lower radius fits around the rectangular content canvas, which
+    # starts one pixel inside the frame. Each inner arc shares its outer center.
+    side = np.minimum(x, 32 - x)
+    top = np.maximum(8 - side, 0) ** 2 + np.maximum(8 - y, 0) ** 2
+    bottom_radius = 2.5
+    bottom = np.maximum(bottom_radius - side, 0) ** 2 + np.maximum(y - (64 - bottom_radius), 0) ** 2
+    return (top <= (8 - inset) ** 2) & (bottom <= (bottom_radius - inset) ** 2)
 
 
 def coverage(width, height, shape, softness):
@@ -38,16 +40,16 @@ def coverage(width, height, shape, softness):
 
 
 def window_frame():
-    outer = coverage(32, 64, frame_shape, 0.34)
-    inner = coverage(32, 64, lambda x, y: frame_shape(x, y, 1), 0.34)
-    # Store straight luminance and alpha. The outermost covered samples contain
-    # only the outline color; the interior is tinted by the Canvas image.
-    alpha = np.asarray(outer, dtype=float)
-    fill = np.divide(np.asarray(inner), alpha, out=np.zeros_like(alpha), where=alpha > 0)
-    light = np.full_like(alpha, 255)
+    outer = np.asarray(coverage(32, 64, frame_shape, 0.34), dtype=float)
+    fill = np.asarray(coverage(32, 64, lambda x, y: frame_shape(x, y, 0.75), 0.34), dtype=float)
+    # A translucent graphite edge picks up the actual scenery or window beneath it.
+    edge = (outer - fill) * 0.18
+    alpha = fill + edge
+    light = np.full_like(fill, 255)
     light[31 * TEXTURE_SCALE : 32 * TEXTURE_SCALE] = [[226], [244]]
-    luminance = np.rint(185 + (light - 185) * np.minimum(fill, 1)).astype(np.uint8)
-    return Image.merge("LA", (Image.fromarray(luminance), outer))
+    # PNG stores straight color. Weight by covered area before dividing by alpha.
+    luminance = np.divide(fill * light + edge * 32, alpha, out=np.zeros_like(alpha), where=alpha > 0)
+    return Image.fromarray(np.rint(np.stack((luminance, alpha), axis=-1)).astype(np.uint8))
 
 
 if __name__ == "__main__":

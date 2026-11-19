@@ -19,7 +19,7 @@ var styleVehicleWindow = func(win) {
 	# FlightGear places the content canvas inside the frame, above the decoration.
 	var surface = decoration.createChild("image", "vehicle-frame")
 		.setFile(images ~ "window-frame.png").set("z-index", -1)
-		.set("slice", "64 16 2").set("slice-width", "32 8 1")
+		.set("slice", "64 16 6").set("slice-width", "32 8 3")
 		.set("fill", "#f5f5f7");
 	var dragArea = win._title_bar_bg.set("fill-opacity", 0).set("z-index", 1);
 	win._resizeDecoration = func {
