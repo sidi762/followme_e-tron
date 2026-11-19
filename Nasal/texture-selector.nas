@@ -278,7 +278,7 @@ var TextureSelectorDialog = {
         me._currentLabel = me._text(footer, me._rowInset, 22, "", 13).set("fill", "#494950");
         var close = footer.createChild("group", "close-button");
         var bg = close.createChild("path").rect(0, 0, 68, 28, {"border-radius": 5}).set("fill", "#ffffff");
-        me._text(close, 34, 14, "Close", 14, "center-center").set("fill", "#005bc4");
+        me._text(close, 34, 14, "Close", 14, "center-center").set("fill", "#365b82");
         close.addEventListener("mouseenter", func bg.set("fill", "#eef3f8"));
         close.addEventListener("mouseleave", func bg.set("fill", "#ffffff"));
         close.addEventListener("mousedown", func bg.set("fill", "#e0e9f2"));
@@ -314,6 +314,12 @@ var TextureSelectorDialog = {
             func dialog._syncSelection(), 1, 0);
         me._cursor = math.max(0, me._selectedIndex);
         me._revealCursor();
+        var repaintFocus = func {
+            if (dialog._selectedIndex >= 0) dialog._paint(dialog._selectedIndex);
+            if (dialog._keyboard and dialog._cursor != dialog._selectedIndex) dialog._paint(dialog._cursor);
+        };
+        me._canvas.addEventListener("wm.focus-in", repaintFocus);
+        me._canvas.addEventListener("wm.focus-out", repaintFocus);
         # Install the placement now so a close/reopen in this frame can remove it.
         me._canvas.update();
     },
@@ -345,9 +351,16 @@ var TextureSelectorDialog = {
     _paint: func(i) {
         var row = me._rows[i];
         var selected = i == me._selectedIndex;
-        row.bg.set("fill", selected ? "#d4e5fa" : (row.hover ? "#f2f3f5" : "#ffffff"))
-            .set("stroke", me._keyboard and i == me._cursor ? "#007aff" : "none");
-        row.label.set("fill", selected ? "#193b62" : "#1d1d1f");
+        var active = me._window._focused;
+        var fill = row.hover ? "#f2f3f5" : "#ffffff";
+        var ink = "#1d1d1f";
+        if (selected) {
+            fill = active ? "#315f9d" : "#e3e4e8";
+            ink = active ? "#ffffff" : "#36363a";
+        }
+        var cursor = active and me._keyboard and i == me._cursor;
+        row.bg.set("fill", fill).set("stroke", cursor ? (selected ? "#ffffff" : "#16417d") : "none");
+        row.label.set("fill", ink);
     },
 
     _syncSelection: func {
