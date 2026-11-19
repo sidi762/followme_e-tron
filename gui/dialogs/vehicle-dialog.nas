@@ -1,269 +1,109 @@
-###############################################################################
-# Vehicle Dialog Implementation
-# Manages the vehicle configuration and control dialog
-###############################################################################
+io.include("base/settings-dialog.nas");
 
-io.include("gui/dialogs/base/window.nas");
-io.include("gui/dialogs/base/widget.nas");
+var vehicleDialog = {
+	parents: [SettingsDialog],
+	_dialogName: "vehicle-dialog",
+	_id: "followme-vehicle-options",
+	_title: "Vehicle Options",
 
-var VehicleDialogClass = {
-    new: func() {
-        var m = { 
-            parents: [VehicleDialogClass],
-            _name: "Vehicle Options",
-            _title: "Vehicle Options",
-            _listeners: [],
-            _window: nil,
-            _canvas: nil,
-            _widgets: {},
-            _sections: {}
-        };
-        return m;
-    },
+	_onClose: func {
+		me._steerTimer.stop();
+		me._steerTimer = me._syncSteering = nil;
+	},
 
-    close: func() {
-        print("VehicleDialog: Closing window");
-        if (me._window != nil) {
-            me._window.del();
-            me._window = nil;
-        }
-    },
+	_brakeSlider: func(y) {
+		var path = "/systems/BrakeController/keyboardBrakeIntensity";
+		var w = me._width - 112;
+		var g = me._body.createChild("group", "brake-slider").setTranslation(0, y);
+		g.createChild("path").rect(0, 0, w, 25).set("fill", me._bg);
+		g.createChild("path").rect(7, 10, w - 14, 4, {"border-radius": 2}).set("fill", "#c8cad0");
+		var filled = g.createChild("path").set("fill", me._blue);
+		var knob = g.createChild("path").circle(7, 0, 12).set("fill", "#ffffff")
+			.set("stroke", "#969aa3").set("stroke-width", 1);
+		var label = me._text(me._body, w + 6, y + 12, "", 14, me._ink);
+		var write = func(v) setprop(path, math.clamp(math.round(v * 100) / 100, 0.1, 1));
+		var scrub = func(e) {
+			var px = g.canvasToLocal([e.clientX, e.clientY])[0];
+			write(0.1 + 0.9 * (px - 7) / (w - 14));
+			e.stopPropagation();
+		};
+		me._register(g, y, nil, func(show) knob.set("stroke", show ? "#007aff" : "#969aa3"),
+			func(step) write(getprop(path) + 0.01 * step));
+		g.addEventListener("mousedown", scrub);
+		g.addEventListener("drag", scrub);
+		me._watch(path, func(v) {
+			var length = math.round((w - 14) * math.clamp((v - 0.1) / 0.9, 0, 1));
+			filled.reset().rect(7, 10, length, 4, {"border-radius": 2});
+			knob.setTranslation(7 + length, 0);
+			label.setText(sprintf("%.0f%%", 100 * v));
+		});
+		me._button(me._width - 60, y, 60, "Default", func write(0.8));
+	},
 
-    removeListeners: func() {
-        foreach(var l; me._listeners) {
-            removelistener(l);
-        }
-        me._listeners = [];
-    },
+	# Rows are deliberately kept in the same order and columns as the vehicle menu.
+	_build: func {
+		var w = me._width;
+		var half = int((w - 6) / 2);
+		var right = w - half;
+		var third = int((w - 12) / 3);
+		var mode = "/controls/mode";
+		var welcome = "/systems/welcome-message";
+		var drift = "/systems/drifting-sound";
+		var y = me._heading(0, "Drive mode");
+		me._choice(0, y, half, "Performance", mode, 1);
+		me._choice(right, y, half, "Comfort", mode, 0.65);
+		me._choice(0, y + 29, half, "Low Power", mode, 0.4);
 
-    _onClose: func() {
-        print("VehicleDialog: Closing window");
-        me.removeListeners();
-        foreach(var widget; keys(me._widgets)) {
-            if (me._widgets[widget] != nil) {
-                me._widgets[widget].deinit();
-                me._widgets[widget] = nil;
-            }
-        }
-        me._window = nil;
-    },
+		y = me._heading(y + 65, "Realistic steering");
+		var on = me._button(0, y, half, "Enable", func { followme.enableAdvancedSteering(); vehicleDialog._syncSteering(); });
+		var off = me._button(right, y, half, "Disable", func { followme.disableAdvancedSteering(); vehicleDialog._syncSteering(); });
+		var last = nil;
+		me._syncSteering = func {
+			var v = followme.steeringAssistance.mode;
+			if (v == last) return;
+			last = v;
+			on(v == 1); off(v == 0);
+		};
+		me._syncSteering();
+		var dialog = me;
+		me._steerTimer = maketimer(0.25, func dialog._syncSteering());
+		me._steerTimer.start();
+		me._text(me._body, 0, y + 36, "Experimental. Set steering travel to Normal.", 12, me._secondary);
 
-    open: func() {        
-        me._window = canvas.Window.new([400, 825], "dialog");
-        me._window.setTitle(me._title);
-        me._window.setPosition(100, 100);
-        
-        # Set up listener for window closure
-        me._window.addEventListener("del", func vehicleDialog._onClose());
-        
-        me._canvas = me._window.createCanvas();
-        me._canvas.set("background", "#2a2a2a"); # Darker background for better contrast
-        
-        me._group = me._canvas.createGroup();
-        me._group.setTranslation(10, 10);
-        
-        me._createUI();
-    },
+		y = me._heading(y + 54, "Keyboard braking intensity");
+		me._brakeSlider(y);
+		y = me._heading(y + 36, "Welcome message & startup sound");
+		me._button(0, y, half, "Set Startup Sound…", func smartInstruments.setStartupSound_dlg.open());
+		me._choice(right, y, half, "Message Off", welcome, 0);
+		me._choice(0, y + 29, third, "Chinese", welcome, 1);
+		me._choice(third + 6, y + 29, third, "English", welcome, 2);
+		me._choice(2 * (third + 6), y + 29, w - 2 * (third + 6), "Special", welcome, 3);
 
-    _createUI: func() {
-        var mainWidget = UIWidget.new(me, me._group, "main");
-        var yPos = 0;
-        var availableWidth = 380;
+		y = me._heading(y + 65, "Drift sound");
+		me._choice(0, y, half, "Enable", drift, 1);
+		me._choice(right, y, half, "Disable", drift, 0);
+		var configWidth = math.min(270, w);
+		me._button(int((w - configWidth) / 2), y + 35, configWidth, "Vehicle Configuration…", func dialogs.configDialog.open());
 
-        # Title - create a centered title directly
-        mainWidget.createCenteredLabel(availableWidth / 2, yPos + 10, "Vehicle Options", 18);
-        yPos += 25;
+		y = me._heading(y + 71, "Rescue");
+		me._button(0, y, half, "Flip Vehicle", func {
+			setprop("/orientation/roll-deg", 0);
+			setprop("/velocities/groundspeed-kt", 0);
+		});
+		me._button(right, y, half, "Quick Recharge", func followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull());
+		me._button(0, y + 29, half, "Reset Airbag", func followme.safety.reset());
+		me._button(right, y + 29, half, "Reset Here", func followme.resetOnPosition());
+		me._text(me._body, 0, y + 65, "Airbag reset disables the safety system.", 12, me._secondary);
 
-        mainWidget.createSeparator(0, yPos, availableWidth);
-        yPos += 15;
-
-        # Create sections
-        yPos = me._createVehicleModesSection(mainWidget, yPos, availableWidth);
-        yPos = me._createSteeringSection(mainWidget, yPos, availableWidth);
-        yPos = me._createBrakingSection(mainWidget, yPos, availableWidth);
-        yPos = me._createWelcomeSection(mainWidget, yPos, availableWidth);
-        yPos = me._createDriftingSection(mainWidget, yPos, availableWidth);
-        yPos = me._createConfigSection(mainWidget, yPos, availableWidth);
-        yPos = me._createRescueSection(mainWidget, yPos, availableWidth);
-        yPos = me._createEngineSection(mainWidget, yPos, availableWidth);
-        yPos = me._createMiscSection(mainWidget, yPos, availableWidth);
-
-        me._widgets.main = mainWidget;
-        mainWidget.init();
-    },
-
-    _createVehicleModesSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Vehicle Modes:", 16);
-        yPos += 15;
-
-        # Performance/Comfort Mode
-        widget.createButton(5, yPos, 180, 30, "Enable Performance Mode", 
-            func setprop("/controls/mode", 1));
-        widget.createButton(200, yPos, 180, 30, "Enable Comfort Mode", 
-            func setprop("/controls/mode", 0.65));
-        yPos += 40;
-
-        # Low Power Mode
-        widget.createButton(5, yPos, 180, 30, "Enable Low Power Mode", 
-            func setprop("/controls/mode", 0.4));
-        yPos += 38;
-
-        widget.createSeparator(5, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createSteeringSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Realistic Steering (*Experimental):", 16);
-        yPos += 15;
-
-        widget.createButton(5, yPos, 180, 30, "Enable", 
-            func followme.enableAdvancedSteering());
-        widget.createButton(200, yPos, 180, 30, "Disable", 
-            func followme.disableAdvancedSteering());
-        yPos += 50;
-
-        # Tips
-        widget.createLabel(5, yPos, "Tips: When this is enabled, it is STRONGLY", 12);
-        yPos += 15;
-        widget.createLabel(5, yPos, "recommended to set the max travel to Normal", 12);
-        yPos += 15;
-        widget.createLabel(5, yPos, "in Configuration dialog (default is Long).", 12);
-        yPos += 15;
-        widget.createLabel(5, yPos, "By enabling Realistic Steering, the drifting sound", 12);
-        yPos += 15;
-        widget.createLabel(5, yPos, "effect will be enabled automatically.", 12);
-        yPos += 15;
-
-        widget.createSeparator(0, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createBrakingSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Keyboard braking intensity:", 16);
-        yPos += 10;
-
-        widget.createSlider(0, yPos, 260, 
-            "/systems/BrakeController/keyboardBrakeIntensity", 0.1, 1, 0.8);
-        yPos += 35;
-
-        widget.createSeparator(0, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createWelcomeSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Welcome message/Startup Sound:", 16);
-        yPos += 15;
-
-        widget.createButton(5, yPos, 180, 30, "Set Startup Sound", 
-            func smartInstruments.setStartupSound_dlg.open());
-        widget.createButton(200, yPos, 180, 30, "Disable welcome message", 
-            func setprop("systems/welcome-message", 0));
-        yPos += 35;
-
-        widget.createButton(5, yPos, 116, 30, "Enable Chinese", 
-            func setprop("systems/welcome-message", 1));
-        widget.createButton(133.9, yPos, 116, 30, "Enable English", 
-            func setprop("systems/welcome-message", 2));
-        widget.createButton(262.8, yPos, 116, 30, "Enable Special", 
-            func setprop("systems/welcome-message", 3));
-        yPos += 35;
-
-        widget.createSeparator(0, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createDriftingSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Drifting Sound Effect:", 16);
-        yPos += 15;
-
-        widget.createButton(5, yPos, 180, 30, "Enable", 
-            func setprop("systems/drifting-sound", 1));
-        widget.createButton(200, yPos, 180, 30, "Disable", 
-            func setprop("systems/drifting-sound", 0));
-        yPos += 35;
-
-        widget.createSeparator(0, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createConfigSection: func(widget, yPos, width) {
-        widget.createButton((width - 300) / 2, yPos, 300, 30, "Vehicle Configuration", 
-            func followme.configDialog.open());
-        yPos += 35;
-
-        widget.createSeparator(0, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createRescueSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Rescue:", 16);
-        yPos += 15;
-
-        widget.createButton(5, yPos, 180, 30, "Flip Vehicle", func {
-            setprop("/orientation/roll-deg", 0);
-            setprop("velocities/groundspeed-kt", 0);
-        });
-        widget.createButton(200, yPos, 180, 30, "Quick Recharge", 
-            func followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull());
-        yPos += 35;
-
-        widget.createButton(5, yPos, 180, 30, "Reset/Disable Airbag", 
-            func followme.safety.reset());
-        widget.createButton(200, yPos, 180, 30, "Reset Here", 
-            func followme.resetOnPosition());
-        yPos += 40;
-
-        widget.createLabel(5, yPos, "Resetting Airbag stops the entire safety system!", 12);
-        yPos += 10;
-
-        widget.createSeparator(0, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createEngineSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Engine Controls:", 16);
-        yPos += 15;
-
-        widget.createButton(5, yPos, 180, 30, "Start Engine", 
-            func engine.startEngine(engine.engine_1));
-        widget.createButton(200, yPos, 180, 30, "Stop Engine", 
-            func engine.stopEngine(engine.engine_1));
-        yPos += 35;
-
-        widget.createSeparator(0, yPos, width);
-        yPos += 15;
-
-        return yPos;
-    },
-
-    _createMiscSection: func(widget, yPos, width) {
-        widget.createLabel(5, yPos, "Miscellaneous:", 16);
-        yPos += 15;
-
-        widget.createCheckbox(5, yPos, "Enable ALS procedural lights", 
-            "/systems/enable_als_lights");
-        yPos += 28;
-
-        widget.createLabel(5, yPos, "(for older FG versions without Compositor support)", 12);
-        yPos += 20;
-
-        return yPos;
-    }
+		y = me._heading(y + 83, "Engine");
+		var running = me._text(me._body, w, y - 12, "", 12, me._secondary, 0, "right-center");
+		me._watch("/controls/engines/engine/started", func(v) running.setText(v == 1 ? "Running" : "Stopped"));
+		me._button(0, y, half, "Start Engine", func engine.startEngine(engine.engine_1));
+		me._button(right, y, half, "Stop Engine", func engine.stopEngine(engine.engine_1));
+		y = me._heading(y + 36, "Miscellaneous");
+		var path = "/systems/enable_als_lights";
+		me._checkbox(y, "Enable ALS procedural lights", path);
+		me._text(me._body, 0, y + 35, "For older versions without Compositor.", 12, me._secondary);
+		return y + 43;
+	},
 };
-
-# Create global dialog instance
-var vehicleDialog = VehicleDialogClass.new();

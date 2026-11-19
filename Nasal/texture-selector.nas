@@ -27,7 +27,7 @@
 #//      Dialog:Same as above
 #// Pure texture, custom dialog(without multiplayer):
 #//      var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
-#//      var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[4]/combo/");
+#//      var plateSelector = TextureSelector.new(name: "Plate-Selector", path: path, fileType: ".png", enableNone: 1, customDialog: 1);
 #//
 #// Documentation:
 #//
@@ -50,6 +50,8 @@
 #// multiplayerProperty: The multiplayer property. Only be used if enableMultiplayer is set to 1. Default to be /sim/multiplay/generic/string[19] (The last string property in the MP Protocol).
 #// texturePrePath: The prefix path for texture files. Must end with '/'. Defaults to "".
 #// defaultValue: The default texture value to set. Defaults to "".
+#// dialogTitle: Optional human-readable title for a dedicated selector window.
+#// outputNameProp: Destination for the selected name. Defaults to textureNameProp.
 #//
 #// Returns the TextureSelector instance.
 #//
@@ -67,203 +69,315 @@
 #// reflected over MP at real time. This is a big part of the reason I wrote
 #// this system instead of using the existing one.
 
+io.include("../gui/dialogs/base/window.nas");
+
 var TextureSelector = {
     new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
             customDialogPosition = "", texturePropertyBase = "sim/model/livery/", textureProp = "livery", textureNameProp = "name",
             textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]",
-            texturePrePath = "", defaultValue = ""){
+            texturePrePath = "", defaultValue = "", canvasItemsPropPath = nil, dialogTitle = nil, outputNameProp = nil) {
 
-        #//Add the slash and the end of the path if it's not there already
         if(right(path, 1) != "/"){
             path = path ~ "/";
             print("Texture selector: ‘/’ added in the end of the path");
         }
 
         var m = {parents:[TextureSelector]};
-        if(customDialog == 1){
-            m.dialogNode = props.getNode(customDialogBase, 1);
-        }else{
-            m.dialogBaseNode = props.getNode("/sim/gui/dialogs/TextureSelector", 1).getNode(name, 1).getNode("dialog", 1);
-            m.dialog = TextureSelectorDialog.new(dialogBase : m.dialogBaseNode, defaultV: defaultValue, name: name);
-            m.dialogLis = setlistener(m.dialogBaseNode.getNode("opened", 1), func m.dialogTriggered());
-        }
+
         if(textureDataNode == nil) textureDataNode = props.getNode("/TextureSelector/liveries/", 1);
 
         m.name = name;
         m.path = path;
         m.fileType = fileType;
         m.enableNone = enableNone;
-        m.customDialog = customDialog;
-        m.dialogCustom = customDialogPosition;
         m.texturePropertyBase = texturePropertyBase;
         m.textureProp = textureProp;
-        m.texturePrePath = texturePrePath;#//Tmp Node: must end with /
+        m.texturePrePath = texturePrePath;
         m.textureNameProp = textureNameProp;
+        m.outputNameProp = outputNameProp or textureNameProp;
         m.textureDataNode = textureDataNode;
         m.defaultValue = defaultValue;
         m.enableMultiplayer = enableMultiplayer;
         m.multiplayerProperty = multiplayerProperty;
-        m.updateList();
-        if(defaultValue and m.fileType == ".xml"){
-            m.setTextureByNameXML(defaultValue);
-            print("Texture selector: Default value is " ~ defaultValue);
-        }else if(defaultValue){
-            props.getNode(m.texturePropertyBase, 1).getNode(m.textureProp, 1).setValue(m.texturePrePath ~ defaultValue ~ m.fileType);
+        if (canvasItemsPropPath == nil) {
+            m._canvasItemsPropPath = "/TextureSelector/liveries/" ~ m.name ~ "/items";
+        } else {
+            m._canvasItemsPropPath = canvasItemsPropPath;
         }
-        if(enableMultiplayer) props.getNode(multiplayerProperty, 1).alias(props.getNode(m.texturePropertyBase, 1).getNode(m.textureProp, 1));
+        m.dialog = nil; # Will hold TextureSelectorDialog instance if customDialog is 0
+
+        if (customDialog == 0) {
+            # Create Canvas-based dialog instance
+            m.dialog = TextureSelectorDialog.new(m, dialogTitle or m.name);
+        }
+
+        m.updateList();
+
+        if(defaultValue){
+            m.applyTexture(defaultValue, 1); # Apply default, suppress print for initial setup
+        }
+
+        if(enableMultiplayer) {
+            var sourceNode = props.getNode(m.texturePropertyBase, 1).getNode(m.textureProp, 1);
+            var mpNode = props.getNode(multiplayerProperty, 1);
+            if (sourceNode != nil and mpNode != nil) {
+                mpNode.alias(sourceNode);
+            } else {
+                print("TextureSelector: Warning - Could not set up multiplayer alias for " ~ m.name);
+            }
+        }
         return m;
     },
-    path: "", #//path containing texture file
-    fileType: "",
-    enableNone: 0,
-    customDialog: 0,
-    dialogCustom:"list/",
-    texturePropertyBase: "sim/model/livery/",
-    textureProp:"livery",
-    textureNameProp:"name",
-    defaultValue:"",
-    dialogNode:nil,
-    dialog:nil,
-    current:nil,
-    textureDataNode:props.getNode("/TextureSelector/liveries/", 1),
-    enableMultiplayer: 0, #//The property will be transmitted via MP if enabled.
-    multiplayerProperty: "/sim/multiplay/generic/string[19]", #// The multiplayer property. Only be used if enableMultiplayer is set to 1. Default to be /sim/multiplay/generic/string[19](The last string property in the MP Protocol)
-    scan: func(path = nil, fileType = nil){
-        if(path == nil and me.path) path = me.path;
-        else return 1;
-        if(fileType == nil and me.fileType) fileType = me.fileType;
-        else return 1;
-        var data = [];
-        var files = directory(path);
-        if (size(files)) {
-            foreach (var file; files) {
-                if (substr(file, 0 - size(fileType)) != fileType)
-                    continue;
-                append(data, [substr(file, 0, size(file) - size(fileType)), path ~ file]);
-            }
-            #me.data = sort(me.data, func(a, b) num(a[1]) == nil or num(b[1]) == nil
-            #        ? cmp(a[1], b[1]) : a[1] - b[1]);
+    # Return the names and disk paths of the textures in this directory.
+    scan: func(path=nil, fileType=nil) {
+        path = path or me.path;
+        fileType = fileType or me.fileType;
+        var items = [];
+        if (!fileType) return items;
+        if (right(path, 1) != "/") path ~= "/";
+        foreach (var file; directory(path) or []) {
+            if (right(file, size(fileType)) == fileType)
+                append(items, [left(file, size(file) - size(fileType)), path ~ file]);
         }
-        return data;
+        return items;
     },
-    scanXML: func(path = nil){
-        if(path == nil and me.path) path = me.path;
-        else return 1;
-        var fileType = ".xml";
-        var names = [];
-        var files = directory(path);
-        if (size(files)) {
-            var i = 0;
-            foreach (var file; files) {
-                if (substr(file, 0 - size(fileType)) != fileType)
-                    continue;
-                var node = me.textureDataNode.getChild(me.textureProp, i, 1); #//Temporary solution, to be improved
-                n = io.read_properties(me.path ~ file, node);
-                if(n == nil) continue;
-                var data = [];
-                append(data, n.getNode(me.texturePropertyBase ~ me.textureNameProp).getValue());
-                append(names, data);
-                i+=1;
-            }
+
+    # Read every definition into a fresh tree so an incomplete file cannot inherit
+    # the preceding livery's name or texture. Keep the published definition cache.
+    scanXML: func(path=nil) {
+        var files = me.scan(path, ".xml");
+        files = sort(files, func(a,b) cmp(a[1], b[1]));
+        me.textureDataNode.removeChildren(me.textureProp);
+        me._definitions = {};
+        var items = [];
+        foreach (var file; files) {
+            var doc = io.read_properties(file[1], nil, 1);
+            if (doc == nil) continue;
+            var entry = doc.getNode(me.texturePropertyBase);
+            if (entry == nil) continue;
+            var name = entry.getValue(me.textureNameProp);
+            var texture = entry.getValue(me.textureProp);
+            if (name == nil or name == "" or texture == nil or texture == "" or contains(me._definitions, name)) continue;
+            var cached = me.textureDataNode.getChild(me.textureProp, size(items), 1);
+            props.copy(doc, cached);
+            me._definitions[name] = cached.getNode(me.texturePropertyBase);
+            append(items, [name, texture]);
         }
-        return names;
+        return items;
     },
-    updateList: func(){
-        var allItems = nil;
-        if(me.fileType != ".xml") allItems = me.scan();
-        else allItems = me.scanXML();
-        var data = nil;
-        if(me.customDialog) data = me.dialogNode.getNode(me.dialogCustom, 1); #//Pass the custom dialog if used
-        else data = me.dialog.list;
-        data.removeChildren("value");
-        if(me.enableNone){
-            data.getChild("value", 0, 1).setValue("NONE");
-            forindex(var i; allItems){
-                data.getChild("value", i+1, 1).setValue(allItems[i][0]);
-            }
-        }else{
-            forindex(var i; allItems){
-                data.getChild("value", i, 1).setValue(allItems[i][0]);
-            }
+
+    # Rebuild only this selector's rows, including removals since the previous open.
+    updateList: func {
+        var xml = me.fileType == ".xml";
+        var found = xml ? me.scanXML() : me.scan();
+        found = sort(found, func(a,b) cmp(string.lc(a[0]), string.lc(b[0])));
+        me.items = [];
+        me._textures = {};
+        var listNode = props.getNode(me._canvasItemsPropPath, 1);
+        listNode.removeChildren("value");
+        if (me.enableNone) {
+            me._textures["NONE"] = "";
+            append(me.items, "NONE");
         }
+        foreach (var item; found) {
+            if (contains(me._textures, item[0])) continue;
+            me._textures[item[0]] = xml ? item[1] : me.texturePrePath ~ item[0] ~ me.fileType;
+            append(me.items, item[0]);
+        }
+        forindex (var i; me.items) listNode.getChild("value", i, 1).setValue(me.items[i]);
+        me.current = me.selectedName();
     },
-    dialogTriggered: func(){
-        if(me.dialogBaseNode.getNode("opened", 1).getValue() == 1){
-            #//print("Dialog opened");
-            me.updateList();
-            me.resultLis = setlistener(me.dialog.result, func(){
-               var selected = me.dialog.result.getValue();
-               if(selected != "none"){
-                   me.current = selected;
-                   if(me.fileType == ".xml") me.setTextureByNameXML(selected);
-                   else props.getNode(me.texturePropertyBase, 1).getNode(me.textureProp, 1).setValue(me.texturePrePath ~ me.current ~ me.fileType);
-               }else{
-                   #fileNode.setValue(nameNode.getValue());
-               }
-            });
-        }else{
-            removelistener(me.resultLis);
+
+    # Resolve the active row from the texture actually used by the vehicle.
+    selectedName: func {
+        var texture = props.getNode(me.texturePropertyBase, 1).getValue(me.textureProp);
+        foreach (var name; me.items) {
+            if (me._textures[name] == texture) return name;
         }
+        return nil;
     },
-    setTextureByNameXML: func(name){
-        allTextures = me.textureDataNode.getChildren(me.textureProp);
-        foreach(var texture; allTextures){
-            var tmp = texture.getNode(me.texturePropertyBase);
-            if(tmp.getNode(me.textureNameProp).getValue() == name){
-                props.copy(tmp, props.getNode(me.texturePropertyBase));
-                print("Texture " ~ tmp.getNode(me.textureProp).getValue() ~ " Set");
-                #if(me.enableMultiplayer){
-                #    props.getNode(me.multiplayerProperty, 1).setValue(texture.getNode(me.texturePropertyBase).getNode(me.textureProp).getValue());
-                #}
-                break;
-            }
+
+    applyTexture: func(name, isDefaultSetup=0) {
+        if (name == nil or !contains(me._textures, name)) return 0;
+        var target = props.getNode(me.texturePropertyBase, 1);
+        if (me.fileType == ".xml" and contains(me._definitions, name)) {
+            me.setTextureByNameXML(name, isDefaultSetup);
+        } else {
+            target.getNode(me.textureProp, 1).setValue(me._textures[name]);
+            target.getNode(me.outputNameProp, 1).setValue(name);
         }
+        me.current = name;
+        return 1;
+    },
+
+    # Preserve auxiliary XML fields, while storing the LED sign's name separately
+    # from the body livery name even when both definitions call their field "name".
+    setTextureByNameXML: func(name, isDefaultSetup=0) {
+        if (!contains(me._definitions, name)) return 0;
+        var target = props.getNode(me.texturePropertyBase, 1);
+        foreach (var field; me._definitions[name].getChildren()) {
+            var key = field.getName();
+            if (key == me.textureNameProp) key = me.outputNameProp;
+            props.copy(field, target.getChild(key, field.getIndex(), 1));
+        }
+        me.current = name;
+        return 1;
     },
 };
 
-#// Class: TextureSelectorDialog
-#// Constructor: new()
-#// Creates a new Texture Selector Dialog instance.
-#// Note that this is already handled by TextureSelector internally and there
-#// is no need to create it yourself.
-#// dialogBase: The base node for the custom dialog.
-#// dialogFile: The path to the XML file that defines the dialog layout. Defaults to "Aircraft/followme_e-tron/gui/dialogs/livery-select.xml".
-#// defaultV: The default value for the texture selection. Defaults to an empty string.
-#// name: The name of the dialog. Defaults to "Texture selection".
-#// Returns the TextureSelectorDialog instance.
-#// Example usage:
-#// var customDialog = TextureSelectorDialog.new(dialogBase, "path/to/custom_dialog.xml", "defaultTextureName", "Custom Dialog Title");
-
 var TextureSelectorDialog = {
-    new: func(dialogBase, dialogFile = "Aircraft/followme_e-tron/gui/dialogs/livery-select.xml", defaultV = "", name = "Texture selection"){
-        var m = gui.Dialog.new(dialogBase, dialogFile, name);
-        m.parents = [TextureSelectorDialog, gui.Dialog];
-        m.dialogNode = dialogBase;
-        m.dialogFile = dialogFile;
-        m.title = name;
-        m.list = m.dialogNode.getNode("list", 1);
-        m.result = props.getNode(m.list.getPath() ~ "/result", 1);
-        m.defaultValue = defaultV;
-        m.nasal = m.dialogNode.getNode("nasal", 1);
-        m.openScript = m.nasal.getNode("open", 1);
-        m.closeScript = m.nasal.getNode("close", 1);
-        m.openScript.setValue('print("' ~ m.title ~ ' dialog opened");
-        props.getNode(cmdarg().getPath()).getNode("opened"), 1).setValue(1);');
-        m.closeScript.setValue('props.getNode(cmdarg().getPath()).getNode("opened", 1).setValue(0);');
-        m.reload();
-        #Reload when the GUI is reloaded
-        m.reload_listener = setlistener("/sim/signals/reinit-gui", func(n) m.reload());
-
-        return m;
+    new: func(selector, title) {
+        return {parents: [TextureSelectorDialog], _parentSelector: selector,
+            _title: title, _window: nil, _rowHeight: 28, _listener: nil};
     },
-    reload: func(){
-        me.list.getNode("property").setValue(me.result.getPath());
-        me.result.setValue(me.result.getValue() or me.defaultValue);
-        me.openScript.setValue('print("' ~ me.title ~ ' dialog opened");
-        props.getNode(cmdarg().getPath()~"/opened", 1).setValue(1);');
-        me.closeScript.setValue('followme.playAudio("repair.wav");
-        props.getNode(cmdarg().getPath()).getNode("opened", 1).setValue(0);');
-        me.dialogNode.getNode("group/text/label").setValue(me.title);
-        me.dialogNode.getNode("group/button/binding/script").setValue('gui.Dialog.instance["' ~ me.dialogNode.getNode("name").getValue() ~ '"].close()');
+
+    # Only the list scrolls. Use the actual Canvas desktop size, which can be
+    # smaller than the old 400px window even on a high-DPI screen.
+    open: func {
+        if (me._window != nil) {
+            me._window.raise();
+            return;
+        }
+        var selector = me._parentSelector;
+        selector.updateList();
+        var dw = getprop("/sim/gui/canvas/size[0]");
+        var dh = getprop("/sim/gui/canvas/size[1]");
+        var w = math.min(340, dw - 16);
+        var h = math.min(dh - 64, 420, math.max(1, size(selector.items)) * me._rowHeight + 56);
+        me._listWidth = w - 16;
+        me._listHeight = h - 56;
+        me._rows = [];
+        me._cursor = -1;
+        me._keyboard = 0;
+        var dialog = me;
+        me._window = canvas.Window.new([w, h], "dialog", selector.name ~ "-TextureDialog");
+        me._window.setTitle(me._title);
+        me._window.onClose = func dialog.close();
+        me._canvas = me._window.createCanvas();
+        me._canvas.set("background", "#f5f5f7").setInt("size[0]", 2*w).setInt("size[1]", 2*h);
+        me._canvas.setBool("mipmapping", 1);
+        styleVehicleWindow(me._window);
+        var root = me._canvas.createGroup("texture-selector");
+        var host = root.createChild("group").setTranslation(8, 8);
+        me._scrollArea = canvas.gui.widgets.ScrollArea.new(host);
+        me._scrollArea.setColorBackground([1, 1, 1]);
+        me._scrollArea._view.vert.set("stroke", "#8e8e93");
+        me._listGroup = me._scrollArea.getContent();
+        var listH = math.max(1, size(selector.items)) * me._rowHeight;
+        # ScrollArea measures immediately. Publish the complete bounds before
+        # the first measurement, even if the selected item is the first row.
+        me._listGroup.createChild("path").rect(0, 0, me._listWidth, listH).set("fill", "#ffffff").update();
+        forindex (var i; selector.items) me._addRow(i, selector.items[i]);
+        if (!size(selector.items)) me._text(me._listGroup, 12, 14, "No entries found", 14);
+        me._scrollArea.setSize(me._listWidth, me._listHeight);
+        me._disconnectWheel = bindVehicleScroll(me._window, host, me._scrollArea, me._rowHeight);
+
+        var footer = root.createChild("group").setTranslation(8, h - 39);
+        me._currentLabel = me._text(footer, 4, 17, "", 13);
+        me._currentLabel.setClipByBoundingBox([0, 0, me._listWidth - 74, 34]);
+        var close = footer.createChild("group", "close-button").setTranslation(me._listWidth - 68, 3);
+        var bg = close.createChild("path").rect(0.5, 0.5, 67, 27, {"border-radius": 6})
+            .set("fill", "#ffffff").set("stroke", "#c9cbd1").set("stroke-width", 1);
+        me._text(close, 34, 14, "Close", 14, "center-center");
+        close.addEventListener("mouseenter", func bg.set("fill", "#eaf1fa"));
+        close.addEventListener("mouseleave", func bg.set("fill", "#ffffff"));
+        close.addEventListener("click", func dialog.close());
+        me._canvas.addEventListener("keydown", func(e) dialog._key(e));
+        root.setFocus();
+
+        me._listener = setlistener(props.getNode(selector.texturePropertyBase, 1).getNode(selector.textureProp, 1),
+            func dialog._syncSelection(), 1, 0);
+        me._cursor = math.max(0, me._selectedIndex);
+        me._revealCursor();
+        # Install the placement now so a close/reopen in this frame can remove it.
+        me._canvas.update();
+    },
+
+    _text: func(parent, x, y, value, px, align="left-center") {
+        return parent.createChild("text").setText(value).setAlignment(align)
+            .setFont("LiberationFonts/LiberationSans-Regular.ttf").set("character-size", px)
+            .set("font-resolution", px * 2).set("fill", "#1d1d1f").setTranslation(x, y);
+    },
+
+    # Hit areas fill the row. A single click applies the item and keeps the menu open.
+    _addRow: func(i, name) {
+        var dialog = me;
+        var g = me._listGroup.createChild("group", "row-" ~ i).setTranslation(0, i * me._rowHeight);
+        var bg = g.createChild("path", "background").rect(1, 1, me._listWidth - 9, me._rowHeight - 2,
+            {"border-radius": 5}).set("fill", "#ffffff");
+        var label = me._text(g, 12, 14, name, 14);
+        var row = {group: g, name: name, bg: bg, label: label, hover: 0};
+        append(me._rows, row);
+        g.addEventListener("mouseenter", func { row.hover=1; dialog._paint(i); });
+        g.addEventListener("mouseleave", func { row.hover=0; dialog._paint(i); });
+        g.addEventListener("click", func {
+            dialog._keyboard=0;
+            dialog._cursor=i;
+            dialog._parentSelector.applyTexture(name);
+            dialog._syncSelection();
+        });
+    },
+
+    _paint: func(i) {
+        var row = me._rows[i];
+        var selected = i == me._selectedIndex;
+        row.bg.set("fill", selected ? "#e1edfc" : (row.hover ? "#f0f3f8" : "#ffffff"))
+            .set("stroke", me._keyboard and i == me._cursor ? "#007aff" : "none");
+        row.label.set("fill", selected ? "#004caa" : "#1d1d1f");
+    },
+
+    _syncSelection: func {
+        var active = me._parentSelector.selectedName();
+        me._selectedIndex = -1;
+        forindex (var i; me._rows) {
+            if (me._rows[i].name == active) me._selectedIndex = i;
+        }
+        forindex (var i; me._rows) me._paint(i);
+        me._currentLabel.setText(active == nil ? "No selection" : "Current: " ~ active);
+    },
+
+    _revealCursor: func {
+        var y = me._cursor * me._rowHeight;
+        var top = me._scrollArea._content_pos[1];
+        if (y < top) me._scrollArea.scrollTo(0, y);
+        elsif (y + me._rowHeight > top + me._listHeight)
+            me._scrollArea.scrollTo(0, y + me._rowHeight - me._listHeight);
+    },
+
+    _key: func(e) {
+        if (e.key == "Escape" or e.key == "Esc") {
+            e.stopPropagation();
+            me.close();
+            return;
+        }
+        var last = size(me._rows) - 1;
+        if (last < 0) return;
+        var old = me._cursor;
+        var page = math.max(1, int(me._listHeight / me._rowHeight));
+        if (e.key == "Down") me._cursor += 1;
+        elsif (e.key == "Up") me._cursor -= 1;
+        elsif (e.key == "PageDown" or e.key == "Page_Down") me._cursor += page;
+        elsif (e.key == "PageUp" or e.key == "Page_Up") me._cursor -= page;
+        elsif (e.key == "Home") me._cursor = 0;
+        elsif (e.key == "End") me._cursor = last;
+        elsif (e.key == "Enter" or e.key == " ") me._parentSelector.applyTexture(me._rows[old].name);
+        else return;
+        e.stopPropagation();
+        me._keyboard = 1;
+        me._cursor = math.clamp(me._cursor, 0, last);
+        me._paint(old);
+        me._paint(me._cursor);
+        me._revealCursor();
+    },
+
+    close: func {
+        if (me._window == nil) return;
+        if (me._listener != nil) removelistener(me._listener);
+        me._disconnectWheel();
+        me._disconnectWheel = nil;
+        me._listener = nil;
+        me._window.del();
+        me._window = me._canvas = me._scrollArea = me._listGroup = me._currentLabel = nil;
+        me._rows = [];
     }
 };

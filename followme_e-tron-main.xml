@@ -31,8 +31,8 @@
     				<item>
     					<label>Show Options</label>
     					<binding>
-    						<command>dialog-show</command>
-    						<dialog-name>vehicle-dialog</dialog-name>
+                            <command>nasal</command>
+                            <script>dialogs.vehicleDialog.open()</script>
     					</binding>
     				</item>
     				<item>
@@ -46,7 +46,7 @@
     					<label>Configuration</label>
     					<binding>
     						<command>nasal</command>
-    						<script>followme.configDialog.open();</script>
+    						<script>dialogs.configDialog.open();</script>
     					</binding>
     				</item>
                     <item>
@@ -201,7 +201,7 @@
         </systems>
 
         <tutorials>
-             <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
+            <tutorial include="Tutorials/followme-cockpit-overview-dashboard.xml"/>
      	    <tutorial include="Tutorials/followme-cockpit-overview-dashboard-zh.xml"/>
      	    <tutorial include="Tutorials/followme-cockpit-overview-center-console.xml"/>
      	    <tutorial include="Tutorials/followme-keyboard.xml"/>
@@ -508,6 +508,8 @@
         </musicplayer> -->
         <dialogs>
             <file>Aircraft/followme_e-tron/gui/dialogs/config.nas</file>
+            <file>Aircraft/followme_e-tron/gui/dialogs/vehicle-dialog.nas</file>
+            <file>Aircraft/followme_e-tron/gui/dialogs/config-dialog.nas</file>
         </dialogs>
         <save>
     	<file>Aircraft/followme_e-tron/Nasal/save.nas</file>

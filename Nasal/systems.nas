@@ -17,9 +17,13 @@
 
 io.include("library.nas");
 
-# GUI
-props.getNode("/sim/gui/dialogs/vehicle_config/dialog",1);
-var configDialog = gui.Dialog.new("/sim/gui/dialogs/vehicle_config/dialog", "Aircraft/followme_e-tron/gui/dialogs/config-dialog.xml");
+# Existing aircraft scripts may still call followme.configDialog.
+var configDialog = {
+	open: func dialogs.configDialog.open(),
+	close: func dialogs.configDialog.close(),
+	toggle: func dialogs.configDialog.toggle(),
+	is_open: func dialogs.configDialog.is_open(),
+};
 
 # Tyre Smoke
 var tyreSmoke_0 = aircraft.tyresmoke.new(0, auto = 1, diff_norm = 0.4, check_vspeed = 0);

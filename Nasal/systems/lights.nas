@@ -78,7 +78,7 @@ var IndicatorController = {
     falseLight: 0,
 
     ledMessage: props.getNode("/sim/model/livery/texture",1),
-    ledMessageName: props.getNode("/sim/model/livery/name",1),
+    ledMessageName: props.getNode("/sim/model/livery/message-name",1),
 
     savedMessage:{
         texture: "",

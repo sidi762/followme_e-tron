@@ -2,12 +2,12 @@
 #//Contact: sidi.liang@gmail.com
 #
 #Instructions: This code scans the Models/plate/texture folder
-#whenever the vehicle config dialog (config-dialog.xml) is opened.
+#whenever Vehicle Configuration is opened.
 #To add an plate, just place the new plate texture file (must be .png
 #format) to that folder and it will show up in the dialog.
 
 var path = props.getNode("/",1).getValue("sim/aircraft-dir") ~ '/Models/plate/texture';
-var plateSelector = TextureSelector.new("Plate-Selector", path, ".png", 1, 1, "sim/gui/dialogs/vehicle_config/dialog", "group[6]/combo/");
+var plateSelector = TextureSelector.new(name: "Plate-Selector", path: path, fileType: ".png", enableNone: 1, customDialog: 1);
 var rearNameNode = props.getNode("systems/rear_plate/name", 1);
 var rearFileNode = props.getNode("systems/rear_plate/file", 1);
 rearFileNode.setValue("plate/texture/" ~ "e-tron.png");

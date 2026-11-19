@@ -1,174 +1,67 @@
-###############################################################################
-# Window Class
-# Extends canvas.Window with custom styling and behavior
-###############################################################################
-var Window = {
-    new: func(size, type = nil, id = nil) {
-        var m = canvas.Window.new(size, type, id);
-        m.parents = [Window] ~ m.parents;
-        
-        # Set initial position 
-        m.setPosition(100, 100);
-        
-        # # Set up decorations
-        # m._updateDecoration();
-        
-        # Track open state
-        m._isOpen = 1;
-        
-        return m;
-    },
-    
-    # Destructor
-    del: func() {
-        if (me["_title"] != nil) me._title.del();
-        me.clearFocus();
+# FlightGear allocates the decoration in logical pixels when sizing a dialog.
+# Configure it after the window's final size is known so both layers are sharp.
+var styleVehicleWindow = func(win) {
+	var titleHeight = 32;
+	win._title_bar_height = titleHeight;
+	win.setInt("shadow-radius", 0).setInt("shadow-inset", 0);
+	win.set("decoration-border", "32 0 0").setBool("update", 1);
+	var deco = win.getCanvasDecoration();
+	var (width, bodyHeight) = win.getSize();
+	var height = bodyHeight + titleHeight;
+	deco.setInt("view[0]", width).setInt("view[1]", height)
+		.setInt("size[0]", width * 2).setInt("size[1]", height * 2).setBool("mipmapping", 1);
+	win._frame.hide();
+	win._top_line.hide();
+	win._title_bar_bg.reset().rect(0, 0, width, titleHeight, {"border-top-radius": 8});
+	win._title.setTranslation(40, 16).set("character-size", 15).set("font-resolution", 30);
+	var tintTitle = func {
+		win._title_bar_bg.set("fill", "#f5f5f7");
+		win._title.set("fill", "#1d1d1f");
+	};
+	tintTitle();
+	deco.addEventListener("wm.focus-in", tintTitle);
+	deco.addEventListener("wm.focus-out", tintTitle);
 
-        if(me["_canvas"] != nil) {
-            var placements = me._canvas._node.getChildren("placement");
-            # Do not remove canvas if other placements exist
-            if(size(placements) > 1) {
-                foreach(var p; placements){
-                    if(p.getValue("type") == "window" and 
-                    p.getValue("id") == me.get("id"))
-                        p.remove();
-                }
-            } else {
-                me._canvas.del();
-            }
-            me._canvas = nil;
-        }
-        if (me._node != nil) {
-            me._node.remove();
-            me._node = nil;
-        }
-        me._isOpen = 0;
-    },
+	var bar = deco.getGroup("decoration").getElementById("title_bar");
+	bar.getElementById("WindowButton-close").hide();
+	var close = bar.createChild("group", "options-close").setTranslation(5, 3);
+	var hit = close.createChild("path").rect(0, 0, 28, 26, {"border-radius": 6}).set("fill", "#f5f5f7");
+	close.createChild("path").moveTo(9, 8).lineTo(19, 18).moveTo(19, 8).lineTo(9, 18)
+		.set("fill", "none").set("stroke", "#575960").set("stroke-width", 1.6).setStrokeLineCap("round");
+	close.addEventListener("mouseenter", func hit.set("fill", "#e4e5e8"));
+	close.addEventListener("mouseleave", func hit.set("fill", "#f5f5f7"));
+	close.addEventListener("mousedown", func hit.set("fill", "#d6d7db"));
+	close.addEventListener("click", func win.onClose());
+};
 
-    # _updateDecoration: func() {
-    #     var border_radius = 9;
-    #     me.set("decoration-border", "25 1 1");
-    #     me.set("shadow-inset", int((1 - math.cos(45 * D2R)) * border_radius + 0.5));
-    #     me.set("shadow-radius", 5);
-    #     me.setBool("update", 1);
-
-    #     var canvas_deco = me.getCanvasDecoration();
-    #     canvas_deco.addEventListener("mousedown", func me.raise());
-    #     canvas_deco.set("blend-source-rgb", "src-alpha");
-    #     canvas_deco.set("blend-destination-rgb", "one-minus-src-alpha");
-    #     canvas_deco.set("blend-source-alpha", "one");
-    #     canvas_deco.set("blend-destination-alpha", "one");
-
-    #     var group_deco = canvas_deco.getGroup("decoration");
-    #     group_deco.removeAllChildren();
-
-    #     var title_bar = group_deco.createChild("group", "title_bar");
-    #     me._title_bar_bg = title_bar.createChild("path", "background");
-    #     me._title_bar_bg
-    #         .rect(0, 0,
-    #              me.get("size[0]"), 25,
-    #              {"border-top-radius": border_radius})
-    #         .setColorFill(0.25, 0.24, 0.22)
-    #         .setStrokeLineWidth(0);
-            
-    #     # Add border frame
-    #     me._frame = title_bar.createChild("path", "frame");
-    #     me._frame
-    #         .rect(0, 0,
-    #             me.get("size[0]"), me.get("size[1]"),
-    #             {"border-top-radius": border_radius})
-    #         .setColor(0.25, 0.24, 0.22)
-    #         .setStrokeLineWidth(1)
-    #         .setColorFill("none");
-            
-    #     # Add highlight top line
-    #     me._top_line = title_bar.createChild("path", "top-line");
-    #     me._top_line
-    #         .moveTo(border_radius - 2, 2)
-    #         .lineTo(me.get("size[0]") - border_radius + 2, 2)
-    #         .setColor(0.5, 0.5, 0.5)
-    #         .setStrokeLineWidth(1);
-
-    #     # Close button - use direct path drawing for reliability
-    #     var x = 10;
-    #     var y = 3;
-    #     var w = 20;
-    #     var h = 20;
-        
-    #     # Button background
-    #     var close_button = title_bar.createChild("group", "close_button")
-    #         .setTranslation(x, y);
-            
-    #     var bg = close_button.createChild("path", "bg")
-    #         .rect(0, 0, w, h, {"border-radius": 2})
-    #         .setColorFill(1, 0.3, 0.1, 0.8)
-    #         .setStrokeLineWidth(0);
-            
-    #     # X mark
-    #     var x_mark = close_button.createChild("path", "x_mark")
-    #         .setColor(1, 1, 1)
-    #         .setStrokeLineWidth(2);
-            
-    #     x_mark.moveTo(5, 5).lineTo(w-5, h-5);
-    #     x_mark.moveTo(5, h-5).lineTo(w-5, 5);
-                
-    #     # Custom close button handling to fix reusability issue
-    #     close_button.addEventListener("click", func {
-    #         if (me._isOpen)
-    #             me.del();
-    #     });
-        
-    #     close_button.addEventListener("mouseover", func {
-    #         bg.setColorFill(1, 0, 0, 1);
-    #     });
-        
-    #     close_button.addEventListener("mouseout", func {
-    #         bg.setColorFill(1, 0.3, 0.1, 0.8);
-    #     });
-
-    #     # Title text
-    #     me._title = title_bar.createChild("text", "title")
-    #         .set("alignment", "left-center")
-    #         .set("character-size", 14)
-    #         .set("font", "LiberationFonts/LiberationSans-Bold.ttf")
-    #         .setColor(1, 1, 1) # Brighter white text for better contrast
-    #         .setTranslation(x + w + 10, y + h/2);
-
-    #     var title = me.get("title", "Canvas Window");
-    #     me._title.setText(title);
-    #     me._node.getNode("title", 1).alias(me._title._node.getPath() ~ "/text");
-
-    #     # Window drag behavior - simplify further to avoid 'local' property
-    #     title_bar.addEventListener("drag", func(e) {
-    #         # Store the window reference for the event handler
-    #         var window = me;
-            
-    #         # Move the window based on the delta
-    #         window.move(e.deltaX, e.deltaY);
-    #     });
-        
-    #     # Handle window resize
-    #     me.onResize = func {
-    #         if (me._title_bar_bg != nil) {
-    #             me._title_bar_bg.reset().rect(0, 0, me.get("size[0]"), 25, {"border-top-radius": border_radius})
-    #                 .setColorFill(0.25, 0.24, 0.22).setStrokeLineWidth(0);
-                    
-    #             me._frame.reset().rect(0, 0, me.get("size[0]"), me.get("size[1]"), 
-    #                 {"border-top-radius": border_radius})
-    #                 .setColor(0.25, 0.24, 0.22).setStrokeLineWidth(1).setColorFill("none");
-                    
-    #             me._top_line.reset().moveTo(border_radius - 2, 2)
-    #                 .lineTo(me.get("size[0]") - border_radius + 2, 2)
-    #                 .setColor(0.5, 0.5, 0.5).setStrokeLineWidth(1);
-    #         }
-            
-    #         if (me['_canvas'] != nil) {
-    #             for(var i = 0; i < 2; i += 1) {
-    #                 var size = me.get("content-size[" ~ i ~ "]");
-    #                 me._canvas.set("size[" ~ i ~ "]", size);
-    #                 me._canvas.set("view[" ~ i ~ "]", size);
-    #             }
-    #         }
-    #     };
-    # }
+# Cocoa SCROLL_2D falls through Canvas and reaches FGMouseInput as buttons 3/4.
+# Return the disconnect function so the owner can release both listeners on close.
+var bindVehicleScroll = func(win, host, scroll, step, enabled=func 1) {
+	var overList = nil;
+	host.addEventListener("mouseenter", func { overList = 1; });
+	host.addEventListener("mouseleave", func { overList = 0; });
+	win.getCanvas().addEventListener("wm.focus-out", func { overList = 0; });
+	win.getCanvas().addEventListener("wm.focus-in", func { overList = nil; });
+	var mouse = props.getNode("/devices/status/mice/mouse[0]", 1);
+	var modes = props.getNode("/input/mice/mouse[0]", 1);
+	var pulse = func(n) {
+		if (!n.getBoolValue() or !scroll._max_scroll[1] or !enabled()) return;
+		var mode = modes.getChild("mode", mouse.getValue("mode"));
+		if (mode == nil or !mode.getValue("pass-through") or mouse.getValue("button[2]")) return;
+		if (overList == nil) {
+			# Opening the window under a stationary pointer produces no enter event.
+			if (canvas.gui.focused_window != win) return;
+			var origin = win.toScreenPosition(host.localToCanvas([0, 0]));
+			var x = mouse.getValue("x");
+			var y = mouse.getValue("y");
+			if (x == nil or y == nil or x < origin[0] or x >= origin[0] + scroll._size[0]
+				or y < origin[1] or y >= origin[1] + scroll._size[1]) return;
+		} elsif (!overList) return;
+		var distance = n.getIndex() == 3 ? -step : step;
+		scroll.scrollBy(0, distance);
+	};
+	var listeners = [];
+	foreach (var button; [3, 4])
+		append(listeners, setlistener(mouse.getChild("button", button, 1), pulse, 0, 0));
+	return func { foreach (var id; listeners) removelistener(id); };
 };
