@@ -75,7 +75,8 @@ var TextureSelector = {
     new: func(name, path, fileType = nil, enableNone = 0, customDialog = 0, customDialogBase = "",
             customDialogPosition = "", texturePropertyBase = "sim/model/livery/", textureProp = "livery", textureNameProp = "name",
             textureDataNode = nil, enableMultiplayer = 0, multiplayerProperty = "/sim/multiplay/generic/string[19]",
-            texturePrePath = "", defaultValue = "", canvasItemsPropPath = nil, dialogTitle = nil, outputNameProp = nil) {
+            texturePrePath = "", defaultValue = "", canvasItemsPropPath = nil, dialogTitle = nil, outputNameProp = nil,
+            compactDialog = 0) {
 
         if(right(path, 1) != "/"){
             path = path ~ "/";
@@ -108,7 +109,7 @@ var TextureSelector = {
 
         if (customDialog == 0) {
             # Create Canvas-based dialog instance
-            m.dialog = TextureSelectorDialog.new(m, dialogTitle or m.name);
+            m.dialog = TextureSelectorDialog.new(m, dialogTitle or m.name, compactDialog);
         }
 
         m.updateList();
@@ -226,9 +227,10 @@ var TextureSelector = {
 };
 
 var TextureSelectorDialog = {
-    new: func(selector, title) {
+    new: func(selector, title, compact=0) {
         return {parents: [TextureSelectorDialog], _parentSelector: selector,
-            _title: title, _window: nil, _rowHeight: 28, _listener: nil};
+            _title: title, _window: nil, _rowHeight: 28, _listener: nil,
+            _preferredWidth: compact ? 264 : 340, _preferredRows: compact ? 8 : 13};
     },
 
     # Only the list scrolls. Use the actual Canvas desktop size, which can be
@@ -244,10 +246,10 @@ var TextureSelectorDialog = {
         var dh = getprop("/sim/gui/canvas/size[1]");
         var footerHeight = 44;
         var listH = math.max(1, size(selector.items)) * me._rowHeight;
-        var w = math.min(340, dw - 16);
-        var available = math.min(dh - 64, 420) - footerHeight;
+        var w = math.min(me._preferredWidth, dw - 16);
+        var available = dh - 64 - footerHeight;
         # Open on whole rows so revealing the last selection leaves a clean top edge.
-        var visibleRows = math.max(1, int(available / me._rowHeight));
+        var visibleRows = math.clamp(int(available / me._rowHeight), 1, me._preferredRows);
         var h = footerHeight + math.max(1, math.min(listH, visibleRows * me._rowHeight, available));
         me._rows = [];
         me._cursor = -1;
@@ -267,11 +269,11 @@ var TextureSelectorDialog = {
         me._listGroup = me._scrollArea.getContent();
         var extent = me._listGroup.createChild("path").set("fill", "#ffffff");
         forindex (var i; selector.items) me._addRow(i, selector.items[i]);
-        if (!size(selector.items)) me._text(me._listGroup, 16, 14, "No entries found", 14);
+        if (!size(selector.items)) me._text(me._listGroup, 16, 14, "No entries found", 15);
 
         var footer = root.createChild("group");
         var separator = footer.createChild("path").set("fill", "#e8e8ec");
-        me._currentLabel = me._text(footer, 16, 22, "", 12).set("fill", "#5d5d65");
+        me._currentLabel = me._text(footer, 16, 22, "", 13).set("fill", "#494950");
         var close = footer.createChild("group", "close-button");
         var bg = close.createChild("path").rect(0, 0, 68, 28, {"border-radius": 5}).set("fill", "#ffffff");
         me._text(close, 34, 14, "Close", 14, "center-center").set("fill", "#005bc4");
@@ -320,7 +322,7 @@ var TextureSelectorDialog = {
         var dialog = me;
         var g = me._listGroup.createChild("group", "row-" ~ i).setTranslation(0, i * me._rowHeight);
         var bg = g.createChild("path", "background").set("fill", "#ffffff");
-        var label = me._text(g, 16, 14, name, 14);
+        var label = me._text(g, 16, 14, name, 15);
         var row = {group: g, name: name, bg: bg, label: label, hover: 0};
         append(me._rows, row);
         g.addEventListener("mouseenter", func { row.hover=1; dialog._paint(i); });
@@ -336,7 +338,7 @@ var TextureSelectorDialog = {
     _paint: func(i) {
         var row = me._rows[i];
         var selected = i == me._selectedIndex;
-        row.bg.set("fill", selected ? "#dfeaf8" : (row.hover ? "#f2f3f5" : "#ffffff"))
+        row.bg.set("fill", selected ? "#d4e5fa" : (row.hover ? "#f2f3f5" : "#ffffff"))
             .set("stroke", me._keyboard and i == me._cursor ? "#007aff" : "none");
         row.label.set("fill", selected ? "#193b62" : "#1d1d1f");
     },

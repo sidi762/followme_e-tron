@@ -32,10 +32,10 @@ var styleVehicleWindow = func(win) {
 		dragArea.reset().rect(0, 0, w, titleHeight);
 	};
 	win._resizeDecoration();
-	# The capitals are about 10.5 px tall at 15 px. A fixed baseline keeps
-	# their center aligned with the close icon even in titles containing g or y.
-	win._title.setAlignment("left-baseline").setTranslation(40, centerY + 5.25)
-		.set("character-size", 15).set("font-resolution", 30);
+	# Align the 14 px headline's capitals with the close icon, independent of descenders.
+	win._title.setFont("LiberationFonts/LiberationSans-Bold.ttf")
+		.setAlignment("left-baseline").setTranslation(40, centerY + 4.75)
+		.set("character-size", 14).set("font-resolution", 28);
 	bar.getElementById("WindowButton-close").hide();
 	var close = bar.createChild("group", "options-close").setTranslation(5, centerY - 13).set("z-index", 2);
 	var hit = close.createChild("path").rect(0, 0, 28, 26, {"border-radius": 6}).set("fill", "#f5f5f7");

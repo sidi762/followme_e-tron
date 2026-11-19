@@ -142,7 +142,7 @@ var SettingsDialog = {
 	},
 
 	_heading: func(y, title) {
-		me._text(me._body, 0, y + 7, title, 13, me._secondary);
+		me._text(me._body, 0, y + 7, title, 13, "#45454b", 1);
 		return y + 19;
 	},
 
