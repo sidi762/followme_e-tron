@@ -17,6 +17,7 @@
 io.include("library.nas");
 io.include("lib_elec.nas");
 var N2LBS = 0.2248089;
+
 var Engine = {
     #//Class for any electric power unit (engine and gear box)
     #//mTorque: Max torque, mPower: Max Power, rpmAtMPower: RPM at max power
@@ -28,7 +29,6 @@ var Engine = {
         m.applianceName = "Engine Module";
         m.applianceDescription = "This is the engine for the vehicle";
 
-        m.engineSwitch = Switch.new(0);
 
         m.engineNode = followme.vInfo.engine;
         m.engineNode.throttleNode = props.getNode("/controls/engines/engine/throttle",1);
@@ -48,9 +48,9 @@ var Engine = {
         return m;
     },
 
-    motorResistance: 0.5,#//No datasource, based on guess
-    resistance: 0.2,
-    protectionResistance: 0.5, #//temp solution
+    # Motor/inverter is a power load on the DC bus.
+    isPowerLoad: 1,
+    resistance: 0,
 
     runningState: 0,
 
@@ -179,8 +179,10 @@ var Engine = {
         var mode = me.engineNode.mode.getValue();
         me.mode = mode;
 
-        if(me.voltage <= 50){
+        if (followme.powerState == "precharge") return;
+        if (followme.powerState != "ready" or me.voltage <= 50){
             me.stopEngine();
+            mainSwitchStarted = 0;
             print("No Power");
             me.errorMessage = "NO POWER";
             #//To be improved
@@ -190,19 +192,12 @@ var Engine = {
             me.errorMessage = nil;
         }
 
+        if (!me.runningState) {
+            me.runningState = 1;
+            me.engineNode.isStarted.setValue(1);
+        }
         throttle = throttle * mode;
         #print("throttle:" ~throttle);
-
-        me.controlResistance = (0 - throttle * 3000000000000) + 3000000000000;#//We do this for now as I still can't find out how is the speed of motor being controlled. Imagine this is a tunable resistor
-        me.resistance = me.controlResistance + me.motorResistance + me.protectionResistance;
-
-        var actualMaxTorque = me.current * (me.maxTorque / me.ratedCurrent); #//We can do this because torque is directly proportional to the current
-
-        var cmdRpm = throttle * me.rpmAtMaxPower;
-        #print("cmdRpm: "~cmdRpm);
-
-        #var cmdPower = throttle * me.ratedPower;
-        #print("cmdPower: "~cmdPower);
 
         me.cmdTorque = throttle * me.maxTorque;
         #//me.cmdTorque = actualMaxTorque;
@@ -218,21 +213,6 @@ var Engine = {
         if(direction * me.rpm > 0) me.torque = ((9549 * me.cmdPower) / me.rpm);
         else if(direction * me.rpm < 0) me.torque = ((9549 * me.cmdPower) / math.abs(me.rpm)) * direction;
         me.activePower_kW = math.abs(me.rpm * me.torque / 9549);
-
-        #if(math.abs(me.rpm) < cmdRpm){
-            #print("me.rpm < cmdRpm");
-            #//me.torque = throttle * actualMaxTorque * direction;
-
-        #}else if(throttle == 0){
-        #    me.activePower_kW = 0;
-        #    me.torque = 0;
-        #    var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
-        #    me.rpm = me.rpm_calculate(angularAcceleration);
-        #}else{
-        #    var angularAcceleration = direction * math.abs(me.torque) / me.rotor_moi; #rad/s^2
-        #    me.rpm = me.rpm_calculate(angularAcceleration);
-        #    me.torque = throttle * direction * math.abs((9549 * me.activePower_kW) / me.rpm);
-        #}
 
         var force = (1/me.wheel_radius) * me.torque * me.gear;#//unit: N
 
@@ -255,10 +235,9 @@ var Engine = {
     engineTimer: nil,
 
     startEngine: func(){
-        if(me.engineTimer == nil) me.engineTimer = maketimer(0.1, func me.update_engine());
-        me.engineSwitch.switchConnect();
-        me.runningState = 1;
-        me.engineNode.isStarted.setValue(1);
+        if (!followme.requestDrivePower()) return 0;
+        if (me.engineTimer == nil) me.engineTimer = maketimer(0.1, func me.update_engine());
+        if (me.engineTimer.isRunning) return 1;
         me.engineTimer.simulatedTime = 1;
         me.rpm = 100 * me.getDirection();
         followme.playAudio("starter.wav");
@@ -267,8 +246,9 @@ var Engine = {
     },
 
     stopEngine: func(){
-        me.engineSwitch.switchDisconnect();
-        me.engineTimer.stop();
+        followme.updateElectrical();
+        followme.setPowerState("off");
+        if (me.engineTimer != nil) me.engineTimer.stop();
         me.rpm = 0;
         me.torque = 0;
         me.outputForce = 0;
@@ -276,6 +256,7 @@ var Engine = {
         me.activePower_kW = 0;
         me.runningState = 0;
         me.engineNode.isStarted.setValue(0);
+        followme.advancePowerSupply(0);
     },
 
     printDebugInfo: func(){
@@ -291,8 +272,6 @@ var Engine = {
 var engine_1 = Engine.new(460, 375, 7750);
 followme.circuit_1.addUnitToSeries(0, followme.Cable.new(5, 0.008));
 followme.circuit_1.addUnitToSeries(0, engine_1);
-followme.circuit_1.addUnitToSeries(0, engine_1.engineSwitch);
-engine_1.engineSwitch.switchDisconnect();
 followme.circuit_1.addUnitToSeries(0, followme.Cable.new(5, 0.008));
 
 var outputForce = func(force){
@@ -326,11 +305,11 @@ var outputForce = func(force){
 props.getNode("systems/welcome-message", 1).setValue(3);
 var mainSwitchStarted = 0;
 var startEngine = func(my_engine){
-    mainSwitchStarted = 1;
-    smartInstruments.smartInstruments.startUp();
-    if(!props.getNode("/controls/is-recharging").getValue()){
+    if(!getprop("/services/service-truck/connect") and !getprop("/controls/is-recharging")){
+        smartInstruments.smartInstruments.startUp();
         var signal = my_engine.startEngine();
         if(signal){
+            mainSwitchStarted = 1;
             print("Engine started");
             if(followme.safety.isEnabled) followme.safety.init();
             if(props.getNode("systems/welcome-message", 1).getValue() == 1){
@@ -346,9 +325,9 @@ var startEngine = func(my_engine){
             smartInstruments.smartInstruments.showWarningMessage(my_engine.errorMessage);
         }
 
-    }else if(followme.chargeTimer.isRunning){
-        #screen.log.write("Battery is recharging, cannot start engine.", 0, 0.584, 1);
-        setprop("/sim/sound/voices/pilot", "Battery is recharging, cannot start engine.");
+    }else{
+        #screen.log.write("Disconnect the charge cable before starting.", 0, 0.584, 1);
+        setprop("/sim/sound/voices/pilot", "Disconnect the charge cable before starting.");
     }
 }
 

@@ -479,7 +479,7 @@
                 </enable>
                 <binding>
                     <command>nasal</command>
-                    <script>followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull()</script>
+                    <script>followme.quickRecharge()</script>
                 </binding>
             </button>
         </group>

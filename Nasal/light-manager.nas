@@ -204,6 +204,9 @@ var light_manager = {
             highBeam = getprop("controls/lighting/highBeam");
 			#//headlight = getprop("controls/lighting/headlight-als");
 			headlight = getprop("controls/lighting/headlight");
+            if (getprop("/systems/electrical/e-tron/aux-bus-powered") == 0) {
+                highBeam = headlight = 0;
+            }
 
             ll3 = getprop("sim/model/lights/nose-lights");
 			nav = getprop("/sim/model/lights/nav-lights");

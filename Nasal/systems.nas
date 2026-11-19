@@ -58,6 +58,18 @@ aircraft.door.toggle = func(){
     }
 }
 
+# Keep the driver switch position when the accessory bus loses power.
+# The passenger aircraft also loads this file and has no local battery model.
+var poweredAuxSwitch = func(path) {
+    var request = props.globals.getNode(path, 1);
+    var output = request.getNode("powered", 1);
+    var bus = props.globals.initNode("/systems/electrical/e-tron/aux-bus-powered", 1, "BOOL");
+    var refresh = func { output.setBoolValue(request.getBoolValue() and bus.getBoolValue()); };
+    setlistener(request, refresh);
+    setlistener(bus, refresh, 1);
+    return output;
+};
+
 # Wiper
 io.include("systems/wiper.nas");
 frontWiper = wiper.new("/controls/wiper/frontwiper");
@@ -70,54 +82,49 @@ var indicatorController = IndicatorController.new();
 io.include("systems/brakes.nas");
 var brakeController = BrakeController.new();
 
-# Recharge (Todo: Implement a better system)
-var chargeBatterySec = func(){
-    #//var battery = props.getNode("/systems/electrical/e-tron/battery-kWs");
-    #//var currentBattery = battery.getValue();
-    var battery = circuit_1.parallelConnection[0].units[0];
-    var batteryRemaining = battery.remaining;
-    var batteryElecForce = battery.ratedElectromotiveForce;
-    if(batteryRemaining >= battery.electricalCapacity){
+# External service-truck charger, kW delivered to the pack.
+var chargerPowerKW = 240;
+var chargeBatteryStop = func {
+    vInfo.electrical.isRecharging.setValue(0);
+    screen.log.write("Recharge Stopped", 0, 0.584, 1);
+    setprop("/sim/sound/voices/pilot", "Recharge Stopped. Have a nice ride!");
+};
+
+var updateCharging = func(dt) {
+    if (!supplyCableConnected or powerState != "off") {
+        chargeBatteryStop();
+        return;
+    }
+    cSource.addToBattery(chargerPowerKW * dt);
+    if (cSource.remaining >= cSource.electricalCapacity) {
+        chargeBatteryStop();
         screen.log.write("Battery is Successfully recharged!", 0, 0.584, 1);
-        chargeBatteryStop(batteryElecForce);
     }
-    #//battery.setValue(currentBattery+240);
-    #//batteryRemaining += 240;
-    circuit_1.parallelConnection[0].units[0].addToBattery(240);
-}
-var chargeTimer = maketimer(1, chargeBatterySec);
-var chargeBatteryStart = func(){
-    var battery = circuit_1.parallelConnection[0].units[0];
-    var batteryRemaining = battery.remaining;
-    var batteryTotal = battery.electricalCapacity;
-    var batteryElecForce = battery.electromotiveForce;
-    if(!props.getNode("/controls/is-recharging", 1).getValue()){
-        if(props.getNode("/",1).getValue("services/service-truck/connect") == 1 and props.getNode("/",1).getValue("/controls/engines/engine/started") == 0){
-            var deltaBattery = batteryTotal - batteryRemaining;
-            battery.electromotiveForce = 0;
-            var remainingTime = sprintf("%.0f", (deltaBattery / 240) / 60);      #Based on 20 mins from 0 to full
-            screen.log.write("Recharging. About "~remainingTime~" mins remaining.", 0, 0.584, 1);
-            setprop("/sim/sound/voices/pilot", "Recharging. About "~remainingTime~" mins remaining.");
-            chargeTimer.start();
-            props.getNode("/controls/is-recharging", 1).setValue(1);
-        }else if(!props.getNode("/",1).getValue("services/service-truck/connect")){
-            screen.log.write("Cannot recharge. Call service truck and connect the cable first.", 0, 0.584, 1);
-            setprop("/sim/sound/voices/pilot", "Cannot recharge. Call service truck and connect the cable first.");
-        }else if(props.getNode("/",1).getValue("/controls/engines/engine/started")){
-            screen.log.write("Cannot recharge. Shut down the engine first.", 0, 0.584, 1);
-            setprop("/sim/sound/voices/pilot", "Cannot recharge. Shut down the engine first.");
-        }
-    }else if(props.getNode("/controls/is-recharging", 1).getValue()){
-        chargeBatteryStop(batteryElecForce);
+};
+
+# The charge button toggles a session. Settle the old state at the time of the click.
+var chargeBatteryStart = func {
+    var wasCharging = vInfo.electrical.isRecharging.getValue();
+    updateElectrical();
+    if (wasCharging) {
+        if (vInfo.electrical.isRecharging.getValue()) chargeBatteryStop();
+        return;
     }
-}
-var chargeBatteryStop = func(bef){
-   chargeTimer.stop();
-   circuit_1.parallelConnection[0].units[0].electromotiveForce = bef;
-   screen.log.write("Recharge Stopped", 0, 0.584, 1);
-   setprop("/sim/sound/voices/pilot", "Recharge Stopped. Have a nice ride!");
-   props.getNode("/controls/is-recharging", 1).setValue(0);
-}
+    var message = "";
+    if (!getprop("/services/service-truck/connect")) {
+        message = "Cannot recharge. Call service truck and connect the cable first.";
+    } elsif (powerState != "off") {
+        message = "Cannot recharge. Shut down the engine first.";
+    } elsif (cSource.remaining >= cSource.electricalCapacity) {
+        message = "Battery is fully charged.";
+    } else {
+        var minutes = (cSource.electricalCapacity - cSource.remaining) / chargerPowerKW / 60;
+        message = sprintf("Recharging. About %.0f mins remaining.", minutes);
+        vInfo.electrical.isRecharging.setValue(1);
+    }
+    screen.log.write(message, 0, 0.584, 1);
+    setprop("/sim/sound/voices/pilot", message);
+};
 
 # Parking Radar
 var parkingRadar = Radar.new(0.3, 0, 3.8, 3, 3);

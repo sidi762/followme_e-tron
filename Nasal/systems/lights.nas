@@ -28,7 +28,7 @@ var Indicator = {
     new: func(type) { 
         var newIndicator = { parents:[Indicator] };
         newIndicator.type = type;  
-        newIndicator.fgLight = aircraft.light.new("/sim/model/lights/indicator-"~type, [0.5, 0.5], "/controls/lighting/indicator-"~type);
+        newIndicator.fgLight = aircraft.light.new("/sim/model/lights/indicator-"~type, [0.5, 0.5], poweredAuxSwitch("/controls/lighting/indicator-"~type));
         return newIndicator;
     },
     state: 0,

@@ -28,15 +28,15 @@ var wiper = {
     
     new: func(wiperNode){
         var m = {parents:[wiper]};
-        me.switchNode = props.globals.getNode(wiperNode~"/switch", 1);
-        me.controller = aircraft.light.new(wiperNode, [1, 1], me.switchNode);
-        me.controller.stateN = me.controller.node.initNode("state", 0, "DOUBLE");
-        props.getNode(wiperNode,1).setValue("/switch", 0);
+        m.switchNode = props.globals.getNode(wiperNode~"/switch", 1);
+        m.controller = aircraft.light.new(wiperNode, [1, 1], poweredAuxSwitch(wiperNode ~ "/switch"));
+        m.controller.stateN = m.controller.node.initNode("state", 0, "DOUBLE");
+        m.switchNode.setBoolValue(0);
         return m;
     },
     Stop: func(){
         me.switchNode.setValue(0);
-        mode = me.WIPER_MODE.STOP;
+        me.mode = me.WIPER_MODE.STOP;
     },
     Fast: func(){
         me.controller.pattern = [0.5, 0.5];

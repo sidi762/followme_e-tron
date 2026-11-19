@@ -216,7 +216,7 @@ var VehicleDialogClass = {
             setprop("velocities/groundspeed-kt", 0);
         });
         widget.createButton(200, yPos, 180, 30, "Quick Recharge", 
-            func followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull());
+            func followme.quickRecharge());
         yPos += 35;
 
         widget.createButton(5, yPos, 180, 30, "Reset/Disable Airbag", 
