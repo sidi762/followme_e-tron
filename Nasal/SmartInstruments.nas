@@ -50,7 +50,10 @@ var SmartInstruments = {
         m.positionLightSign = m.signGroup.getElementById("positionlight_sign");
         m.highbeamSign = m.signGroup.getElementById("highbeam_sign");
         m.foglightSign = m.signGroup.getElementById("foglight_sign");
-        m.foglightSign.hide(); #// Not implemented yet
+        m.escOffSign = m.signGroup.getElementById("escoff_sign");
+        m.readySign = m.signGroup.getElementById("ready_sign");
+        m.autopilotSign = m.signGroup.getElementById("zidongshengtian_sign");
+        m.cruiseSign = m.signGroup.getElementById("cruise_sign");
 
         m.signGroup.hide();
         #Background
@@ -258,39 +261,18 @@ var SmartInstruments = {
         me.timeDisplay.updateText(hour~":"~minute);
 
         #//Signs
-        if(!followme.safety.isOn){
-            settimer(func me.airbagSign.show(), 1);
-        }else{
-            settimer(func me.airbagSign.hide(), 1);
-        }
-
-        if(followme.brakeController.handBrakeIsOn()){
-            me.handBrakeSign.show();
-        }else{
-            me.handBrakeSign.hide();
-        }
-
-        if(me.information.systems.isAutoholdWorking.getValue()){
-            me.autoholdSign.show();
-        }else{
-            me.autoholdSign.hide();
-        }
-
-        if(me.information.lighting.headlight.getValue() == 1){
-            me.positionLightSign.show();
-        }else if(me.information.lighting.headlight.getValue() == 2){
-            me.positionLightSign.show();
-            me.headlightSign.show();
-        }else if(me.information.lighting.headlight.getValue() == 0){
-            me.positionLightSign.hide();
-            me.headlightSign.hide();
-        }
-
-        if(me.information.lighting.highBeam.getValue()){
-            me.highbeamSign.show();
-        }else{
-            me.highbeamSign.hide();
-        }
+        var safety = followme.safety;
+        me.airbagSign.setVisible(!safety.isOn or safety.frontAirbagProp.getBoolValue()
+                                              or safety.sideAirbagProp.getBoolValue());
+        me.handBrakeSign.setVisible(followme.brakeController.handBrakeIsOn());
+        me.autoholdSign.setVisible(me.information.systems.isAutoholdWorking.getBoolValue());
+        var lightMode = me.information.lighting.headlight.getValue();
+        me.positionLightSign.setVisible(lightMode == 1 or lightMode == 2);
+        me.headlightSign.setVisible(lightMode == 2);
+        me.highbeamSign.setVisible(me.information.lighting.highBeam.getBoolValue());
+        me.readySign.setVisible(engine.engine_1.isRunning());
+        me.autopilotSign.setVisible(autopilot.road_check_timer.isRunning);
+        me.cruiseSign.setVisible(autospeed.active);
 
         #//Check for doors
         doors = [followme.frontleft_door, followme.frontright_door, followme.rearleft_door, followme.rearright_door, followme.charging_cap];
@@ -343,7 +325,11 @@ var SmartInstruments = {
 
     updateTimer:nil,
     init: func(){
-        if(me.updateTimer == nil) me.updateTimer = maketimer(0.1, func me.update());
+        if(!me.initialized){
+            me.updateTimer = maketimer(0.1, func me.update());
+            me.startScreenTimer = maketimer(1, func me.startSequence());
+            me.startScreenTimer.singleShot = 1;
+        }
         me.group.hide();
         me.gaugeGroup.hide();
         me.infoImage.hide();
@@ -351,21 +337,15 @@ var SmartInstruments = {
         me.initialized = 1;
     },
     selfTest: func(){
-        me.airbagSign.show();
-        me.handBrakeSign.show();
-        me.autoholdSign.show();
-        me.headlightSign.show();
-        me.positionLightSign.show();
-        me.highbeamSign.show();
+        foreach (var sign; me.signGroup.getChildren()) sign.show();
     },
     startUp:func(){
         # if(!me.showingWarningMessage) me.welcomeGroup.show();
+        me.updateTimer.stop();
         me.selfTest();
         me.group.show();
         me.signGroup.show();
-        var startScreenTimer = maketimer(1, func me.startSequence());
-        startScreenTimer.singleShot = 1;
-        startScreenTimer.start();
+        me.startScreenTimer.restart(1);
     },
     startSequence: func(){
         me.group.show();
@@ -388,10 +368,14 @@ var SmartInstruments = {
         # selfTestTimer.singleShot = 1;
         # selfTestTimer.start();
 
-        if(!me.initialized) me.init();
-        settimer(func me.updateTimer.start(), 0.5);
+        # The fog lamps and ESC have no controller in this vehicle.
+        me.foglightSign.hide();
+        me.escOffSign.hide();
+        me.update();
+        me.updateTimer.start();
     },
     shutDown:func(){
+        me.startScreenTimer.stop();
         if(me.updateTimer != nil) me.updateTimer.stop();
         me.group.hide();
         me.welcomeGroup.hide();
