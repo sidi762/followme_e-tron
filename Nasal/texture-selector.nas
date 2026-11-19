@@ -227,6 +227,7 @@ var TextureSelector = {
 };
 
 var TextureSelectorDialog = {
+    _rowInset: 16,
     new: func(selector, title, compact=0) {
         return {parents: [TextureSelectorDialog], _parentSelector: selector,
             _title: title, _window: nil, _rowHeight: 28, _listener: nil,
@@ -268,12 +269,13 @@ var TextureSelectorDialog = {
         me._scrollArea._view.vert.set("stroke", "#a6a6ad");
         me._listGroup = me._scrollArea.getContent();
         var extent = me._listGroup.createChild("path").set("fill", "#ffffff");
+        var dividers = me._listGroup.createChild("path", "row-dividers").set("fill", "#e9e9ed");
         forindex (var i; selector.items) me._addRow(i, selector.items[i]);
-        if (!size(selector.items)) me._text(me._listGroup, 16, 14, "No entries found", 15);
+        if (!size(selector.items)) me._text(me._listGroup, me._rowInset, 14, "No entries found", 15);
 
         var footer = root.createChild("group");
         var separator = footer.createChild("path").set("fill", "#e8e8ec");
-        me._currentLabel = me._text(footer, 16, 22, "", 13).set("fill", "#494950");
+        me._currentLabel = me._text(footer, me._rowInset, 22, "", 13).set("fill", "#494950");
         var close = footer.createChild("group", "close-button");
         var bg = close.createChild("path").rect(0, 0, 68, 28, {"border-radius": 5}).set("fill", "#ffffff");
         me._text(close, 34, 14, "Close", 14, "center-center").set("fill", "#005bc4");
@@ -290,8 +292,13 @@ var TextureSelectorDialog = {
                 .setInt("size[0]", 2 * width).setInt("size[1]", 2 * height);
             # ScrollArea measures its children as soon as setSize is called.
             extent.reset().rect(0, 0, width, listH).update();
+            # One inset strip shows through the one-pixel gaps between opaque rows.
+            dividers.reset();
+            var inset = dialog._rowInset;
+            if (width > 2 * inset and size(dialog._rows) > 1)
+                dividers.rect(inset, dialog._rowHeight - 1, width - 2 * inset, listH - 2 * dialog._rowHeight + 1);
             foreach (var row; dialog._rows)
-                row.bg.reset().rect(0.5, 0.5, width - 1, dialog._rowHeight - 1);
+                row.bg.reset().rect(0.5, 0, width - 1, dialog._rowHeight - 1);
             dialog._scrollArea.setSize(width, dialog._listHeight);
             footer.setTranslation(0, dialog._listHeight);
             separator.reset().rect(0, 0, width, 1);
@@ -322,7 +329,7 @@ var TextureSelectorDialog = {
         var dialog = me;
         var g = me._listGroup.createChild("group", "row-" ~ i).setTranslation(0, i * me._rowHeight);
         var bg = g.createChild("path", "background").set("fill", "#ffffff");
-        var label = me._text(g, 16, 14, name, 15);
+        var label = me._text(g, me._rowInset, 14, name, 15);
         var row = {group: g, name: name, bg: bg, label: label, hover: 0};
         append(me._rows, row);
         g.addEventListener("mouseenter", func { row.hover=1; dialog._paint(i); });
