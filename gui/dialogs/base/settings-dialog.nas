@@ -142,7 +142,7 @@ var SettingsDialog = {
 	},
 
 	_heading: func(y, title) {
-		me._text(me._body, 0, y + 7, title, 14, me._ink, 1);
+		me._text(me._body, 0, y + 7, title, 13, me._secondary);
 		return y + 19;
 	},
 

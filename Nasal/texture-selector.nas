@@ -242,10 +242,13 @@ var TextureSelectorDialog = {
         selector.updateList();
         var dw = getprop("/sim/gui/canvas/size[0]");
         var dh = getprop("/sim/gui/canvas/size[1]");
+        var footerHeight = 44;
+        var listH = math.max(1, size(selector.items)) * me._rowHeight;
         var w = math.min(340, dw - 16);
-        var h = math.min(dh - 64, 420, math.max(1, size(selector.items)) * me._rowHeight + 56);
-        me._listWidth = w - 16;
-        me._listHeight = h - 56;
+        var available = math.min(dh - 64, 420) - footerHeight;
+        # Open on whole rows so revealing the last selection leaves a clean top edge.
+        var visibleRows = math.max(1, int(available / me._rowHeight));
+        var h = footerHeight + math.max(1, math.min(listH, visibleRows * me._rowHeight, available));
         me._rows = [];
         me._cursor = -1;
         me._keyboard = 0;
@@ -254,34 +257,47 @@ var TextureSelectorDialog = {
         me._window.setTitle(me._title);
         me._window.onClose = func dialog.close();
         me._canvas = me._window.createCanvas();
-        me._canvas.set("background", "#f5f5f7").setInt("size[0]", 2*w).setInt("size[1]", 2*h);
-        me._canvas.setBool("mipmapping", 1);
+        me._canvas.set("background", "#ffffff").setBool("mipmapping", 1);
         styleVehicleWindow(me._window);
         var root = me._canvas.createGroup("texture-selector");
-        var host = root.createChild("group").setTranslation(8, 8);
+        var host = root.createChild("group");
         me._scrollArea = canvas.gui.widgets.ScrollArea.new(host);
         me._scrollArea.setColorBackground([1, 1, 1]);
-        me._scrollArea._view.vert.set("stroke", "#8e8e93");
+        me._scrollArea._view.vert.set("stroke", "#a6a6ad");
         me._listGroup = me._scrollArea.getContent();
-        var listH = math.max(1, size(selector.items)) * me._rowHeight;
-        # ScrollArea measures immediately. Publish the complete bounds before
-        # the first measurement, even if the selected item is the first row.
-        me._listGroup.createChild("path").rect(0, 0, me._listWidth, listH).set("fill", "#ffffff").update();
+        var extent = me._listGroup.createChild("path").set("fill", "#ffffff");
         forindex (var i; selector.items) me._addRow(i, selector.items[i]);
-        if (!size(selector.items)) me._text(me._listGroup, 12, 14, "No entries found", 14);
-        me._scrollArea.setSize(me._listWidth, me._listHeight);
-        me._disconnectWheel = bindVehicleScroll(me._window, host, me._scrollArea, me._rowHeight);
+        if (!size(selector.items)) me._text(me._listGroup, 16, 14, "No entries found", 14);
 
-        var footer = root.createChild("group").setTranslation(8, h - 39);
-        me._currentLabel = me._text(footer, 4, 17, "", 13);
-        me._currentLabel.setClipByBoundingBox([0, 0, me._listWidth - 74, 34]);
-        var close = footer.createChild("group", "close-button").setTranslation(me._listWidth - 68, 3);
-        var bg = close.createChild("path").rect(0.5, 0.5, 67, 27, {"border-radius": 6})
-            .set("fill", "#ffffff").set("stroke", "#c9cbd1").set("stroke-width", 1);
-        me._text(close, 34, 14, "Close", 14, "center-center");
-        close.addEventListener("mouseenter", func bg.set("fill", "#eaf1fa"));
+        var footer = root.createChild("group");
+        var separator = footer.createChild("path").set("fill", "#e8e8ec");
+        me._currentLabel = me._text(footer, 16, 22, "", 12).set("fill", "#5d5d65");
+        var close = footer.createChild("group", "close-button");
+        var bg = close.createChild("path").rect(0, 0, 68, 28, {"border-radius": 5}).set("fill", "#ffffff");
+        me._text(close, 34, 14, "Close", 14, "center-center").set("fill", "#005bc4");
+        close.addEventListener("mouseenter", func bg.set("fill", "#eef3f8"));
         close.addEventListener("mouseleave", func bg.set("fill", "#ffffff"));
+        close.addEventListener("mousedown", func bg.set("fill", "#e0e9f2"));
+        close.addEventListener("mouseup", func bg.set("fill", "#eef3f8"));
         close.addEventListener("click", func dialog.close());
+
+        me._window.onResize = func {
+            var (width, height) = dialog._window.getSize();
+            dialog._listHeight = math.max(1, height - footerHeight);
+            dialog._canvas.setInt("view[0]", width).setInt("view[1]", height)
+                .setInt("size[0]", 2 * width).setInt("size[1]", 2 * height);
+            # ScrollArea measures its children as soon as setSize is called.
+            extent.reset().rect(0, 0, width, listH).update();
+            foreach (var row; dialog._rows)
+                row.bg.reset().rect(0.5, 0.5, width - 1, dialog._rowHeight - 1);
+            dialog._scrollArea.setSize(width, dialog._listHeight);
+            footer.setTranslation(0, dialog._listHeight);
+            separator.reset().rect(0, 0, width, 1);
+            dialog._currentLabel.setClipByBoundingBox([0, 0, math.max(0, width - 84), footerHeight]);
+            close.setTranslation(width - 76, 8);
+        };
+        me._window.onResize();
+        me._disconnectWheel = bindVehicleScroll(me._window, host, me._scrollArea, me._rowHeight);
         me._canvas.addEventListener("keydown", func(e) dialog._key(e));
         root.setFocus();
 
@@ -303,9 +319,8 @@ var TextureSelectorDialog = {
     _addRow: func(i, name) {
         var dialog = me;
         var g = me._listGroup.createChild("group", "row-" ~ i).setTranslation(0, i * me._rowHeight);
-        var bg = g.createChild("path", "background").rect(1, 1, me._listWidth - 9, me._rowHeight - 2,
-            {"border-radius": 5}).set("fill", "#ffffff");
-        var label = me._text(g, 12, 14, name, 14);
+        var bg = g.createChild("path", "background").set("fill", "#ffffff");
+        var label = me._text(g, 16, 14, name, 14);
         var row = {group: g, name: name, bg: bg, label: label, hover: 0};
         append(me._rows, row);
         g.addEventListener("mouseenter", func { row.hover=1; dialog._paint(i); });
@@ -321,9 +336,9 @@ var TextureSelectorDialog = {
     _paint: func(i) {
         var row = me._rows[i];
         var selected = i == me._selectedIndex;
-        row.bg.set("fill", selected ? "#e1edfc" : (row.hover ? "#f0f3f8" : "#ffffff"))
+        row.bg.set("fill", selected ? "#dfeaf8" : (row.hover ? "#f2f3f5" : "#ffffff"))
             .set("stroke", me._keyboard and i == me._cursor ? "#007aff" : "none");
-        row.label.set("fill", selected ? "#004caa" : "#1d1d1f");
+        row.label.set("fill", selected ? "#193b62" : "#1d1d1f");
     },
 
     _syncSelection: func {
