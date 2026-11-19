@@ -13,7 +13,7 @@ BINOPS = {ast.Add: "sum", ast.Sub: "difference", ast.Mult: "product", ast.Div: "
 
 # expression name -> JSBSim element
 CALLS = {
-    "abs": "abs", "sin": "sin", "cos": "cos", "atan": "atan", "sqrt": "sqrt",
+    "abs": "abs", "sin": "sin", "cos": "cos", "tan": "tan", "atan": "atan", "sqrt": "sqrt",
     "pow": "pow", "min": "min", "max": "max", "ifthen": "ifthen", "lt": "lt",
 }
 

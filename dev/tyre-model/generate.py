@@ -36,23 +36,32 @@ G = 9.80665
 # --------------------------------------------------------------------------
 # Parameters. Each becomes a JSBSim property that can be changed while the
 # simulator runs (FlightGear: /fdm/jsbsim/tyre/par/... and .../driveline/par/...).
-# The values are estimates for a road tyre, not fitted to measurements.
+# Dry force measurements, fit procedure and limits are documented in README.md.
 # --------------------------------------------------------------------------
 TYRE_PARAMS = [
-    ("mu0", 1.05, "peak friction coefficient at the nominal load"),
-    ("load_sensitivity", 0.12, "fraction of mu0 lost when the load doubles"),
-    ("slip_ratio_peak", 0.11, "longitudinal slip ratio at peak force"),
-    ("slip_tan_peak", 0.14, "tan(slip angle) at peak force; 0.14 is 8 deg"),
-    ("shape_b", 1.732, "magic formula B, for slip normalised so the peak is at 1"),
-    ("shape_c", 1.5, "magic formula C; sliding force is sin(C pi/2) of the peak"),
-    ("shape_e", 0.0, "magic formula E"),
-    ("rolling_resistance", 0.012, "rolling resistance coefficient"),
-    ("radius_m", 0.31, "rolling radius"),
+    ("mu0", 1.0935, "dry longitudinal peak at 4000 N; scales all three measured curves"),
+    ("rolling_resistance", 0.0087, "Pilot Sport 4 S rolling resistance proxy, 8.7 kg/t"),
+    ("radius_m", 0.31205, "mean kinematic rolling radius of the four KIT 4000 N longitudinal runs"),
     ("wheel_inertia_kgm2", 2.1, "one wheel plus its share of the motor rotor seen through the gear"),
     ("low_speed_mps", 3.0, "below this the slip definitions are softened; see README"),
     ("stick_full_mps", 0.15, "a stopped wheel slower than this is held by JSBSim's static friction"),
     ("stick_none_mps", 0.50, "above this the tyre model alone acts"),
 ]
+
+# KIT 205/55 R17 91H. Each column corresponds to one of the three test loads.
+# Peak slip is a ratio longitudinally and tan(angle from zero lateral force) laterally.
+TEST_LOADS_N = (1250, 4000, 6000)
+LOAD_CURVES = {
+    "drive_peak_mu":  (1.1532,   1.0935,   1.050333),
+    "brake_peak_mu":  (1.1408,   1.0935,   1.07325),
+    "side_peak_mu":   (1.1372,   1.014625, 0.95975),
+    "drive_peak_slip": (0.18,     0.145,    0.085),
+    "brake_peak_slip": (0.205,    0.14,     0.105),
+    "side_peak_slip":  (0.184028, 0.169463, 0.182993),
+    "drive_shape":     (1.322317, 1.192531, 1.282328),
+    "brake_shape":     (1.247996, 1.267602, 1.285354),
+    "side_shape":      (1.430374, 1.367815, 1.342919),
+}
 
 DRIVELINE_PARAMS = [
     ("gear", 9.73, "motor to wheel reduction"),
@@ -87,9 +96,6 @@ EXTERNAL = {
     "p": "velocities/p-rad_sec",
     "q": "velocities/q-rad_sec",
     "r": "velocities/r-rad_sec",
-    # FlightGear sets these two from the scenery material under the car
-    "surface": "ground/static-friction-factor",
-    "roll_factor": "ground/rolling_friction-factor",
     # In this FDM the LEFT brake group is the front axle and RIGHT the rear
     "brake_front": "fcs/left-brake-cmd-norm",
     "brake_rear": "fcs/right-brake-cmd-norm",
@@ -133,14 +139,21 @@ WHEEL_EQS = [
     # Slip with the wheel speed left over from the previous frame.
     ("slip_ratio_prev", "(omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps"),
     ("slip_tan", "-1.0 * vy_wheel_mps / v_ref_mps"),
-    ("mu", "mu0 * surface * max(0.6, min(1.25, 1.0 + load_sensitivity * (1.0 - load_n / load_nominal_n)))"),
+    # A locked wheel in reverse has positive slip. Select the braking curve by
+    # whether the slip opposes travel, independent of the selected drive gear.
+    ("braking", "lt(slip_ratio_prev * vx_wheel_mps, 0.0)"),
+    ("slip_ratio_peak", "ifthen(braking, brake_peak_slip, drive_peak_slip)"),
+    ("slip_tan_peak", "side_peak_slip"),
+    ("shape_x", "ifthen(braking, brake_shape, drive_shape)"),
+    ("grip_scale", "mu0 / {reference_mu}"),
+    ("mu_x", "surface * grip_scale * ifthen(braking, brake_peak_mu, drive_peak_mu)"),
+    ("mu_y", "surface * grip_scale * side_peak_mu"),
+    ("mu", "max(mu_x, mu_y)"),
     ("slip_norm_prev", "sqrt(pow(slip_ratio_prev / slip_ratio_peak, 2.0)"
                        " + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001)"),
-    # Magic formula on the combined slip, divided by that slip: multiplying it
-    # by either slip component gives that component's share of the force.
-    ("curve_prev", "sin(shape_c * atan(shape_b * slip_norm_prev - shape_e"
-                   " * (shape_b * slip_norm_prev - atan(shape_b * slip_norm_prev)))) / slip_norm_prev"),
-    ("stiffness_x_n", "mu * load_n * curve_prev / slip_ratio_peak"),
+    # For a normalised slip of 1, C * atan(B) = pi/2 for each fitted shape.
+    ("curve_x_prev", "sin(shape_x * atan(tan(1.5707963267948966 / shape_x) * slip_norm_prev)) / slip_norm_prev"),
+    ("stiffness_x_n", "mu_x * load_n * curve_x_prev / slip_ratio_peak"),
     # Wheel spin. A free-rolling wheel is far too stiff to integrate explicitly
     # at 120 Hz, so the tyre force enters implicitly through its secant
     # stiffness, and brake plus rolling resistance act as Coulomb friction that
@@ -160,15 +173,15 @@ WHEEL_EQS = [
     ("omega_rad_sec", "ifthen(lt(sim_time, 0.05), vx_wheel_mps / radius_m,"
                       " numerator * max(abs(numerator) - brake_torque_nm, 0.0)"
                       " / (max(abs(numerator), 0.000001) * (wheel_inertia_kgm2 / dt_s + implicit_gain)))"),
-    # Forces at the new wheel speed. They use the stiffness the wheel was just
-    # balanced against, so wheel torque and road force agree; the min() keeps
-    # the resultant inside the friction circle when the slip jumps in one frame.
+    # Keep the implicit longitudinal stiffness unless the new slip would take
+    # the resultant outside the friction ellipse. Lateral force uses the new slip.
     ("slip_ratio", "(omega_rad_sec * radius_m - vx_wheel_mps) / v_ref_mps"),
     ("slip_norm", "sqrt(pow(slip_ratio / slip_ratio_peak, 2.0)"
                   " + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001)"),
-    ("curve", "min(curve_prev, 1.0 / slip_norm)"),
-    ("fx_n", "mu * load_n * curve * slip_ratio / slip_ratio_peak"),
-    ("fy_n", "mu * load_n * curve * slip_tan / slip_tan_peak"),
+    ("curve_x", "min(curve_x_prev, 1.0 / slip_norm)"),
+    ("curve_y", "sin(side_shape * atan(tan(1.5707963267948966 / side_shape) * slip_norm)) / slip_norm"),
+    ("fx_n", "mu_x * load_n * curve_x * slip_ratio / slip_ratio_peak"),
+    ("fy_n", "mu_y * load_n * curve_y * slip_tan / slip_tan_peak"),
     # Standstill. A slip-based tyre cannot hold a parked car: it creeps. So a
     # wheel that is nearly stationary over the ground and not turning (held by
     # the brake, or just by its rolling resistance) is handed to JSBSim's own
@@ -177,9 +190,10 @@ WHEEL_EQS = [
     ("locked", "ifthen(lt(abs(omega_rad_sec), 0.000001), 1.0, 0.0)"),
     ("stick", "locked * max(0.0, min(1.0, (stick_none_mps - contact_speed_mps)"
               " / (stick_none_mps - stick_full_mps)))"),
-    ("jsb_static_mu", "stick * mu",
+    # The native lateral solver applies the wheel's surface factor itself.
+    ("jsb_static_mu", "stick * grip_scale * side_peak_mu",
      ["gear/unit[{unit}]/static_friction_coeff"]),
-    ("jsb_rolling_mu", "stick * min(mu, brake_torque_nm / (radius_m * max(load_n, 1.0)))"
+    ("jsb_rolling_mu", "stick * min(surface * grip_scale * brake_peak_mu, brake_torque_nm / (radius_m * max(load_n, 1.0)))"
                        " / max(roll_factor, 0.05)",
      ["gear/unit[{unit}]/rolling_friction_coeff"]),
     # Back to body axes and pounds, applied at the contact patch.
@@ -252,6 +266,15 @@ def _property_lines(prefix, items):
                    % (INDENT, float(value), prefix, name, note) for name, value, note in items)
 
 
+def _load_curve_xml(output, load_property, values):
+    rows = "".join(f"\t\t\t\t\t\t{load} {value}\n" for load, value in zip(TEST_LOADS_N, values))
+    return (f'\t\t<fcs_function name="{output}">\n'
+            f'\t\t\t<function>\n\t\t\t\t<table>\n'
+            f'\t\t\t\t\t<independentVar>{load_property}</independentVar>\n'
+            f'\t\t\t\t\t<tableData>\n{rows}\t\t\t\t\t</tableData>\n'
+            f'\t\t\t\t</table>\n\t\t\t</function>\n\t\t</fcs_function>\n')
+
+
 def build_system(stock_text):
     cg, mass_kg, wheels = read_vehicle(stock_text)
     front = [w for w in wheels if w.front]
@@ -267,7 +290,7 @@ def build_system(stock_text):
     for w in wheels:
         shared["omega_" + w.name] = "tyre/%s/omega_rad_sec" % w.name
     driveline_names = [name for name, _ in DRIVELINE_EQS]
-    wheel_names = [eq[0] for eq in WHEEL_EQS]
+    wheel_names = set(LOAD_CURVES) | {eq[0] for eq in WHEEL_EQS}
 
     def resolve_driveline(name):
         if name in driveline_names:
@@ -303,6 +326,8 @@ def build_system(stock_text):
             "comp_ft": "gear/unit[%d]/compression-ft" % w.unit,
             "comp_vel_fps": "gear/unit[%d]/compression-velocity-fps" % w.unit,
             "steer_deg": "fcs/steer-pos-deg[%d]" % w.unit,
+            "surface": "gear/unit[%d]/static-friction-factor" % w.unit,
+            "roll_factor": "gear/unit[%d]/rolling_friction-factor" % w.unit,
         }
 
         def resolve_wheel(name, w=w, local=local):
@@ -329,12 +354,16 @@ def build_system(stock_text):
             "wheels_on_axle": repr(float(len(front if w.front else rear))),
             "brake_cmd": "brake_front" if w.front else "brake_rear",
             "brake_par": "brake_front_nm" if w.front else "brake_rear_nm",
+            "reference_mu": LOAD_CURVES["brake_peak_mu"][1],
         }
         out.append('\n%s<channel name="Tyre %s">\n' % (INDENT, w.name))
         for eq in WHEEL_EQS:
             name, expr = eq[0], eq[1].format(**fields)
             outputs = [o.format(**fields) for o in (eq[2] if len(eq) > 2 else [])]
             out.append(fcs_function("tyre/%s/%s" % (w.name, name), expr, resolve_wheel, outputs))
+            if name == "load_n":
+                for parameter, values in LOAD_CURVES.items():
+                    out.append(_load_curve_xml(resolve_wheel(parameter), resolve_wheel("load_n"), values))
         out.append("%s</channel>\n" % INDENT)
 
     out.append("\n</system>\n")
@@ -411,7 +440,7 @@ def build_fdm(stock_text, test_forces=False):
 
 def check_equations():
     """Catch a typo in an equation before JSBSim does, with a clearer message."""
-    known = set(EXTERNAL) | {"comp_ft", "comp_vel_fps", "steer_deg"}
+    known = set(EXTERNAL) | set(LOAD_CURVES) | {"comp_ft", "comp_vel_fps", "steer_deg", "surface", "roll_factor"}
     known |= {n for n, _, _ in TYRE_PARAMS + DRIVELINE_PARAMS + DRIVELINE_INPUTS} | {"load_nominal_n"}
     known |= {"omega_fl", "omega_fr", "omega_bl", "omega_br"}
     known |= {n for n, _ in DRIVELINE_EQS} | {eq[0] for eq in WHEEL_EQS}

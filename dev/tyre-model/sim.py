@@ -163,18 +163,18 @@ class Car:
         for unit, wheel in enumerate(WHEELS):
             row["jsb_slip_deg_" + wheel] = fdm["gear/unit[%d]/slip-angle-deg" % unit]
             if self.kind == "tyre":
-                for key in ("slip_ratio", "slip_tan", "omega_rad_sec", "load_n", "mu", "fx_n", "fy_n"):
+                for key in ("slip_ratio", "slip_tan", "omega_rad_sec", "load_n", "mu", "mu_x", "mu_y", "fx_n", "fy_n"):
                     row["%s_%s" % (key, wheel)] = fdm["tyre/%s/%s" % (wheel, key)]
         return row
 
-    def run(self, seconds, throttle=0.0, steer=0.0, brake=0.0, cruise=None, until=None):
+    def run(self, seconds, throttle=0.0, steer=0.0, brake=0.0, cruise=None, until=None, rear_brake=None):
         """Advance; returns one sample per frame. `cruise` holds a speed in m/s."""
         rows = []
         for _ in range(int(round(seconds / self.dt))):
             pedal = throttle
             if cruise is not None:
                 pedal = max(0.0, min(1.0, 0.4 * (cruise - self.fdm["velocities/u-fps"] * FT) + 0.02))
-            self.step(pedal, steer, brake, brake)
+            self.step(pedal, steer, brake, brake if rear_brake is None else rear_brake)
             rows.append(self.sample())
             if until is not None and until(rows[-1]):
                 break
@@ -200,10 +200,10 @@ def launch(kind, surface=1.0, **kw):
     return out, rows
 
 
-def stop(kind, pedal=1.0, surface=1.0, steer=0.0, speed=100 * KMH, **kw):
+def stop(kind, pedal=1.0, surface=1.0, steer=0.0, speed=100 * KMH, rear_pedal=None, **kw):
     """Brake to rest from `speed`."""
     car = Car(kind, speed=speed, surface=surface, **kw)
-    rows = car.run(60.0, brake=pedal, steer=steer, until=lambda r: abs(r["u"]) < 0.2)
+    rows = car.run(60.0, brake=pedal, rear_brake=rear_pedal, steer=steer, until=lambda r: abs(r["u"]) < 0.2)
     start = rows[0]["u"]
     core = [r for r in rows if 0.25 * start < r["u"] < 0.9 * start] or rows
     out = {"dist": moved(rows), "decel_g": -mean(core, "ax_g"), "lat_g": mean(core, "ny", abs),

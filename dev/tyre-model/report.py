@@ -31,6 +31,9 @@ def main():
                                 "rear locked" if b["rear_locked"] else "rear rolling")
             print("  grip x%.1f   tyre model, pedal %.1f     %6.1f m  %.2f g  (%s)"
                   % (surface, pedal, b["dist"], b["decel_g"], state))
+    threshold, _ = stop("tyre", pedal=0.92, rear_pedal=0.82, dt=dt)
+    print("  grip x1.0   tyre model, front .92 rear .82   %.1f m  %.2f g"
+          % (threshold["dist"], threshold["decel_g"]))
 
     print("\nBraking from 100 km/h with 6.75 deg of steering")
     a, _ = stop("stock", steer=0.15, dt=dt)

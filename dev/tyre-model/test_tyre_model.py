@@ -87,10 +87,12 @@ def test_coasting_slows_the_car_like_the_standard_fdm():
 
 def test_threshold_braking_beats_locked_wheels():
     locked, _ = stop("tyre", pedal=1.0)
-    threshold, _ = stop("tyre", pedal=0.8)
-    assert locked["front_locked"] and not threshold["front_locked"]
-    assert 38.0 < threshold["dist"] < 46.0
-    assert locked["dist"] > threshold["dist"] + 2.0
+    # The lighter rear axle reaches the measured slip peak at a lower pedal.
+    threshold, _ = stop("tyre", pedal=0.92, rear_pedal=0.82)
+    assert locked["front_locked"] and locked["rear_locked"]
+    assert not threshold["front_locked"] and not threshold["rear_locked"]
+    assert 35.0 < threshold["dist"] < 40.0
+    assert locked["dist"] > threshold["dist"] + 1.0
 
 
 def test_locked_front_wheels_cannot_steer():
@@ -100,13 +102,32 @@ def test_locked_front_wheels_cannot_steer():
     assert rolling["yaw_dps"] > 8.0
 
 
-def test_forces_stay_inside_the_friction_circle():
+def test_forces_stay_inside_each_tyres_friction_ellipse():
     _, rows = stop("tyre", pedal=0.9, steer=0.3)
     _, more = launch("tyre", surface=0.5, params=REAR_DRIVE)
     for row in rows + more:
         for w in WHEELS:
-            limit = row["mu_" + w] * row["load_n_" + w]
-            assert math.hypot(row["fx_n_" + w], row["fy_n_" + w]) <= limit * 1.0001 + 1.0
+            normal = row["load_n_" + w]
+            assert math.hypot(row["fx_n_" + w] / row["mu_x_" + w],
+                              row["fy_n_" + w] / row["mu_y_" + w]) <= normal * 1.0001 + 1.0
+
+
+def test_each_wheel_uses_its_own_surface_for_grip_and_rolling_resistance():
+    car = Car("tyre")
+    fdm = car.fdm
+    # Seed the held samples as FlightGear's contact callback does on mixed ground.
+    # Standalone JSBSim refreshes them from uniform ground after the system runs.
+    materials = [(0.525, 5.0), (0.75, 1.0), (0.7, 5.0), (1.0, 1.0)]
+    for unit, (grip, rolling) in enumerate(materials):
+        fdm[f"gear/unit[{unit}]/static-friction-factor"] = grip
+        fdm[f"gear/unit[{unit}]/rolling_friction-factor"] = rolling
+    car.step()
+    for w, (grip, rolling) in zip(WHEELS, materials):
+        prefix = f"tyre/{w}/"
+        assert fdm[prefix + "mu_y"] == pytest.approx(grip * fdm[prefix + "side_peak_mu"])
+        assert fdm[prefix + "jsb_static_mu"] == pytest.approx(fdm[prefix + "stick"] * fdm[prefix + "side_peak_mu"])
+        expected_drag = fdm["tyre/par/rolling_resistance"] * rolling * fdm[prefix + "load_n"] * fdm["tyre/par/radius_m"]
+        assert fdm[prefix + "brake_torque_nm"] == pytest.approx(expected_drag)
 
 
 def test_cornering_has_a_grip_limit_and_understeers_towards_it():
