@@ -90,7 +90,7 @@ var vehicleDialog = {
 			setprop("/orientation/roll-deg", 0);
 			setprop("/velocities/groundspeed-kt", 0);
 		});
-		me._button(right, y, half, "Quick Recharge", func followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull());
+		me._button(right, y, half, "Quick Recharge", func followme.quickRecharge());
 		me._button(0, y + 29, half, "Reset Airbag", func followme.safety.reset());
 		me._button(right, y + 29, half, "Reset Here", func followme.resetOnPosition());
 		me._text(me._body, 0, y + 65, "Airbag reset disables the safety system.", 12, me._secondary);

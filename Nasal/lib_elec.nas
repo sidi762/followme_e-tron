@@ -32,9 +32,8 @@ var kWs2kWh = func(kWs){
 var Series = {
     #//Class for any series connection
     new: func() {
-        return { parents:[Series] };
+        return { parents:[Series], units: [] };
     },
-    units: [],
     addUnit: func(unit){
         append(me.units, unit);
     },
@@ -42,94 +41,44 @@ var Series = {
         return 0;
     },
 
-    totalResistance: func(){
-        var total = 0;
-        foreach(elem; me.units){
-            total += elem.resistance;
-        }
-        return total;
-    },
+    voltage: 0,
+    current: 0,
 
-    totalActivePower: func(){
-        var total = 0;
-        foreach(elem; me.units){
-            total += elem.activePower;
-            total += elem.activePower_kW * 1000;
-        }
-        return total;
-    },
-
-    totalPower: func(){
-        var total = 0;
-        foreach(elem; me.units){
-            total += elem.power();
-        }
-        return total;
-    },
-
-
-    voltage: 0, #//Total Voltage Input, Volt
-    current: 0, #//current, Ampere
-    totalCounterElectromotiveForce: 0,#//Total counterElectromotiveForce, calculated from v=Power output / I, after the current is calculated
-
-    updateCurrent: func(){
-
-        #//Calculated by solving the equation UI = I^2*R + Power output
-        var R = me.totalResistance();
-        var U = me.voltage;
-        var Pout = me.totalActivePower();
-        if(U == 0){
-            me.current = 0;
-            return 0;#//No voltage, no current.
+    # Solve U*I = P + R*I^2. The traction inverter draws the current
+    # needed for its shaft power. Contactor and cable losses are in series.
+    solve: func() {
+        var resistance = 0;
+        var demandW = 0;
+        var powerLoad = nil;
+        var open = size(me.units) == 1 and me.units[0].isVoltageSource();
+        foreach (var unit; me.units) {
+            if (unit.isSwitch() and !unit.isConnected()) open = 1;
+            if (unit.isPowerLoad) powerLoad = unit;
+            resistance += unit.resistance;
+            demandW += unit.loadPowerW();
         }
 
-        #//print("U ",U," R ",R," Pout ",Pout);
-
-        var deltaSquared = U*U - 4*R*Pout;
-
-        if(deltaSquared < 0){
-            electricalDebug.debugPrint("Electrical: Floting point error when calculating current! skipping", 1);
-            deltaSquared = 0;
-        }
-
-        var delta = math.sqrt(deltaSquared);
-
-        #//used to be minus, but adding it seems to be correct
-        var result = (U+delta)/(2*R); #//Ampere
-        me.current = result;
-        me.totalCounterElectromotiveForce = Pout / result; #//Calculate the totalCounterElectromotiveForce
-
-        return result;
-    },
-
-    calculateSeriesVoltage: func(){
-        me.updateCurrent();
-        cElectromotiveForce = me.totalCounterElectromotiveForce;
-
-        #totalTmp = 0;
-        #foreach(elem; me.units){
-        #    totalTmp += elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000;
-        #}
-
-        foreach(elem; me.units){
-            if(me.current){
-                elem.voltage = me.current * elem.resistance + (elem.activePower + elem.activePower_kW * 1000) / me.current;
-            }else{
-                elem.voltage = 0;
+        var u = me.voltage;
+        var i = 0;
+        if (!open and u > 0) {
+            if (powerLoad != nil or demandW > 0) {
+                # The low-current root, in a form stable also at zero load.
+                var discriminant = u*u - 4*resistance*demandW;
+                i = discriminant >= 0 ? 2*demandW / (u + math.sqrt(discriminant))
+                                      : u / (2*resistance);
+            } elsif (resistance > 0) {
+                i = u / resistance;
             }
-
-            #var factor = (elem.current * elem.current * elem.resistance + elem.activePower + elem.activePower_kW * 1000)/totalTmp;
-            #elem.voltage = me.voltage * factor;
-            electricalDebug.debugPrint(elem.applianceName ~ " volt" ~ elem.voltage, 3);
         }
-        electricalDebug.debugPrint("____________________________SeriesVoltage calculated____________________________", 3);
-    },
-
-    calculateApplianceCurrent: func(){
-        foreach(elem; me.units){
-            elem.current = me.current;
+        me.current = i;
+        foreach (var unit; me.units) {
+            unit.current = i;
+            unit.voltage = i * unit.resistance;
+            if (unit.isVoltageSource()) unit.voltage = u - i * unit.resistance;
+            elsif (unit == powerLoad and !open) unit.voltage = u - i * (resistance - unit.resistance);
         }
     },
+
 };
 
 var Circuit = {
@@ -137,17 +86,15 @@ var Circuit = {
     #//Currently must be initalized with a source
     #//Currently only support one voltage source in a circuit
     new: func(vSource) {
-        var new_circuit = { parents:[Circuit] };
+        var new_circuit = { parents:[Circuit], source: vSource, parallelConnection: [] };
         new_circuit.addNewSeriesWithUnitToParallel(vSource);
         return new_circuit;
     },
 
 
-    parallelConnection: [],
-
     newSeriesWithUnits: func(addedUnits...){
         var newSeries = Series.new();
-        foreach(elem; addedUnits){
+        foreach(var elem; addedUnits){
             newSeries.addUnit(elem);
         }
         return newSeries;
@@ -168,86 +115,26 @@ var Circuit = {
     },
 
 
-    current: 0, #//Ampere
-    voltage: func(){ #//Terminal voltage
-        var v = me.parallelConnection[0].units[0].electromotiveForce - me.calculateTotalParallelCurrent()*me.parallelConnection[0].units[0].resistance;
-        return v
-    }, #//Volt
-
-    calculateParallelVoltage: func(){
-        #//var setVoltage = me.voltage();
-        var setVoltage = me.parallelConnection[0].units[0].electromotiveForce; #//2021/8/9 note: view it as ideal voltage source for now
-        foreach(elem; me.parallelConnection){
-            elem.voltage = setVoltage;
-        }
-    }, #//Volt
-
-    calculateSeriesCurrentAndVoltage: func(){
-        foreach(elem; me.parallelConnection){
-            elem.updateCurrent();
-            elem.calculateSeriesVoltage();
-        }
-    }, #//Volt
-
-    calculateTotalParallelCurrent: func(){
-        var total = 0;
-        foreach(elem; me.parallelConnection){
-            total += elem.current;
-        }
-        me.current = total;
-        return total;
-    }, #//Ampere
-
-    calculateTotalPower: func(){
-      var total = 0;
-      foreach(elem; me.parallelConnection){
-          total += elem.totalPower();
-      }
-      return total;
+    current: 0,
+    voltage: func() {
+        return math.max(0, me.source.electromotiveForce - me.current * me.source.resistance);
     },
 
-    updateInterval: 0.1, #//Seconds between each update
-
-    loopCount: 0,
-
-    update: func(){
-        electricalDebug.debugPrint("Loop Count: "~me.loopCount, 1);
-
-        me.calculateParallelVoltage();
-        electricalDebug.debugPrint("Parallel Voltage Calculated", 2);
-
-        electricalDebug.debugPrint("Power: "~me.calculateTotalPower(), 1);
-
-        me.calculateSeriesCurrentAndVoltage();
-        electricalDebug.debugPrint("Series Current and Voltage Calculated", 2);
-
-        foreach(elem; me.parallelConnection){
-            elem.calculateApplianceCurrent();
-        }
-        electricalDebug.debugPrint("Applicance Current Calculated", 2);
-
-        me.calculateTotalParallelCurrent();
-        electricalDebug.debugPrint("Parallel Current Calculated", 2);
-
-        foreach(elem; me.parallelConnection){
-            foreach(unit; elem.units){
-                if(unit.isVoltageSource()) unit.voltageSourceUpdate(me.calculateTotalPower(), me.updateInterval); #//Update the voltage source. Pass in negetive power in case of charging
-            }
-        }
-        electricalDebug.debugPrint("Power Calculated", 2);
-
-        props.getNode("/systems/electrical/e-tron/battery-kWh", 1).setValue(me.parallelConnection[0].units[0].getRemainingInkWh());
-        props.getNode("/systems/electrical/e-tron/battery-remaining-percent", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentage());
-        props.getNode("/systems/electrical/e-tron/battery-remaining-percent-float", 1).setValue(me.parallelConnection[0].units[0].getRemainingPercentageFloat());
-
-        electricalDebug.debugPrint("current: "~me.current, 1);
-        electricalDebug.debugPrint("terminal voltage: "~me.voltage(), 1);
-        electricalDebug.debugPrint("Main Battery Remaining: "~me.parallelConnection[0].units[0].remaining, 1);
-        #//if(me.debugMode)
-        #//print("Secondery Battery Remaining: "~me.parallelConnection[0].units[0].remaining);
-
-        me.loopCount += 1;
+    calculateTotalPower: func() {
+        return me.source.electromotiveForce * me.current;
     },
+
+    updateInterval: 0.1,
+    update: func(dt = 0) {
+        me.current = 0;
+        foreach (var branch; me.parallelConnection) {
+            branch.voltage = me.source.electromotiveForce;
+            branch.solve();
+            me.current += branch.current;
+        }
+        if (dt > 0) me.source.voltageSourceUpdate(me.calculateTotalPower(), dt);
+    },
+
 };
 
 var Appliance = {
@@ -260,6 +147,7 @@ var Appliance = {
         return 0;
     },
 
+    isPowerLoad: 0,
     ratedPower: 0, #//rate power , Watt, 0 if isResistor
 
     isSwitch: func(){
@@ -272,6 +160,7 @@ var Appliance = {
     current: 0, #//electric current, Ampere
     activePower: 0, #//Output Power, Watt
     activePower_kW: 0, #//Output Power, kWatt, independence of activePower
+    loadPowerW: func() { return me.activePower + 1000 * me.activePower_kW; },
     heatingPower: func(){
         return me.current * me.current * me.resistance;
     },#//heating Power
@@ -319,34 +208,30 @@ var VoltageSource = {
     remaining: 0, #//kWs
 
 
-    voltageSourceUpdate: func(power, interval){
-        me.remaining -= power * 0.001 * interval; #//Pass in negetive power for charging
-        if(me.remaining <= 0){
-            me.electromotiveForce = 0;
-        }else{
-            me.electromotiveForce = me.ratedElectromotiveForce;
-        }
+    voltageSourceUpdate: func(powerW, dt) {
+        if (powerW > 0 and dt > 0) me.addToBattery(-powerW * dt / 1000);
     },
 
-    #//Usage: followme.circuit_1.parallelConnection[0].units[0].resetRemainingToFull();
-    resetRemainingToFull: func(){
-        me.remaining = me.electricalCapacity;
+    # Source energy is stored in kW s. All writers pass through this boundary.
+    setRemainingKWs: func(energy) {
+        me.remaining = math.clamp(energy, 0, me.electricalCapacity);
+        me.electromotiveForce = me.remaining > 0 ? me.ratedElectromotiveForce : 0;
+        if (me.onEnergyChanged != nil) me.onEnergyChanged();
     },
-    resetRemainingToZero: func(){
-        me.remaining = 0;
+    onEnergyChanged: nil,
+    setRemainingKWh: func(kWh) { me.setRemainingKWs(kWh2kWs(kWh)); },
+    setRemainingFraction: func(fraction) { me.setRemainingKWs(fraction * me.electricalCapacity); },
+    resetRemainingToFull: func() { me.setRemainingFraction(1); },
+    resetRemainingToZero: func() { me.setRemainingFraction(0); },
+    getRemainingPercentage: func() {
+        return sprintf("%.0f%%", me.getRemainingPercentageFloat());
     },
-    getRemainingPercentage: func(){
-        return sprintf("%.0f", 100 * me.remaining / me.electricalCapacity)~"%";
+    getRemainingPercentageFloat: func() {
+        return 100 * me.remaining / me.electricalCapacity;
     },
-    getRemainingPercentageFloat: func(){
-        return sprintf("%.0f", 100 * me.remaining / me.electricalCapacity);
-    },
-    getRemainingInkWh: func(){
-        return me.remaining/3600;
-    },
-    addToBattery: func(num){
-        me.remaining += num;
-    },
+    getRemainingInkWh: func() { return kWs2kWh(me.remaining); },
+    addToBattery: func(deltaKWs) { me.setRemainingKWs(me.remaining + deltaKWs); },
+
 };
 
 var Switch = {

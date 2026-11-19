@@ -105,6 +105,10 @@
 	            <enable>
                     <and>
                         <equals>
+                            <property>/systems/electrical/e-tron/power-state</property>
+                            <value>off</value>
+                        </equals>
+                        <equals>
                             <property>services/service-truck/enable</property>
                             <value>1</value>
                         </equals>
@@ -120,7 +124,7 @@
                      </binding>
                      <binding>
                          <command>nasal</command>
-                         <script>followme.charging_cap.open();</script>
+                         <script>if (getprop("/services/service-truck/connect")) followme.charging_cap.open(); else followme.charging_cap.close();</script>
                      </binding>
 	                 <binding>
                          <command>dialog-update</command>

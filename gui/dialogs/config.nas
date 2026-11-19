@@ -3,12 +3,6 @@ var font_mapper = func(family, weight) {
     return "Orbitron/Orbitron-Bold.ttf";
 };
 
-var clamp = func(value, min=0.0, max=0.0) {
-    if(value < min) {value = min;}
-    if(value > max) {value = max;}
-    return value;
-}
-
 var SvgWidget = {
     new: func(dialog, canvasGroup, name) {
         var m = {parents:[SvgWidget]};
@@ -42,36 +36,27 @@ var BatteryWidget = {
         m._class = "BatteryWidget";
         m._name = name;
         
-        m._nLevelPct = props.getNode("/systems/electrical/e-tron/battery-remaining-percent");
-        m._fraction = followme.circuit_1.parallelConnection[0].units[0].getRemainingPercentageFloat();
-        m._capacity = 80; #80 kWh (per pack)
+        m._battery = followme.cSource;
+        m._energy = props.getNode("/systems/electrical/e-tron/battery-kWh");
 
-        m._cFrame = m._group.getElementById(m._name~"_Frame");
         m._cFrameV = m._group.getElementById(m._name~"_Frame_Vis");
         m._cLevel = m._group.getElementById(m._name~"_Charge_Level");
         m._cDataLevel = m._group.getElementById(m._name~"_Data_Level");
         m._cDataAbs = m._group.getElementById(m._name~"_Data_Abs");
 
-        m._cDataLevel.setText(sprintf("%3d", m._fraction)~" %");
-        m._cDataAbs.setText(sprintf("%3.1f", m._fraction*m._capacity*0.01)~" kWh");
-
-        m._left = m._cFrame.get("coord[0]");
-        m._right = m._cFrame.get("coord[2]");
-        m._width = m._right - m._left;
+        m._left = m._cLevel.get("coord[0]");
+        m._width = m._cLevel.get("coord[2]") - m._left;
+        m.setListeners(m);
         return m;
     },
 
     setListeners: func(instance) {
-        append(me._listeners, setlistener(me._nLevelPct, func() {me._onChargeLevelChange();}, 1, 0));
+        append(me._listeners, setlistener(me._energy, func() {instance._onChargeLevelChange();}, 1, 0));
 
-        me._cFrameV.addEventListener("drag", func(e) {me._onChargeInputChange(e);});
-        me._cLevel.addEventListener("drag", func(e) {me._onChargeInputChange(e);});
-        me._cFrameV.addEventListener("wheel", func(e) {me._onChargeInputChange(e);});
-        me._cLevel.addEventListener("wheel", func(e) {me._onChargeInputChange(e);});
-    },
-
-    init: func(instance=me) {
-        me.setListeners(instance);
+        me._cFrameV.addEventListener("drag", func(e) {instance._onChargeInputChange(e);});
+        me._cLevel.addEventListener("drag", func(e) {instance._onChargeInputChange(e);});
+        me._cFrameV.addEventListener("wheel", func(e) {instance._onChargeInputChange(e);});
+        me._cLevel.addEventListener("wheel", func(e) {instance._onChargeInputChange(e);});
     },
 
     deinit: func() {
@@ -79,23 +64,15 @@ var BatteryWidget = {
     },
 
     _onChargeLevelChange: func() {
-        me._fraction = followme.circuit_1.parallelConnection[0].units[0].getRemainingPercentageFloat();
-        
-        me._cDataLevel.setText(sprintf("%3d", me._fraction)~" %");
-        me._cDataAbs.setText(sprintf("%3.1f", me._fraction*m._capacity*0.01)~" kWh");
-
-        me._cLevel.set("coord[2]", me._left + (me._width * me._fraction));
+        var percent = me._battery.getRemainingPercentageFloat();
+        me._cDataLevel.setText(sprintf("%.0f %%", percent));
+        me._cDataAbs.setText(sprintf("%.1f kWh", me._battery.getRemainingInkWh()));
+        me._cLevel.set("coord[2]", me._left + me._width * percent / 100);
     },
 
     _onChargeInputChange: func(e) {
-        var newFraction = 0;
-        if(e.type == "wheel") {
-            newFraction = me._fraction + (e.deltaY/me._width);
-        } else {
-            newFraction = me._fraction + (e.deltaX/me._width);
-        }
-        newFraction = clamp(newFraction, 0.0, 1.0);
-        followme.circuit_1.parallelConnection[0].units[0].remaining = newFraction * me._capacity;
+        var delta = e.type == "wheel" ? e.deltaY : e.deltaX;
+        me._battery.setRemainingFraction(me._battery.getRemainingPercentageFloat() / 100 + delta / me._width);
     }
 };
 
@@ -127,20 +104,12 @@ var BatteryPayloadClass = {
     },
 
     toggle: func() {
-        if(me._window != nil) {
-            if (me._window._isOpen) {
-                me.close();
-            } else {
-                me.open();
-            }
-        } else {
-            me.open();
-        }
+        if (me._window == nil) me.open();
+        else me.close();
     },
 
     close: func() {
-        me._window.del();
-        me._window = nil;
+        if (me._window != nil) me._window.del();
     },
 
     removeListeners: func() {
@@ -154,7 +123,7 @@ var BatteryPayloadClass = {
 
     _onClose: func() {
         me.removeListeners();
-        me._window.del();
+        me._window = nil;
 
         foreach(widget; keys(me._widget)) {
             if(me._widget[widget] != nil) {
@@ -198,7 +167,7 @@ var BatteryPayloadClass = {
 
         me._group = me._canvas.createGroup();
 
-        canvas.parsesvg(me._group, "Aircraft/followme_e-tron/gui/dialogs/config.svg", {"font-mapper": font_mapper});
+        canvas.parsesvg(me._group, "Aircraft/followme_e-tron/gui/dialogs/config_.svg", {"font-mapper": font_mapper});
 
         me._widget.Front = BatteryWidget.new(me, me._group, "Front");
     }
