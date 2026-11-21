@@ -5,6 +5,17 @@ var journeyStartKm = nil;
 var journeyStartKWh = nil;
 var ignition = func { engine.toggleEngine(engine.engine_1); };
 
+# Read the commands delivered to the vehicle's physics, after pedal and automatic braking are combined.
+var checkBrakeCommands = func(left, right) {
+    foreach (var axle; [["left", left], ["right", right]]) {
+        var actual = getprop("/fdm/jsbsim/fcs/" ~ axle[0] ~ "-brake-cmd-norm");
+        if (actual == nil or math.abs(actual - axle[1]) > 0.001)
+            die(axle[0] ~ " brake: expected " ~ axle[1] ~ ", got " ~ actual);
+    }
+    if (math.abs(getprop("/sim/multiplay/generic/float[25]") - left) > 0.001)
+        die("brake lights do not follow the effective front brake");
+};
+
 var checkPage = func(name) {
     if (panel.displayPage != name) die("expected " ~ name ~ ", got " ~ panel.displayPage);
     var files = smartInstruments.art;
@@ -99,7 +110,54 @@ var more = [
         panel.nextCenterScreen();
         followme.safety.aebActive();
     }],
-    [1, func { checkPage("aeb"); followme.safety.aebStop(); }],
+    [1, func {
+        checkPage("aeb");
+        checkBrakeCommands(0.8, 0.8);
+        var brakes = followme.brakeController;
+        brakes.applyBrakes(1);
+        brakes.applyBrakes(0);
+        brakes.manualHandBrakePull();
+        brakes.manualHandBrakeRelease();
+        brakes.setCruiseBrakes(0.4);
+        brakes.setCruiseBrakes(0);
+        autospeed.startAutoSpeed();
+        autospeed.autoSpeedMainLoop();
+        if (autospeed.active) die("cruise still active during AEB");
+        checkPage("aeb");
+        brakes.keyboardBrake();
+        checkPage("doors");
+        brakes.keyboardBrakeRelease();
+        checkPage("doors");
+    }],
+    [0.3, func {
+        checkBrakeCommands(0.8, 0.8);
+        if (!getprop("/systems/safety/aeb_activated")) die("pedal cancelled AEB");
+        followme.safety.aebStop();
+        followme.safety.aebActive();
+        checkPage("aeb");
+        setprop("/controls/gear/brake-right", 0.95);
+        checkPage("doors");
+    }],
+    [0.3, func {
+        checkBrakeCommands(0.8, 0.95);
+        followme.safety.aebFullBrake();
+        setprop("/controls/gear/brake-right", 0.25);
+    }],
+    [0.6, func {
+        checkBrakeCommands(1, 1);
+        checkPage("doors");
+        followme.safety.aebStop();
+        followme.safety.disableEmergencyMode();
+    }],
+    [0.6, func {
+        checkBrakeCommands(0, 0.25);
+        followme.safety.aebActive();
+        checkPage("doors");
+        setprop("/controls/gear/brake-right", 0);
+        checkPage("doors");
+        followme.safety.disableAEB();
+        if (getprop("/autopilot/autobrake/engaged")) die("stale AEB brake command");
+    }],
     [1, func { checkPage("doors"); followme.frontleft_door.close(); }],
     [1.3, func {
         checkPage("compass");

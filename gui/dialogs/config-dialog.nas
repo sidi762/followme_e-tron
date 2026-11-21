@@ -223,7 +223,7 @@ var ConfigDialogClass = {
     _createSafetySection: func(widget, yPos, width) {
         # Safety buttons
         widget.createButton(5, yPos, 180, 30, "Toggle Parking Radar", 
-            func followme.parkingRadar.toggle());
+            func followme.toggleParkingRadar());
         widget.createButton(200, yPos, 180, 30, "(Re)Initialize Safety", 
             func followme.safety.init());
         yPos += 35;

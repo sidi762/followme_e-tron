@@ -15,51 +15,68 @@
 #// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 var BrakeController = {
-    new: func() { return { parents:[BrakeController]}; },
-    leftBrakeNode: props.getNode("/controls/gear/brake-left",1),
-    rightBrakeNode: props.getNode("/controls/gear/brake-right",1), # These are the rear brakes since the last FDM update
-    parkingBrakeNode: props.getNode("/controls/gear/brake-parking",1),
+	new: func() {
+		var controller = {parents: [BrakeController]};
+		foreach (var pedal; [controller.leftBrakeNode, controller.rightBrakeNode]) {
+			setlistener(pedal, func { controller.updateBrakeOutputs(); }, 0, 0);
+		}
+		controller.updateBrakeOutputs();
+		return controller;
+	},
+	leftBrakeNode: props.getNode("/controls/gear/brake-left", 1),
+	rightBrakeNode: props.getNode("/controls/gear/brake-right", 1),
+	parkingBrakeNode: props.getNode("/controls/gear/brake-parking", 1),
+	autoBrake: props.getNode("/autopilot/autobrake", 1),
+	pedalPressed: props.getNode("/systems/BrakeController/pedal-pressed", 1),
+	pedalPosition: props.getNode("/systems/BrakeController/pedal-position-norm", 1),
+	frontBrakeOutput: props.getNode("/systems/BrakeController/front-brake-output", 1),
+	applyingFeetBrake: 0,
+	_handBrakeIsOn: 0,
+	_manualHandBrakeIsPulled: 0,
+	aebDemand: 0,
+	holdDemand: 0,
+	cruiseDemand: 0,
+	leftBrakeValue: 0,
+	rightBrakeValue: 0,
 
-    applyingFeetBrake: 0,
-    _handBrakeIsOn: 0,
-    _manualHandBrakeIsPulled: 0,
-    leftBrakeValue: 0,
-    rightBrakeValue: 0,
-    
     #//Decides how much brakings to be applied, can be adjusted via GUI and defaults to be 0.8
     keyboardBrakeIntensity: Variable.new("keyboardBrakeIntensity", 0.8, 
                                           "Braking Intensity when using s key", 
                                           0, 1, 1, 
                                           "/systems/BrakeController/keyboardBrakeIntensity"), 
 
-    _applyLeftBrake: func(value){
-        # For internal use
-        me.leftBrakeNode.setValue(value);
-        me.leftBrakeValue = value;
-    },
-    _applyRightBrake: func(value){
-        # For internal use
-        me.rightBrakeNode.setValue(value);
-        me.rightBrakeValue = value;
-    },
-    _applyBrakes: func(value){
-        # For internal use
-        me.rightBrakeNode.setValue(value);
-        me.rightBrakeValue = value;
-        me.leftBrakeNode.setValue(value);
-        me.leftBrakeValue = value;
-    },
-    applyBrakes: func(value){
-        me._applyBrakes(value);
-    },
-    applyFeetBrakes: func(value){
-        # For feet brakes
-        if(value) me.applyingFeetBrake = 1;
-        else me.applyingFeetBrake = 0;
-        me.rightBrakeNode.setValue(value);
-        me.rightBrakeValue = value;
-        me.leftBrakeNode.setValue(value);
-        me.leftBrakeValue = value;
+	# FlightGear passes the autobrake outputs to JSBSim while engaged. The pedal
+	# nodes remain driver inputs, including joystick axes and the S key.
+	updateBrakeOutputs: func() {
+		var left = me.leftBrakeNode.getValue();
+		var right = me.rightBrakeNode.getValue();
+		var automatic = math.max(me.aebDemand, me.holdDemand, me.cruiseDemand);
+		me.leftBrakeValue = math.max(left, automatic);
+		me.rightBrakeValue = math.max(right, automatic, me._manualHandBrakeIsPulled);
+		me.autoBrake.setValue("brake-left-output", me.leftBrakeValue);
+		me.autoBrake.setValue("brake-right-output", me.rightBrakeValue);
+		me.autoBrake.setValue("engaged", automatic > 0 or me._manualHandBrakeIsPulled);
+		me.frontBrakeOutput.setDoubleValue(me.leftBrakeValue);
+		# Static Auto Hold maintains wheel pressure with the driver's pedal free to return.
+		me.pedalPosition.setDoubleValue(math.max(left, right, me.aebDemand, me.cruiseDemand));
+		me.applyingFeetBrake = left > 0 or right > 0;
+		me.pedalPressed.setBoolValue(me.applyingFeetBrake);
+	},
+	applyBrakes: func(value) {
+		me.holdDemand = value;
+		me.updateBrakeOutputs();
+	},
+	setCruiseBrakes: func(value) {
+		me.cruiseDemand = value;
+		me.updateBrakeOutputs();
+	},
+	setAebBrakes: func(value) {
+		me.aebDemand = value;
+		me.updateBrakeOutputs();
+	},
+	applyFeetBrakes: func(value) {
+		me.leftBrakeNode.setValue(value);
+		me.rightBrakeNode.setValue(value);
         # Double blink when applying full brakes, should look for a better solution
         if(value == 1) settimer(func{if(me.applyingFeetBrake) safety.emergencyMode();}, 0.6);
     },
@@ -67,13 +84,13 @@ var BrakeController = {
     manualHandBrakePull: func(){
         me._manualHandBrakeIsPulled = 1;
         # Right Brakes are the rear brakes since the last FDM update
-        me._applyRightBrake(1); 
+        me.updateBrakeOutputs();
     },
 
     manualHandBrakeRelease: func(){
         me._manualHandBrakeIsPulled = 0;
         # Right Brakes are the rear brakes since the last FDM update
-        me._applyRightBrake(0);
+        me.updateBrakeOutputs();
     },
 
     _activeHandBrake: func(){
@@ -114,9 +131,7 @@ var BrakeController = {
         }
     },
     activeEmergencyBrake: func(){
-        me._applyLeftBrake(1);
-        me._applyRightBrake(1);
-        me.enableHandBrake();
+        me.setAebBrakes(1);
         safety.emergencyMode();
     },
     keyboardBrake: func(){
@@ -126,15 +141,18 @@ var BrakeController = {
         me.applyFeetBrakes(0);
         if(vInfo.getSpeedKMH() > 10 and safety.emergencyModeState) safety.disableEmergencyMode();
     },
-    releaseBrake: func(){
-        me._applyLeftBrake(0);
-        me._applyRightBrake(0);
-    },
-    releaseAllBrakes: func(){
-        me._applyLeftBrake(0);
-        me._applyRightBrake(0);
-        me.disableHandBrake();
-    },
+	releaseAebBrakes: func() {
+		me.setAebBrakes(0);
+	},
+	releaseBrake: func() {
+		me.applyBrakes(0);
+		me.setCruiseBrakes(0);
+		me.applyFeetBrakes(0);
+	},
+	releaseAllBrakes: func() {
+		me.releaseBrake();
+		me.disableHandBrake();
+	},
     handBrakeIsOn: func(){
         return me._handBrakeIsOn;
     },

@@ -122,13 +122,21 @@ var SmartInstruments = {
         m.updateTimer = maketimer(0.1, func m.update());
         m.update();
         m.updateTimer.start();
-        setlistener(m.information.systems.safety.aebActivated, func {
+        # A pedal press acknowledges only the current intervention's dashboard prompt.
+        setlistener(m.information.systems.safety.aebActivated, func(n) {
+            m.showAebPrompt = n.getBoolValue() and !followme.brakeController.applyingFeetBrake;
             if (m.phase == "driving") m.update();
-        });
+        }, 1, 0);
+        setlistener(followme.brakeController.pedalPressed, func(n) {
+            if (n.getBoolValue() and m.showAebPrompt) {
+                m.showAebPrompt = 0;
+                if (m.phase == "driving") m.update();
+            }
+        }, 0, 0);
         return m;
     },
     startupSoundIsEnabled: 0, startupSound: nil, showingWarningMessage: 0,
-    keyDown: nil,
+    keyDown: nil, showAebPrompt: 0,
     enableStartupSound: func(){
         me.startupSoundIsEnabled = 1;
     },
@@ -177,7 +185,7 @@ var SmartInstruments = {
     selectPage: func() {
         if (!followme.auxBusPowered.getBoolValue()) return "off";
         if (me.phase == "selfTest") return "selfTest";
-        if (me.phase == "driving" and me.information.systems.safety.aebActivated.getBoolValue()) return "aeb";
+        if (me.phase == "driving" and me.showAebPrompt) return "aeb";
         if (me.information.electrical.isRecharging.getBoolValue()) return "charge";
         foreach (var door; me.doors) if (door.getpos() > 0) return "doors";
         return me.phase == "driving" ? menu[me.infoImageIndex] : me.phase;
@@ -260,9 +268,9 @@ var SmartInstruments = {
             var label = autopilot.road_check_timer.isRunning ? "AUTO" : (autospeed.active ? "CRUISE" : "STANDBY");
             me.assistState.setText(label ~ (speed == "" ? "" : "   " ~ speed));
         } elsif (page == "radar") {
-            var radar = followme.parkingRadar;
+            var assist = followme.parkingAssist;
             var label = "OFF";
-            if (radar.isRunning) label = radar.warningTimer.isRunning ? "OBSTACLE" : "ON";
+            if (assist.isRunning) label = assist.hasObstacle() ? "OBSTACLE" : "ON";
             me.radarState.setText(label);
         }
     },
@@ -314,7 +322,7 @@ var SmartInstruments = {
         var safety = followme.safety;
         me.airbagSign.setVisible(!safety.isOn or safety.frontAirbagProp.getBoolValue()
                                               or safety.sideAirbagProp.getBoolValue());
-        me.handBrakeSign.setVisible(followme.brakeController.handBrakeIsOn());
+        me.handBrakeSign.setVisible(followme.brakeController.parkingBrakeNode.getBoolValue());
         me.autoholdSign.setVisible(me.information.systems.isAutoholdWorking.getBoolValue());
         var lightMode = me.information.lighting.headlight.getValue();
         me.positionLightSign.setVisible(lightMode == 1 or lightMode == 2);

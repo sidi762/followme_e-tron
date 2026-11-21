@@ -183,7 +183,7 @@
                     <pref-height>28</pref-height>
                     <binding>
                         <command>nasal</command>
-                        <script>followme.parkingRadar.toggle()</script>
+                        <script>followme.toggleParkingRadar()</script>
                     </binding>
                 </button>
                 <button>

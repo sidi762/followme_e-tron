@@ -53,7 +53,11 @@ var stopAndSwitchToParking = func(){
     followme.brakeController.enableHandBrake();
 }
 
-var autoHoldTimer = maketimer(0.05,autoHoldMainLoop);
+# AEB owns the service brake through its timed standstill hold and calls
+# autoHoldMainLoop once at handoff, using the current switch, throttle and doors.
+var autoHoldTimer = maketimer(0.05, func {
+	if (!followme.brakeController.aebDemand) autoHoldMainLoop();
+});
 
 var startAutoHold = func(){
     autoHoldTimer.start();
@@ -66,7 +70,7 @@ var stopAutoHold = func(){
     activeNode.setIntValue(0);
     autoHoldTimer.stop();
     currentSpeed = speedNode.getValue();
-    if(followme.brakeController.applyingFeetBrake){
+    if(followme.brakeController.applyingFeetBrake or followme.brakeController.aebDemand){
         working = 0;
         workingNode.setIntValue(0);
         followme.brakeController.applyBrakes(0);
