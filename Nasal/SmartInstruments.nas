@@ -14,35 +14,45 @@
 #// You should have received a copy of the GNU General Public License
 #// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+var artDir = "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/";
+var menu = ["assist", "tyres", "flow", "compass", "range", "total", "sinceStart", "trip1", "trip2", "media", "navigation"];
+var art = {
+    assist: "1.0_on", tyres: "1.1", flow: "1.3", compass: "1.4", radar: "1.5",
+    range: "2.1", total: "2.2", sinceStart: "2.3", trip1: "2.4", trip2: "2.5",
+    media: "3", navigation: "4", aeb: "_AEB", charge: "_charge",
+    standby: "_start", selfTest: "_self_test", summary: "_summary",
+};
+
+var panelText = func(group, x, y, height, align="center-center", font="ExoRegular-ymMe.ttf") {
+    return group.createChild("text").setTranslation(x, y).setAlignment(align)
+                .setFont(font).setFontSize(height).setColor(1, 1, 1);
+};
+var panelImage = func(group, file) {
+    return group.createChild("image").setFile(artDir ~ file).setSize(1509, 736);
+};
+
 var SmartInstruments = {
     new: func(placement) {
-        var m = {
-            parents:[SmartInstruments],
-            instrumentCanvas: canvas.new({
-              "name": "smartInstruments",   # The name is optional but allow for easier identification
-              "size": [8192, 4096], # Size of the underlying texture (should be a power of 2, required) [Resolution]
-              "view": [1509, 736],  # Virtual resolution (Defines the coordinate system of the canvas [Dimensions]
-                                    # which will be stretched the size of the texture, required)
-              "mipmapping": 0       # Enable mipmapping (optional)
-            }),
-        };
-
+        var m = {parents: [SmartInstruments]};
+        m.instrumentCanvas = canvas.new({name: "smartInstruments", size: [8192, 4096], view: [1509, 736], mipmapping: 0});
+        m.instrumentCanvas.addPlacement({node: placement});
         m.information = followme.vInfo;
-        m.startupSoundIsEnabled = 0;
-        m.startupSound = nil;#//The startup sound
-        m.startupSoundPath = nil;#//Path to the startup sound
-        m.group = m.instrumentCanvas.createGroup();#//Main group
-        m.signGroup = m.instrumentCanvas.createGroup();#//sign group
-        m.welcomeGroup = m.instrumentCanvas.createGroup();
-        m.gaugeGroup = m.instrumentCanvas.createGroup();#//gauge group
-        m.iconGroup = m.instrumentCanvas.createGroup(); #//group for icons
-        m.mapGroup = m.instrumentCanvas.createGroup(); #//map group
-        m.instrumentCanvas.addPlacement({"node": placement});
-        #Sign svg
-        canvas.parsesvg(
-                m.signGroup,
-                "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard.svg",
-        );
+        m.backgroundImage = panelImage(m.instrumentCanvas.createGroup(), "dashboard0.png");
+        m.infoImage = panelImage(m.instrumentCanvas.createGroup(), "dashboard_start.png");
+        m.gaugeGroup = m.instrumentCanvas.createGroup();
+        var digits = "trueno-font/Trueno-wml2.ttf";
+        m.speedometer = panelText(m.gaugeGroup, 1205, 380, 148,"center-center", digits);
+        m.power = panelText(m.gaugeGroup, 295, 380, 148,"center-center", digits);
+        m.batteryRemainingDisplay = panelText(m.gaugeGroup, 312, 542, 30);
+        m.driveMode = panelText(m.gaugeGroup, 780, 628, 40);
+        m.gearDisplay = panelText(m.gaugeGroup, 940, 620, 70);
+        m.tempDisplay = panelText(m.gaugeGroup, 420, 220, 30,"left-center");
+        m.timeDisplay = panelText(m.gaugeGroup, 1055, 215, 40,"right-center");
+        m.tripDisplay = panelText(m.gaugeGroup, 510, 630, 25,"right-center");
+        m.distanceDisplay = panelText(m.gaugeGroup, 1020, 630, 25,"left-center");
+
+        m.signGroup = m.instrumentCanvas.createGroup();
+        canvas.parsesvg(m.signGroup, artDir ~ "dashboard.svg");
         m.airbagSign = m.signGroup.getElementById("airbag_sign");
         m.handBrakeSign = m.signGroup.getElementById("handbrake_sign");
         m.autoholdSign = m.signGroup.getElementById("autohold_sign");
@@ -55,149 +65,66 @@ var SmartInstruments = {
         m.autopilotSign = m.signGroup.getElementById("zidongshengtian_sign");
         m.cruiseSign = m.signGroup.getElementById("cruise_sign");
 
-        m.signGroup.hide();
-        #Background
-        m.backgroundPath = "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard0.png";
-        # create an image child for the texture
-        m.backgroundImage = m.group.createChild("image")
-                                   .setFile(m.backgroundPath)
-                                   .setTranslation(0, 0)
-                                   .setSize(1509, 736);
-        #center info
-        m.infoImagePath = ["Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard1.png",
-                           "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard2.png",
-                           "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard3.png",
-                           "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard4.png"];
-        m.infoImageIndex = 0;
-        m.infoImage = m.group.createChild("image")
-                             .setFile(m.infoImagePath[m.infoImageIndex])
-                             .setTranslation(0, 0)
-                             .setSize(1509, 736);
-        m.chargingImage = m.group.createChild("image")
-                        .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/dashboard_charge.png")
-                        .setTranslation(0, 0)
-                        .setSize(1509, 736)
-                        .hide();
-        m.doorsNotShutImage = m.group.createChild("image")
-                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door.png")
-                             .setTranslation(0, 0)
-                             .setSize(1509, 736)
-                             .hide();
-        m.doorFLIcon = m.iconGroup.createChild("image")
-                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_FL.png")
-                             .setTranslation(0, 0)
-                             .setSize(1509, 736)
-                             .hide();
-        m.doorFRIcon = m.iconGroup.createChild("image")
-                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_FR.png")
-                             .setTranslation(0, 0)
-                             .setSize(1509, 736)
-                             .hide();
-        m.doorRLIcon = m.iconGroup.createChild("image")
-                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_RL.png")
-                             .setTranslation(0, 0)
-                             .setSize(1509, 736)
-                             .hide();
-        m.doorRRIcon = m.iconGroup.createChild("image")
-                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_RR.png")
-                             .setTranslation(0, 0)
-                             .setSize(1509, 736)
-                             .hide();
-        m.doorRCIcon = m.iconGroup.createChild("image")
-                             .setFile("Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/doors/dashboard_Door_RechargeCap.png")
-                             .setTranslation(0, 0)
-                             .setSize(1509, 736)
-                             .hide();
-        m.doorIcons = [m.doorFLIcon, m.doorFRIcon, m.doorRLIcon, m.doorRRIcon, m.doorRCIcon];
-        # Create a text element and set some values(Self test)
-        m.selfTestText = m.welcomeGroup.createChild("text", "optional-id-for element")
-                               .setTranslation(530, 140)      # The origin is in the top left corner
-                               .setAlignment("left-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                               .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                               .setFontSize(50)        # Set fontsize and optionally character aspect ratio
-                               .setColor(1,0,0)             # Text color
-                               .setText("SELF TEST NORMAL")
-                               .show();
-        m.warningText = m.group.createChild("text", "optional-id-for element")
-                                    .setTranslation(780, 140)      # The origin is in the top left corner
-                                    .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                                    .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                                    .setFontSize(50)        # Set fontsize and optionally character aspect ratio
-                                    .setColor(1,0,0)             # Text color
-                                    .setText("WARNING MESSAGE")
-                                    .hide();
-        #//speedometer
-        m.speedometer = m.gaugeGroup.createChild("text", "optional-id-for element")
-                               .setTranslation(1205, 380)      # The origin is in the top left corner
-                               .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                               .setFont("trueno-font/Trueno-wml2.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                               .setFontSize(148)        # Set fontsize and optionally character aspect ratio
-                               .setColor(1,1,1)             # Text color
-                               .setText("--");
 
-        #//power
-        m.power = m.gaugeGroup.createChild("text", "optional-id-for element")
-                         .setTranslation(295, 380)      # The origin is in the top left corner
-                         .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                         .setFont("trueno-font/Trueno-wml2.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                         .setFontSize(148)        # Set fontsize and optionally character aspect ratio
-                         .setColor(1,1,1)             # Text color
-                         .setText("--");
-        #//Battery remaining
-        m.batteryRemainingDisplay = m.gaugeGroup.createChild("text", "optional-id-for element")
-                         .setTranslation(312, 542)      # The origin is in the top left corner
-                         .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                         .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                         .setFontSize(30)        # Set fontsize and optionally character aspect ratio
-                         .setColor(0.58,0.894,1)             # Text color
-                         .setText("--");
+        m.warningText = panelText(m.instrumentCanvas.createGroup(), 755, 102, 36).setColor(1, 0.22, 0.12);
+        m.doors = [followme.frontleft_door, followme.frontright_door, followme.rearleft_door,
+                   followme.rearright_door, followme.charging_cap];
+        m.details = {};
+        foreach (var name; ["doors","charge","summary","range","consumption","flow","compass","assist","radar"]) {
+            m.details[name] = m.instrumentCanvas.createGroup();
+            m.details[name].hide();
+        }
+        m.doorIcons = [];
+        foreach (var name; ["FL","FR","RL","RR"])
+            append(m.doorIcons, panelImage(m.details.doors, "doors/dashboard_Door_" ~ name ~ ".png"));
+        m.capLabel = panelText(m.details.doors, 754, 545, 24).setText("CHARGE PORT");
+        m.chargeStatus = panelText(m.details.charge, 754, 548, 30);
+        m.summaryRows = [];
+        foreach (var y; [305, 368, 432, 497])
+            append(m.summaryRows, panelText(m.details.summary, 952, y, 30, "right-center"));
+        m.summaryRows[3].setFontSize(24);
+        m.rangeKm = panelText(m.details.range, 801, 347, 46,"right-center");
+        m.rangePercent = panelText(m.details.range, 801, 478, 46,"right-center");
+        m.consumptionValue = panelText(m.details.consumption, 754, 364, 35);
+        var barOrigin = m.details.consumption.createChild("group").setTranslation(596, 418);
+        m.barFill = barOrigin.createChild("path").rect(0, 0, 317, 43).setColorFill(0.54, 0.86, 1, 0.74);
+        m.consumptionPointer = m.details.consumption.createChild("path")
+            .moveTo(-8, 0).lineTo(8, 0).lineTo(0, 16).close().setColorFill(0.7, 0.95, 1);
+        m.flowArrows = m.details.flow.createChild("image").setFile(artDir ~ "energy-flow-arrows.png")
+                               .setTranslation(663, 316).setSize(196, 120);
+        m.flowPower = panelText(m.details.flow, 754, 504, 29);
+        m.bearing = panelText(m.details.compass, 754, 304, 40);
+        m.cardinals = [];
+        foreach (var letter; ["N","E","S","W"]) {
+            var label = panelText(m.details.compass, 0, 0, 24).setText(letter);
+            if (letter == "N") label.setColor(1, 0.35, 0.3);
+            append(m.cardinals, label);
+        }
+        m.assistState = panelText(m.details.assist, 754, 340, 36);
+        m.radarState = panelText(m.details.radar, 754, 483, 25);
 
-        #//Drive Mode
-        m.driveMode = m.gaugeGroup.createChild("text", "optional-id-for element")
-                             .setTranslation(780, 628)      # The origin is in the top left corner
-                             .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                             .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                             .setFontSize(40)        # Set fontsize and optionally character aspect ratio
-                             .setColor(1,1,1)             # Text color
-                             .setText("Performance");
-        #//Gear
-        m.gearDisplay = m.gaugeGroup.createChild("text", "optional-id-for element")
-                               .setTranslation(940, 620)      # The origin is in the top left corner
-                               .setAlignment("center-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                               .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                               .setFontSize(70)        # Set fontsize and optionally character aspect ratio
-                               .setColor(1,1,1)             # Text color
-                               .setText("D");
-        #//Temperature
-        m.tempDisplay = m.gaugeGroup.createChild("text", "optional-id-for element")
-                               .setTranslation(420, 220)      # The origin is in the top left corner
-                               .setAlignment("left-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                               .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                               .setFontSize(30)        # Set fontsize and optionally character aspect ratio
-                               .setColor(1,1,1)             # Text color
-                               .setText("30 °C");
-        #//Time
-        m.timeDisplay = m.group.createChild("text", "optional-id-for element")
-                               .setTranslation(1055, 215)      # The origin is in the top left corner
-                               .setAlignment("right-center") # All values from osgText are supported (see $FG_ROOT/Docs/README.osgtext)
-                               .setFont("ExoRegular-ymMe.ttf") # Fonts are loaded either from $AIRCRAFT_DIR/Fonts or $FG_ROOT/Fonts
-                               .setFontSize(40)        # Set fontsize and optionally character aspect ratio
-                               .setColor(1,1,1)             # Text color
-                               .setText("9:41");
-
-        #//Map
-        #//Map Structure is a mess, removed
-
-        m.init();
+        m.km = 0;
+        m.kWh = 0;
+        m.seconds = 0;
+        m.counters = {};
+        foreach (var name; ["total","sinceStart","trip1","trip2","journey"]) m.resetCounter(name);
+        m.infoImageIndex = vecindex(menu,"range");
+        m.phase = "standby";
+        m.displayPage = nil;
+        m.phaseTimer = maketimer(1, func m.finishPhase());
+        m.phaseTimer.singleShot = 1;
+        m.lampTestTimer = maketimer(0.5, func m.updateLamps());
+        m.lampTestTimer.singleShot = 1;
+        m.updateTimer = maketimer(0.1, func m.update());
+        m.update();
+        m.updateTimer.start();
+        setlistener(m.information.systems.safety.aebActivated, func {
+            if (m.phase == "driving") m.update();
+        });
         return m;
     },
-    initialized: 0,
-    loopCount:0,
-    showingWarningMessage: 0,
-    isCenterScreenInfoShown: 1,
-    isDoorsNotShut: 0,
-    doorsNotShut: [0,0,0,0,0],
-
+    startupSoundIsEnabled: 0, startupSound: nil, showingWarningMessage: 0,
+    lastTime: nil, lastKW: 0, lastSpeed: 0, keyDown: nil,
     enableStartupSound: func(){
         me.startupSoundIsEnabled = 1;
     },
@@ -208,59 +135,198 @@ var SmartInstruments = {
         me.startupSoundPath = io.dirname(startupSoundPath);
         me.startupSound = io.basename(startupSoundPath);
     },
-    nextCenterScreen: func(){
-        if(me.infoImageIndex < 3) me.infoImageIndex += 1;
-        else if(me.infoImageIndex >= 3) me.infoImageIndex = 0;
-        me.infoImage.setFile(me.infoImagePath[me.infoImageIndex]);
+
+    # All four counters share one integration of ground speed and HV pack power.
+    # The journey summary keeps its ignition baseline even if a driver resets a counter.
+    resetCounter: func(name) {
+        me.counters[name] = {km: me.km, kWh: me.kWh, seconds: me.seconds};
+    },
+    sampleTrip: func() {
+        var now = getprop("/fdm/jsbsim/simulation/sim-time-sec");
+        if (now == nil) return;
+        if (me.lastTime != nil) {
+            var dt = math.max(0, now-me.lastTime);
+            me.km += me.lastSpeed * dt / 3600;
+            me.kWh += me.lastKW * dt / 3600;
+            me.seconds += dt;
+        }
+        me.lastTime = nil;
+        if (engine.engine_1.isRunning()) {
+            me.lastTime = now;
+            me.lastSpeed = math.abs(me.information.getSpeedKMH());
+            me.lastKW = followme.circuit_1.current * followme.cSource.electromotiveForce / 1000;
+        }
+    },
+    consumption: func(name) {
+        var c = me.counters[name];
+        var km = me.km - c.km;
+        return km >= 0.1 ? 100 * (me.kWh - c.kWh) / km : nil;
+    },
+    cyclePage: func(delta) {
+        if (me.displayPage == menu[me.infoImageIndex]) {
+            me.infoImageIndex = math.mod(me.infoImageIndex + delta + size(menu), size(menu));
+            me.update();
+        }
         return me.infoImageIndex;
     },
-    previousCenterScreen: func(){
-        if(me.infoImageIndex > 0) me.infoImageIndex -= 1;
-        else if(me.infoImageIndex == 0) me.infoImageIndex = 3;
-        me.infoImage.setFile(me.infoImagePath[me.infoImageIndex]);
-        return me.infoImageIndex;
+    nextCenterScreen: func() { return me.cyclePage(1); },
+    previousCenterScreen: func() { return me.cyclePage(-1); },
+    pageKey: func(down) {
+        if (down) {
+            if (me.keyDown == nil) {
+                me.keyDown = systime();
+                me.keyPage = me.displayPage;
+            }
+        } elsif (me.keyDown != nil) {
+            var held = systime() - me.keyDown;
+            me.keyDown = nil;
+            if (me.displayPage != me.keyPage or me.displayPage != menu[me.infoImageIndex]) return;
+            if (held >= 1 and contains(me.counters, me.displayPage)) {
+                me.resetCounter(me.displayPage);
+                me.update();
+            } else me.nextCenterScreen();
+        }
     },
-    update: func(){
+    selectPage: func() {
+        if (!followme.auxBusPowered.getBoolValue()) return "off";
+        if (me.phase == "selfTest") return "selfTest";
+        if (me.phase == "driving" and me.information.systems.safety.aebActivated.getBoolValue()) return "aeb";
+        if (me.information.electrical.isRecharging.getBoolValue()) return "charge";
+        foreach (var door; me.doors) if (door.getpos() > 0) return "doors";
+        return me.phase == "driving" ? menu[me.infoImageIndex] : me.phase;
+    },
+    showPage: func(page) {
+        var driving = me.phase == "driving" and page != "off";
+        me.backgroundImage.setVisible(driving);
+        me.gaugeGroup.setVisible(driving);
+        me.signGroup.setVisible(driving or page == "selfTest");
+        if (me.displayPage == page) return;
+        me.keyDown = nil;
+        me.displayPage = page;
+        me.infoImage.setVisible(page != "off");
+        if (page != "off") {
+            var file = page == "doors" ? "doors/dashboard_Door.png" : "dashboard" ~ art[page] ~ ".png";
+            me.infoImage.setFile(artDir ~ file);
+        }
+        var detail = contains(me.counters, page) ? "consumption" : page;
+        foreach (var name; keys(me.details)) me.details[name].setVisible(name == detail);
+    },
+    update: func() {
+        if (me.phase == "driving" or me.phase == "selfTest") me.sampleTrip();
+        var page = me.selectPage();
+        me.showPage(page);
+        if (me.phase == "driving" and page != "off") {
+            me.updateGauges();
+            if (!me.lampTestTimer.isRunning) me.updateLamps();
+        }
+        me.warningText.setVisible(me.phase == "driving" and page != "off" and me.showingWarningMessage
+                                  and math.mod(int(systime()*2), 2) == 0);
+        me.updatePage(page);
+    },
+    updatePage: func(page) {
+        if (page == "doors") {
+            for (var i=0; i<size(me.doorIcons); i+=1) me.doorIcons[i].setVisible(me.doors[i].getpos() > 0);
+            me.capLabel.setVisible(followme.charging_cap.getpos() > 0);
+        } elsif (page == "charge") {
+            var pack = followme.cSource;
+            var minutes = math.ceil((pack.electricalCapacity - pack.remaining) / followme.chargerPowerKW / 60);
+            me.chargeStatus.setText(sprintf("%s   ·   %d min", pack.getRemainingPercentage(), minutes));
+        } elsif (page == "summary") {
+            var c = me.counters.journey;
+            var km = me.km-c.km;
+            var seconds = me.seconds-c.seconds;
+            var avg = me.consumption("journey");
+            me.summaryRows[0].setText(sprintf("%.1f km", km));
+            me.summaryRows[1].setText(sprintf("%d:%02d:%02d", int(seconds/3600),
+                                               math.mod(int(seconds/60), 60), math.mod(int(seconds), 60)));
+            me.summaryRows[2].setText(sprintf("%.1f km/h", seconds > 0 ? 3600*km/seconds : 0));
+            me.summaryRows[3].setText((avg == nil ? "--" : sprintf("%.1f", avg)) ~ " kWh/100km");
+        } elsif (page == "range") {
+            # The first acceleration from a standstill is a poor range sample.
+            var estimate = "--";
+            if (me.km >= 1 and me.kWh > 0)
+                estimate = sprintf("%.0f", followme.cSource.getRemainingInkWh() * me.km / me.kWh);
+            me.rangeKm.setText(estimate);
+            me.rangePercent.setText(sprintf("%.0f", followme.cSource.getRemainingPercentageFloat()));
+        } elsif (contains(me.counters, page)) {
+            var avg = me.consumption(page);
+            me.consumptionValue.setText((avg == nil ? "--" : sprintf("%.1f", avg)) ~ " kWh/100km");
+            me.consumptionPointer.setVisible(avg != nil);
+            me.barFill.setVisible(avg != nil and avg > 0);
+            if (avg != nil) {
+                var fraction = math.clamp(avg/30, 0, 1);
+                me.barFill.setScale(fraction, 1);
+                me.consumptionPointer.setTranslation(595 + 318*fraction, 398);
+            }
+        } elsif (page == "flow") {
+            var power = engine.engine_1.activePower_kW;
+            me.flowArrows.setVisible(power >= 0.1);
+            me.flowPower.setText(sprintf("%.1f kW", power));
+        } elsif (page == "compass") {
+            var heading = math.mod(me.information.getHeadingDEG()+360, 360);
+            me.bearing.setText(sprintf("%03d°", math.mod(int(heading+0.5), 360)));
+            for (var i=0; i<4; i+=1) {
+                var angle = math.mod(i*90-heading+540, 360)-180;
+                me.cardinals[i].setVisible(math.abs(angle) <= 59);
+                if (math.abs(angle) <= 59)
+                    me.cardinals[i].setTranslation(754+221*math.sin(angle*D2R), 555-221*math.cos(angle*D2R));
+            }
+        } elsif (page == "assist") {
+            var speed = autospeed.active ? sprintf("%.0f km/h", autospeed.targetSpeed*1.852) : "";
+            var label = autopilot.road_check_timer.isRunning ? "AUTO" : (autospeed.active ? "CRUISE" : "STANDBY");
+            me.assistState.setText(label ~ (speed == "" ? "" : "   " ~ speed));
+        } elsif (page == "radar") {
+            var radar = followme.parkingRadar;
+            var label = "OFF";
+            if (radar.isRunning) label = radar.warningTimer.isRunning ? "OBSTACLE" : "ON";
+            me.radarState.setText(label);
+        }
+    },
+    updateGauges: func() {
         #//Speedometer
-        me.loopCount += 1;
         var currentSpeedKMH = sprintf("%i", me.information.getSpeedKMH());
-        me.speedometer.updateText(currentSpeedKMH);
+        me.speedometer.setText(currentSpeedKMH);
         if(autospeed.active == 1){
             me.speedometer.setColor(0.34, 0.63, 1);
         }else{
             me.speedometer.setColor(1, 1, 1);
         }
         #//Power
-        me.power.updateText(sprintf("%i", engine.engine_1.activePower_kW));
+        me.power.setText(sprintf("%i", engine.engine_1.activePower_kW));
         #//Battery
-        me.batteryRemainingDisplay.updateText(me.information.electrical.batteryRemainingPercent.getValue());
-        if(me.information.electrical.batteryRemainingPercentFloat.getValue() <= 20.0) me.batteryRemainingDisplay.setColor(1,0,0);
-        else me.batteryRemainingDisplay.setColor(0.58,0.894,1);
-        #//runtimeTextAdjust(me.batteryRemainingDisplay);
+        me.batteryRemainingDisplay.setText(me.information.electrical.batteryRemainingPercent.getValue());
+        if(me.information.electrical.batteryRemainingPercentFloat.getValue() <= 20.0) me.batteryRemainingDisplay.setColor(1, 0, 0);
+        else me.batteryRemainingDisplay.setColor(0.58, 0.894, 1);
         #//Gear
         if(engine.engine_1.direction == 1){
-            me.gearDisplay.updateText("D");
+            me.gearDisplay.setText("D");
         }else if(engine.engine_1.direction == -1){
-            me.gearDisplay.updateText("R");
+            me.gearDisplay.setText("R");
         }
         #//Mode
         if(engine.engine_1.mode == 1){
-            me.driveMode.updateText("Performance");
+            me.driveMode.setText("Performance");
         }else if(engine.engine_1.mode == 0.65){
-            me.driveMode.updateText("Comfort");
+            me.driveMode.setText("Comfort");
         }else if(engine.engine_1.mode == 0.4){
-            me.driveMode.updateText("Low Power");
+            me.driveMode.setText("Low Power");
         }
 
         #//Temperature and Time
         var tempC = me.information.environment.temperature.getValue();
-        me.tempDisplay.updateText(sprintf("%0.1f", tempC)~" °C");
+        me.tempDisplay.setText(sprintf("%0.1f", tempC)~" °C");
         var hour = me.information.getTimeHour();
         var minute = me.information.getTimeMinute();
         if(minute < 10) minute = "0"~minute;
-        me.timeDisplay.updateText(hour~":"~minute);
+        me.timeDisplay.setText(hour~":"~minute);
 
-        #//Signs
+        me.tripDisplay.setText(sprintf("TRIP 1   %.1f km", me.km-me.counters.trip1.km));
+        me.distanceDisplay.setText(sprintf("TOTAL   %.1f km", me.km));
+    },
+    updateLamps: func() {
+        # These two lamps only light during the ignition test.
+        me.foglightSign.hide();
+        me.escOffSign.hide();
         var safety = followme.safety;
         me.airbagSign.setVisible(!safety.isOn or safety.frontAirbagProp.getBoolValue()
                                               or safety.sideAirbagProp.getBoolValue());
@@ -273,68 +339,6 @@ var SmartInstruments = {
         me.readySign.setVisible(engine.engine_1.isRunning());
         me.autopilotSign.setVisible(autopilot.road_check_timer.isRunning);
         me.cruiseSign.setVisible(autospeed.active);
-
-        #//Check for doors
-        doors = [followme.frontleft_door, followme.frontright_door, followme.rearleft_door, followme.rearright_door, followme.charging_cap];
-        me.isDoorsNotShut = 0;
-        for(var i = 0; i <= 4; i += 1){
-            if(doors[i].getpos()){
-                me.isDoorsNotShut = 1;
-                me.doorsNotShut[i] = 1;
-            }else{
-                me.doorIcons[i].hide();
-                me.doorsNotShut[i] = 0;
-            }
-        }
-        if(me.isDoorsNotShut){
-            me.infoImage.hide();
-            me.isCenterScreenInfoShown = 0;
-            me.doorsNotShutImage.show();
-            for(var i = 0; i <= 4; i += 1){
-                if(me.doorsNotShut[i]) me.doorIcons[i].show();
-            }
-        }else{
-            me.doorsNotShutImage.hide();
-            if(!me.isCenterScreenInfoShown) me.infoImage.show();
-        }
-
-
-        #//Charging page
-        #//Needs refactoring
-        # if(me.information.electrical.isRecharging.getValue()){
-        #     me.infoImage.hide();
-        #     me.doorsNotShutImage.hide();
-        #     me.isCenterScreenInfoShown = 0;
-        #     me.chargingImage.show();
-        # }else{
-        #     me.chargingImage.hide();
-        #     if(!me.isCenterScreenInfoShown) me.infoImage.show();
-        # }
-
-        #//Warning MESSAGE
-        if(me.showingWarningMessage){
-            if(math.mod(me.loopCount, 10) < 5){
-                me.warningText.show();
-            }else{
-                me.warningText.hide();
-            }
-        }else{
-            me.warningText.hide();
-        }
-    },
-
-    updateTimer:nil,
-    init: func(){
-        if(!me.initialized){
-            me.updateTimer = maketimer(0.1, func me.update());
-            me.startScreenTimer = maketimer(1, func me.startSequence());
-            me.startScreenTimer.singleShot = 1;
-        }
-        me.group.hide();
-        me.gaugeGroup.hide();
-        me.infoImage.hide();
-        me.welcomeGroup.hide();
-        me.initialized = 1;
     },
     selfTest: func(){
         # Visibility is cached per Canvas wrapper. Use the same ones as the live display.
@@ -345,82 +349,44 @@ var SmartInstruments = {
             sign.show();
         }
     },
-    startUp:func(){
-        # if(!me.showingWarningMessage) me.welcomeGroup.show();
-        me.updateTimer.stop();
+
+    startUp: func() {
+        me.phaseTimer.stop();
+        me.lampTestTimer.stop();
+        me.resetCounter("sinceStart");
+        me.resetCounter("journey");
+        me.lastTime = nil;
+        me.phase = "selfTest";
         me.selfTest();
-        me.group.show();
-        me.signGroup.show();
-        me.startScreenTimer.restart(1);
-    },
-    startSequence: func(){
-        me.group.show();
-        me.iconGroup.show();
-        me.gaugeGroup.show();
-        me.infoImage.show();
-        me.speedometer.enableUpdate();
-        me.power.enableUpdate();
-        me.batteryRemainingDisplay.enableUpdate();
-        me.driveMode.enableUpdate();
-        me.gearDisplay.enableUpdate();
-        me.tempDisplay.enableUpdate();
-        me.timeDisplay.enableUpdate();
-
-        if(me.startupSound and me.startupSoundIsEnabled) followme.playAudio(me.startupSound, 1, me.startupSoundPath);
-
-        # var selfTestTimer = maketimer(2, func(){
-        #     me.welcomeGroup.hide();
-        # });
-        # selfTestTimer.singleShot = 1;
-        # selfTestTimer.start();
-
-        # The fog lamps and ESC have no controller in this vehicle.
-        me.foglightSign.hide();
-        me.escOffSign.hide();
         me.update();
-        me.updateTimer.start();
+        me.phaseTimer.restart(1);
     },
-    shutDown:func(){
-        me.startScreenTimer.stop();
-        if(me.updateTimer != nil) me.updateTimer.stop();
-        me.group.hide();
-        me.welcomeGroup.hide();
-        me.iconGroup.hide();
-        me.signGroup.hide();
-        me.infoImage.hide();
-        me.gaugeGroup.hide();
+    finishPhase: func() {
+        if (me.phase == "selfTest") {
+            me.phase = "driving";
+            # Keep the lamp test visible for half a second over the live gauges.
+            me.lampTestTimer.start();
+            if (me.startupSound and me.startupSoundIsEnabled)
+                followme.playAudio(me.startupSound, 1, me.startupSoundPath);
+        } elsif (me.phase == "summary") me.phase = "off";
+        me.update();
     },
-    showWarningMessage:func(msg){
-        me.warningText.enableUpdate();
-        me.warningText.updateText(msg);
+    shutDown: func() {
+        me.phaseTimer.stop();
+        me.lampTestTimer.stop();
+        me.sampleTrip();
+        me.lastTime = nil;
+        me.phase = "summary";
+        me.showingWarningMessage = 0;
+        me.update();
+        me.phaseTimer.restart(8);
+    },
+    showWarningMessage: func(msg) {
+        me.warningText.setText(msg);
         me.showingWarningMessage = 1;
     },
-    hideWarningMessage:func(){
-        me.showingWarningMessage = 0;
-    }
-
+    hideWarningMessage: func() { me.showingWarningMessage = 0; },
 };
 
 var smartInstruments = SmartInstruments.new("instrumentScreen");
-
-
-
-#props.getNode("/dev/smart/size", 1).setValue(30);
-#props.getNode("/dev/smart/x", 1).setValue(520);
-#props.getNode("/dev/smart/y", 1).setValue(220);
-
-var runtimeTextAdjust = func(text){
-    var x = props.getNode("/dev/smart/x", 1).getValue();
-    var y = props.getNode("/dev/smart/y", 1).getValue();
-    text.setTranslation(x, y);
-    var siz = props.getNode("/dev/smart/size", 1).getValue();
-    text.setFontSize(siz);
-}
-
-
 var setStartupSound_dlg = gui.Dialog.new("/sim/gui/dialogs/smartinstruments/setStartupSound_dlg/dialog","Aircraft/followme_e-tron/gui/dialogs/load-startup-sound.xml");
-
-
-
-#var window = canvas.Window.new([756,368],"dialog");
-#window.setCanvas(smartInstruments.instrumentCanvas);

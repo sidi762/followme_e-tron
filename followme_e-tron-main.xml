@@ -425,9 +425,14 @@
                 <repeatable>false</repeatable>
                 <binding>
                     <command>nasal</command>
-                    <script>smartInstruments.smartInstruments.nextCenterScreen();</script>
-                    <value type="double">1</value>
+                    <script>smartInstruments.smartInstruments.pageKey(1);</script>
                 </binding>
+                <mod-up>
+                    <binding>
+                        <command>nasal</command>
+                        <script>smartInstruments.smartInstruments.pageKey(0);</script>
+                    </binding>
+                </mod-up>
             </key>
             <key n="73">
                 <name>I</name>
