@@ -266,15 +266,5 @@
   </axis>
 </animation>
 <!-- Brake pedal -->
-<animation>
-  <type>translate</type>
-  <object-name>brake</object-name>
-  <property>sim/multiplay/generic/float[25]</property>
-  <factor> 0.03 </factor>
-  <axis>
-    <x>  -1 </x>
-    <y>  0 </y>
-    <z>  0 </z>
-  </axis>
-</animation>
+<animation include="../Instruments/brake-pedal.xml"/>
 </PropertyList>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<PropertyList>
+	<type>translate</type>
+	<object-name>brake</object-name>
+	<property>sim/multiplay/generic/float[37]</property>
+	<factor>0.03</factor>
+	<!-- Pedal travel towards the firewall and floor, in model axes. -->
+	<axis>
+		<x>-0.8</x>
+		<y>0</y>
+		<z>-0.6</z>
+	</axis>
+</PropertyList>

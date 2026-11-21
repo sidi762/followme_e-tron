@@ -131,11 +131,18 @@ var chargeBatteryStart = func {
 };
 
 # Parking Radar
-var parkingRadar = Radar.new(0.3, 0, 3.8, 3, 3);
+#//Rear: covers the 1.5 m bumper and widens to 3 m at the 3 m range
+var parkingRadar = Radar.new(height: 0.3, installCoordX: 0, installCoordY: 3.8, maxRange: 3, maxWidth: 3,
+    baseWidth: 1.5, updateInterval: 0.1);
+#//Front: shorter range, with the higher front tone recorded from an Audi A4L B8 (no long sample, so it
+#//repeats the beep when close) on its own queue so that both ends can sound together
+var frontParkingRadar = Radar.new(height: 0.3, installCoordX: 0, installCoordY: 0, maxRange: 1.2, maxWidth: 2,
+    baseWidth: 1.4, orientationMode: 180, updateInterval: 0.1, beepSound: "parking_radar_high.wav",
+    continuousSound: "parking_radar_high.wav", continuousDistance: 0.3, audioQueue: "fx_radar_front");
 var isParkingRadarActive = Variable.new("isParkingRadarActive", 0, "Indicates the status of the parking radar", 0, 1, 0, "/systems/isParkingRadarActive");
+var parkingAssist = ParkingAssist.new(parkingRadar, frontParkingRadar, isParkingRadarActive);
 var toggleParkingRadar = func(){
-    parkingRadar.toggle();
-    isParkingRadarActive.setValue(parkingRadar.isRunning);
+    parkingAssist.toggle();
 }
 
 # Safety System

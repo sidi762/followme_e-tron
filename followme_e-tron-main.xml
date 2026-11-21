@@ -88,7 +88,7 @@
     					<label>Toggle Parking Radar</label>
     					<binding>
     						<command>nasal</command>
-    						<script>followme.parkingRadar.toggle()</script>
+    						<script>followme.toggleParkingRadar()</script>
     					</binding>
     				</item>
     		        <item>
@@ -173,7 +173,8 @@
 
             <float n="18" alias="/fdm/jsbsim/animation/steering_wheel_pos"/>
             <float n="19" alias="/controls/gear/brake-parking"/>
-            <float n="25" alias="/controls/gear/brake-left"/>
+            <float n="25" alias="/systems/BrakeController/front-brake-output"/>
+            <float n="37" alias="/systems/BrakeController/pedal-position-norm"/>
             <float n="22" alias="/controls/engines/engine/throttle"/>
 
             <float n="23" alias="/fdm/jsbsim/animation/storage_cover_pos"/>

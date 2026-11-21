@@ -18,15 +18,15 @@ print("Auto speed system loaded");
 var active = 0;
 var targetSpeed = 0;
 var mode = 1;#//1:Hold 2:Auto Speed
-var leftBrakes = props.getNode("/controls/gear/brake-left",1);
-var rightBrakes = props.getNode("/controls/gear/brake-right",1);
+var brakeController = followme.brakeController;
 var throttleNode = props.getNode("/controls/engines/engine/throttle",1);
 var lastDeltaSpeed = 0;
 
 var autoSpeedMainLoop = func(){
-    if(leftBrakes.getValue() >= 0.8 or rightBrakes.getValue() >= 0.8 or throttleNode.getValue() == 1){  #//Stop if full brakes or full throttle are manually applied
+    if (brakeController.leftBrakeValue >= 0.8 or brakeController.rightBrakeValue >= 0.8 or throttleNode.getValue() == 1) {
         throttleNode.setValue(0);
         stopAutoSpeed();
+        return;
     }
     var currentSpeed = props.getNode("/", 1).getValue("sim/multiplay/generic/float[15]");
     var deltaSpeed = targetSpeed - currentSpeed;
@@ -42,8 +42,7 @@ var autoSpeedMainLoop = func(){
     }
     if(active) throttleNode.setValue(throttle);
     else throttleNode.setValue(0);
-    leftBrakes.setValue(brakes);
-    rightBrakes.setValue(brakes);
+    brakeController.setCruiseBrakes(brakes);
     lastDeltaSpeed = deltaSpeed;
 }
 
@@ -61,6 +60,7 @@ var startAutoSpeed = func(){
 var stopAutoSpeed = func(){
     active = 0;
     autoSpeedTimer.stop();
+    brakeController.setCruiseBrakes(0);
     props.getNode("/sim/messages/copilot",1).setValue("ze dong chao sue see tong yee guan bee. Auto Speeding System is off.");
     throttleNode.setValue(0);
 }
