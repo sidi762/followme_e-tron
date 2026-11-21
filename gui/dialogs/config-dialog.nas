@@ -35,7 +35,7 @@ var configDialog = {
 			["None", "Type_A", "Type_M", "Type_BT", "Concept", "Original"]);
 
 		y += 38;
-		me._button(0, y, half, "Toggle Parking Radar", func followme.parkingRadar.toggle());
+		me._button(0, y, half, "Toggle Parking Radar", func followme.toggleParkingRadar());
 		me._button(right, y, half, "Initialize Safety", func followme.safety.init());
 		me._button(0, y + 29, half, "Disable Safety", func followme.safety.stop());
 		me._button(right, y + 29, half, "Toggle AEB", func followme.safety.toggleAEB());

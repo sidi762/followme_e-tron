@@ -25,8 +25,11 @@ var SettingsDialog = {
 	},
 
 	_openCanvas: func {
-		var desktopW = getprop("/sim/gui/canvas/size[0]");
-		var desktopH = getprop("/sim/gui/canvas/size[1]");
+		# FlightGear next moved the Canvas desktop to /canvas/desktop; 2024.1 uses /sim/gui/canvas.
+		var desktopW = getprop("/canvas/desktop/size[0]");
+		var desktopH = getprop("/canvas/desktop/size[1]");
+		if (desktopW == nil) desktopW = getprop("/sim/gui/canvas/size[0]");
+		if (desktopH == nil) desktopH = getprop("/sim/gui/canvas/size[1]");
 		var w = math.min(380, desktopW - 16);
 		me._width = w - 32;
 		me._items = [];

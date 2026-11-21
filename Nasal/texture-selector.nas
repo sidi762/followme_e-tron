@@ -244,8 +244,11 @@ var TextureSelectorDialog = {
         }
         var selector = me._parentSelector;
         selector.updateList();
-        var dw = getprop("/sim/gui/canvas/size[0]");
-        var dh = getprop("/sim/gui/canvas/size[1]");
+        # FlightGear next moved the Canvas desktop to /canvas/desktop; 2024.1 uses /sim/gui/canvas.
+        var dw = getprop("/canvas/desktop/size[0]");
+        var dh = getprop("/canvas/desktop/size[1]");
+        if (dw == nil) dw = getprop("/sim/gui/canvas/size[0]");
+        if (dh == nil) dh = getprop("/sim/gui/canvas/size[1]");
         var footerHeight = 44;
         var listH = math.max(1, size(selector.items)) * me._rowHeight;
         var w = math.min(me._preferredWidth, dw - 16);
