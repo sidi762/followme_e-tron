@@ -1,6 +1,8 @@
 # Run in an isolated FlightGear session with
 # --prop:/nasal/paneltest/file=Aircraft/followme_e-tron/dev/instruments/restart.nas
 var panel = nil;
+var journeyStartKm = nil;
+var journeyStartKWh = nil;
 var ignition = func { engine.toggleEngine(engine.engine_1); };
 
 var checkPage = func(name) {
@@ -57,6 +59,8 @@ var steps = [
         checkLiveScreenWithTestLamps();
         ignition();
         checkPage("summary");
+        journeyStartKm = panel.km;
+        journeyStartKWh = panel.kWh;
         ignition();
     }],
     [0.65, func { checkPage("selfTest"); checkLamps(); }],
@@ -109,7 +113,8 @@ var more = [
     }],
     [45, func {
         setprop("/controls/engines/engine/throttle", 0);
-        if (panel.km < 1 or panel.kWh <= 0 or panel.rangeKm.getText() == "--") die("missing trip measurements");
+        if (panel.km - journeyStartKm < 1 or panel.kWh <= journeyStartKWh or panel.rangeKm.getText() == "--")
+            die("missing trip measurements");
         panel.nextCenterScreen();
         checkPage("total");
         panel.pageKey(1);
@@ -120,7 +125,8 @@ var more = [
         if (panel.consumption("total") != nil or panel.consumption("sinceStart") == nil) die("counter reset leaked");
         ignition();
         checkPage("summary");
-        if (panel.summaryRows[0].getText() != sprintf("%.1f km",panel.km)) die("incorrect trip distance");
+        if (panel.summaryRows[0].getText() != sprintf("%.1f km", panel.km - journeyStartKm))
+            die("incorrect trip distance");
     }],
     [1.5, func {
         followme.cSource.setRemainingFraction(0.46);
@@ -140,7 +146,7 @@ var more = [
     [2, func {
         checkPage("total");
         checkLamps({ready_sign:1});
-        if (panel.counters.sinceStart.km < 1 or panel.counters.sinceStart.km != panel.counters.journey.km)
+        if (panel.counters.sinceStart.km < journeyStartKm + 1 or panel.counters.sinceStart.km != panel.counters.journey.km)
             die("stale trip on restart");
     }],
 ];

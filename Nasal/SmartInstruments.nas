@@ -14,6 +14,8 @@
 #// You should have received a copy of the GNU General Public License
 #// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+io.include("systems/trip-computer.nas");
+
 var artDir = "Aircraft/followme_e-tron/Models/Interior/Instruments/Smart/";
 var menu = ["assist", "tyres", "flow", "compass", "range", "total", "sinceStart", "trip1", "trip2", "media", "navigation"];
 var art = {
@@ -21,6 +23,10 @@ var art = {
     range: "2.1", total: "2.2", sinceStart: "2.3", trip1: "2.4", trip2: "2.5",
     media: "3", navigation: "4", aeb: "_AEB", charge: "_charge",
     standby: "_start", selfTest: "_self_test", summary: "_summary",
+};
+
+var formatConsumption = func(kWhPer100Km) {
+	return (kWhPer100Km == nil ? "--" : sprintf("%.1f", kWhPer100Km)) ~ " kWh/100km";
 };
 
 var panelText = func(group, x, y, height, align="center-center", font="ExoRegular-ymMe.ttf") {
@@ -32,6 +38,7 @@ var panelImage = func(group, file) {
 };
 
 var SmartInstruments = {
+	parents: [TripComputer],
     new: func(placement) {
         var m = {parents: [SmartInstruments]};
         m.instrumentCanvas = canvas.new({name: "smartInstruments", size: [8192, 4096], view: [1509, 736], mipmapping: 0});
@@ -103,11 +110,8 @@ var SmartInstruments = {
         m.assistState = panelText(m.details.assist, 754, 340, 36);
         m.radarState = panelText(m.details.radar, 754, 483, 25);
 
-        m.km = 0;
-        m.kWh = 0;
-        m.seconds = 0;
-        m.counters = {};
-        foreach (var name; ["total","sinceStart","trip1","trip2","journey"]) m.resetCounter(name);
+        m.initHistory();
+		setlistener("/sim/signals/save", func { m.saveHistory(); });
         m.infoImageIndex = vecindex(menu,"range");
         m.phase = "standby";
         m.displayPage = nil;
@@ -124,7 +128,7 @@ var SmartInstruments = {
         return m;
     },
     startupSoundIsEnabled: 0, startupSound: nil, showingWarningMessage: 0,
-    lastTime: nil, lastKW: 0, lastSpeed: 0, keyDown: nil,
+    keyDown: nil,
     enableStartupSound: func(){
         me.startupSoundIsEnabled = 1;
     },
@@ -136,32 +140,15 @@ var SmartInstruments = {
         me.startupSound = io.basename(startupSoundPath);
     },
 
-    # All four counters share one integration of ground speed and HV pack power.
-    # The journey summary keeps its ignition baseline even if a driver resets a counter.
-    resetCounter: func(name) {
-        me.counters[name] = {km: me.km, kWh: me.kWh, seconds: me.seconds};
-    },
-    sampleTrip: func() {
-        var now = getprop("/fdm/jsbsim/simulation/sim-time-sec");
-        if (now == nil) return;
-        if (me.lastTime != nil) {
-            var dt = math.max(0, now-me.lastTime);
-            me.km += me.lastSpeed * dt / 3600;
-            me.kWh += me.lastKW * dt / 3600;
-            me.seconds += dt;
-        }
-        me.lastTime = nil;
-        if (engine.engine_1.isRunning()) {
-            me.lastTime = now;
-            me.lastSpeed = math.abs(me.information.getSpeedKMH());
-            me.lastKW = followme.circuit_1.current * followme.cSource.electromotiveForce / 1000;
-        }
-    },
-    consumption: func(name) {
-        var c = me.counters[name];
-        var km = me.km - c.km;
-        return km >= 0.1 ? 100 * (me.kWh - c.kWh) / km : nil;
-    },
+	# The live update and the pre-save signal use the same sampling window.
+	sampleActiveTrip: func() {
+		if (me.phase == "driving" or me.phase == "selfTest") me.sampleTrip();
+	},
+	saveHistory: func() {
+		me.sampleActiveTrip();
+		me.writeHistory();
+	},
+
     cyclePage: func(delta) {
         if (me.displayPage == menu[me.infoImageIndex]) {
             me.infoImageIndex = math.mod(me.infoImageIndex + delta + size(menu), size(menu));
@@ -212,7 +199,7 @@ var SmartInstruments = {
         foreach (var name; keys(me.details)) me.details[name].setVisible(name == detail);
     },
     update: func() {
-        if (me.phase == "driving" or me.phase == "selfTest") me.sampleTrip();
+        me.sampleActiveTrip();
         var page = me.selectPage();
         me.showPage(page);
         if (me.phase == "driving" and page != "off") {
@@ -232,25 +219,22 @@ var SmartInstruments = {
             var minutes = math.ceil((pack.electricalCapacity - pack.remaining) / followme.chargerPowerKW / 60);
             me.chargeStatus.setText(sprintf("%s   ·   %d min", pack.getRemainingPercentage(), minutes));
         } elsif (page == "summary") {
-            var c = me.counters.journey;
-            var km = me.km-c.km;
-            var seconds = me.seconds-c.seconds;
-            var avg = me.consumption("journey");
-            me.summaryRows[0].setText(sprintf("%.1f km", km));
-            me.summaryRows[1].setText(sprintf("%d:%02d:%02d", int(seconds/3600),
-                                               math.mod(int(seconds/60), 60), math.mod(int(seconds), 60)));
-            me.summaryRows[2].setText(sprintf("%.1f km/h", seconds > 0 ? 3600*km/seconds : 0));
-            me.summaryRows[3].setText((avg == nil ? "--" : sprintf("%.1f", avg)) ~ " kWh/100km");
+			var distanceKm = me.counterDistanceKm("journey");
+			var durationSec = me.seconds - me.counters.journey.seconds;
+			var averageSpeedKmh = durationSec > 0 ? 3600 * distanceKm / durationSec : 0;
+			me.summaryRows[0].setText(sprintf("%.1f km", distanceKm));
+			me.summaryRows[1].setText(sprintf("%d:%02d:%02d", int(durationSec / 3600),
+			                                  math.mod(int(durationSec / 60), 60), math.mod(int(durationSec), 60)));
+			me.summaryRows[2].setText(sprintf("%.1f km/h", averageSpeedKmh));
+			me.summaryRows[3].setText(formatConsumption(me.consumption("journey")));
         } elsif (page == "range") {
-            # The first acceleration from a standstill is a poor range sample.
-            var estimate = "--";
-            if (me.km >= 1 and me.kWh > 0)
-                estimate = sprintf("%.0f", followme.cSource.getRemainingInkWh() * me.km / me.kWh);
-            me.rangeKm.setText(estimate);
-            me.rangePercent.setText(sprintf("%.0f", followme.cSource.getRemainingPercentageFloat()));
+			var pack = followme.cSource;
+			var estimateKm = me.estimatedRangeKm(pack.getRemainingInkWh());
+			me.rangeKm.setText(estimateKm == nil ? "--" : sprintf("%.0f", estimateKm));
+			me.rangePercent.setText(sprintf("%.0f", pack.getRemainingPercentageFloat()));
         } elsif (contains(me.counters, page)) {
             var avg = me.consumption(page);
-            me.consumptionValue.setText((avg == nil ? "--" : sprintf("%.1f", avg)) ~ " kWh/100km");
+			me.consumptionValue.setText(formatConsumption(avg));
             me.consumptionPointer.setVisible(avg != nil);
             me.barFill.setVisible(avg != nil and avg > 0);
             if (avg != nil) {
@@ -320,7 +304,7 @@ var SmartInstruments = {
         if(minute < 10) minute = "0"~minute;
         me.timeDisplay.setText(hour~":"~minute);
 
-        me.tripDisplay.setText(sprintf("TRIP 1   %.1f km", me.km-me.counters.trip1.km));
+        me.tripDisplay.setText(sprintf("TRIP 1   %.1f km", me.counterDistanceKm("trip1")));
         me.distanceDisplay.setText(sprintf("TOTAL   %.1f km", me.km));
     },
     updateLamps: func() {
@@ -353,9 +337,7 @@ var SmartInstruments = {
     startUp: func() {
         me.phaseTimer.stop();
         me.lampTestTimer.stop();
-        me.resetCounter("sinceStart");
-        me.resetCounter("journey");
-        me.lastTime = nil;
+        me.resetIgnitionCounters();
         me.phase = "selfTest";
         me.selfTest();
         me.update();
@@ -375,7 +357,7 @@ var SmartInstruments = {
         me.phaseTimer.stop();
         me.lampTestTimer.stop();
         me.sampleTrip();
-        me.lastTime = nil;
+        me.lastSampleTime = nil;
         me.phase = "summary";
         me.showingWarningMessage = 0;
         me.update();

@@ -11,13 +11,19 @@ var circuit_low = Circuit.new(cSource_small);#//Low voltage circuit
 
 io.include("power-supply.nas");
 
+# Restore the pack first. A stored zero is an empty pack; a missing value keeps the factory charge.
 var energyKWh = vInfo.electrical.getNode("battery-kWh", 1);
+var storedKWh = num(energyKWh.getValue());
+if (storedKWh != nil) cSource.setRemainingKWh(storedKWh);
+
+# Publish the initial charge and every later change through the same callback.
 cSource.onEnergyChanged = func {
-    energyKWh.setDoubleValue(me.getRemainingInkWh());
-    vInfo.electrical.batteryRemainingPercent.setValue(me.getRemainingPercentage());
-    vInfo.electrical.batteryRemainingPercentFloat.setDoubleValue(me.getRemainingPercentageFloat());
+	energyKWh.setDoubleValue(me.getRemainingInkWh());
+	vInfo.electrical.batteryRemainingPercent.setValue(me.getRemainingPercentage());
+	vInfo.electrical.batteryRemainingPercentFloat.setDoubleValue(me.getRemainingPercentageFloat());
 };
 cSource.onEnergyChanged();
+aircraft.data.add(energyKWh);
 
 # The scheduler may deliver fewer than ten callbacks per simulated second.
 # Rebase on pause/resume: an FDM-only freeze can leave the clock running.
