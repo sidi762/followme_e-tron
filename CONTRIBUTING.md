@@ -2,6 +2,10 @@
 
 These examples will show the Guidelines for contributing. Please follow this at all times, or your contribution will not be merged.
 
+## Simulator tests
+
+Use FlightGear 2024.1.8 for simulator tests. On a Mac with the M4 build, the executable is `~/Applications/FlightGear-2024.1.8-M4.app/Contents/MacOS/FlightGear`. On Linux, point the headless runner's `FGFS` variable at the 2024.1.8 executable.
+
 ## Basic Guidelines:
 - Use Tabs to indent code, DO NOT USE SPACE.
 - Use lowerCamelCase or underscores for naming Nasal variables/functions (someFunction, some_function).
