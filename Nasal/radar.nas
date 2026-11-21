@@ -109,7 +109,7 @@ var Radar = {
     new: func(height, installCoordX, installCoordY, maxRange, maxWidth, orientationMode=0, warnEnabled=1,
         updateInterval=0.25, debug=0, baseWidth=0, lateralSamples=2,
         beepSound="parking_radar.wav", continuousSound="parking_radar_long.wav", continuousDistance=0.5,
-        audioQueue="fx_radar") {
+        audioQueue="fx_radar", reportSectors=0) {
         return {
             parents:[Radar, Appliance.new()],
             height: height, installCoordX:installCoordX, installCoordY:installCoordY,
@@ -119,6 +119,8 @@ var Radar = {
             beepSound:beepSound, continuousSound:continuousSound, continuousDistance:continuousDistance,
             audioQueue:audioQueue, warningSound:beepSound,
             radarOutput:10000, scanCount:0,
+            # Left, centre and right looking out from the sensor. Nil entries mean no echo.
+            sectorRanges: reportSectors ? [nil, nil, nil] : nil,
             #//Each radar keeps its own list, so stopping one radar leaves the others' alone
             multiplayerManager: MultiplayerCoordManager.new(),
         };
@@ -204,6 +206,7 @@ var Radar = {
             print("Parking radar stopped!");
         }
         me.radarOutput = 10000;
+        if (me.sectorRanges != nil) me.sectorRanges = [nil, nil, nil];
         if(me.warningTimer != nil) me.warningTimer.stop();
         if(me.radarTimer != nil) me.radarTimer.stop();
         me.multiplayerManager.stop();
@@ -262,7 +265,7 @@ var Radar = {
             geo.normdeg180(frame.lon + distance * frame.sinB * frame.lonPerM));
     },
     #//Nearest AI or multiplayer model in the sector: its distance along the scan direction, or nil
-    nearestModel: func(frame){
+    nearestModel: func(frame, sectors=nil){
         var nearest = nil;
         var myElev = me.calculateVehicleElevation();
         var reach = me.maxRange + me.targetHalfLength + me.targetHalfWidth + me.halfWidthAt(me.maxRange);
@@ -299,13 +302,25 @@ var Radar = {
                     var s = across + x * sinA + y * cosA;
                     if (f < -0.3 or f > me.maxRange) continue;
                     if (f < 0) f = 0; #//Already touching the bumper
-                    if (math.abs(s) > me.halfWidthAt(f)) continue;
+                    var halfWidth = me.halfWidthAt(f);
+                    if (math.abs(s) > halfWidth) continue;
                     if (nearest == nil or f < nearest) nearest = f;
+                    if (sectors != nil) {
+                        var sector = me.sectorIndex(s, halfWidth);
+                        if (sectors[sector] == nil or f < sectors[sector]) sectors[sector] = f;
+                    }
                 }
             }
         }
         return nearest;
     },
+	# Split each cross-section of the beam into equal thirds. A wide obstacle can
+	# cover multiple sectors; a second obstacle may be farther away in a different one.
+	sectorIndex: func(offset, halfWidth) {
+		if (offset < -halfWidth / 3) return 0;
+		if (offset > halfWidth / 3) return 2;
+		return 1;
+	},
     #//Distance to the nearest obstacle along the scan direction, or nil when clear
     scan: func(){
         var bearing = geo.normdeg(me.vehicleHeading + 180) * D2R;
@@ -318,7 +333,8 @@ var Radar = {
             latPerM: me.calculateLatChange(1),
             lonPerM: me.calculateLonChange(1, me.coord),
         };
-        var nearest = me.nearestModel(frame);
+        var sectors = me.sectorRanges == nil ? nil : [nil, nil, nil];
+        var nearest = me.nearestModel(frame, sectors);
 
         #//Terrain is an obstacle once it rises more than the sensor height above the ground the
         #//vehicle stands on, extended along its slope so that ramps don't count. The slope is
@@ -330,7 +346,7 @@ var Radar = {
 
         var searchDis = 0.01;#Meters
         var searchStep = 0;#Meters
-        while(searchDis <= me.maxRange and (nearest == nil or searchDis < nearest)){
+        while(searchDis <= me.maxRange and (sectors != nil or nearest == nil or searchDis < nearest)){
             var limit = ground + me.height + searchDis * slope;
             var halfWidth = me.halfWidthAt(searchDis);
             for(var j = 0; j <= me.lateralSamples; j += 1){
@@ -340,18 +356,27 @@ var Radar = {
                     offsets = [-side, side];
                 }
                 foreach(var offset; offsets){
+                    if (sectors != nil) {
+                        var sector = me.sectorIndex(offset, halfWidth);
+                        if (sectors[sector] != nil and sectors[sector] <= searchDis) continue;
+                    }
                     var north = searchDis * frame.cosB - offset * frame.sinB;
                     var east = searchDis * frame.sinB + offset * frame.cosB;
                     var lat = frame.lat + north * frame.latPerM;
                     var lon = geo.normdeg180(frame.lon + east * frame.lonPerM);
                     if(me.debug) geo.put_model(getprop("sim/aircraft-dir")~"/Nasal/waypoint.ac", lat, lon, me.coord.alt());
                     var targetElev = geo.elevation(lat, lon);
-                    if(targetElev != nil and targetElev > limit) return searchDis;
+                    if(targetElev != nil and targetElev > limit) {
+                        if (sectors == nil) return searchDis;
+                        sectors[sector] = searchDis;
+                        if (nearest == nil or searchDis < nearest) nearest = searchDis;
+                    }
                 }
             }
             searchStep += 0.1;
             searchDis += searchStep;
         }
+        me.sectorRanges = sectors;
         return nearest;
     },
     update: func(){

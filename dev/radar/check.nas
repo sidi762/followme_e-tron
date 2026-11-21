@@ -68,6 +68,25 @@ var stopped = func(assist) {
     return !assist.isRunning and !assist.rear.isRunning and !assist.front.isRunning and !getprop("/systems/isParkingRadarActive");
 };
 
+# Check the actual Canvas paths by vehicle side, independently of sensor orientation.
+var checkDisplay = func(frontText, rearText, lit) {
+	var panel = smartInstruments.smartInstruments;
+	check("display: radar page", panel.displayPage == "radar" and panel.details.radar.getVisible());
+	check("display: front distance", panel.frontRadarDisplay.distanceText.getText() == frontText,
+	      panel.frontRadarDisplay.distanceText.getText());
+	check("display: rear distance", panel.rearRadarDisplay.distanceText.getText() == rearText,
+	      panel.rearRadarDisplay.distanceText.getText());
+	var visible = [];
+	foreach (var bumper; ["front", "rear"])
+		foreach (var side; ["left", "center", "right"])
+			foreach (var band; ["near", "mid", "far"]) {
+				var id = bumper ~ "-" ~ side ~ "-" ~ band;
+				var arc = panel.details.radar.getElementById(id);
+				if (arc.getVisible() and arc.get("fill") != nil) append(visible, id);
+			}
+	check("display: illuminated sectors", string.join(" ", visible) == lit, string.join(" ", visible));
+};
+
 # Rear bumper 3.8 m behind the front one, target half length 2.3 m, half width 0.95 m
 var steps = [
     [5, func {
@@ -170,8 +189,49 @@ var steps = [
     [8, func {
         var assist = followme.parkingAssist;
         check("drive system is ready after starting", powerState() == "ready", powerState());
+        smartInstruments.smartInstruments.previousCenterScreen();
         reverse(1);
         check("assist: reverse turns front and rear on, with the cockpit lamp", running(assist));
+        checkDisplay("--", "--", "");
+        smartInstruments.smartInstruments.nextCenterScreen();
+        place(targets[0], -(2.3 + 0.2), -1.55);
+        place(targets[1], 3.8 + 2.3 + 1.3, 1.55);
+        targets[1].setBoolValue("valid", 1);
+        setprop("/ai/models/model-added", targets[1].getPath());
+    }],
+    [1.4, func {
+        checkDisplay("0.2 m", "1.3 m", "front-left-near rear-right-mid");
+        place(targets[0], -(2.3 + 1.0), 1.55);
+        place(targets[1], 3.8 + 2.3 + 0.3, 0);
+    }],
+    [1.4, func {
+        checkDisplay("1.0 m", "0.3 m", "front-right-far rear-left-near rear-center-near rear-right-near");
+        # Two echoes at one bumper must survive, even when the closer one occupies only one side.
+        place(targets[1], -(2.3 + 0.5), -1.55);
+    }],
+    [1.4, func {
+        checkDisplay("0.5 m", "--", "front-left-mid front-right-far");
+        park(targets[0]);
+        place(targets[1], -2.25, 0);
+    }],
+    [1.4, func {
+        checkDisplay("0.0 m", "--", "front-left-near front-center-near front-right-near");
+        park(targets[1]);
+    }],
+    [1.4, func {
+        checkDisplay("--", "--", "");
+        var panel = smartInstruments.smartInstruments;
+        followme.frontleft_door.setpos(1);
+        panel.update();
+        check("display: open door overrides the radar", panel.displayPage == "doors");
+        followme.frontleft_door.setpos(0);
+        panel.update();
+        check("display: radar resumes when the door closes", panel.displayPage == "radar");
+        followme.safety.aebActive();
+        check("display: AEB overrides the radar", panel.displayPage == "aeb");
+        followme.safety.aebStop();
+        check("display: radar resumes after AEB", panel.displayPage == "radar");
+        var assist = followme.parkingAssist;
         reverse(0);
         assist.watchSpeed();
         check("assist: stays on when pulling forwards slowly", running(assist));
@@ -179,17 +239,22 @@ var steps = [
         assist.watchSpeed();
         delete(assist, "speedKMH");
         check("assist: goes off above 15 km/h forwards", stopped(assist));
+        check("display: returns to selected compass page", panel.displayPage == "compass");
         followme.toggleParkingRadar();
         check("assist: the switch turns it back on", running(assist));
+        checkDisplay("--", "--", "");
         engine.toggleEngine(engine.engine_1);
         check("assist: shutting the drive system down turns it off", stopped(assist), powerState());
+        check("display: shutdown takes down the radar page", panel.displayPage == "summary");
         reverse(1);
         engine.toggleEngine(engine.engine_1);
     }],
     [8, func {
         var assist = followme.parkingAssist;
         check("assist: powering up in reverse turns it on", running(assist), powerState());
+        checkDisplay("--", "--", "");
         assist.stop();
+        check("display: previous page survives restart", smartInstruments.smartInstruments.displayPage == "compass");
         reverse(0);
         engine.toggleEngine(engine.engine_1);
     }],

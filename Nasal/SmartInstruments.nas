@@ -37,6 +37,39 @@ var panelImage = func(group, file) {
     return group.createChild("image").setFile(artDir ~ file).setSize(1509, 736);
 };
 
+var RadarBumperDisplay = {
+	new: func(group, drawing, sensor, end, sides, textX) {
+		var m = {parents: [RadarBumperDisplay], sensor: sensor, sectors: []};
+		m.distanceText = panelText(group, textX, 294, 30, "left-center");
+		foreach (var side; sides) {
+			var bands = [];
+			foreach (var level; ["near", "mid", "far"])
+				append(bands, drawing.getElementById(end ~ "-" ~ side ~ "-" ~ level));
+			append(m.sectors, bands);
+		}
+		return m;
+	},
+	bandForDistance: func(distance) {
+		var radar = me.sensor;
+		if (!radar.isRunning or distance == nil or distance > radar.maxRange) return -1;
+		# The red band starts at the same distance as the continuous parking tone.
+		if (distance <= radar.continuousDistance) return 0;
+		if (distance <= (radar.continuousDistance + radar.maxRange) / 2) return 1;
+		return 2;
+	},
+	update: func() {
+		var radar = me.sensor;
+		var nearestBand = me.bandForDistance(radar.radarOutput);
+		me.distanceText.setText(nearestBand < 0 ? "--" : sprintf("%.1f m", radar.radarOutput));
+		me.distanceText.set("fill", nearestBand < 0 ? "#93a8bf" : me.sectors[1][nearestBand].get("fill"));
+		forindex (var side; me.sectors) {
+			var level = me.bandForDistance(radar.sectorRanges[side]);
+			forindex (var band; me.sectors[side])
+				me.sectors[side][band].setVisible(band == level);
+		}
+	},
+};
+
 var SmartInstruments = {
 	parents: [TripComputer],
     new: func(placement) {
@@ -108,7 +141,14 @@ var SmartInstruments = {
             append(m.cardinals, label);
         }
         m.assistState = panelText(m.details.assist, 754, 340, 36);
-        m.radarState = panelText(m.details.radar, 754, 483, 25);
+		var radarDrawing = m.details.radar.createChild("group");
+		canvas.parsesvg(radarDrawing, artDir ~ "parking-radar.svg");
+		var assist = followme.parkingAssist;
+		m.frontRadarDisplay = RadarBumperDisplay.new(m.details.radar, radarDrawing, assist.front,
+		                                             "front", ["left", "center", "right"], 652);
+		# Sensor-left at the rear bumper is vehicle-right on the top-down diagram.
+		m.rearRadarDisplay = RadarBumperDisplay.new(m.details.radar, radarDrawing, assist.rear,
+		                                            "rear", ["right", "center", "left"], 858);
 
         m.initHistory();
 		setlistener("/sim/signals/save", func { m.saveHistory(); });
@@ -122,6 +162,7 @@ var SmartInstruments = {
         m.updateTimer = maketimer(0.1, func m.update());
         m.update();
         m.updateTimer.start();
+		setlistener("/systems/isParkingRadarActive", func { m.update(); }, 0, 0);
         # A pedal press acknowledges only the current intervention's dashboard prompt.
         setlistener(m.information.systems.safety.aebActivated, func(n) {
             m.showAebPrompt = n.getBoolValue() and !followme.brakeController.applyingFeetBrake;
@@ -188,6 +229,7 @@ var SmartInstruments = {
         if (me.phase == "driving" and me.showAebPrompt) return "aeb";
         if (me.information.electrical.isRecharging.getBoolValue()) return "charge";
         foreach (var door; me.doors) if (door.getpos() > 0) return "doors";
+        if (followme.parkingAssist.isRunning) return "radar";
         return me.phase == "driving" ? menu[me.infoImageIndex] : me.phase;
     },
     showPage: func(page) {
@@ -268,10 +310,8 @@ var SmartInstruments = {
             var label = autopilot.road_check_timer.isRunning ? "AUTO" : (autospeed.active ? "CRUISE" : "STANDBY");
             me.assistState.setText(label ~ (speed == "" ? "" : "   " ~ speed));
         } elsif (page == "radar") {
-            var assist = followme.parkingAssist;
-            var label = "OFF";
-            if (assist.isRunning) label = assist.hasObstacle() ? "OBSTACLE" : "ON";
-            me.radarState.setText(label);
+			me.frontRadarDisplay.update();
+			me.rearRadarDisplay.update();
         }
     },
     updateGauges: func() {
