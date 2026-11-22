@@ -84,7 +84,15 @@ var steps = [
         checkLamps({ready_sign: 1, positionlight_sign: 1, headlight_sign: 1});
         setprop("/controls/lighting/headlight", 0);
     }],
-    [0.5, func { checkLamps({ready_sign: 1}); }],
+	[0.5, func {
+		checkLamps({ready_sign: 1});
+		followme.toggleHandBrake();
+	}],
+	[0.8, func {
+		checkLamps({ready_sign: 1, handbrake_sign: 1});
+		followme.toggleHandBrake();
+	}],
+	[0.8, func { checkLamps({ready_sign: 1}); }],
 ];
 
 # Visit every normal page through the driver controls, including wraparound.
@@ -166,6 +174,8 @@ var more = [
         setprop("/controls/engines/engine/throttle", 0.65);
     }],
     [8, func {
+		if (panel.information.getSpeedKMH() <= 0.5 or panel.readySign.getVisible())
+			die("READY should go out when driving");
         if (panel.km < 1 and panel.rangeKm.getText() != "--") die("premature range estimate");
         setprop("/controls/engines/engine/throttle", 0.08);
     }],
@@ -173,13 +183,17 @@ var more = [
         setprop("/controls/engines/engine/throttle", 0);
         if (panel.km - journeyStartKm < 1 or panel.kWh <= journeyStartKWh or panel.rangeKm.getText() == "--")
             die("missing trip measurements");
+		followme.brakeController.keyboardBrake();
         panel.nextCenterScreen();
         checkPage("total");
         panel.pageKey(1);
     }],
-    [1.5, func {
+	[6, func {
         panel.pageKey(0);
         checkPage("total");
+		if (panel.information.getSpeedKMH() > 0.5 or !panel.readySign.getVisible())
+			die("READY should light again at a stop");
+		followme.brakeController.keyboardBrakeRelease();
         if (panel.consumption("total") != nil or panel.consumption("sinceStart") == nil) die("counter reset leaked");
         ignition();
         checkPage("summary");

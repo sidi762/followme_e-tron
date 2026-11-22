@@ -368,7 +368,8 @@ var SmartInstruments = {
         me.positionLightSign.setVisible(lightMode == 1 or lightMode == 2);
         me.headlightSign.setVisible(lightMode == 2);
         me.highbeamSign.setVisible(me.information.lighting.highBeam.getBoolValue());
-        me.readySign.setVisible(engine.engine_1.isRunning());
+		# Allow for the small groundspeed fluctuations at a standstill.
+		me.readySign.setVisible(engine.engine_1.isRunning() and math.abs(me.information.getSpeedKMH()) <= 0.5);
         me.autopilotSign.setVisible(autopilot.road_check_timer.isRunning);
         me.cruiseSign.setVisible(autospeed.active);
     },

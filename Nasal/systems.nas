@@ -86,6 +86,11 @@ var indicatorController = IndicatorController.new();
 io.include("systems/brakes.nas");
 var brakeController = BrakeController.new();
 
+# All cockpit parking brake picks use this entry point.
+var toggleHandBrake = func {
+	brakeController.toggleHandBrake();
+};
+
 # External service-truck charger, kW delivered to the pack.
 var chargerPowerKW = 240;
 var chargeBatteryStop = func {
