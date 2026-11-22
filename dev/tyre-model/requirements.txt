@@ -1,2 +1,5 @@
 jsbsim>=1.2
 pytest
+# only for the TC/ESC manual: manual_figures.py and manual_pdf.py
+matplotlib
+markdown
