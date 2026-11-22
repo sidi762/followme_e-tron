@@ -29,4 +29,12 @@
 		</generic>
 	</multiplay>
 </sim>
+<systems>
+	<!-- Read by the FDM on every frame (Systems/tyre-model.xml). The co-driver
+	     sits on the rear right seat and counts while "Enable co-driver model" is ticked. -->
+	<occupants>
+		<driver-kg type="double">60</driver-kg>
+		<codriver-kg type="double">60</codriver-kg>
+	</occupants>
+</systems>
 </PropertyList>

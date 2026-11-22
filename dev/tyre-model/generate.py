@@ -23,6 +23,7 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import mass
 from jsbexpr import INDENT, fcs_function, names
 
 REPO = Path(__file__).resolve().parents[2]
@@ -72,7 +73,7 @@ DRIVELINE_PARAMS = [
     ("coast_regen_nm", 24.0, "motor braking torque with the pedal released (matches the standard FDM's coast-down)"),
     ("coast_regen_fade_rad_sec", 100.0, "coast regen fades out below this motor speed"),
     ("brake_front_nm", 2300.0, "brake torque per front wheel at full pedal"),
-    ("brake_rear_nm", 580.0, "brake torque per rear wheel at full pedal"),
+    ("brake_rear_nm", None, "brake torque per rear wheel at full pedal; follows the CG, see rear_brake_nm() in generate.py"),
     ("park_lock_nm", 1000.0, "holding torque per wheel while the motor is switched off"),
 ]
 
@@ -81,6 +82,25 @@ DRIVELINE_INPUTS = [
     ("throttle_norm", 0.0, "accelerator pedal, 0 to 1"),
     ("direction", 1.0, "1 = forward, -1 = reverse"),
     ("motor_on", 1.0, "0 switches the motor off: no drive, no coast regen, park lock on"),
+]
+
+# The rear brakes are sized so that on equal grip the front axle reaches its
+# limit first at any deceleration up to this one, a little above the dry peak.
+BRAKE_BALANCE_G = 1.15
+
+# Occupant weights live outside the FDM, which FlightGear resets on every
+# reposition. The tyre variant's -set.xml gives them their defaults.
+OCCUPANT_INPUTS = {
+    "driver_kg": "/systems/occupants/driver-kg",
+    "codriver_kg": "/systems/occupants/codriver-kg",
+    "codriver_enable": "/systems/codriver-enable",
+}
+
+# Evaluated first on every frame; JSBSim applies the point masses in the same frame.
+OCCUPANT_EQS = [
+    ("driver_lbs", "max(0.0, driver_kg) * 2.2046226", ["inertia/pointmass-weight-lbs[0]"]),
+    ("codriver_lbs", "codriver_enable * max(0.0, codriver_kg) * 2.2046226",
+     ["inertia/pointmass-weight-lbs[1]"]),
 ]
 
 # --------------------------------------------------------------------------
@@ -96,6 +116,10 @@ EXTERNAL = {
     "p": "velocities/p-rad_sec",
     "q": "velocities/q-rad_sec",
     "r": "velocities/r-rad_sec",
+    # The occupants move the CG, so the wheel positions are taken from it live
+    "cg_x_in": "inertia/cg-x-in",
+    "cg_y_in": "inertia/cg-y-in",
+    "cg_z_in": "inertia/cg-z-in",
     # In this FDM the LEFT brake group is the front axle and RIGHT the rear
     "brake_front": "fcs/left-brake-cmd-norm",
     "brake_rear": "fcs/right-brake-cmd-norm",
@@ -128,10 +152,13 @@ DRIVELINE_EQS = [
 WHEEL_EQS = [
     # Load on the wheel, from the state of JSBSim's own strut (one frame old).
     ("load_n", "max(0.0, {spring} * comp_ft + {damping} * comp_vel_fps) * 4.4482216"),
-    ("cg_height_m", "{cg_height} - comp_ft * 0.3048"),
+    # Contact point relative to the CG: forward, right and below it.
+    ("x_body_m", "cg_x_in * 0.0254 - {x_struct}"),
+    ("y_body_m", "{y_struct} - cg_y_in * 0.0254"),
+    ("cg_height_m", "cg_z_in * 0.0254 - {z_struct} - comp_ft * 0.3048"),
     # Velocity of the contact patch: body axes, then the wheel's own axes.
-    ("vx_mps", "u_mps + q * cg_height_m - r * {y_body}"),
-    ("vy_mps", "v_mps + r * {x_body} - p * cg_height_m"),
+    ("vx_mps", "u_mps + q * cg_height_m - r * y_body_m"),
+    ("vy_mps", "v_mps + r * x_body_m - p * cg_height_m"),
     ("steer_rad", "{steer}"),
     ("vx_wheel_mps", "vx_mps * cos(steer_rad) + vy_mps * sin(steer_rad)"),
     ("vy_wheel_mps", "vy_mps * cos(steer_rad) - vx_mps * sin(steer_rad)"),
@@ -247,11 +274,13 @@ def _location(element, **attrs):
 
 
 def read_vehicle(stock_text):
-    """Pull what the model needs to know about the car out of the standard FDM."""
+    """The wheels of the standard FDM and the tyre variant's mass with its default driver.
+
+    Returns (cg, mass_kg, wheels). The CG is for the car with the default
+    driver aboard; the FDM itself follows the occupants' weights while running.
+    """
     root = ET.fromstring(stock_text)
-    mass_balance = root.find("mass_balance")
-    cg = _location(mass_balance, name="CG")
-    mass_kg = _number(mass_balance, "emptywt", "KG")
+    mass_kg, cg, _ = mass.with_occupants()
     wheels = []
     for unit, contact in enumerate(root.find("ground_reactions").findall("contact")):
         if contact.get("type") != "BOGEY":
@@ -266,6 +295,55 @@ def read_vehicle(stock_text):
     if len(wheels) != 4 or sum(w.front for w in wheels) != 2:
         raise ValueError("expected two front and two rear BOGEY contacts")
     return cg, mass_kg, wheels
+
+
+def rear_brake_nm(front_nm, cg, mass_kg, wheels):
+    """Rear brake torque that shares braking out like the axle loads at BRAKE_BALANCE_G.
+
+    Below that deceleration the front axle carries a smaller share of the load
+    than of the braking, so on equal grip the front wheels reach their limit
+    first and a locking car stays straight.
+    """
+    front_x = sum(w.x for w in wheels if w.front) / 2.0
+    rear_x = sum(w.x for w in wheels if not w.front) / 2.0
+    wheelbase = rear_x - front_x
+    to_rear = rear_x - cg[0]
+    axle_n = {True: mass_kg * G * to_rear / wheelbase, False: mass_kg * G * (wheelbase - to_rear) / wheelbase}
+    # the ground under the settled car, in the structural frame
+    ground_z = sum(w.z + axle_n[w.front] / 2.0 / (w.spring * 4.4482216 / 0.3048) for w in wheels) / 4.0
+    height = cg[2] - ground_z
+    front_share = (to_rear + height * BRAKE_BALANCE_G) / wheelbase
+    return round(front_nm * (1.0 - front_share) / front_share, 1)
+
+
+def _mass_balance():
+    """The tyre variant's <mass_balance>: mass.py's empty car plus the two occupants."""
+    kg, cg, inertia = mass.empty()
+    pad = "    "
+
+    def location(point, indent):
+        return ("%s<location%s unit=\"M\">\n" % (indent[0], indent[1])
+                + "".join("%s    <%s> %.3f </%s>\n" % (indent[0], axis, value, axis)
+                          for axis, value in zip("xyz", point))
+                + "%s</location>\n" % indent[0])
+
+    out = [pad + "<!-- From dev/tyre-model/mass.py: components placed from the 3D model, a 90 kWh\n"
+           + pad + "     floor battery and one motor driving all four wheels. Inertia about the\n"
+           + pad + "     empty CG; the products of inertia are small and left out. The occupants'\n"
+           + pad + "     weights are set on every frame by Systems/tyre-model.xml. -->\n",
+           pad + "<mass_balance>\n"]
+    for axis, i in (("ixx", 0), ("iyy", 1), ("izz", 2)):
+        out.append('%s    <%s unit="KG*M2"> %.0f </%s>\n' % (pad, axis, inertia[i][i], axis))
+    out.append('%s    <emptywt unit="KG"> %.1f </emptywt>\n' % (pad, kg))
+    out.append(location(cg, (pad + "    ", ' name="CG"')))
+    for name, default_kg, at in mass.OCCUPANTS:
+        weight = default_kg if name == "Driver" else 0.0
+        out.append('%s    <pointmass name="%s">\n' % (pad, name))
+        out.append('%s        <weight unit="KG"> %.1f </weight>\n' % (pad, weight))
+        out.append(location(at, (pad + "        ", "")))
+        out.append("%s    </pointmass>\n" % pad)
+    out.append(pad + "</mass_balance>\n")
+    return "".join(out)
 
 
 def _property_lines(prefix, items):
@@ -288,9 +366,13 @@ def build_system(stock_text):
     rear = [w for w in wheels if not w.front]
 
     tyre_params = TYRE_PARAMS + [
-        ("load_nominal_n", round(mass_kg * G / len(wheels), 1), "a quarter of the car's weight"),
+        ("load_nominal_n", round(mass_kg * G / len(wheels), 1), "a quarter of the car's weight with the driver"),
     ]
+    front_brake = dict((name, value) for name, value, _ in DRIVELINE_PARAMS)["brake_front_nm"]
+    driveline_params = [(name, rear_brake_nm(front_brake, cg, mass_kg, wheels) if value is None else value, note)
+                        for name, value, note in DRIVELINE_PARAMS]
     shared = dict(EXTERNAL)
+    shared.update(OCCUPANT_INPUTS)
     shared.update((name, "tyre/par/" + name) for name, _, _ in tyre_params)
     shared.update((name, "driveline/par/" + name) for name, _, _ in DRIVELINE_PARAMS)
     shared.update((name, "driveline/in/" + name) for name, _, _ in DRIVELINE_INPUTS)
@@ -316,11 +398,16 @@ def build_system(stock_text):
            '<system name="Tyre and driveline model">\n\n',
            INDENT + "<!-- Tyre parameters -->\n", _property_lines("tyre/par", tyre_params), "\n",
            INDENT + "<!-- Driveline and brake parameters -->\n",
-           _property_lines("driveline/par", DRIVELINE_PARAMS), "\n",
+           _property_lines("driveline/par", driveline_params), "\n",
            INDENT + "<!-- Inputs -->\n", _property_lines("driveline/in", DRIVELINE_INPUTS), "\n",
            INDENT + "<!-- State: wheel speeds -->\n"]
     for w in wheels:
         out.append('%s<property value="0.0">tyre/%s/omega_rad_sec</property>\n' % (INDENT, w.name))
+
+    out.append('\n%s<channel name="Occupants">\n' % INDENT)
+    for name, expr, outputs in OCCUPANT_EQS:
+        out.append(fcs_function("occupants/" + name, expr, shared.__getitem__, outputs))
+    out.append("%s</channel>\n" % INDENT)
 
     out.append('\n%s<channel name="Driveline">\n' % INDENT)
     fields = {"front_omega": axle_mean(front), "rear_omega": axle_mean(rear)}
@@ -351,10 +438,9 @@ def build_system(stock_text):
             "unit": w.unit,
             "spring": repr(w.spring),
             "damping": repr(w.damping),
-            # body axes: x forward, y right, z down; structural: x aft, y right, z up
-            "x_body": repr(round(cg[0] - w.x, 4)),
-            "y_body": repr(round(w.y - cg[1], 4)),
-            "cg_height": repr(round(cg[2] - w.z, 4)),
+            # structural frame: x aft, y right, z up
+            "x_struct": repr(w.x),
+            "y_struct": repr(w.y),
             "z_struct": repr(w.z),
             "steer": "steer_deg * 0.017453293" if w.steered else "0.0",
             "axle_torque": "axle_torque_front_nm" if w.front else "axle_torque_rear_nm",
@@ -409,11 +495,13 @@ FDM_HEADER = """<!--
     GENERATED FILE: edit followme_e-tron.xml or dev/tyre-model/generate.py and
     run the generator again.
 
-    This is followme_e-tron.xml with three changes:
+    This is followme_e-tron.xml with four changes:
       - the four wheels keep their struts but JSBSim's own wheel friction and
         brakes are switched off,
       - the four drive forces are replaced by tyre forces at the contact patches,
-      - Systems/tyre-model.xml computes those forces.
+      - Systems/tyre-model.xml computes those forces,
+      - mass, CG and inertia come from dev/tyre-model/mass.py, with point
+        masses for the driver and the co-driver.
     See dev/tyre-model/README.md.
 -->
 """
@@ -434,6 +522,9 @@ def build_fdm(stock_text, test_forces=False):
 
     xml, n = re.subn(r"<contact type=\"BOGEY\".*?</contact>", strip_wheel, xml, flags=re.S)
     assert n == 4, n
+    xml, n = re.subn(r"[ \t]*<mass_balance>.*?</mass_balance>\n",
+                     lambda m: _mass_balance(), xml, flags=re.S)
+    assert n == 1, n
     xml, n = re.subn(r"[ \t]*<external_reactions>.*?</external_reactions>\n",
                      lambda m: _external_reactions(stock_text, test_forces), xml, flags=re.S)
     assert n == 1, n
@@ -449,9 +540,9 @@ def check_equations():
     """Catch a typo in an equation before JSBSim does, with a clearer message."""
     known = set(EXTERNAL) | set(LOAD_CURVES) | {"comp_ft", "comp_vel_fps", "steer_deg", "surface", "roll_factor"}
     known |= {n for n, _, _ in TYRE_PARAMS + DRIVELINE_PARAMS + DRIVELINE_INPUTS} | {"load_nominal_n"}
-    known |= {"omega_fl", "omega_fr", "omega_bl", "omega_br"}
+    known |= {"omega_fl", "omega_fr", "omega_bl", "omega_br"} | set(OCCUPANT_INPUTS)
     known |= {n for n, _ in DRIVELINE_EQS} | {eq[0] for eq in WHEEL_EQS}
-    for eq in DRIVELINE_EQS + WHEEL_EQS:
+    for eq in OCCUPANT_EQS + DRIVELINE_EQS + WHEEL_EQS:
         expr = re.sub(r"\{\w+\}", "0.0", eq[1])
         unknown = names(expr) - known
         if unknown:

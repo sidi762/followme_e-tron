@@ -28,11 +28,12 @@ The scalar tuning parameters can be changed while driving, in the property brows
 | Cornering grip | fixed 1.0 g cap, same at any load | peaks, then falls; less per kg on a loaded tyre |
 | Combined | braking and cornering limits are independent | one friction ellipse per tyre |
 | Surface | affects braking and cornering, not acceleration | affects everything |
+| Mass | 1575 kg, 67% on the front wheels, yaw inertia 16,200 kg·m² | 1575 kg from components plus a 60 kg driver: 52% front, yaw inertia 1,830 kg·m² |
 
 `report.py` prints current numbers for both. On flat dry ground at 120 Hz the standard FDM
-reaches 100 km/h in 3.8 s and the tyre model in 3.3 s. The nominal 100 km/h stop takes about
-23 m for the standard FDM. The tyre model takes 40.3 m at 80% pedal and 38.8 m at full pedal.
-Independent front/rear inputs of 92%/82% give 37.1 m with both axles still rolling.
+reaches 100 km/h in 3.8 s and the tyre model in 3.5 s. The nominal 100 km/h stop takes about
+23 m for the standard FDM. The tyre model takes 38.8 m at 80% pedal and 38.0 m at full pedal.
+Independent front/rear inputs of 83%/90% give 37.0 m with both axles still rolling.
 
 The standard FDM is slower off the line because `engine.nas` works out each update's torque from
 the previous update's rpm, which lags while the rpm climbs. That also makes its acceleration depend
@@ -47,6 +48,8 @@ on the frame rate: at about 4 fps it took 4 s to reach 89 km/h.
 | `Systems/tyre-model.xml` | **generated** JSBSim system: the model itself |
 | `dev/tyre-model/generate.py` | the equations and parameters, and the generator for the two files above |
 | `dev/tyre-model/fit_reference.py` | reproduces the force-curve fits from the published test archive |
+| `dev/tyre-model/mass.py` | mass, CG and inertia built up from components |
+| `dev/tyre-model/fit_body_shell.py` | measures the body shell in the 3D model for `mass.py` |
 | `dev/tyre-model/jsbexpr.py` | turns `a * max(b, c)` into JSBSim `<function>` XML |
 | `dev/tyre-model/sim.py` | runs either FDM headless in JSBSim |
 | `dev/tyre-model/test_tyre_model.py` | behaviour checks |
@@ -97,6 +100,50 @@ environment with NumPy and SciPy. It checks the shipped coefficients against the
 python3 dev/tyre-model/fit_reference.py "/path/to/Determination of tire properties - Data.zip"
 ```
 
+## Mass and occupants
+
+The standard FDM puts its 1575 kg 0.82 m behind the front axle, 67% on the front wheels, and gives
+it moments of inertia several times those of a car this size. The variant keeps the 1575 kg but
+builds the CG and inertia up from components in `mass.py`, each placed where the 3D model puts it:
+
+- a 545 kg battery for the 90 kWh in `Nasal/electrical.nas`, under the floor between the arches
+- one drive unit on the front axle (motor, inverter, reduction gear, centre differential), a
+  propeller shaft and a rear differential, matching the single-motor driveline
+- 40 kg unsprung per corner, the front and rear compartments, seats, instrument panel and trim
+- the body shell, which takes the remaining 329 kg spread over the exterior mesh by area
+
+| | Mass | Front axle share | CG height | Ixx / Iyy / Izz |
+|---|---|---|---|---|
+| Standard FDM | 1575 kg | 67% | about 0.37 m | 7,587 / 7,232 / 16,195 kg·m² |
+| Tyre variant with the default driver | 1635 kg | 52% | about 0.46 m | 515 / 1,756 / 1,830 kg·m² |
+
+The component masses are estimates for a car of this kind, not measurements. The battery sits
+almost exactly at the CG, so the split hardly depends on them; its weight mostly moves the CG
+height. `python3 dev/tyre-model/mass.py` prints the table. The products of inertia are small and
+left out.
+
+Two JSBSim point masses carry the occupants: the driver behind the steering wheel, and the
+co-driver on the rear right seat, where `Models/followmeEV.xml` shows the co-driver model. Their
+weights are FlightGear properties outside the FDM, so they survive a reposition:
+`/systems/occupants/driver-kg` (60 kg, or 50/60/75/90 kg under Vehicle Configuration) and
+`/systems/occupants/codriver-kg` (60 kg), which counts while "Enable co-driver model" is ticked.
+The FDM applies them on every frame, and the tyre model takes the wheel positions from the live CG.
+
+The rear brakes follow the CG. `rear_brake_nm()` in `generate.py` sizes them so that, on equal grip,
+the front axle reaches its limit first at any deceleration up to 1.15 g. With the CG near the
+middle that is 836 N·m per rear wheel instead of 580.
+
+The centre differential stays at 50:50. With the weight further back, a full-throttle start on dry
+asphalt now slips the front tyres past their peak. A rear bias hooks up on dry but spins the rear
+first on a slippery road, and with the lower yaw inertia the car then turns round. Traction control
+is meant to deal with both.
+
+To audit the body shell against the 3D model (needs NumPy):
+
+```bash
+python3 dev/tyre-model/fit_body_shell.py
+```
+
 ## How it works
 
 JSBSim keeps doing the suspension: the four `BOGEY` contacts still carry the car. Their friction
@@ -104,8 +151,8 @@ coefficients are zero and they are in no brake group, so JSBSim adds no force in
 `Systems/tyre-model.xml` supplies those forces instead, every FDM frame, per wheel:
 
 1. **Load** from JSBSim's strut compression and compression speed.
-2. **Contact patch velocity** from the body velocity and rotation rates, turned into the wheel's
-   own axes by the steering angle.
+2. **Contact patch velocity** from the body velocity and rotation rates about the current CG,
+   turned into the wheel's own axes by the steering angle.
 3. **Slip**: slip ratio from wheel speed against road speed, slip angle from the sideways speed.
 4. **Force** uses fitted drive, brake and lateral curves evaluated at the combined normalised
    slip. Each wheel reads the last contact sample from its own
@@ -149,6 +196,14 @@ Brakes and steering need nothing new: the model reads `fcs/left-brake-cmd-norm` 
 `fcs/right-brake-cmd-norm` (rear axle) and `fcs/steer-pos-deg`, which FlightGear already fills from
 `/controls/gear/brake-left`, `brake-right`, `brake-parking` and the rudder.
 
+The occupants are read from FlightGear properties outside `/fdm/jsbsim/`:
+
+| Property | |
+|---|---|
+| `/systems/occupants/driver-kg` | driver weight, 60 kg by default |
+| `/systems/occupants/codriver-kg` | co-driver weight on the rear right seat, 60 kg by default |
+| `/systems/codriver-enable` | 1 while "Enable co-driver model" is ticked; the co-driver counts only then |
+
 Outputs worth knowing, per wheel `fl`, `fr`, `bl`, `br`:
 
 | Property | |
@@ -188,11 +243,12 @@ python3 -m pytest dev/tyre-model      # a few seconds
 python3 dev/tyre-model/report.py
 ```
 
-The tests run the generated FDM in standalone JSBSim on flat ground: launch on dry and slippery
-surfaces, threshold braking against locked wheels, steering with locked wheels, the friction
-ellipse, mixed surfaces, the cornering limit and understeer, power oversteer by drive layout, holding and releasing
-on slopes, pulling away at full lock, and that results do not depend on the FDM rate (60 to
-240 Hz). They do not start FlightGear and do not run any Nasal.
+The tests run the generated FDM in standalone JSBSim on flat ground: wheel loads and occupant
+weights, launch on dry and slippery surfaces, threshold braking against locked wheels, steering
+with locked wheels, the friction ellipse, mixed surfaces, the cornering limit and understeer, power
+oversteer by drive layout, holding and releasing on slopes, pulling away at full lock, and that
+results do not depend on the FDM rate (60 to 240 Hz). They do not start FlightGear and do not run
+any Nasal.
 
 For that there is a scripted drive in a real FlightGear, rendered in software under Xvfb:
 
@@ -203,7 +259,9 @@ dev/tyre-model/fg/run.sh followme_e-tron-tyre reposition.nas    # reposition whi
 ```
 
 It prints what the car did and fails on a Nasal error. It has been run on FlightGear 2020.3.18
-(Ubuntu 24.04 package) only. Nobody has driven the tyre model by hand yet.
+(Ubuntu 24.04 package) only. The occupant weights and the driver weight buttons have also been
+checked in FlightGear 2024.1.8 on macOS, including after a reposition. Nobody has driven the tyre
+model by hand yet.
 
 ## Limits
 
@@ -212,6 +270,11 @@ It prints what the car did and fails on a Nasal error. It has been run on Flight
 - Forces act in the body's x-y plane, which is the road plane only as long as the car sits on its
   wheels.
 - The wheel load is one frame old.
+- A locked tyre's force points about 2° off its sliding direction, because the friction ellipse
+  normalises the two slips by different peak slips. Braking on locked wheels with 6.75° of
+  steering still turns the car at about 4°/s.
+- A full-throttle start on dry asphalt slips the front tyres past their peak (see Mass and
+  occupants).
 - Coast regen is a fixed motor torque so that lifting off slows the car as the standard FDM does;
   it does not charge the battery.
 - On every reposition FlightGear 2020.3 prints "Property ... is already defined" once per

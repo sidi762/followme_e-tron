@@ -3,11 +3,13 @@
     GENERATED FILE: edit followme_e-tron.xml or dev/tyre-model/generate.py and
     run the generator again.
 
-    This is followme_e-tron.xml with three changes:
+    This is followme_e-tron.xml with four changes:
       - the four wheels keep their struts but JSBSim's own wheel friction and
         brakes are switched off,
       - the four drive forces are replaced by tyre forces at the contact patches,
-      - Systems/tyre-model.xml computes those forces.
+      - Systems/tyre-model.xml computes those forces,
+      - mass, CG and inertia come from dev/tyre-model/mass.py, with point
+        masses for the driver and the co-driver.
     See dev/tyre-model/README.md.
 -->
 <fdm_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -46,17 +48,36 @@
         </location>
     </metrics>
 
+    <!-- From dev/tyre-model/mass.py: components placed from the 3D model, a 90 kWh
+         floor battery and one motor driving all four wheels. Inertia about the
+         empty CG; the products of inertia are small and left out. The occupants'
+         weights are set on every frame by Systems/tyre-model.xml. -->
     <mass_balance>
-        <ixx unit="SLUG*FT2"> 5596 </ixx>
-        <iyy unit="SLUG*FT2"> 5334 </iyy>
-        <izz unit="SLUG*FT2"> 11945 </izz>
-        <ixz unit="SLUG*FT2"> 0 </ixz>
-        <emptywt unit="KG"> 1575 </emptywt>
+        <ixx unit="KG*M2"> 506 </ixx>
+        <iyy unit="KG*M2"> 1754 </iyy>
+        <izz unit="KG*M2"> 1823 </izz>
+        <emptywt unit="KG"> 1575.0 </emptywt>
         <location name="CG" unit="M">
-            <x> 1.5 </x>
-            <y> 0.0 </y>
-            <z> 0.4 </z>
+            <x> 1.874 </x>
+            <y> 0.001 </y>
+            <z> 0.478 </z>
         </location>
+        <pointmass name="Driver">
+            <weight unit="KG"> 60.0 </weight>
+            <location unit="M">
+                <x> 1.850 </x>
+                <y> -0.330 </y>
+                <z> 0.700 </z>
+            </location>
+        </pointmass>
+        <pointmass name="Co-driver">
+            <weight unit="KG"> 0.0 </weight>
+            <location unit="M">
+                <x> 2.550 </x>
+                <y> 0.330 </y>
+                <z> 0.700 </z>
+            </location>
+        </pointmass>
     </mass_balance>
 
     <ground_reactions>

@@ -15,7 +15,7 @@
 	<property value="3.0">tyre/par/low_speed_mps</property> <!-- below this the slip definitions are softened; see README -->
 	<property value="0.15">tyre/par/stick_full_mps</property> <!-- a stopped wheel slower than this is held by JSBSim's static friction -->
 	<property value="0.5">tyre/par/stick_none_mps</property> <!-- above this the tyre model alone acts -->
-	<property value="3861.4">tyre/par/load_nominal_n</property> <!-- a quarter of the car's weight -->
+	<property value="4008.5">tyre/par/load_nominal_n</property> <!-- a quarter of the car's weight with the driver -->
 
 	<!-- Driveline and brake parameters -->
 	<property value="9.73">driveline/par/gear</property> <!-- motor to wheel reduction -->
@@ -26,7 +26,7 @@
 	<property value="24.0">driveline/par/coast_regen_nm</property> <!-- motor braking torque with the pedal released (matches the standard FDM's coast-down) -->
 	<property value="100.0">driveline/par/coast_regen_fade_rad_sec</property> <!-- coast regen fades out below this motor speed -->
 	<property value="2300.0">driveline/par/brake_front_nm</property> <!-- brake torque per front wheel at full pedal -->
-	<property value="580.0">driveline/par/brake_rear_nm</property> <!-- brake torque per rear wheel at full pedal -->
+	<property value="836.4">driveline/par/brake_rear_nm</property> <!-- brake torque per rear wheel at full pedal; follows the CG, see rear_brake_nm() in generate.py -->
 	<property value="1000.0">driveline/par/park_lock_nm</property> <!-- holding torque per wheel while the motor is switched off -->
 
 	<!-- Inputs -->
@@ -39,6 +39,36 @@
 	<property value="0.0">tyre/fr/omega_rad_sec</property>
 	<property value="0.0">tyre/bl/omega_rad_sec</property>
 	<property value="0.0">tyre/br/omega_rad_sec</property>
+
+	<channel name="Occupants">
+		<!-- driver_lbs = max(0.0, driver_kg) * 2.2046226 -->
+		<fcs_function name="occupants/driver_lbs">
+			<function>
+				<product>
+					<max>
+						<v>0.0</v>
+						<p>/systems/occupants/driver-kg</p>
+					</max>
+					<v>2.2046226</v>
+				</product>
+			</function>
+			<output>inertia/pointmass-weight-lbs[0]</output>
+		</fcs_function>
+		<!-- codriver_lbs = codriver_enable * max(0.0, codriver_kg) * 2.2046226 -->
+		<fcs_function name="occupants/codriver_lbs">
+			<function>
+				<product>
+					<p>/systems/codriver-enable</p>
+					<max>
+						<v>0.0</v>
+						<p>/systems/occupants/codriver-kg</p>
+					</max>
+					<v>2.2046226</v>
+				</product>
+			</function>
+			<output>inertia/pointmass-weight-lbs[1]</output>
+		</fcs_function>
+	</channel>
 
 	<channel name="Driveline">
 		<!-- dt_s = max(sim_dt, 0.0005) -->
@@ -342,11 +372,41 @@
 				</table>
 			</function>
 		</fcs_function>
-		<!-- cg_height_m = 0.42 - comp_ft * 0.3048 -->
+		<!-- x_body_m = cg_x_in * 0.0254 - 0.68 -->
+		<fcs_function name="tyre/fl/x_body_m">
+			<function>
+				<difference>
+					<product>
+						<p>inertia/cg-x-in</p>
+						<v>0.0254</v>
+					</product>
+					<v>0.68</v>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- y_body_m = -0.66 - cg_y_in * 0.0254 -->
+		<fcs_function name="tyre/fl/y_body_m">
+			<function>
+				<difference>
+					<v>-0.66</v>
+					<product>
+						<p>inertia/cg-y-in</p>
+						<v>0.0254</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = cg_z_in * 0.0254 - -0.02 - comp_ft * 0.3048 -->
 		<fcs_function name="tyre/fl/cg_height_m">
 			<function>
 				<difference>
-					<v>0.42</v>
+					<difference>
+						<product>
+							<p>inertia/cg-z-in</p>
+							<v>0.0254</v>
+						</product>
+						<v>-0.02</v>
+					</difference>
 					<product>
 						<p>gear/unit[0]/compression-ft</p>
 						<v>0.3048</v>
@@ -354,7 +414,7 @@
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vx_mps = u_mps + q * cg_height_m - r * -0.66 -->
+		<!-- vx_mps = u_mps + q * cg_height_m - r * y_body_m -->
 		<fcs_function name="tyre/fl/vx_mps">
 			<function>
 				<difference>
@@ -367,12 +427,12 @@
 					</sum>
 					<product>
 						<p>velocities/r-rad_sec</p>
-						<v>-0.66</v>
+						<p>tyre/fl/y_body_m</p>
 					</product>
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vy_mps = v_mps + r * 0.82 - p * cg_height_m -->
+		<!-- vy_mps = v_mps + r * x_body_m - p * cg_height_m -->
 		<fcs_function name="tyre/fl/vy_mps">
 			<function>
 				<difference>
@@ -380,7 +440,7 @@
 						<p>driveline/v_mps</p>
 						<product>
 							<p>velocities/r-rad_sec</p>
-							<v>0.82</v>
+							<p>tyre/fl/x_body_m</p>
 						</product>
 					</sum>
 					<product>
@@ -1245,11 +1305,41 @@
 				</table>
 			</function>
 		</fcs_function>
-		<!-- cg_height_m = 0.42 - comp_ft * 0.3048 -->
+		<!-- x_body_m = cg_x_in * 0.0254 - 0.68 -->
+		<fcs_function name="tyre/fr/x_body_m">
+			<function>
+				<difference>
+					<product>
+						<p>inertia/cg-x-in</p>
+						<v>0.0254</v>
+					</product>
+					<v>0.68</v>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- y_body_m = 0.66 - cg_y_in * 0.0254 -->
+		<fcs_function name="tyre/fr/y_body_m">
+			<function>
+				<difference>
+					<v>0.66</v>
+					<product>
+						<p>inertia/cg-y-in</p>
+						<v>0.0254</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = cg_z_in * 0.0254 - -0.02 - comp_ft * 0.3048 -->
 		<fcs_function name="tyre/fr/cg_height_m">
 			<function>
 				<difference>
-					<v>0.42</v>
+					<difference>
+						<product>
+							<p>inertia/cg-z-in</p>
+							<v>0.0254</v>
+						</product>
+						<v>-0.02</v>
+					</difference>
 					<product>
 						<p>gear/unit[1]/compression-ft</p>
 						<v>0.3048</v>
@@ -1257,7 +1347,7 @@
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vx_mps = u_mps + q * cg_height_m - r * 0.66 -->
+		<!-- vx_mps = u_mps + q * cg_height_m - r * y_body_m -->
 		<fcs_function name="tyre/fr/vx_mps">
 			<function>
 				<difference>
@@ -1270,12 +1360,12 @@
 					</sum>
 					<product>
 						<p>velocities/r-rad_sec</p>
-						<v>0.66</v>
+						<p>tyre/fr/y_body_m</p>
 					</product>
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vy_mps = v_mps + r * 0.82 - p * cg_height_m -->
+		<!-- vy_mps = v_mps + r * x_body_m - p * cg_height_m -->
 		<fcs_function name="tyre/fr/vy_mps">
 			<function>
 				<difference>
@@ -1283,7 +1373,7 @@
 						<p>driveline/v_mps</p>
 						<product>
 							<p>velocities/r-rad_sec</p>
-							<v>0.82</v>
+							<p>tyre/fr/x_body_m</p>
 						</product>
 					</sum>
 					<product>
@@ -2148,11 +2238,41 @@
 				</table>
 			</function>
 		</fcs_function>
-		<!-- cg_height_m = 0.43 - comp_ft * 0.3048 -->
+		<!-- x_body_m = cg_x_in * 0.0254 - 3.17 -->
+		<fcs_function name="tyre/bl/x_body_m">
+			<function>
+				<difference>
+					<product>
+						<p>inertia/cg-x-in</p>
+						<v>0.0254</v>
+					</product>
+					<v>3.17</v>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- y_body_m = -0.66 - cg_y_in * 0.0254 -->
+		<fcs_function name="tyre/bl/y_body_m">
+			<function>
+				<difference>
+					<v>-0.66</v>
+					<product>
+						<p>inertia/cg-y-in</p>
+						<v>0.0254</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = cg_z_in * 0.0254 - -0.03 - comp_ft * 0.3048 -->
 		<fcs_function name="tyre/bl/cg_height_m">
 			<function>
 				<difference>
-					<v>0.43</v>
+					<difference>
+						<product>
+							<p>inertia/cg-z-in</p>
+							<v>0.0254</v>
+						</product>
+						<v>-0.03</v>
+					</difference>
 					<product>
 						<p>gear/unit[2]/compression-ft</p>
 						<v>0.3048</v>
@@ -2160,7 +2280,7 @@
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vx_mps = u_mps + q * cg_height_m - r * -0.66 -->
+		<!-- vx_mps = u_mps + q * cg_height_m - r * y_body_m -->
 		<fcs_function name="tyre/bl/vx_mps">
 			<function>
 				<difference>
@@ -2173,12 +2293,12 @@
 					</sum>
 					<product>
 						<p>velocities/r-rad_sec</p>
-						<v>-0.66</v>
+						<p>tyre/bl/y_body_m</p>
 					</product>
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vy_mps = v_mps + r * -1.67 - p * cg_height_m -->
+		<!-- vy_mps = v_mps + r * x_body_m - p * cg_height_m -->
 		<fcs_function name="tyre/bl/vy_mps">
 			<function>
 				<difference>
@@ -2186,7 +2306,7 @@
 						<p>driveline/v_mps</p>
 						<product>
 							<p>velocities/r-rad_sec</p>
-							<v>-1.67</v>
+							<p>tyre/bl/x_body_m</p>
 						</product>
 					</sum>
 					<product>
@@ -3048,11 +3168,41 @@
 				</table>
 			</function>
 		</fcs_function>
-		<!-- cg_height_m = 0.43 - comp_ft * 0.3048 -->
+		<!-- x_body_m = cg_x_in * 0.0254 - 3.17 -->
+		<fcs_function name="tyre/br/x_body_m">
+			<function>
+				<difference>
+					<product>
+						<p>inertia/cg-x-in</p>
+						<v>0.0254</v>
+					</product>
+					<v>3.17</v>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- y_body_m = 0.66 - cg_y_in * 0.0254 -->
+		<fcs_function name="tyre/br/y_body_m">
+			<function>
+				<difference>
+					<v>0.66</v>
+					<product>
+						<p>inertia/cg-y-in</p>
+						<v>0.0254</v>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- cg_height_m = cg_z_in * 0.0254 - -0.03 - comp_ft * 0.3048 -->
 		<fcs_function name="tyre/br/cg_height_m">
 			<function>
 				<difference>
-					<v>0.43</v>
+					<difference>
+						<product>
+							<p>inertia/cg-z-in</p>
+							<v>0.0254</v>
+						</product>
+						<v>-0.03</v>
+					</difference>
 					<product>
 						<p>gear/unit[3]/compression-ft</p>
 						<v>0.3048</v>
@@ -3060,7 +3210,7 @@
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vx_mps = u_mps + q * cg_height_m - r * 0.66 -->
+		<!-- vx_mps = u_mps + q * cg_height_m - r * y_body_m -->
 		<fcs_function name="tyre/br/vx_mps">
 			<function>
 				<difference>
@@ -3073,12 +3223,12 @@
 					</sum>
 					<product>
 						<p>velocities/r-rad_sec</p>
-						<v>0.66</v>
+						<p>tyre/br/y_body_m</p>
 					</product>
 				</difference>
 			</function>
 		</fcs_function>
-		<!-- vy_mps = v_mps + r * -1.67 - p * cg_height_m -->
+		<!-- vy_mps = v_mps + r * x_body_m - p * cg_height_m -->
 		<fcs_function name="tyre/br/vy_mps">
 			<function>
 				<difference>
@@ -3086,7 +3236,7 @@
 						<p>driveline/v_mps</p>
 						<product>
 							<p>velocities/r-rad_sec</p>
-							<v>-1.67</v>
+							<p>tyre/br/x_body_m</p>
 						</product>
 					</sum>
 					<product>

@@ -26,6 +26,10 @@ FG_SIDE_PROPS = {
     "/controls/wiper/frontwiper/state": 0.0,
     "/controls/steering_wheel/steering_limit-deg": 900.0,
     "/controls/flight/rudder": 0.0,
+    # occupant defaults from followme_e-tron-tyre-set.xml and Nasal/node_setup.nas
+    "/systems/occupants/driver-kg": 60.0,
+    "/systems/occupants/codriver-kg": 60.0,
+    "/systems/codriver-enable": 0.0,
 }
 
 _test_dir = None

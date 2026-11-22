@@ -57,6 +57,15 @@ var configDialog = {
 		y += 38;
 		me._button(0, y, half, "Select Livery…", func liveries.liverySelector.dialog.open());
 		me._button(right, y, half, "Select Message…", func liveries.displaySelector.dialog.open());
+		# Only the tyre model's FDM carries the occupants' weight. The co-driver
+		# below adds /systems/occupants/codriver-kg on the rear right seat.
+		if (props.getNode("/fdm/jsbsim/occupants/driver_lbs") != nil) {
+			y = me._heading(y + 37, "Driver weight");
+			var quarter = int((w - 18) / 4);
+			var weights = [50, 60, 75, 90];
+			forindex (var i; weights)
+				me._choice(i * (quarter + 6), y, quarter, weights[i] ~ " kg", "/systems/occupants/driver-kg", weights[i]);
+		}
 		y = me._heading(y + 37, "Miscellaneous");
 		me._checkbox(y, "Enable co-driver model", "/systems/codriver-enable");
 		me._checkbox(y + 27, "Enable smart screen", "/systems/screen-enable");
