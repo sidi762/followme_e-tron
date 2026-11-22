@@ -33,16 +33,55 @@
 	<property value="0.5">driveline/par/epb_dynamic_norm</property> <!-- service brake demand of that dynamic emergency braking -->
 	<property value="1000.0">driveline/par/park_lock_nm</property> <!-- holding torque per wheel while the motor is switched off -->
 
+	<!-- ABS parameters -->
+	<property value="1.0">abs/par/enabled</property> <!-- 0 switches ABS off: each wheel gets its whole service brake request -->
+	<property value="2.5">abs/par/min_speed_mps</property> <!-- below this ABS lets the wheels lock, as real systems do near a standstill -->
+	<property value="1.0">abs/par/dump_slip</property> <!-- release above this braking slip, as a share of the tyre's peak slip at its load -->
+	<property value="0.6">abs/par/rebuild_slip</property> <!-- rebuild below this share; hold in between -->
+	<property value="15.0">abs/par/dump_rate</property> <!-- outlet valve: while releasing, the torque falls by this share per second, exponentially -->
+	<property value="1.5">abs/par/build_rate</property> <!-- pulsed inlet valve: while rebuilding, it rises by this share of the full-pedal torque per second -->
+	<property value="0.1">abs/par/yaw_delay_start</property> <!-- front wheels: while one is under ABS, the other may brake this share of the full-pedal torque harder -->
+	<property value="0.5">abs/par/yaw_delay_rate</property> <!-- and that margin grows by this share per second, so split grip turns the car gradually -->
+
 	<!-- Inputs -->
 	<property value="0.0">driveline/in/throttle_norm</property> <!-- accelerator pedal, 0 to 1 -->
 	<property value="1.0">driveline/in/direction</property> <!-- 1 = forward, -1 = reverse -->
 	<property value="1.0">driveline/in/motor_on</property> <!-- 0 switches the motor off: no drive, no coast regen, park lock on -->
 
-	<!-- State: wheel speeds -->
+	<!-- State: wheel speeds, and what the ABS channel reads before the wheels compute it -->
 	<property value="0.0">tyre/fl/omega_rad_sec</property>
+	<property value="0.0">tyre/fl/slip_ratio</property>
+	<property value="0.0">tyre/fl/vx_wheel_mps</property>
+	<property value="0.0">tyre/fl/abs_slip_last</property>
+	<property value="0.0">tyre/fl/abs_active</property>
+	<property value="0.0">tyre/fl/abs_yaw_margin_nm</property>
+	<property value="0.0">tyre/fl/service_brake_nm</property>
+	<property value="0.1">tyre/fl/brake_peak_slip</property>
 	<property value="0.0">tyre/fr/omega_rad_sec</property>
+	<property value="0.0">tyre/fr/slip_ratio</property>
+	<property value="0.0">tyre/fr/vx_wheel_mps</property>
+	<property value="0.0">tyre/fr/abs_slip_last</property>
+	<property value="0.0">tyre/fr/abs_active</property>
+	<property value="0.0">tyre/fr/abs_yaw_margin_nm</property>
+	<property value="0.0">tyre/fr/service_brake_nm</property>
+	<property value="0.1">tyre/fr/brake_peak_slip</property>
 	<property value="0.0">tyre/bl/omega_rad_sec</property>
+	<property value="0.0">tyre/bl/slip_ratio</property>
+	<property value="0.0">tyre/bl/vx_wheel_mps</property>
+	<property value="0.0">tyre/bl/abs_slip_last</property>
+	<property value="0.0">tyre/bl/abs_active</property>
+	<property value="0.0">tyre/bl/abs_yaw_margin_nm</property>
+	<property value="0.0">tyre/bl/service_brake_nm</property>
+	<property value="0.1">tyre/bl/brake_peak_slip</property>
 	<property value="0.0">tyre/br/omega_rad_sec</property>
+	<property value="0.0">tyre/br/slip_ratio</property>
+	<property value="0.0">tyre/br/vx_wheel_mps</property>
+	<property value="0.0">tyre/br/abs_slip_last</property>
+	<property value="0.0">tyre/br/abs_active</property>
+	<property value="0.0">tyre/br/abs_yaw_margin_nm</property>
+	<property value="0.0">tyre/br/service_brake_nm</property>
+	<property value="0.1">tyre/br/brake_peak_slip</property>
+	<property value="0.0">abs/active</property>
 
 	<channel name="Occupants">
 		<!-- driver_lbs = max(0.0, driver_kg) * 2.2046226 -->
@@ -209,14 +248,20 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- motor_torque_nm = motor_on * (drive_torque_nm + coast_torque_nm) -->
+		<!-- motor_torque_nm = motor_on * (drive_torque_nm + coast_torque_nm * (1.0 - abs_any)) -->
 		<fcs_function name="driveline/motor_torque_nm">
 			<function>
 				<product>
 					<p>driveline/in/motor_on</p>
 					<sum>
 						<p>driveline/drive_torque_nm</p>
-						<p>driveline/coast_torque_nm</p>
+						<product>
+							<p>driveline/coast_torque_nm</p>
+							<difference>
+								<v>1.0</v>
+								<p>abs/active</p>
+							</difference>
+						</product>
 					</sum>
 				</product>
 			</function>
@@ -313,6 +358,804 @@
 						</difference>
 						<p>driveline/par/parking_nm</p>
 					</product>
+				</max>
+			</function>
+		</fcs_function>
+	</channel>
+
+	<channel name="ABS">
+		<!-- brake_request_nm = service_front * brake_front_nm -->
+		<fcs_function name="tyre/fl/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_front</p>
+					<p>driveline/par/brake_front_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/fl/abs_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/fl/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/fl/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/fl/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_rate = (abs_slip - abs_slip_last) / dt_s -->
+		<fcs_function name="tyre/fl/abs_slip_rate">
+			<function>
+				<quotient>
+					<difference>
+						<p>tyre/fl/abs_slip</p>
+						<p>tyre/fl/abs_slip_last</p>
+					</difference>
+					<p>driveline/dt_s</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_last = abs_slip -->
+		<fcs_function name="tyre/fl/abs_slip_last">
+			<function>
+				<p>tyre/fl/abs_slip</p>
+			</function>
+		</fcs_function>
+		<!-- abs_wheel_mode = ifthen(lt(abs_dump_slip, abs_slip) * (1.0 - lt(abs_slip_rate, 0.0)), -1.0, ifthen(lt(abs_rebuild_slip, abs_slip), 0.0, 1.0)) -->
+		<fcs_function name="tyre/fl/abs_wheel_mode">
+			<function>
+				<ifthen>
+					<product>
+						<lt>
+							<p>abs/par/dump_slip</p>
+							<p>tyre/fl/abs_slip</p>
+						</lt>
+						<difference>
+							<v>1.0</v>
+							<lt>
+								<p>tyre/fl/abs_slip_rate</p>
+								<v>0.0</v>
+							</lt>
+						</difference>
+					</product>
+					<v>-1.0</v>
+					<ifthen>
+						<lt>
+							<p>abs/par/rebuild_slip</p>
+							<p>tyre/fl/abs_slip</p>
+						</lt>
+						<v>0.0</v>
+						<v>1.0</v>
+					</ifthen>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- brake_request_nm = service_front * brake_front_nm -->
+		<fcs_function name="tyre/fr/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_front</p>
+					<p>driveline/par/brake_front_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/fr/abs_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/fr/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/fr/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/fr/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_rate = (abs_slip - abs_slip_last) / dt_s -->
+		<fcs_function name="tyre/fr/abs_slip_rate">
+			<function>
+				<quotient>
+					<difference>
+						<p>tyre/fr/abs_slip</p>
+						<p>tyre/fr/abs_slip_last</p>
+					</difference>
+					<p>driveline/dt_s</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_last = abs_slip -->
+		<fcs_function name="tyre/fr/abs_slip_last">
+			<function>
+				<p>tyre/fr/abs_slip</p>
+			</function>
+		</fcs_function>
+		<!-- abs_wheel_mode = ifthen(lt(abs_dump_slip, abs_slip) * (1.0 - lt(abs_slip_rate, 0.0)), -1.0, ifthen(lt(abs_rebuild_slip, abs_slip), 0.0, 1.0)) -->
+		<fcs_function name="tyre/fr/abs_wheel_mode">
+			<function>
+				<ifthen>
+					<product>
+						<lt>
+							<p>abs/par/dump_slip</p>
+							<p>tyre/fr/abs_slip</p>
+						</lt>
+						<difference>
+							<v>1.0</v>
+							<lt>
+								<p>tyre/fr/abs_slip_rate</p>
+								<v>0.0</v>
+							</lt>
+						</difference>
+					</product>
+					<v>-1.0</v>
+					<ifthen>
+						<lt>
+							<p>abs/par/rebuild_slip</p>
+							<p>tyre/fr/abs_slip</p>
+						</lt>
+						<v>0.0</v>
+						<v>1.0</v>
+					</ifthen>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- brake_request_nm = service_rear * brake_rear_nm -->
+		<fcs_function name="tyre/bl/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_rear</p>
+					<p>driveline/par/brake_rear_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/bl/abs_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/bl/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/bl/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/bl/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_rate = (abs_slip - abs_slip_last) / dt_s -->
+		<fcs_function name="tyre/bl/abs_slip_rate">
+			<function>
+				<quotient>
+					<difference>
+						<p>tyre/bl/abs_slip</p>
+						<p>tyre/bl/abs_slip_last</p>
+					</difference>
+					<p>driveline/dt_s</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_last = abs_slip -->
+		<fcs_function name="tyre/bl/abs_slip_last">
+			<function>
+				<p>tyre/bl/abs_slip</p>
+			</function>
+		</fcs_function>
+		<!-- abs_wheel_mode = ifthen(lt(abs_dump_slip, abs_slip) * (1.0 - lt(abs_slip_rate, 0.0)), -1.0, ifthen(lt(abs_rebuild_slip, abs_slip), 0.0, 1.0)) -->
+		<fcs_function name="tyre/bl/abs_wheel_mode">
+			<function>
+				<ifthen>
+					<product>
+						<lt>
+							<p>abs/par/dump_slip</p>
+							<p>tyre/bl/abs_slip</p>
+						</lt>
+						<difference>
+							<v>1.0</v>
+							<lt>
+								<p>tyre/bl/abs_slip_rate</p>
+								<v>0.0</v>
+							</lt>
+						</difference>
+					</product>
+					<v>-1.0</v>
+					<ifthen>
+						<lt>
+							<p>abs/par/rebuild_slip</p>
+							<p>tyre/bl/abs_slip</p>
+						</lt>
+						<v>0.0</v>
+						<v>1.0</v>
+					</ifthen>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- brake_request_nm = service_rear * brake_rear_nm -->
+		<fcs_function name="tyre/br/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_rear</p>
+					<p>driveline/par/brake_rear_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/br/abs_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/br/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/br/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/br/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_rate = (abs_slip - abs_slip_last) / dt_s -->
+		<fcs_function name="tyre/br/abs_slip_rate">
+			<function>
+				<quotient>
+					<difference>
+						<p>tyre/br/abs_slip</p>
+						<p>tyre/br/abs_slip_last</p>
+					</difference>
+					<p>driveline/dt_s</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- abs_slip_last = abs_slip -->
+		<fcs_function name="tyre/br/abs_slip_last">
+			<function>
+				<p>tyre/br/abs_slip</p>
+			</function>
+		</fcs_function>
+		<!-- abs_wheel_mode = ifthen(lt(abs_dump_slip, abs_slip) * (1.0 - lt(abs_slip_rate, 0.0)), -1.0, ifthen(lt(abs_rebuild_slip, abs_slip), 0.0, 1.0)) -->
+		<fcs_function name="tyre/br/abs_wheel_mode">
+			<function>
+				<ifthen>
+					<product>
+						<lt>
+							<p>abs/par/dump_slip</p>
+							<p>tyre/br/abs_slip</p>
+						</lt>
+						<difference>
+							<v>1.0</v>
+							<lt>
+								<p>tyre/br/abs_slip_rate</p>
+								<v>0.0</v>
+							</lt>
+						</difference>
+					</product>
+					<v>-1.0</v>
+					<ifthen>
+						<lt>
+							<p>abs/par/rebuild_slip</p>
+							<p>tyre/br/abs_slip</p>
+						</lt>
+						<v>0.0</v>
+						<v>1.0</v>
+					</ifthen>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- abs_mode = abs_wheel_mode -->
+		<fcs_function name="tyre/fl/abs_mode">
+			<function>
+				<p>tyre/fl/abs_wheel_mode</p>
+			</function>
+		</fcs_function>
+		<!-- abs_active = abs_enabled * lt(abs_min_speed_mps, abs(vx_wheel_mps)) * lt(0.0, brake_request_nm) * max(abs_active, lt(abs_mode, -0.5)) * (1.0 - lt(0.5, abs_mode) * lt(brake_request_nm - 1.0, service_brake_nm)) -->
+		<fcs_function name="tyre/fl/abs_active">
+			<function>
+				<product>
+					<p>abs/par/enabled</p>
+					<lt>
+						<p>abs/par/min_speed_mps</p>
+						<abs>
+							<p>tyre/fl/vx_wheel_mps</p>
+						</abs>
+					</lt>
+					<lt>
+						<v>0.0</v>
+						<p>tyre/fl/brake_request_nm</p>
+					</lt>
+					<max>
+						<p>tyre/fl/abs_active</p>
+						<lt>
+							<p>tyre/fl/abs_mode</p>
+							<v>-0.5</v>
+						</lt>
+					</max>
+					<difference>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<v>0.5</v>
+								<p>tyre/fl/abs_mode</p>
+							</lt>
+							<lt>
+								<difference>
+									<p>tyre/fl/brake_request_nm</p>
+									<v>1.0</v>
+								</difference>
+								<p>tyre/fl/service_brake_nm</p>
+							</lt>
+						</product>
+					</difference>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_valve_nm = ifthen(abs_active, max(0.0, min(brake_request_nm, ifthen(lt(abs_mode, -0.5), service_brake_nm * exp(-1.0 * abs_dump_rate * dt_s), service_brake_nm + lt(0.5, abs_mode) * abs_build_rate * brake_front_nm * dt_s))), brake_request_nm) -->
+		<fcs_function name="tyre/fl/abs_valve_nm">
+			<function>
+				<ifthen>
+					<p>tyre/fl/abs_active</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>tyre/fl/brake_request_nm</p>
+							<ifthen>
+								<lt>
+									<p>tyre/fl/abs_mode</p>
+									<v>-0.5</v>
+								</lt>
+								<product>
+									<p>tyre/fl/service_brake_nm</p>
+									<exp>
+										<product>
+											<v>-1.0</v>
+											<p>abs/par/dump_rate</p>
+											<p>driveline/dt_s</p>
+										</product>
+									</exp>
+								</product>
+								<sum>
+									<p>tyre/fl/service_brake_nm</p>
+									<product>
+										<lt>
+											<v>0.5</v>
+											<p>tyre/fl/abs_mode</p>
+										</lt>
+										<p>abs/par/build_rate</p>
+										<p>driveline/par/brake_front_nm</p>
+										<p>driveline/dt_s</p>
+									</product>
+								</sum>
+							</ifthen>
+						</min>
+					</max>
+					<p>tyre/fl/brake_request_nm</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- abs_yaw_margin_nm = ifthen(partner_abs_active, min(brake_front_nm, abs_yaw_margin_nm + abs_yaw_delay_rate * brake_front_nm * dt_s), abs_yaw_delay_start * brake_front_nm) -->
+		<fcs_function name="tyre/fl/abs_yaw_margin_nm">
+			<function>
+				<ifthen>
+					<p>tyre/fr/abs_active</p>
+					<min>
+						<p>driveline/par/brake_front_nm</p>
+						<sum>
+							<p>tyre/fl/abs_yaw_margin_nm</p>
+							<product>
+								<p>abs/par/yaw_delay_rate</p>
+								<p>driveline/par/brake_front_nm</p>
+								<p>driveline/dt_s</p>
+							</product>
+						</sum>
+					</min>
+					<product>
+						<p>abs/par/yaw_delay_start</p>
+						<p>driveline/par/brake_front_nm</p>
+					</product>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = ifthen(partner_abs_active, min(abs_valve_nm, partner_service_nm + abs_yaw_margin_nm), abs_valve_nm) -->
+		<fcs_function name="tyre/fl/service_brake_nm">
+			<function>
+				<ifthen>
+					<p>tyre/fr/abs_active</p>
+					<min>
+						<p>tyre/fl/abs_valve_nm</p>
+						<sum>
+							<p>tyre/fr/service_brake_nm</p>
+							<p>tyre/fl/abs_yaw_margin_nm</p>
+						</sum>
+					</min>
+					<p>tyre/fl/abs_valve_nm</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- abs_mode = abs_wheel_mode -->
+		<fcs_function name="tyre/fr/abs_mode">
+			<function>
+				<p>tyre/fr/abs_wheel_mode</p>
+			</function>
+		</fcs_function>
+		<!-- abs_active = abs_enabled * lt(abs_min_speed_mps, abs(vx_wheel_mps)) * lt(0.0, brake_request_nm) * max(abs_active, lt(abs_mode, -0.5)) * (1.0 - lt(0.5, abs_mode) * lt(brake_request_nm - 1.0, service_brake_nm)) -->
+		<fcs_function name="tyre/fr/abs_active">
+			<function>
+				<product>
+					<p>abs/par/enabled</p>
+					<lt>
+						<p>abs/par/min_speed_mps</p>
+						<abs>
+							<p>tyre/fr/vx_wheel_mps</p>
+						</abs>
+					</lt>
+					<lt>
+						<v>0.0</v>
+						<p>tyre/fr/brake_request_nm</p>
+					</lt>
+					<max>
+						<p>tyre/fr/abs_active</p>
+						<lt>
+							<p>tyre/fr/abs_mode</p>
+							<v>-0.5</v>
+						</lt>
+					</max>
+					<difference>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<v>0.5</v>
+								<p>tyre/fr/abs_mode</p>
+							</lt>
+							<lt>
+								<difference>
+									<p>tyre/fr/brake_request_nm</p>
+									<v>1.0</v>
+								</difference>
+								<p>tyre/fr/service_brake_nm</p>
+							</lt>
+						</product>
+					</difference>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_valve_nm = ifthen(abs_active, max(0.0, min(brake_request_nm, ifthen(lt(abs_mode, -0.5), service_brake_nm * exp(-1.0 * abs_dump_rate * dt_s), service_brake_nm + lt(0.5, abs_mode) * abs_build_rate * brake_front_nm * dt_s))), brake_request_nm) -->
+		<fcs_function name="tyre/fr/abs_valve_nm">
+			<function>
+				<ifthen>
+					<p>tyre/fr/abs_active</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>tyre/fr/brake_request_nm</p>
+							<ifthen>
+								<lt>
+									<p>tyre/fr/abs_mode</p>
+									<v>-0.5</v>
+								</lt>
+								<product>
+									<p>tyre/fr/service_brake_nm</p>
+									<exp>
+										<product>
+											<v>-1.0</v>
+											<p>abs/par/dump_rate</p>
+											<p>driveline/dt_s</p>
+										</product>
+									</exp>
+								</product>
+								<sum>
+									<p>tyre/fr/service_brake_nm</p>
+									<product>
+										<lt>
+											<v>0.5</v>
+											<p>tyre/fr/abs_mode</p>
+										</lt>
+										<p>abs/par/build_rate</p>
+										<p>driveline/par/brake_front_nm</p>
+										<p>driveline/dt_s</p>
+									</product>
+								</sum>
+							</ifthen>
+						</min>
+					</max>
+					<p>tyre/fr/brake_request_nm</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- abs_yaw_margin_nm = ifthen(partner_abs_active, min(brake_front_nm, abs_yaw_margin_nm + abs_yaw_delay_rate * brake_front_nm * dt_s), abs_yaw_delay_start * brake_front_nm) -->
+		<fcs_function name="tyre/fr/abs_yaw_margin_nm">
+			<function>
+				<ifthen>
+					<p>tyre/fl/abs_active</p>
+					<min>
+						<p>driveline/par/brake_front_nm</p>
+						<sum>
+							<p>tyre/fr/abs_yaw_margin_nm</p>
+							<product>
+								<p>abs/par/yaw_delay_rate</p>
+								<p>driveline/par/brake_front_nm</p>
+								<p>driveline/dt_s</p>
+							</product>
+						</sum>
+					</min>
+					<product>
+						<p>abs/par/yaw_delay_start</p>
+						<p>driveline/par/brake_front_nm</p>
+					</product>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = ifthen(partner_abs_active, min(abs_valve_nm, partner_service_nm + abs_yaw_margin_nm), abs_valve_nm) -->
+		<fcs_function name="tyre/fr/service_brake_nm">
+			<function>
+				<ifthen>
+					<p>tyre/fl/abs_active</p>
+					<min>
+						<p>tyre/fr/abs_valve_nm</p>
+						<sum>
+							<p>tyre/fl/service_brake_nm</p>
+							<p>tyre/fr/abs_yaw_margin_nm</p>
+						</sum>
+					</min>
+					<p>tyre/fr/abs_valve_nm</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- abs_mode = min(abs_wheel_mode, partner_wheel_mode) -->
+		<fcs_function name="tyre/bl/abs_mode">
+			<function>
+				<min>
+					<p>tyre/bl/abs_wheel_mode</p>
+					<p>tyre/br/abs_wheel_mode</p>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- abs_active = abs_enabled * lt(abs_min_speed_mps, abs(vx_wheel_mps)) * lt(0.0, brake_request_nm) * max(abs_active, lt(abs_mode, -0.5)) * (1.0 - lt(0.5, abs_mode) * lt(brake_request_nm - 1.0, service_brake_nm)) -->
+		<fcs_function name="tyre/bl/abs_active">
+			<function>
+				<product>
+					<p>abs/par/enabled</p>
+					<lt>
+						<p>abs/par/min_speed_mps</p>
+						<abs>
+							<p>tyre/bl/vx_wheel_mps</p>
+						</abs>
+					</lt>
+					<lt>
+						<v>0.0</v>
+						<p>tyre/bl/brake_request_nm</p>
+					</lt>
+					<max>
+						<p>tyre/bl/abs_active</p>
+						<lt>
+							<p>tyre/bl/abs_mode</p>
+							<v>-0.5</v>
+						</lt>
+					</max>
+					<difference>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<v>0.5</v>
+								<p>tyre/bl/abs_mode</p>
+							</lt>
+							<lt>
+								<difference>
+									<p>tyre/bl/brake_request_nm</p>
+									<v>1.0</v>
+								</difference>
+								<p>tyre/bl/service_brake_nm</p>
+							</lt>
+						</product>
+					</difference>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_valve_nm = ifthen(abs_active, max(0.0, min(brake_request_nm, ifthen(lt(abs_mode, -0.5), service_brake_nm * exp(-1.0 * abs_dump_rate * dt_s), service_brake_nm + lt(0.5, abs_mode) * abs_build_rate * brake_rear_nm * dt_s))), brake_request_nm) -->
+		<fcs_function name="tyre/bl/abs_valve_nm">
+			<function>
+				<ifthen>
+					<p>tyre/bl/abs_active</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>tyre/bl/brake_request_nm</p>
+							<ifthen>
+								<lt>
+									<p>tyre/bl/abs_mode</p>
+									<v>-0.5</v>
+								</lt>
+								<product>
+									<p>tyre/bl/service_brake_nm</p>
+									<exp>
+										<product>
+											<v>-1.0</v>
+											<p>abs/par/dump_rate</p>
+											<p>driveline/dt_s</p>
+										</product>
+									</exp>
+								</product>
+								<sum>
+									<p>tyre/bl/service_brake_nm</p>
+									<product>
+										<lt>
+											<v>0.5</v>
+											<p>tyre/bl/abs_mode</p>
+										</lt>
+										<p>abs/par/build_rate</p>
+										<p>driveline/par/brake_rear_nm</p>
+										<p>driveline/dt_s</p>
+									</product>
+								</sum>
+							</ifthen>
+						</min>
+					</max>
+					<p>tyre/bl/brake_request_nm</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- abs_yaw_margin_nm = 0.0 -->
+		<fcs_function name="tyre/bl/abs_yaw_margin_nm">
+			<function>
+				<v>0.0</v>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = abs_valve_nm -->
+		<fcs_function name="tyre/bl/service_brake_nm">
+			<function>
+				<p>tyre/bl/abs_valve_nm</p>
+			</function>
+		</fcs_function>
+		<!-- abs_mode = min(abs_wheel_mode, partner_wheel_mode) -->
+		<fcs_function name="tyre/br/abs_mode">
+			<function>
+				<min>
+					<p>tyre/br/abs_wheel_mode</p>
+					<p>tyre/bl/abs_wheel_mode</p>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- abs_active = abs_enabled * lt(abs_min_speed_mps, abs(vx_wheel_mps)) * lt(0.0, brake_request_nm) * max(abs_active, lt(abs_mode, -0.5)) * (1.0 - lt(0.5, abs_mode) * lt(brake_request_nm - 1.0, service_brake_nm)) -->
+		<fcs_function name="tyre/br/abs_active">
+			<function>
+				<product>
+					<p>abs/par/enabled</p>
+					<lt>
+						<p>abs/par/min_speed_mps</p>
+						<abs>
+							<p>tyre/br/vx_wheel_mps</p>
+						</abs>
+					</lt>
+					<lt>
+						<v>0.0</v>
+						<p>tyre/br/brake_request_nm</p>
+					</lt>
+					<max>
+						<p>tyre/br/abs_active</p>
+						<lt>
+							<p>tyre/br/abs_mode</p>
+							<v>-0.5</v>
+						</lt>
+					</max>
+					<difference>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<v>0.5</v>
+								<p>tyre/br/abs_mode</p>
+							</lt>
+							<lt>
+								<difference>
+									<p>tyre/br/brake_request_nm</p>
+									<v>1.0</v>
+								</difference>
+								<p>tyre/br/service_brake_nm</p>
+							</lt>
+						</product>
+					</difference>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- abs_valve_nm = ifthen(abs_active, max(0.0, min(brake_request_nm, ifthen(lt(abs_mode, -0.5), service_brake_nm * exp(-1.0 * abs_dump_rate * dt_s), service_brake_nm + lt(0.5, abs_mode) * abs_build_rate * brake_rear_nm * dt_s))), brake_request_nm) -->
+		<fcs_function name="tyre/br/abs_valve_nm">
+			<function>
+				<ifthen>
+					<p>tyre/br/abs_active</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>tyre/br/brake_request_nm</p>
+							<ifthen>
+								<lt>
+									<p>tyre/br/abs_mode</p>
+									<v>-0.5</v>
+								</lt>
+								<product>
+									<p>tyre/br/service_brake_nm</p>
+									<exp>
+										<product>
+											<v>-1.0</v>
+											<p>abs/par/dump_rate</p>
+											<p>driveline/dt_s</p>
+										</product>
+									</exp>
+								</product>
+								<sum>
+									<p>tyre/br/service_brake_nm</p>
+									<product>
+										<lt>
+											<v>0.5</v>
+											<p>tyre/br/abs_mode</p>
+										</lt>
+										<p>abs/par/build_rate</p>
+										<p>driveline/par/brake_rear_nm</p>
+										<p>driveline/dt_s</p>
+									</product>
+								</sum>
+							</ifthen>
+						</min>
+					</max>
+					<p>tyre/br/brake_request_nm</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- abs_yaw_margin_nm = 0.0 -->
+		<fcs_function name="tyre/br/abs_yaw_margin_nm">
+			<function>
+				<v>0.0</v>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = abs_valve_nm -->
+		<fcs_function name="tyre/br/service_brake_nm">
+			<function>
+				<p>tyre/br/abs_valve_nm</p>
+			</function>
+		</fcs_function>
+		<!-- active = max(active_fl, active_fr, active_bl, active_br) -->
+		<fcs_function name="abs/active">
+			<function>
+				<max>
+					<p>tyre/fl/abs_active</p>
+					<p>tyre/fr/abs_active</p>
+					<p>tyre/bl/abs_active</p>
+					<p>tyre/br/abs_active</p>
 				</max>
 			</function>
 		</fcs_function>
@@ -783,21 +1626,6 @@
 						</min>
 					</max>
 				</product>
-			</function>
-		</fcs_function>
-		<!-- brake_request_nm = service_front * brake_front_nm -->
-		<fcs_function name="tyre/fl/brake_request_nm">
-			<function>
-				<product>
-					<p>brakes/service_front</p>
-					<p>driveline/par/brake_front_nm</p>
-				</product>
-			</function>
-		</fcs_function>
-		<!-- service_brake_nm = brake_request_nm -->
-		<fcs_function name="tyre/fl/service_brake_nm">
-			<function>
-				<p>tyre/fl/brake_request_nm</p>
 			</function>
 		</fcs_function>
 		<!-- brake_torque_nm = service_brake_nm + 0.0 + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
@@ -1731,21 +2559,6 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = service_front * brake_front_nm -->
-		<fcs_function name="tyre/fr/brake_request_nm">
-			<function>
-				<product>
-					<p>brakes/service_front</p>
-					<p>driveline/par/brake_front_nm</p>
-				</product>
-			</function>
-		</fcs_function>
-		<!-- service_brake_nm = brake_request_nm -->
-		<fcs_function name="tyre/fr/service_brake_nm">
-			<function>
-				<p>tyre/fr/brake_request_nm</p>
-			</function>
-		</fcs_function>
 		<!-- brake_torque_nm = service_brake_nm + 0.0 + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
 		<fcs_function name="tyre/fr/brake_torque_nm">
 			<function>
@@ -2674,21 +3487,6 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = service_rear * brake_rear_nm -->
-		<fcs_function name="tyre/bl/brake_request_nm">
-			<function>
-				<product>
-					<p>brakes/service_rear</p>
-					<p>driveline/par/brake_rear_nm</p>
-				</product>
-			</function>
-		</fcs_function>
-		<!-- service_brake_nm = brake_request_nm -->
-		<fcs_function name="tyre/bl/service_brake_nm">
-			<function>
-				<p>tyre/bl/brake_request_nm</p>
-			</function>
-		</fcs_function>
 		<!-- brake_torque_nm = service_brake_nm + mechanical_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
 		<fcs_function name="tyre/bl/brake_torque_nm">
 			<function>
@@ -3615,21 +4413,6 @@
 						</min>
 					</max>
 				</product>
-			</function>
-		</fcs_function>
-		<!-- brake_request_nm = service_rear * brake_rear_nm -->
-		<fcs_function name="tyre/br/brake_request_nm">
-			<function>
-				<product>
-					<p>brakes/service_rear</p>
-					<p>driveline/par/brake_rear_nm</p>
-				</product>
-			</function>
-		</fcs_function>
-		<!-- service_brake_nm = brake_request_nm -->
-		<fcs_function name="tyre/br/service_brake_nm">
-			<function>
-				<p>tyre/br/brake_request_nm</p>
 			</function>
 		</fcs_function>
 		<!-- brake_torque_nm = service_brake_nm + mechanical_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->

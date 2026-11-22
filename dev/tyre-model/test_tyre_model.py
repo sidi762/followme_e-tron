@@ -18,6 +18,8 @@ from sim import KMH, WHEELS, Car, corner, launch, mean, moved, stop
 
 REAR_DRIVE = {"driveline/par/front_torque_share": 0.0}
 FRONT_DRIVE = {"driveline/par/front_torque_share": 1.0}
+# For the tests of what the tyres themselves do when a wheel locks.
+NO_ABS = {"abs/par/enabled": 0.0}
 
 
 def test_generated_files_are_current():
@@ -103,7 +105,7 @@ def test_smoke_follows_the_sliding_axle():
     for wheel in ("bl", "br"):
         assert car.fdm[f"tyre/{wheel}/smoke_norm"] > 0.5
 
-    car = Car("tyre", speed=20, settle=0.6)
+    car = Car("tyre", speed=20, settle=0.6, params=NO_ABS)
     car.run(0.25)
     assert all(car.fdm[f"tyre/{wheel}/smoke_norm"] == 0 for wheel in WHEELS)
     car.run(0.6, brake=1, rear_brake=0)
@@ -160,9 +162,9 @@ def test_coasting_slows_the_car_like_the_standard_fdm():
 
 
 def test_threshold_braking_beats_locked_wheels():
-    locked, _ = stop("tyre", pedal=1.0)
+    locked, _ = stop("tyre", pedal=1.0, params=NO_ABS)
     # Pedals found by search: each axle just short of locking.
-    threshold, _ = stop("tyre", pedal=0.83, rear_pedal=0.90)
+    threshold, _ = stop("tyre", pedal=0.83, rear_pedal=0.90, params=NO_ABS)
     assert locked["front_locked"] and locked["rear_locked"]
     assert not threshold["front_locked"] and not threshold["rear_locked"]
     assert 35.0 < threshold["dist"] < 40.0
@@ -171,8 +173,8 @@ def test_threshold_braking_beats_locked_wheels():
 
 
 def test_locked_front_wheels_cannot_steer():
-    locked, _ = stop("tyre", pedal=1.0, steer=0.15)
-    rolling, _ = stop("tyre", pedal=0.6, steer=0.15)
+    locked, _ = stop("tyre", pedal=1.0, steer=0.15, params=NO_ABS)
+    rolling, _ = stop("tyre", pedal=0.6, steer=0.15, params=NO_ABS)
     # Not zero: the friction ellipse normalises the two slips differently, so a
     # locked tyre's force points about 2 deg off its sliding direction.
     assert locked["yaw_dps"] < 5.0
@@ -339,6 +341,95 @@ def test_auto_hold_holds_on_a_slope_with_the_service_brakes():
     car.push(forward=0.2)
     assert moved(car.run(30.0)) < 0.01
     assert min(brake_torques(car.fdm, "service_brake_nm")) > 0.0
+
+
+@pytest.mark.parametrize("surface", [1.0, 0.6, 0.3])
+def test_abs_keeps_the_wheels_rolling_and_stops_shorter(surface):
+    locked, _ = stop("tyre", pedal=1.0, surface=surface, params=NO_ABS)
+    with_abs, rows = stop("tyre", pedal=1.0, surface=surface)
+    assert locked["front_locked"] and locked["rear_locked"]
+    assert not with_abs["front_locked"] and not with_abs["rear_locked"]
+    assert with_abs["dist"] < locked["dist"] - 0.5
+    if surface == 1.0:
+        # as short as the best split of the two pedals found by hand
+        threshold, _ = stop("tyre", pedal=0.83, rear_pedal=0.90, params=NO_ABS)
+        assert with_abs["dist"] < threshold["dist"] + 0.5
+
+
+def test_abs_lets_the_car_steer_while_braking_hard():
+    locked, _ = stop("tyre", pedal=1.0, steer=0.15, params=NO_ABS)
+    with_abs, _ = stop("tyre", pedal=1.0, steer=0.15)
+    assert with_abs["yaw_dps"] > 10.0
+    assert with_abs["yaw_dps"] > 3.0 * locked["yaw_dps"]
+
+
+def test_abs_stays_out_of_ordinary_braking():
+    plain, _ = stop("tyre", pedal=0.4, params=NO_ABS)
+    car = Car("tyre", speed=100 * KMH)
+    rows, active = [], 0.0
+    while not rows or abs(rows[-1]["u"]) >= 0.2:
+        car.step(brake_front=0.4, brake_rear=0.4)
+        rows.append(car.sample())
+        active = max(active, car.fdm["abs/active"])
+    assert active == 0.0
+    assert moved(rows) == pytest.approx(plain["dist"], abs=0.01)
+
+
+def test_abs_releases_coast_regen_and_leaves_the_handbrake_alone():
+    car = Car("tyre", speed=60 * KMH, surface=0.3)
+    car.run(0.5, brake=1.0)
+    assert car.fdm["abs/active"] == 1.0
+    assert car.fdm["driveline/motor_torque_nm"] == 0.0
+    # the lever bypasses the hydraulics: ABS does not stop it locking the rear wheels
+    car = Car("tyre", speed=60 * KMH, settle=0.5)
+    car.fdm["/systems/BrakeController/handbrake-norm"] = 1.0
+    car.run(0.5)
+    assert car.fdm["tyre/bl/slip_ratio"] < -0.9
+
+
+def split_grip_stop(params, steer_against_yaw):
+    """Full braking from 80 km/h with the left wheels on asphalt and the right on ice.
+
+    With steer_against_yaw, a driver holds the heading after 0.3 s, turning
+    the wheel at most 18 deg/s and 6.75 deg at the road wheels.
+    """
+    grip = (1.0, 0.3, 1.0, 0.3)
+    car = Car("tyre", speed=80 * KMH, params=params)
+    fdm = car.fdm
+    start, heading, steer, rows = fdm.get_sim_time(), 0.0, 0.0, []
+    while fdm.get_sim_time() - start < 10.0 and fdm["velocities/u-fps"] * 0.3048 > 0.3:
+        for unit, g in enumerate(grip):   # standalone JSBSim has one surface; seed each wheel's
+            fdm[f"gear/unit[{unit}]/static-friction-factor"] = g
+        if steer_against_yaw and fdm.get_sim_time() - start > 0.3:
+            want = max(-0.15, min(0.15, -(1.5 * heading + 0.25 * fdm["velocities/r-rad_sec"])))
+            steer += max(-0.4 * car.dt, min(0.4 * car.dt, want - steer))
+        car.step(brake_front=1.0, brake_rear=1.0, steer=steer)
+        row = car.sample()
+        heading += row["yaw_rate"] * car.dt
+        row["heading_deg"] = math.degrees(heading)
+        row.update(("brake_" + w, fdm[f"tyre/{w}/service_brake_nm"]) for w in WHEELS)
+        rows.append(row)
+    return rows
+
+
+def test_abs_on_split_grip_brakes_each_front_wheel_for_its_own_grip_and_stays_steerable():
+    rows = split_grip_stop({}, steer_against_yaw=True)
+    middle = rows[len(rows) // 3]
+    assert middle["brake_fl"] > 1.5 * middle["brake_fr"]         # asphalt side brakes harder
+    assert middle["brake_bl"] == middle["brake_br"]             # rear pair: select low
+    assert max(abs(r["heading_deg"]) for r in rows) < 10.0
+    assert all(r["slip_ratio_" + w] > -0.9 for r in rows if r["u"] > 3.0 for w in WHEELS)
+    # without ABS the locked wheels cannot steer and the car turns round
+    locked = split_grip_stop(NO_ABS, steer_against_yaw=True)
+    assert max(abs(r["heading_deg"]) for r in locked) > 45.0
+
+
+def test_abs_lets_split_grip_yaw_build_up_gradually():
+    def heading_after_one_second(params):
+        rows = split_grip_stop(params, steer_against_yaw=False)
+        return abs(min(rows, key=lambda r: abs(r["t"] - rows[0]["t"] - 1.0))["heading_deg"])
+
+    assert heading_after_one_second({}) < 0.9 * heading_after_one_second({"abs/par/yaw_delay_start": 1.0})
 
 
 @pytest.mark.parametrize("params", [{}, REAR_DRIVE, FRONT_DRIVE])

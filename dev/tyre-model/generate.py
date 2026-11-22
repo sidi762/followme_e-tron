@@ -132,6 +132,59 @@ BRAKE_EQS = [
 ]
 
 # --------------------------------------------------------------------------
+# ABS. It runs one frame behind the wheels, as a controller does: it reads the
+# slip the tyre channels worked out in the previous frame and sets each
+# wheel's hydraulic brake torque for this one. Like real valves it can only
+# release, hold or rebuild pressure, never exceed the request. The front
+# wheels are controlled one by one; the rear pair follows whichever rear wheel
+# needs less ("select low"), so on split grip the rear axle adds no yaw.
+# Only the service brakes pass through it; handbrake and parking clamp do not.
+# --------------------------------------------------------------------------
+ABS_PARAMS = [
+    ("enabled", 1.0, "0 switches ABS off: each wheel gets its whole service brake request"),
+    ("min_speed_mps", 2.5, "below this ABS lets the wheels lock, as real systems do near a standstill"),
+    ("dump_slip", 1.0, "release above this braking slip, as a share of the tyre's peak slip at its load"),
+    ("rebuild_slip", 0.6, "rebuild below this share; hold in between"),
+    ("dump_rate", 15.0, "outlet valve: while releasing, the torque falls by this share per second, exponentially"),
+    ("build_rate", 1.5, "pulsed inlet valve: while rebuilding, it rises by this share of the full-pedal torque per second"),
+    ("yaw_delay_start", 0.1, "front wheels: while one is under ABS, the other may brake this share of the full-pedal torque harder"),
+    ("yaw_delay_rate", 0.5, "and that margin grows by this share per second, so split grip turns the car gradually"),
+]
+
+# Pass one, every wheel: the request and what this wheel alone would need.
+ABS_WHEEL_EQS = [
+    ("brake_request_nm", "{service_cmd} * {brake_par}"),
+    # braking slip over the tyre's peak braking slip: above 1 the wheel is past its grip peak
+    ("abs_slip", "max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip"),
+    ("abs_slip_rate", "(abs_slip - abs_slip_last) / dt_s"),
+    ("abs_slip_last", "abs_slip"),
+    # Release while past the peak and still slipping more. Once the wheel
+    # starts to recover, hold: releasing further only wastes braking while
+    # the heavy wheel spins back up.
+    ("abs_wheel_mode", "ifthen(lt(abs_dump_slip, abs_slip) * (1.0 - lt(abs_slip_rate, 0.0)), -1.0,"
+                       " ifthen(lt(abs_rebuild_slip, abs_slip), 0.0, 1.0))"),
+]
+
+# Pass two, every wheel: -1 release, 0 hold, 1 rebuild, then the valves.
+ABS_VALVE_EQS = [
+    ("abs_mode", "{abs_mode}"),
+    # On when a wheel first needs releasing. Off when the request goes, the car
+    # is nearly stopped, or the pressure is back up to the request.
+    ("abs_active", "abs_enabled * lt(abs_min_speed_mps, abs(vx_wheel_mps)) * lt(0.0, brake_request_nm)"
+                   " * max(abs_active, lt(abs_mode, -0.5))"
+                   " * (1.0 - lt(0.5, abs_mode) * lt(brake_request_nm - 1.0, service_brake_nm))"),
+    ("abs_valve_nm", "ifthen(abs_active, max(0.0, min(brake_request_nm, ifthen(lt(abs_mode, -0.5),"
+                     " service_brake_nm * exp(-1.0 * abs_dump_rate * dt_s),"
+                     " service_brake_nm + lt(0.5, abs_mode) * abs_build_rate * {brake_par} * dt_s))),"
+                     " brake_request_nm)"),
+    # Yaw moment build-up delay, front axle only: with one front wheel on ice
+    # under ABS, the other one's extra braking is let in gradually, so the
+    # driver has time to steer against the pull.
+    ("abs_yaw_margin_nm", "{yaw_margin}"),
+    ("service_brake_nm", "{service}"),
+]
+
+# --------------------------------------------------------------------------
 # Equations, evaluated top to bottom on every FDM frame.
 # A name is resolved, in this order, to: a value computed earlier in the same
 # list, a parameter, an input, or one of the JSBSim properties in EXTERNAL.
@@ -167,7 +220,8 @@ DRIVELINE_EQS = [
     # pedal released: a small torque against the rotation, zero at standstill
     ("coast_torque_nm", "-1.0 * coast_regen_nm * (1.0 - min(1.0, 20.0 * throttle_norm))"
                         " * max(-1.0, min(1.0, motor_rad_sec / coast_regen_fade_rad_sec))"),
-    ("motor_torque_nm", "motor_on * (drive_torque_nm + coast_torque_nm)"),
+    # coast regen brakes the wheels outside ABS's control, so it lets go while ABS works
+    ("motor_torque_nm", "motor_on * (drive_torque_nm + coast_torque_nm * (1.0 - abs_any))"),
     ("axle_torque_front_nm", "motor_torque_nm * gear * front_torque_share"),
     ("axle_torque_rear_nm", "motor_torque_nm * gear * (1.0 - front_torque_share)"),
 ]
@@ -214,10 +268,8 @@ WHEEL_EQS = [
     # The park lock only bites below walking pace, so switching the motor off
     # at speed does not lock the wheels.
     ("park_torque_nm", "(1.0 - motor_on) * park_lock_nm * max(0.0, min(1.0, 1.5 - abs(vx_wheel_mps)))"),
-    # This wheel's own brake. The hydraulic unit passes the service request on
-    # unchanged for now; ABS and stability control will modulate it here.
-    ("brake_request_nm", "{service_cmd} * {brake_par}"),
-    ("service_brake_nm", "brake_request_nm"),
+    # This wheel's own brake: the hydraulic torque the ABS channel let through,
+    # handbrake or parking clamp, park lock and rolling resistance.
     ("brake_torque_nm", "service_brake_nm + {mechanical} + park_torque_nm"
                         " + rolling_resistance * roll_factor * load_n * radius_m"),
     ("implicit_gain", "radius_m * radius_m * stiffness_x_n / v_ref_mps"),
@@ -406,11 +458,14 @@ def build_system(stock_text):
     shared.update((name, "tyre/par/" + name) for name, _, _ in tyre_params)
     shared.update((name, "driveline/par/" + name) for name, _, _ in DRIVELINE_PARAMS)
     shared.update((name, "driveline/in/" + name) for name, _, _ in DRIVELINE_INPUTS)
+    shared.update(("abs_" + name, "abs/par/" + name) for name, _, _ in ABS_PARAMS)
+    shared["abs_any"] = "abs/active"
     for w in wheels:
         shared["omega_" + w.name] = "tyre/%s/omega_rad_sec" % w.name
     driveline_names = [name for name, _ in DRIVELINE_EQS]
     brake_names = [name for name, _ in BRAKE_EQS]
-    wheel_names = set(LOAD_CURVES) | {eq[0] for eq in WHEEL_EQS}
+    wheel_names = (set(LOAD_CURVES) | {eq[0] for eq in WHEEL_EQS}
+                   | {name for name, _ in ABS_WHEEL_EQS + ABS_VALVE_EQS})
 
     def resolve_driveline(name):
         if name in driveline_names:
@@ -435,10 +490,14 @@ def build_system(stock_text):
            INDENT + "<!-- Tyre parameters -->\n", _property_lines("tyre/par", tyre_params), "\n",
            INDENT + "<!-- Driveline and brake parameters -->\n",
            _property_lines("driveline/par", driveline_params), "\n",
+           INDENT + "<!-- ABS parameters -->\n", _property_lines("abs/par", ABS_PARAMS), "\n",
            INDENT + "<!-- Inputs -->\n", _property_lines("driveline/in", DRIVELINE_INPUTS), "\n",
-           INDENT + "<!-- State: wheel speeds -->\n"]
+           INDENT + "<!-- State: wheel speeds, and what the ABS channel reads before the wheels compute it -->\n"]
     for w in wheels:
-        out.append('%s<property value="0.0">tyre/%s/omega_rad_sec</property>\n' % (INDENT, w.name))
+        for name in ("omega_rad_sec", "slip_ratio", "vx_wheel_mps", "abs_slip_last", "abs_active", "abs_yaw_margin_nm", "service_brake_nm"):
+            out.append('%s<property value="0.0">tyre/%s/%s</property>\n' % (INDENT, w.name, name))
+        out.append('%s<property value="0.1">tyre/%s/brake_peak_slip</property>\n' % (INDENT, w.name))
+    out.append('%s<property value="0.0">abs/active</property>\n' % INDENT)
 
     out.append('\n%s<channel name="Occupants">\n' % INDENT)
     for name, expr, outputs in OCCUPANT_EQS:
@@ -456,7 +515,7 @@ def build_system(stock_text):
         out.append(fcs_function("brakes/" + name, expr, resolve_brakes))
     out.append("%s</channel>\n" % INDENT)
 
-    for w in wheels:
+    def wheel_resolver(w):
         local = {
             "comp_ft": "gear/unit[%d]/compression-ft" % w.unit,
             "comp_vel_fps": "gear/unit[%d]/compression-velocity-fps" % w.unit,
@@ -464,15 +523,22 @@ def build_system(stock_text):
             "surface": "gear/unit[%d]/static-friction-factor" % w.unit,
             "roll_factor": "gear/unit[%d]/rolling_friction-factor" % w.unit,
         }
+        axle = front if w.front else rear
+        partner = [other for other in axle if other is not w][0]
+        local["partner_wheel_mode"] = "tyre/%s/abs_wheel_mode" % partner.name
+        local["partner_abs_active"] = "tyre/%s/abs_active" % partner.name
+        local["partner_service_nm"] = "tyre/%s/service_brake_nm" % partner.name
 
-        def resolve_wheel(name, w=w, local=local):
+        def resolve_wheel(name):
             if name in wheel_names:
                 return "tyre/%s/%s" % (w.name, name)
             if name in local:
                 return local[name]
             return resolve_brakes(name)
+        return resolve_wheel
 
-        fields = {
+    def wheel_fields(w):
+        return {
             "wheel": w.name,
             "unit": w.unit,
             "spring": repr(w.spring),
@@ -488,7 +554,26 @@ def build_system(stock_text):
             "brake_par": "brake_front_nm" if w.front else "brake_rear_nm",
             "mechanical": "0.0" if w.front else "mechanical_rear_nm",
             "reference_mu": LOAD_CURVES["brake_peak_mu"][1],
+            "abs_mode": "abs_wheel_mode" if w.front else "min(abs_wheel_mode, partner_wheel_mode)",
+            "yaw_margin": ("ifthen(partner_abs_active, min({brake_par}, abs_yaw_margin_nm + abs_yaw_delay_rate"
+                           " * {brake_par} * dt_s), abs_yaw_delay_start * {brake_par})"
+                           .format(brake_par="brake_front_nm")) if w.front else "0.0",
+            "service": ("ifthen(partner_abs_active, min(abs_valve_nm, partner_service_nm + abs_yaw_margin_nm),"
+                        " abs_valve_nm)") if w.front else "abs_valve_nm",
         }
+
+    out.append('\n%s<channel name="ABS">\n' % INDENT)
+    for eqs in (ABS_WHEEL_EQS, ABS_VALVE_EQS):
+        for w in wheels:
+            for name, expr in eqs:
+                out.append(fcs_function("tyre/%s/%s" % (w.name, name), expr.format(**wheel_fields(w)),
+                                        wheel_resolver(w)))
+    actives = {"active_" + w.name: "tyre/%s/abs_active" % w.name for w in wheels}
+    out.append(fcs_function("abs/active", "max(%s)" % ", ".join(actives), actives.__getitem__))
+    out.append("%s</channel>\n" % INDENT)
+
+    for w in wheels:
+        fields, resolve_wheel = wheel_fields(w), wheel_resolver(w)
         out.append('\n%s<channel name="Tyre %s">\n' % (INDENT, w.name))
         for eq in WHEEL_EQS:
             name, expr = eq[0], eq[1].format(**fields)
@@ -581,8 +666,9 @@ def check_equations():
     known = set(EXTERNAL) | set(LOAD_CURVES) | {"comp_ft", "comp_vel_fps", "steer_deg", "surface", "roll_factor"}
     known |= {n for n, _, _ in TYRE_PARAMS + DRIVELINE_PARAMS + DRIVELINE_INPUTS} | {"load_nominal_n"}
     known |= {"omega_fl", "omega_fr", "omega_bl", "omega_br"} | set(OCCUPANT_INPUTS) | set(BRAKE_INPUTS)
-    known |= {n for n, _ in DRIVELINE_EQS + BRAKE_EQS} | {eq[0] for eq in WHEEL_EQS}
-    for eq in OCCUPANT_EQS + DRIVELINE_EQS + BRAKE_EQS + WHEEL_EQS:
+    known |= {n for n, _ in DRIVELINE_EQS + BRAKE_EQS + ABS_WHEEL_EQS + ABS_VALVE_EQS} | {eq[0] for eq in WHEEL_EQS}
+    known |= {"abs_" + n for n, _, _ in ABS_PARAMS} | {"abs_any", "partner_wheel_mode", "partner_abs_active", "partner_service_nm"}
+    for eq in OCCUPANT_EQS + DRIVELINE_EQS + BRAKE_EQS + ABS_WHEEL_EQS + ABS_VALVE_EQS + WHEEL_EQS:
         expr = re.sub(r"\{\w+\}", "0.0", eq[1])
         unknown = names(expr) - known
         if unknown:

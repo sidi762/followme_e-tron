@@ -9,6 +9,8 @@ import sys
 
 from sim import corner, launch, stop
 
+NO_ABS = {"abs/par/enabled": 0.0}
+
 
 def main():
     dt = 1.0 / float(sys.argv[1]) if len(sys.argv) > 1 else 1.0 / 120.0
@@ -25,22 +27,22 @@ def main():
     for surface in (1.0, 0.3):
         a, _ = stop("stock", surface=surface, dt=dt)
         print("  grip x%.1f   standard, full pedal      %6.1f m  %.2f g" % (surface, a["dist"], a["decel_g"]))
-        for pedal in (1.0, 0.8, 0.6, 0.4):
-            b, _ = stop("tyre", pedal=pedal, surface=surface, dt=dt)
+        for pedal, params in ((1.0, NO_ABS), (1.0, {}), (0.8, {}), (0.6, {}), (0.4, {})):
+            b, _ = stop("tyre", pedal=pedal, surface=surface, dt=dt, params=params)
             state = "%s, %s" % ("front locked" if b["front_locked"] else "front rolling",
                                 "rear locked" if b["rear_locked"] else "rear rolling")
-            print("  grip x%.1f   tyre model, pedal %.1f     %6.1f m  %.2f g  (%s)"
-                  % (surface, pedal, b["dist"], b["decel_g"], state))
-    threshold, _ = stop("tyre", pedal=0.83, rear_pedal=0.90, dt=dt)
-    print("  grip x1.0   tyre model, front .83 rear .90   %.1f m  %.2f g"
+            print("  grip x%.1f   tyre model, pedal %.1f %s %6.1f m  %.2f g  (%s)"
+                  % (surface, pedal, "no ABS" if params else "      ", b["dist"], b["decel_g"], state))
+    threshold, _ = stop("tyre", pedal=0.83, rear_pedal=0.90, dt=dt, params=NO_ABS)
+    print("  grip x1.0   tyre model, no ABS, front .83 rear .90   %.1f m  %.2f g"
           % (threshold["dist"], threshold["decel_g"]))
 
     print("\nBraking from 100 km/h with 6.75 deg of steering")
     a, _ = stop("stock", steer=0.15, dt=dt)
     print("  standard, full pedal        yaw %4.1f deg/s" % a["yaw_dps"])
-    for pedal in (1.0, 0.6):
-        b, _ = stop("tyre", pedal=pedal, steer=0.15, dt=dt)
-        print("  tyre model, pedal %.1f       yaw %4.1f deg/s" % (pedal, b["yaw_dps"]))
+    for pedal, params in ((1.0, NO_ABS), (1.0, {}), (0.6, {})):
+        b, _ = stop("tyre", pedal=pedal, steer=0.15, dt=dt, params=params)
+        print("  tyre model, pedal %.1f %s yaw %4.1f deg/s" % (pedal, "no ABS" if params else "      ", b["yaw_dps"]))
 
     print("\nSteady cornering, speed held (radius in m, slip angles in deg)")
     print("  km/h steer  geometric |  standard: g  radius front  rear |  tyre model: g  radius front  rear")

@@ -24,7 +24,7 @@ The scalar tuning parameters can be changed while driving, in the property brows
 | Drive | four equal body forces, whatever the grip | motor torque on the wheels, limited by the tyres |
 | Drive update | by a Nasal timer: 10 Hz, or once per frame below 10 fps | every FDM frame (120 Hz) |
 | Wheel speed | not a state: wheels cannot spin or lock | one state per wheel |
-| Braking | pedal times 1.7 g on a dry road; wheels never lock | brake torque; too much locks the wheels |
+| Braking | pedal times 1.7 g on a dry road; wheels never lock | brake torque per wheel; ABS keeps the wheels from locking |
 | Cornering grip | fixed 1.0 g cap, same at any load | peaks, then falls; less per kg on a loaded tyre |
 | Combined | braking and cornering limits are independent | one friction ellipse per tyre |
 | Surface | affects braking and cornering, not acceleration | affects everything |
@@ -32,8 +32,9 @@ The scalar tuning parameters can be changed while driving, in the property brows
 
 `report.py` prints current numbers for both. On flat dry ground at 120 Hz the standard FDM
 reaches 100 km/h in 3.8 s and the tyre model in 3.5 s. The nominal 100 km/h stop takes about
-23 m for the standard FDM. The tyre model takes 38.8 m at 80% pedal and 38.0 m at full pedal.
-Independent front/rear inputs of 83%/90% give 37.0 m with both axles still rolling.
+23 m for the standard FDM. The tyre model takes 38.8 m at 80% pedal and 36.9 m at full pedal with
+ABS. Without ABS full pedal locks all four wheels and takes 38.0 m, and the best hand-found split of
+the pedals, 83% front and 90% rear, takes 37.0 m.
 
 The standard FDM is slower off the line because `engine.nas` works out each update's torque from
 the previous update's rpm, which lags while the rpm climbs. That also makes its acceleration depend
@@ -144,6 +145,45 @@ To audit the body shell against the 3D model (needs NumPy):
 python3 dev/tyre-model/fit_body_shell.py
 ```
 
+## ABS
+
+The `ABS` channel sits between the `Brakes` channel and the wheels. Like a real controller it
+works one frame behind: it reads the slip each tyre channel computed in the previous frame and
+sets each wheel's hydraulic torque for this one. It controls only the service brakes; the
+handbrake lever and the parking clamp bypass it.
+
+- **What it watches.** Each wheel's braking slip divided by the tyre's measured peak braking slip
+  at its present load (`abs_slip`, 20.5% / 14% / 10.5% at 1,250 / 4,000 / 6,000 N). A real
+  controller estimates the car's speed from the wheels and an accelerometer; this one takes the
+  true speed of each contact patch.
+- **What it can do.** Each wheel's valves release, hold or rebuild pressure, and never give more
+  than the request. Past the peak (`dump_slip`) and still slipping more, it releases, falling
+  exponentially at `dump_rate`. Once the wheel recovers, it holds. Below `rebuild_slip` it builds
+  back up in a slow ramp (`build_rate`). One cycle on dry asphalt takes about a third of a second.
+- **Front and rear.** The front wheels are controlled one by one. The rear pair follows whichever
+  rear wheel needs less ("select low"), so on split grip the rear axle adds no yaw. While one front
+  wheel is under ABS, the other may brake only a little harder at first (`yaw_delay_start`), and
+  that margin grows at `yaw_delay_rate`. So split grip turns the car gradually and the driver has
+  time to steer against it.
+- **When.** It engages when a wheel first needs releasing and lets go when the request goes, when
+  the pressure is back up to the request, or below `min_speed_mps` (9 km/h), where it lets the
+  wheels lock as real systems do. Ordinary braking never reaches it. Coast regen drops out while
+  it works, because the motor brakes the wheels outside its control.
+
+Its parameters are under `/fdm/jsbsim/abs/par`; `abs/par/enabled` = 0 switches it off.
+
+| Full pedal from 100 km/h | Without ABS | With ABS |
+|---|---|---|
+| Dry | 38.0 m, all four locked | 36.9 m, rolling |
+| Grip x0.6 | 62.9 m | 60.2 m |
+| Grip x0.3 | 123.1 m | 118.0 m |
+| Dry, 6.75° of steering | turns at 3.8°/s | turns at 19.4°/s |
+
+The distances differ less than on a real car because the fitted tyre curves keep about 94% of
+their peak grip at full lock. What ABS changes most here is that the car still steers. On split
+grip (80 km/h, left wheels on asphalt, right on ice) a driver holding the heading keeps it within
+4° with ABS. Without ABS the locked wheels cannot steer and the car turns 88°.
+
 ## How it works
 
 JSBSim keeps doing the suspension: the four `BOGEY` contacts still carry the car. Their friction
@@ -171,8 +211,8 @@ rear wheels:
 
 - **Service brakes**, hydraulic, all four wheels: the pedal of that axle, automatic braking (AEB
   and cruise control) and Auto Hold, whichever asks for most. Each wheel turns the demand into
-  `brake_request_nm` and passes it on as `service_brake_nm`. That second step is where ABS and
-  stability control will modulate each wheel; for now it changes nothing.
+  `brake_request_nm`, and the ABS channel passes on as much of it as the wheel can take as
+  `service_brake_nm` (see ABS above). Stability control will add its own requests there later.
 - **Handbrake lever** (held with `b`): the rear wheels only, mechanically, past the hydraulics.
   `handbrake_nm` locks them while driving. Held on a straight at speed, the locked rear wheels let
   the car swing round.
@@ -245,6 +285,9 @@ Outputs worth knowing, per wheel `fl`, `fr`, `bl`, `br`:
 | `tyre/<wheel>/brake_torque_nm` | all of it: service, mechanical, park lock, rolling resistance |
 | `brakes/service_front`, `service_rear` | service brake demand per axle, 0 to 1 |
 | `brakes/mechanical_rear_nm` | handbrake lever or parking clamp on each rear wheel |
+| `abs/active`, `tyre/<wheel>/abs_active` | ABS working on any wheel, on this wheel |
+| `tyre/<wheel>/abs_mode` | -1 releasing, 0 holding, 1 rebuilding |
+| `tyre/<wheel>/abs_slip` | braking slip over the tyre's peak braking slip at its load |
 | `driveline/motor_rad_sec`, `driveline/motor_torque_nm` | motor speed and torque |
 
 Parameters are listed with a comment each at the top of `Systems/tyre-model.xml`.
@@ -275,7 +318,8 @@ The tests run the generated FDM in standalone JSBSim on flat ground: wheel loads
 weights, launch on dry and slippery surfaces, threshold braking against locked wheels, steering
 with locked wheels, the friction ellipse, mixed surfaces, the cornering limit and understeer, power
 oversteer by drive layout, holding and releasing on slopes, pulling away at full lock, each
-wheel's brake request, the handbrake lever, the parking brake at rest and while moving, Auto
+wheel's brake request, ABS on dry, wet and icy roads, while steering and on split grip, the
+handbrake lever, the parking brake at rest and while moving, Auto
 Hold, and that results do not depend on the FDM rate (60 to 240 Hz). They do not start FlightGear
 and do not run any Nasal.
 
@@ -289,7 +333,8 @@ dev/tyre-model/fg/run.sh followme_e-tron-tyre reposition.nas    # reposition whi
 
 It prints what the car did and fails on a Nasal error. It has been run on FlightGear 2020.3.18
 (Ubuntu 24.04 package) only. The occupant weights, the driver weight buttons and each braking
-intent (S key, handbrake lever, parking brake at rest and moving, Auto Hold) have also been
+intent (S key, handbrake lever, parking brake at rest and moving, Auto Hold) and ABS on a full
+stop from 98 km/h (37.5 m, no wheel locked) have also been
 checked in FlightGear 2024.1.8 on macOS, including after a reposition. Nobody has driven the tyre
 model by hand yet.
 
@@ -301,7 +346,7 @@ model by hand yet.
   wheels.
 - The wheel load is one frame old.
 - A locked tyre's force points about 2° off its sliding direction, because the friction ellipse
-  normalises the two slips by different peak slips. Braking on locked wheels with 6.75° of
+  normalises the two slips by different peak slips. Braking on locked wheels (ABS off) with 6.75° of
   steering still turns the car at about 4°/s.
 - A full-throttle start on dry asphalt slips the front tyres past their peak (see Mass and
   occupants).
@@ -316,8 +361,8 @@ Not done yet:
   moving. `tyre/<wheel>/squeal` is there for them.
 - "Magic bush tyres" (`reduceRollingFriction`) has no effect; the equivalent is
   `tyre/par/rolling_resistance`.
-- No ABS, traction control or stability control. They are planned inside the FDM, acting on each
-  wheel's `service_brake_nm` and on the motor torque. `brakesABS` in `Nasal/systems/brakes.nas`
-  is not used.
-- The hydraulic brakes apply the request at once; there is no pressure build-up time yet.
+- No traction control or stability control. They are planned inside the FDM, acting on the motor
+  torque and on each wheel's brake request. `brakesABS` in `Nasal/systems/brakes.nas` is not used.
+- Outside ABS the hydraulic brakes apply the request at once; there is no pressure build-up time.
+- ABS has no warning lamp, sound or pedal feel yet.
 - The limo keeps the standard model.
