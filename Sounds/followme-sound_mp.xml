@@ -76,32 +76,6 @@
 	<max-dist>1000</max-dist>
   </horn>
 
-  <indicator>
-	<name>indicator</name>
-	<mode>looped</mode>
-	<path>Aircraft/followme_e-tron/Sounds/indicatorFlashing.wav</path>
-	<condition>
-      	<and>
-          	<or>
-              	<equals>
-            			<property>controls/lighting/indicator-left</property>
-            			<value>1</value>
-            	</equals>
-              	<equals>
-            			<property>controls/lighting/indicator-right</property>
-            			<value>1</value>
-            	</equals>
-            </or>
-          	<equals>
-        			<property>sim/current-view/internal</property>
-        			<value>1</value>
-        	</equals>
-        </and>
-	</condition>
-	<volume>
-        <value>0.6</value>
-	</volume>
-  </indicator>
 </fx>
 
 </PropertyList>

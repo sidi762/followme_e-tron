@@ -269,32 +269,36 @@
             <reference-dist>100</reference-dist>
             <max-dist>1000</max-dist>
         </horn>
-        <indicator>
-            <name>indicator</name>
-            <mode>looped</mode>
-            <path>Aircraft/followme_e-tron/Sounds/indicatorFlashing.wav</path>
+        <indicator-on>
+            <name>indicator-on</name>
+            <mode>once</mode>
+            <path>Aircraft/followme_e-tron/Sounds/indicator-on.wav</path>
             <condition>
-                <and>
-                    <or>
-                        <equals>
-                            <property>controls/lighting/indicator-left</property>
-                            <value>1</value>
-                        </equals>
-                        <equals>
-                            <property>controls/lighting/indicator-right</property>
-                            <value>1</value>
-                        </equals>
-                    </or>
-                    <equals>
-                        <property>sim/current-view/internal</property>
-                        <value>1</value>
-                    </equals>
-                </and>
+                <equals>
+                    <property>sim/model/lights/indicator-relay</property>
+                    <value>1</value>
+                </equals>
             </condition>
             <volume>
-                <value>0.4</value>
+                <property>sim/current-view/internal</property>
+                <factor>1</factor>
             </volume>
-        </indicator>
+        </indicator-on>
+        <indicator-off>
+            <name>indicator-off</name>
+            <mode>once</mode>
+            <path>Aircraft/followme_e-tron/Sounds/indicator-off.wav</path>
+            <condition>
+                <equals>
+                    <property>sim/model/lights/indicator-relay</property>
+                    <value>-1</value>
+                </equals>
+            </condition>
+            <volume>
+                <property>sim/current-view/internal</property>
+                <factor>1</factor>
+            </volume>
+        </indicator-off>
         <armrest_box_open>
             <name>armrest_box_open</name>
             <mode>in-transit</mode>
