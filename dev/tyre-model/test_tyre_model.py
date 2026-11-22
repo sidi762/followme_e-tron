@@ -80,10 +80,11 @@ def test_launch_on_a_dry_road_is_quick_and_only_the_front_slips():
     assert 3.0 < result["time"] < 3.8
     # The open 50:50 centre differential gives the front axle half the torque
     # while the start moves weight rearward, so the front tyres slip past their
-    # peak. A rear bias would hook up here but let the rear spin first on a
-    # slippery road, which with nothing to catch it turns the car round.
+    # peak, lose grip there and spin up. A rear bias would hook up here but let
+    # the rear spin first on a slippery road, which with nothing to catch it
+    # turns the car round. Traction control is what should stop the spin.
     assert max(max(r["slip_ratio_bl"], r["slip_ratio_br"]) for r in rows) < 0.1
-    assert result["max_slip"] < 0.8
+    assert result["max_slip"] < 1.5
 
 
 def test_launch_on_a_slippery_road_spins_the_wheels_and_is_slow():
@@ -165,20 +166,31 @@ def test_threshold_braking_beats_locked_wheels():
     locked, _ = stop("tyre", pedal=1.0, params=NO_ABS)
     # Pedals found by search: each axle just short of locking.
     threshold, _ = stop("tyre", pedal=0.83, rear_pedal=0.90, params=NO_ABS)
-    assert locked["front_locked"] and locked["rear_locked"]
+    # The front wheels lock first; sliding, they brake less and the rear keeps rolling.
+    assert locked["front_locked"]
     assert not threshold["front_locked"] and not threshold["rear_locked"]
     assert 35.0 < threshold["dist"] < 40.0
-    # Small: the fitted curves keep about 94 % of the peak grip at full lock.
-    assert locked["dist"] > threshold["dist"] + 0.5
+    assert locked["dist"] > 1.1 * threshold["dist"]
 
 
 def test_locked_front_wheels_cannot_steer():
     locked, _ = stop("tyre", pedal=1.0, steer=0.15, params=NO_ABS)
     rolling, _ = stop("tyre", pedal=0.6, steer=0.15, params=NO_ABS)
-    # Not zero: the friction ellipse normalises the two slips differently, so a
-    # locked tyre's force points about 2 deg off its sliding direction.
-    assert locked["yaw_dps"] < 5.0
-    assert rolling["yaw_dps"] > 3.0 * locked["yaw_dps"]
+    assert locked["yaw_dps"] < 2.0
+    assert rolling["yaw_dps"] > 8.0
+
+
+def test_a_locked_tyre_slides_at_three_quarters_of_its_peak_against_its_sliding():
+    # NHTSA DOT HS 809 747 fig. 4.7: a production tyre on dry asphalt keeps
+    # 680 of its 910 lb peak (75 %) fully locked.
+    _, rows = stop("tyre", pedal=1.0, steer=0.1, params=NO_ABS)
+    locked = [r for r in rows if r["slip_ratio_fl"] < -0.999 and r["u"] > 5.0]
+    assert len(locked) > 100
+    for r in locked:
+        force = math.hypot(r["fx_n_fl"], r["fy_n_fl"])
+        assert force == pytest.approx(0.75 * r["mu_x_fl"] * r["load_n_fl"], rel=0.01)
+        assert math.atan2(r["fy_n_fl"], r["fx_n_fl"]) == pytest.approx(
+            math.atan2(r["slip_tan_fl"], r["slip_ratio_fl"]), abs=1e-3)
 
 
 def test_forces_stay_inside_each_tyres_friction_ellipse():
@@ -347,9 +359,11 @@ def test_auto_hold_holds_on_a_slope_with_the_service_brakes():
 def test_abs_keeps_the_wheels_rolling_and_stops_shorter(surface):
     locked, _ = stop("tyre", pedal=1.0, surface=surface, params=NO_ABS)
     with_abs, rows = stop("tyre", pedal=1.0, surface=surface)
-    assert locked["front_locked"] and locked["rear_locked"]
+    assert locked["front_locked"]
     assert not with_abs["front_locked"] and not with_abs["rear_locked"]
-    assert with_abs["dist"] < locked["dist"] - 0.5
+    # NHTSA measured 10 to 17 % shorter than careful braking without ABS on dry
+    # concrete and wet asphalt (SAE 1999-01-1287, table 2); locking is worse still.
+    assert with_abs["dist"] < locked["dist"] / 1.12
     if surface == 1.0:
         # as short as the best split of the two pedals found by hand
         threshold, _ = stop("tyre", pedal=0.83, rear_pedal=0.90, params=NO_ABS)

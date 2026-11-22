@@ -31,10 +31,10 @@ The scalar tuning parameters can be changed while driving, in the property brows
 | Mass | 1575 kg, 67% on the front wheels, yaw inertia 16,200 kg·m² | 1575 kg from components plus a 60 kg driver: 52% front, yaw inertia 1,830 kg·m² |
 
 `report.py` prints current numbers for both. On flat dry ground at 120 Hz the standard FDM
-reaches 100 km/h in 3.8 s and the tyre model in 3.5 s. The nominal 100 km/h stop takes about
+reaches 100 km/h in 3.8 s and the tyre model in 3.6 s. The nominal 100 km/h stop takes about
 23 m for the standard FDM. The tyre model takes 38.8 m at 80% pedal and 36.9 m at full pedal with
-ABS. Without ABS full pedal locks all four wheels and takes 38.0 m, and the best hand-found split of
-the pedals, 83% front and 90% rear, takes 37.0 m.
+ABS. Without ABS full pedal locks the front wheels and takes 42.6 m, and the best hand-found split
+of the pedals, 83% front and 90% rear, takes 37.0 m.
 
 The standard FDM is slower off the line because `engine.nas` works out each update's torque from
 the previous update's rpm, which lags while the rpm climbs. That also makes its acceleration depend
@@ -85,8 +85,18 @@ normalised slip `s = slip / peak_slip` (using the tangent for angles), the fitte
 magnitude is `Fz * μ * sin(C * atan(tan(π / (2*C)) * abs(s)))`. A least-squares fit
 sets C independently for each direction and load. RMS errors in force divided by load range
 from 0.016 to 0.038 on the fitting samples. JSBSim interpolates the parameters between test
-loads and holds their endpoint values outside that range. The full-lock response and large
-sideways slides extrapolate beyond the available sweeps. Combined slip uses an ellipse.
+loads and holds their endpoint values outside that range. Combined slip uses an ellipse.
+
+Beyond the peak the sweeps stop short of full lock, and the fitted curves would keep about 94% of
+their peak grip there. A measured production tyre keeps far less. NHTSA's traction trailer ran a
+Toyota Corolla tyre on dry asphalt at 40 km/h with a 1,035 lb load: 910 lb peak at 15% slip, 725 lb
+at 82%, 680 lb fully locked, so 0.80 and 0.75 of the peak (DOT HS 809 747, 2005, figure 4.7). The
+same tyre at 64 km/h slid at 0.67 of its peak on wet concrete and 0.45 on wet Jennite (table 4.14).
+So past `slide_start` times the peak slip (1.5) the force blends into sliding friction, reaching
+it at full sliding: a locked wheel, or 45° sideways. Sliding friction is `slide_ratio` (0.75)
+times the peak and pulls straight against the tread's sliding direction, the same in every
+direction, as sliding rubber does. The new braking curve gives 0.79 at 82% slip and 0.75 locked;
+below 21% slip nothing changes.
 
 The mean reported kinematic rolling radius in the four 4,000 N longitudinal runs is
 0.31205 m. The rolling resistance uses a separate measured reference, 8.7 kg/t for a
@@ -135,9 +145,9 @@ the front axle reaches its limit first at any deceleration up to 1.15 g. With th
 middle that is 836 N·m per rear wheel instead of 580.
 
 The centre differential stays at 50:50. With the weight further back, a full-throttle start on dry
-asphalt now slips the front tyres past their peak. A rear bias hooks up on dry but spins the rear
-first on a slippery road, and with the lower yaw inertia the car then turns round. Traction control
-is meant to deal with both.
+asphalt now slips the front tyres past their peak, where they lose grip and spin up. A rear bias
+hooks up on dry but spins the rear first on a slippery road, and with the lower yaw inertia the
+car then turns round. Traction control is meant to deal with both.
 
 To audit the body shell against the 3D model (needs NumPy):
 
@@ -174,15 +184,17 @@ Its parameters are under `/fdm/jsbsim/abs/par`; `abs/par/enabled` = 0 switches i
 
 | Full pedal from 100 km/h | Without ABS | With ABS |
 |---|---|---|
-| Dry | 38.0 m, all four locked | 36.9 m, rolling |
-| Grip x0.6 | 62.9 m | 60.2 m |
-| Grip x0.3 | 123.1 m | 118.0 m |
-| Dry, 6.75° of steering | turns at 3.8°/s | turns at 19.4°/s |
+| Dry | 42.6 m, front wheels locked | 36.9 m, rolling (13% shorter) |
+| Grip x0.6 | 76.5 m | 60.2 m (21% shorter) |
+| Grip x0.3 | 151.3 m | 120.5 m (20% shorter) |
+| Dry, 6.75° of steering | turns at 1.0°/s | turns at 19.9°/s |
 
-The distances differ less than on a real car because the fitted tyre curves keep about 94% of
-their peak grip at full lock. What ABS changes most here is that the car still steers. On split
-grip (80 km/h, left wheels on asphalt, right on ice) a driver holding the heading keeps it within
-4° with ABS. Without ABS the locked wheels cannot steer and the car turns 88°.
+For comparison, NHTSA measured nine production cars stopping 10 to 13% shorter with ABS than
+with a test driver's best braking without it on dry concrete, and 11 to 17% on wet asphalt (SAE
+1999-01-1287, table 2); locking the wheels is worse than that best braking. On split grip (80 km/h,
+left wheels on asphalt, right on ice) a driver holding the heading keeps it within 4° with ABS.
+Without ABS the locked wheels cannot steer and the car turns more than 90°, as each of NHTSA's cars
+yawed out of its lane on split grip with ABS disabled.
 
 ## How it works
 
@@ -316,10 +328,10 @@ python3 dev/tyre-model/report.py
 
 The tests run the generated FDM in standalone JSBSim on flat ground: wheel loads and occupant
 weights, launch on dry and slippery surfaces, threshold braking against locked wheels, steering
-with locked wheels, the friction ellipse, mixed surfaces, the cornering limit and understeer, power
-oversteer by drive layout, holding and releasing on slopes, pulling away at full lock, each
-wheel's brake request, ABS on dry, wet and icy roads, while steering and on split grip, the
-handbrake lever, the parking brake at rest and while moving, Auto
+with locked wheels, a locked tyre's sliding friction, the friction ellipse, mixed surfaces, the
+cornering limit and understeer, power oversteer by drive layout, holding and releasing on slopes,
+pulling away at full lock, each wheel's brake request, ABS on dry, wet and icy roads, while
+steering and on split grip, the handbrake lever, the parking brake at rest and while moving, Auto
 Hold, and that results do not depend on the FDM rate (60 to 240 Hz). They do not start FlightGear
 and do not run any Nasal.
 
@@ -345,9 +357,10 @@ model by hand yet.
 - Forces act in the body's x-y plane, which is the road plane only as long as the car sits on its
   wheels.
 - The wheel load is one frame old.
-- A locked tyre's force points about 2° off its sliding direction, because the friction ellipse
-  normalises the two slips by different peak slips. Braking on locked wheels (ABS off) with 6.75° of
-  steering still turns the car at about 4°/s.
+- Sliding friction does not yet depend on speed or water. Real tyres grip more as they slow down,
+  sliding ones too, and slide at a smaller share of their peak on wet roads (0.45 to 0.67 of it in
+  NHTSA's tests). Loose gravel would favour a locked, ploughing wheel; NHTSA's cars stopped 27%
+  shorter there with ABS disabled.
 - A full-throttle start on dry asphalt slips the front tyres past their peak (see Mass and
   occupants).
 - Coast regen is a fixed motor torque so that lifting off slows the car as the standard FDM does;

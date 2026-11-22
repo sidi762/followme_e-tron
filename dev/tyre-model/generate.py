@@ -45,6 +45,9 @@ TYRE_PARAMS = [
     ("radius_m", 0.31205, "mean kinematic rolling radius of the four KIT 4000 N longitudinal runs"),
     ("wheel_inertia_kgm2", 2.1, "one wheel plus its share of the motor rotor seen through the gear"),
     ("low_speed_mps", 3.0, "below this the slip definitions are softened; see README"),
+    ("slide_ratio", 0.75, "a fully sliding tyre's friction as a share of its peak: production tyre on dry asphalt"
+                          " at 40 km/h, NHTSA DOT HS 809 747 figure 4.7"),
+    ("slide_start", 1.5, "past this multiple of the peak slip the force turns towards sliding friction"),
     ("stick_full_mps", 0.15, "a stopped wheel slower than this is held by JSBSim's static friction"),
     ("stick_none_mps", 0.50, "above this the tyre model alone acts"),
 ]
@@ -259,7 +262,17 @@ WHEEL_EQS = [
                        " + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001)"),
     # For a normalised slip of 1, C * atan(B) = pi/2 for each fitted shape.
     ("curve_x_prev", "sin(shape_x * atan(tan(1.5707963267948966 / shape_x) * slip_norm_prev)) / slip_norm_prev"),
-    ("stiffness_x_n", "mu_x * load_n * curve_x_prev / slip_ratio_peak"),
+    # Far past the peak the tread is sliding. The fitted curves keep about 94 %
+    # of their peak there, a measured production tyre 75 %, and sliding rubber
+    # pulls straight against its sliding direction whatever the wheel's heading.
+    # So from slide_start times the peak slip to full sliding (a locked wheel,
+    # or 45 degrees sideways) the force blends into that sliding friction.
+    ("mu_slide", "slide_ratio * mu_x"),
+    ("sigma_prev", "sqrt(pow(slip_ratio_prev, 2.0) + pow(slip_tan, 2.0) + 0.00000001)"),
+    ("slide_prev", "max(0.0, min(1.0, (sigma_prev - slide_start * slip_ratio_peak)"
+                   " / (1.0 - slide_start * slip_ratio_peak)))"),
+    ("stiffness_x_n", "load_n * ((1.0 - slide_prev) * mu_x * curve_x_prev / slip_ratio_peak"
+                      " + slide_prev * mu_slide / sigma_prev)"),
     # Wheel spin. A free-rolling wheel is far too stiff to integrate explicitly
     # at 120 Hz, so the tyre force enters implicitly through its secant
     # stiffness, and brake plus rolling resistance act as Coulomb friction that
@@ -288,8 +301,12 @@ WHEEL_EQS = [
                   " + pow(slip_tan / slip_tan_peak, 2.0) + 0.00000001)"),
     ("curve_x", "min(curve_x_prev, 1.0 / slip_norm)"),
     ("curve_y", "sin(side_shape * atan(tan(1.5707963267948966 / side_shape) * slip_norm)) / slip_norm"),
-    ("fx_n", "mu_x * load_n * curve_x * slip_ratio / slip_ratio_peak"),
-    ("fy_n", "mu_y * load_n * curve_y * slip_tan / slip_tan_peak"),
+    ("sigma", "sqrt(pow(slip_ratio, 2.0) + pow(slip_tan, 2.0) + 0.00000001)"),
+    ("slide", "max(0.0, min(1.0, (sigma - slide_start * slip_ratio_peak) / (1.0 - slide_start * slip_ratio_peak)))"),
+    ("fx_n", "load_n * ((1.0 - slide) * mu_x * curve_x * slip_ratio / slip_ratio_peak"
+             " + slide * mu_slide * slip_ratio / sigma)"),
+    ("fy_n", "load_n * ((1.0 - slide) * mu_y * curve_y * slip_tan / slip_tan_peak"
+             " + slide * mu_slide * slip_tan / sigma)"),
     # Standstill. A slip-based tyre cannot hold a parked car: it creeps. So a
     # wheel that is nearly stationary over the ground and not turning (held by
     # the brake, or just by its rolling resistance) is handed to JSBSim's own
