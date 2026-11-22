@@ -175,10 +175,14 @@ class Car:
             "pitch_deg": fdm["attitude/theta-deg"],
             "dist": fdm["position/distance-from-start-mag-mt"],
         }
+        if self.kind == "tyre":
+            row["tc_active"] = fdm["tc/active"]
+            row["drive_nm"] = fdm["driveline/drive_torque_nm"]
         for unit, wheel in enumerate(WHEELS):
             row["jsb_slip_deg_" + wheel] = fdm["gear/unit[%d]/slip-angle-deg" % unit]
             if self.kind == "tyre":
-                for key in ("slip_ratio", "slip_tan", "omega_rad_sec", "load_n", "mu", "mu_x", "mu_y", "fx_n", "fy_n"):
+                for key in ("slip_ratio", "slip_tan", "omega_rad_sec", "load_n", "mu", "mu_x", "mu_y", "fx_n", "fy_n",
+                            "tc_slip", "stab_brake_nm"):
                     row["%s_%s" % (key, wheel)] = fdm["tyre/%s/%s" % (wheel, key)]
         return row
 
@@ -213,6 +217,42 @@ def launch(kind, surface=1.0, **kw):
     if kind == "tyre":
         out["max_slip"] = max(r["slip_ratio_" + w] for r in rows for w in WHEELS)
     return out, rows
+
+
+SPLIT_ICE = (1.0, 0.1, 1.0, 0.1)    # left wheels on asphalt, right wheels on ice
+
+
+def full_throttle(params=None, surface=1.0, grip=None, until_kmh=100.0, seconds=25.0, direction=1.0,
+                  hold_heading=False, dt=1.0 / 120.0, car=None):
+    """Tyre model, full throttle until a speed, optionally with its own grip under each wheel.
+
+    With hold_heading a driver keeps the heading after 0.3 s, turning the road
+    wheels at most 18 deg/s and 6.75 deg. Rows carry "t" from the start and
+    "heading_deg".
+    """
+    if car is None:
+        car = Car("tyre", surface=surface, dt=dt, params=dict(params or {}, **{"driveline/in/direction": direction}))
+    fdm = car.fdm
+    start, heading, steer, rows = fdm.get_sim_time(), 0.0, 0.0, []
+    while fdm.get_sim_time() - start < seconds and abs(fdm["velocities/u-fps"]) * FT < until_kmh * KMH:
+        if grip:
+            for unit, g in enumerate(grip):   # standalone JSBSim has one surface; seed each wheel's
+                fdm[f"gear/unit[{unit}]/static-friction-factor"] = g
+        if hold_heading and fdm.get_sim_time() - start > 0.3:
+            want = max(-0.15, min(0.15, -(1.5 * heading + 0.25 * fdm["velocities/r-rad_sec"])))
+            steer += max(-0.4 * car.dt, min(0.4 * car.dt, want - steer))
+        car.step(throttle=1.0, steer=steer)
+        row = car.sample()
+        heading += row["yaw_rate"] * car.dt
+        row["t"] -= start
+        row["heading_deg"] = math.degrees(heading)
+        rows.append(row)
+    return rows
+
+
+def late_slip(rows, wheels=WHEELS):
+    """Largest drive slip over the tyre's peak drive slip after the first half second."""
+    return max(r["tc_slip_" + w] for r in rows if r["t"] > 0.5 for w in wheels)
 
 
 def stop(kind, pedal=1.0, surface=1.0, steer=0.0, speed=100 * KMH, rear_pedal=None, **kw):

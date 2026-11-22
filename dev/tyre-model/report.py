@@ -7,9 +7,28 @@ Numbers, not pass/fail: use it to see what a parameter change did.
 """
 import sys
 
-from sim import corner, launch, stop
+from sim import SPLIT_ICE, corner, full_throttle, late_slip, launch, stop
 
 NO_ABS = {"abs/par/enabled": 0.0}
+NO_TC = {"tc/par/enabled": 0.0}
+
+
+def traction_control(dt):
+    print("\nTraction control, full throttle (slip: drive slip over the tyre's peak slip, after 0.5 s)")
+    cases = (("0-100 km/h, dry, 50:50", dict()),
+             ("0-100 km/h, grip x0.3", dict(surface=0.3)),
+             ("0-60 km/h, grip x0.3, 30:70", dict(surface=0.3, until_kmh=60,
+                                                 params={"driveline/par/front_torque_share": 0.3})),
+             ("0-60 km/h, right wheels on ice", dict(grip=SPLIT_ICE, until_kmh=60, hold_heading=True)))
+    for label, kw in cases:
+        params = kw.pop("params", {})
+        line = "  %-32s" % label
+        for name, extra in (("without TC", NO_TC), ("with TC", {})):
+            rows = full_throttle(params=dict(params, **extra), dt=dt, **kw)
+            line += "  %s %5.2f s%s, slip up to %6.2f, heading %6.1f deg" % (
+                name, rows[-1]["t"], "" if abs(rows[-1]["u"]) * 3.6 >= kw.get("until_kmh", 100) - 0.5 else " (not reached)",
+                late_slip(rows), max((abs(r["heading_deg"]) for r in rows), default=0.0))
+        print(line)
 
 
 def main():
@@ -22,6 +41,8 @@ def main():
         b, _ = launch("tyre", surface=surface, dt=dt)
         print("  grip x%.1f   standard %5.2f s (peak %.2f g)   tyre model %5.2f s (peak %.2f g, wheel slip up to %.2f)"
               % (surface, a["time"], a["peak_g"], b["time"], b["peak_g"], b["max_slip"]))
+
+    traction_control(dt)
 
     print("\n100-0 km/h")
     for surface in (1.0, 0.3):

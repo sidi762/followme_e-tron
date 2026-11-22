@@ -34,6 +34,12 @@
 	<property value="2.0">driveline/par/epb_dynamic_mps</property> <!-- above this the parking brake switch brakes all four wheels hydraulically instead -->
 	<property value="0.5">driveline/par/epb_dynamic_norm</property> <!-- service brake demand of that dynamic emergency braking -->
 	<property value="1000.0">driveline/par/park_lock_nm</property> <!-- holding torque per wheel while the motor is switched off -->
+	<property value="9.0">driveline/par/disc_kg_front</property> <!-- front brake disc mass (estimate); for the disc temperature traction control watches -->
+	<property value="7.0">driveline/par/disc_kg_rear</property> <!-- rear brake disc mass (estimate) -->
+	<property value="460.0">driveline/par/disc_heat_j_kgk</property> <!-- heat capacity of grey cast iron -->
+	<property value="20.0">driveline/par/disc_cooling_w_k</property> <!-- disc cooling to the air at rest (estimate) -->
+	<property value="2.0">driveline/par/disc_cooling_w_k_per_mps</property> <!-- extra disc cooling per m/s of road speed (estimate) -->
+	<property value="20.0">driveline/par/ambient_c</property> <!-- air temperature the discs cool down to -->
 
 	<!-- ABS parameters -->
 	<property value="1.0">abs/par/enabled</property> <!-- 0 switches ABS off: each wheel gets its whole service brake request -->
@@ -45,12 +51,33 @@
 	<property value="0.1">abs/par/yaw_delay_start</property> <!-- front wheels: while one is under ABS, the other may brake this share of the full-pedal torque harder -->
 	<property value="0.5">abs/par/yaw_delay_rate</property> <!-- and that margin grows by this share per second, so split grip turns the car gradually -->
 
+	<!-- Traction control parameters -->
+	<property value="1.0">tc/par/enabled</property> <!-- 0 switches traction control off: motor torque limit, differential locks, drag torque control -->
+	<property value="0.85">tc/par/target_slip</property> <!-- reference drive slip, as a share of the tyre's peak drive slip at its load -->
+	<property value="0.4">tc/par/corner_min</property> <!-- share of the reference slip left when the lateral grip is fully in use -->
+	<property value="1.4">tc/par/wheel_limit</property> <!-- no driven wheel the locks leave alone may slip more than this share of its peak (the tyre starts sliding at 1.5) -->
+	<property value="0.3">tc/par/p_gain</property> <!-- motor limit, proportional part: share of the motor's maximum torque per unit slip error -->
+	<property value="10.0">tc/par/cut_rate</property> <!-- motor limit falls by this share of the maximum torque per second per unit slip error -->
+	<property value="5.0">tc/par/restore_rate</property> <!-- and rises by this share per second per unit of slip below the reference -->
+	<property value="2.0">tc/par/error_limit</property> <!-- the motor limit acts on at most this much slip error, so one flaring wheel cannot cut it all -->
+	<property value="0.5">tc/par/lock_deadband</property> <!-- differential locks leave slip differences up to this share of the peak slip alone -->
+	<property value="0.2">tc/par/lock_p_gain</property> <!-- lock brake, proportional part: share of the wheel's maximum drive torque per unit slip error -->
+	<property value="8.0">tc/par/lock_rate</property> <!-- lock brake rises by this share of the wheel's maximum drive torque per second per unit error -->
+	<property value="40.0">tc/par/lock_engage_kmh</property> <!-- differential locks engage below this speed (Audi A4 workshop manual; ika: 38 km/h) -->
+	<property value="80.0">tc/par/lock_cutout_kmh</property> <!-- an engaged lock cuts out above this speed (four-wheel drive; Audi, VW SSP 374) -->
+	<property value="0.15">tc/par/pump_time_s</property> <!-- the pump builds a wheel's full-pedal brake torque in this time (Audi e-tron; ika 0.05-0.15 s) -->
+	<property value="450.0">tc/par/temp_fade_c</property> <!-- the locks start to fade out at this brake disc temperature (estimate) -->
+	<property value="550.0">tc/par/temp_off_c</property> <!-- and are out at this one -->
+	<property value="1.0">tc/par/drag_slip</property> <!-- drag torque control cuts coast regen above this braking slip, as a share of the peak -->
+	<property value="20.0">tc/par/drag_cut_rate</property> <!-- coast regen falls by this share per second while a driven wheel slips -->
+	<property value="2.0">tc/par/drag_restore_rate</property> <!-- and recovers by this share per second -->
+
 	<!-- Inputs -->
 	<property value="0.0">driveline/in/throttle_norm</property> <!-- accelerator pedal, 0 to 1 -->
 	<property value="1.0">driveline/in/direction</property> <!-- 1 = forward, -1 = reverse -->
 	<property value="1.0">driveline/in/motor_on</property> <!-- 0 switches the motor off: no drive, no coast regen, park lock on -->
 
-	<!-- State: wheel speeds, and what the ABS channel reads before the wheels compute it -->
+	<!-- State: wheel speeds, and what the ABS and traction control channels read before the wheels compute it -->
 	<property value="0.0">tyre/fl/omega_rad_sec</property>
 	<property value="0.0">tyre/fl/slip_ratio</property>
 	<property value="0.0">tyre/fl/vx_wheel_mps</property>
@@ -58,7 +85,12 @@
 	<property value="0.0">tyre/fl/abs_active</property>
 	<property value="0.0">tyre/fl/abs_yaw_margin_nm</property>
 	<property value="0.0">tyre/fl/service_brake_nm</property>
+	<property value="0.0">tyre/fl/tc_lock_state_nm</property>
+	<property value="0.0">tyre/fl/stab_brake_nm</property>
 	<property value="0.1">tyre/fl/brake_peak_slip</property>
+	<property value="0.1">tyre/fl/drive_peak_slip</property>
+	<property value="1.0">tyre/fl/mu_y</property>
+	<property value="20.0">tyre/fl/disc_temp_c</property>
 	<property value="0.0">tyre/fr/omega_rad_sec</property>
 	<property value="0.0">tyre/fr/slip_ratio</property>
 	<property value="0.0">tyre/fr/vx_wheel_mps</property>
@@ -66,7 +98,12 @@
 	<property value="0.0">tyre/fr/abs_active</property>
 	<property value="0.0">tyre/fr/abs_yaw_margin_nm</property>
 	<property value="0.0">tyre/fr/service_brake_nm</property>
+	<property value="0.0">tyre/fr/tc_lock_state_nm</property>
+	<property value="0.0">tyre/fr/stab_brake_nm</property>
 	<property value="0.1">tyre/fr/brake_peak_slip</property>
+	<property value="0.1">tyre/fr/drive_peak_slip</property>
+	<property value="1.0">tyre/fr/mu_y</property>
+	<property value="20.0">tyre/fr/disc_temp_c</property>
 	<property value="0.0">tyre/bl/omega_rad_sec</property>
 	<property value="0.0">tyre/bl/slip_ratio</property>
 	<property value="0.0">tyre/bl/vx_wheel_mps</property>
@@ -74,7 +111,12 @@
 	<property value="0.0">tyre/bl/abs_active</property>
 	<property value="0.0">tyre/bl/abs_yaw_margin_nm</property>
 	<property value="0.0">tyre/bl/service_brake_nm</property>
+	<property value="0.0">tyre/bl/tc_lock_state_nm</property>
+	<property value="0.0">tyre/bl/stab_brake_nm</property>
 	<property value="0.1">tyre/bl/brake_peak_slip</property>
+	<property value="0.1">tyre/bl/drive_peak_slip</property>
+	<property value="1.0">tyre/bl/mu_y</property>
+	<property value="20.0">tyre/bl/disc_temp_c</property>
 	<property value="0.0">tyre/br/omega_rad_sec</property>
 	<property value="0.0">tyre/br/slip_ratio</property>
 	<property value="0.0">tyre/br/vx_wheel_mps</property>
@@ -82,8 +124,19 @@
 	<property value="0.0">tyre/br/abs_active</property>
 	<property value="0.0">tyre/br/abs_yaw_margin_nm</property>
 	<property value="0.0">tyre/br/service_brake_nm</property>
+	<property value="0.0">tyre/br/tc_lock_state_nm</property>
+	<property value="0.0">tyre/br/stab_brake_nm</property>
 	<property value="0.1">tyre/br/brake_peak_slip</property>
+	<property value="0.1">tyre/br/drive_peak_slip</property>
+	<property value="1.0">tyre/br/mu_y</property>
+	<property value="20.0">tyre/br/disc_temp_c</property>
 	<property value="0.0">abs/active</property>
+	<property value="0.0">driveline/request_torque_nm</property>
+	<property value="0.0">tc/engaged</property>
+	<property value="0.0">tc/cap_nm</property>
+	<property value="1.0">tc/drag_factor</property>
+	<property value="0.0">tc/lock_front_state_nm</property>
+	<property value="0.0">tc/lock_rear_state_nm</property>
 
 	<channel name="Occupants">
 		<!-- driver_lbs = max(0.0, driver_kg) * 2.2046226 -->
@@ -112,6 +165,1583 @@
 				</product>
 			</function>
 			<output>inertia/pointmass-weight-lbs[1]</output>
+		</fcs_function>
+	</channel>
+
+	<channel name="Traction control">
+		<!-- dt = max(sim_dt, 0.0005) -->
+		<fcs_function name="tc/dt">
+			<function>
+				<max>
+					<p>simulation/channel-dt</p>
+					<v>0.0005</v>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- speed_kmh = abs(u_fps) * 1.09728 -->
+		<fcs_function name="tc/speed_kmh">
+			<function>
+				<product>
+					<abs>
+						<p>velocities/u-fps</p>
+					</abs>
+					<v>1.09728</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- driver_braking = lt(0.02, max(pedal_front, pedal_rear)) -->
+		<fcs_function name="tc/driver_braking">
+			<function>
+				<lt>
+					<v>0.02</v>
+					<max>
+						<p>/controls/gear/brake-left</p>
+						<p>/controls/gear/brake-right</p>
+					</max>
+				</lt>
+			</function>
+		</fcs_function>
+		<!-- lock_allowed = tc_enabled * lt(0.01, throttle_norm) * (1.0 - driver_braking) -->
+		<fcs_function name="tc/lock_allowed">
+			<function>
+				<product>
+					<p>tc/par/enabled</p>
+					<lt>
+						<v>0.01</v>
+						<p>driveline/in/throttle_norm</p>
+					</lt>
+					<difference>
+						<v>1.0</v>
+						<p>tc/driver_braking</p>
+					</difference>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- front_driven = lt(0.0, front_torque_share) -->
+		<fcs_function name="tc/front_driven">
+			<function>
+				<lt>
+					<v>0.0</v>
+					<p>driveline/par/front_torque_share</p>
+				</lt>
+			</function>
+		</fcs_function>
+		<!-- rear_driven = lt(front_torque_share, 1.0) -->
+		<fcs_function name="tc/rear_driven">
+			<function>
+				<lt>
+					<p>driveline/par/front_torque_share</p>
+					<v>1.0</v>
+				</lt>
+			</function>
+		</fcs_function>
+		<!-- tc_slip = slip_ratio * direction / drive_peak_slip -->
+		<fcs_function name="tyre/fl/tc_slip">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fl/slip_ratio</p>
+						<p>driveline/in/direction</p>
+					</product>
+					<p>tyre/fl/drive_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_brake_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/fl/tc_brake_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/fl/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/fl/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/fl/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_temp_factor = max(0.0, min(1.0, (tc_temp_off_c - disc_temp_c) / (tc_temp_off_c - tc_temp_fade_c))) -->
+		<fcs_function name="tyre/fl/tc_temp_factor">
+			<function>
+				<max>
+					<v>0.0</v>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tyre/fl/disc_temp_c</p>
+							</difference>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tc/par/temp_fade_c</p>
+							</difference>
+						</quotient>
+					</min>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- tc_wheel_torque_nm = max_torque_nm * gear * front_torque_share / 2.0 -->
+		<fcs_function name="tyre/fl/tc_wheel_torque_nm">
+			<function>
+				<quotient>
+					<product>
+						<p>driveline/par/max_torque_nm</p>
+						<p>driveline/par/gear</p>
+						<p>driveline/par/front_torque_share</p>
+					</product>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_slip = slip_ratio * direction / drive_peak_slip -->
+		<fcs_function name="tyre/fr/tc_slip">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/fr/slip_ratio</p>
+						<p>driveline/in/direction</p>
+					</product>
+					<p>tyre/fr/drive_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_brake_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/fr/tc_brake_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/fr/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/fr/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/fr/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_temp_factor = max(0.0, min(1.0, (tc_temp_off_c - disc_temp_c) / (tc_temp_off_c - tc_temp_fade_c))) -->
+		<fcs_function name="tyre/fr/tc_temp_factor">
+			<function>
+				<max>
+					<v>0.0</v>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tyre/fr/disc_temp_c</p>
+							</difference>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tc/par/temp_fade_c</p>
+							</difference>
+						</quotient>
+					</min>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- tc_wheel_torque_nm = max_torque_nm * gear * front_torque_share / 2.0 -->
+		<fcs_function name="tyre/fr/tc_wheel_torque_nm">
+			<function>
+				<quotient>
+					<product>
+						<p>driveline/par/max_torque_nm</p>
+						<p>driveline/par/gear</p>
+						<p>driveline/par/front_torque_share</p>
+					</product>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_slip = slip_ratio * direction / drive_peak_slip -->
+		<fcs_function name="tyre/bl/tc_slip">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/bl/slip_ratio</p>
+						<p>driveline/in/direction</p>
+					</product>
+					<p>tyre/bl/drive_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_brake_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/bl/tc_brake_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/bl/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/bl/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/bl/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_temp_factor = max(0.0, min(1.0, (tc_temp_off_c - disc_temp_c) / (tc_temp_off_c - tc_temp_fade_c))) -->
+		<fcs_function name="tyre/bl/tc_temp_factor">
+			<function>
+				<max>
+					<v>0.0</v>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tyre/bl/disc_temp_c</p>
+							</difference>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tc/par/temp_fade_c</p>
+							</difference>
+						</quotient>
+					</min>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- tc_wheel_torque_nm = max_torque_nm * gear * (1.0 - front_torque_share) / 2.0 -->
+		<fcs_function name="tyre/bl/tc_wheel_torque_nm">
+			<function>
+				<quotient>
+					<product>
+						<p>driveline/par/max_torque_nm</p>
+						<p>driveline/par/gear</p>
+						<difference>
+							<v>1.0</v>
+							<p>driveline/par/front_torque_share</p>
+						</difference>
+					</product>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_slip = slip_ratio * direction / drive_peak_slip -->
+		<fcs_function name="tyre/br/tc_slip">
+			<function>
+				<quotient>
+					<product>
+						<p>tyre/br/slip_ratio</p>
+						<p>driveline/in/direction</p>
+					</product>
+					<p>tyre/br/drive_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_brake_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
+		<fcs_function name="tyre/br/tc_brake_slip">
+			<function>
+				<quotient>
+					<max>
+						<v>0.0</v>
+						<product>
+							<v>-1.0</v>
+							<p>tyre/br/slip_ratio</p>
+							<ifthen>
+								<lt>
+									<p>tyre/br/vx_wheel_mps</p>
+									<v>0.0</v>
+								</lt>
+								<v>-1.0</v>
+								<v>1.0</v>
+							</ifthen>
+						</product>
+					</max>
+					<p>tyre/br/brake_peak_slip</p>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_temp_factor = max(0.0, min(1.0, (tc_temp_off_c - disc_temp_c) / (tc_temp_off_c - tc_temp_fade_c))) -->
+		<fcs_function name="tyre/br/tc_temp_factor">
+			<function>
+				<max>
+					<v>0.0</v>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tyre/br/disc_temp_c</p>
+							</difference>
+							<difference>
+								<p>tc/par/temp_off_c</p>
+								<p>tc/par/temp_fade_c</p>
+							</difference>
+						</quotient>
+					</min>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- tc_wheel_torque_nm = max_torque_nm * gear * (1.0 - front_torque_share) / 2.0 -->
+		<fcs_function name="tyre/br/tc_wheel_torque_nm">
+			<function>
+				<quotient>
+					<product>
+						<p>driveline/par/max_torque_nm</p>
+						<p>driveline/par/gear</p>
+						<difference>
+							<v>1.0</v>
+							<p>driveline/par/front_torque_share</p>
+						</difference>
+					</product>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_err = min(tc_slip - partner_tc_slip - tc_lock_deadband, tc_slip - tc_target_slip) -->
+		<fcs_function name="tyre/fl/tc_lock_err">
+			<function>
+				<min>
+					<difference>
+						<difference>
+							<p>tyre/fl/tc_slip</p>
+							<p>tyre/fr/tc_slip</p>
+						</difference>
+						<p>tc/par/lock_deadband</p>
+					</difference>
+					<difference>
+						<p>tyre/fl/tc_slip</p>
+						<p>tc/par/target_slip</p>
+					</difference>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_on = lock_allowed * front_driven * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0, lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, tc_lock_state_nm)) -->
+		<fcs_function name="tyre/fl/tc_lock_on">
+			<function>
+				<product>
+					<p>tc/lock_allowed</p>
+					<p>tc/front_driven</p>
+					<ifthen>
+						<lt>
+							<p>tc/speed_kmh</p>
+							<p>tc/par/lock_engage_kmh</p>
+						</lt>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<p>tc/speed_kmh</p>
+								<p>tc/par/lock_cutout_kmh</p>
+							</lt>
+							<lt>
+								<v>0.0</v>
+								<p>tyre/fl/tc_lock_state_nm</p>
+							</lt>
+						</product>
+					</ifthen>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_state_nm = tc_lock_on * max(0.0, min(brake_front_nm, stab_brake_nm + dt * brake_front_nm / tc_pump_time_s, tc_lock_state_nm + dt * tc_lock_rate * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/fl/tc_lock_state_nm">
+			<function>
+				<product>
+					<p>tyre/fl/tc_lock_on</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_front_nm</p>
+							<sum>
+								<p>tyre/fl/stab_brake_nm</p>
+								<quotient>
+									<product>
+										<p>tc/dt</p>
+										<p>driveline/par/brake_front_nm</p>
+									</product>
+									<p>tc/par/pump_time_s</p>
+								</quotient>
+							</sum>
+							<sum>
+								<p>tyre/fl/tc_lock_state_nm</p>
+								<product>
+									<p>tc/dt</p>
+									<p>tc/par/lock_rate</p>
+									<p>tyre/fl/tc_lock_err</p>
+									<p>tyre/fl/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_nm = tc_lock_on * tc_temp_factor * max(0.0, min(brake_front_nm, tc_lock_state_nm + tc_lock_p_gain * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/fl/tc_lock_nm">
+			<function>
+				<product>
+					<p>tyre/fl/tc_lock_on</p>
+					<p>tyre/fl/tc_temp_factor</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_front_nm</p>
+							<sum>
+								<p>tyre/fl/tc_lock_state_nm</p>
+								<product>
+									<p>tc/par/lock_p_gain</p>
+									<p>tyre/fl/tc_lock_err</p>
+									<p>tyre/fl/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_resid = tc_slip - tc_lock_on * tc_temp_factor * lt(tc_lock_state_nm, 0.98 * brake_front_nm) * max(0.0, tc_lock_err) -->
+		<fcs_function name="tyre/fl/tc_resid">
+			<function>
+				<difference>
+					<p>tyre/fl/tc_slip</p>
+					<product>
+						<p>tyre/fl/tc_lock_on</p>
+						<p>tyre/fl/tc_temp_factor</p>
+						<lt>
+							<p>tyre/fl/tc_lock_state_nm</p>
+							<product>
+								<v>0.98</v>
+								<p>driveline/par/brake_front_nm</p>
+							</product>
+						</lt>
+						<max>
+							<v>0.0</v>
+							<p>tyre/fl/tc_lock_err</p>
+						</max>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_err = min(tc_slip - partner_tc_slip - tc_lock_deadband, tc_slip - tc_target_slip) -->
+		<fcs_function name="tyre/fr/tc_lock_err">
+			<function>
+				<min>
+					<difference>
+						<difference>
+							<p>tyre/fr/tc_slip</p>
+							<p>tyre/fl/tc_slip</p>
+						</difference>
+						<p>tc/par/lock_deadband</p>
+					</difference>
+					<difference>
+						<p>tyre/fr/tc_slip</p>
+						<p>tc/par/target_slip</p>
+					</difference>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_on = lock_allowed * front_driven * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0, lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, tc_lock_state_nm)) -->
+		<fcs_function name="tyre/fr/tc_lock_on">
+			<function>
+				<product>
+					<p>tc/lock_allowed</p>
+					<p>tc/front_driven</p>
+					<ifthen>
+						<lt>
+							<p>tc/speed_kmh</p>
+							<p>tc/par/lock_engage_kmh</p>
+						</lt>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<p>tc/speed_kmh</p>
+								<p>tc/par/lock_cutout_kmh</p>
+							</lt>
+							<lt>
+								<v>0.0</v>
+								<p>tyre/fr/tc_lock_state_nm</p>
+							</lt>
+						</product>
+					</ifthen>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_state_nm = tc_lock_on * max(0.0, min(brake_front_nm, stab_brake_nm + dt * brake_front_nm / tc_pump_time_s, tc_lock_state_nm + dt * tc_lock_rate * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/fr/tc_lock_state_nm">
+			<function>
+				<product>
+					<p>tyre/fr/tc_lock_on</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_front_nm</p>
+							<sum>
+								<p>tyre/fr/stab_brake_nm</p>
+								<quotient>
+									<product>
+										<p>tc/dt</p>
+										<p>driveline/par/brake_front_nm</p>
+									</product>
+									<p>tc/par/pump_time_s</p>
+								</quotient>
+							</sum>
+							<sum>
+								<p>tyre/fr/tc_lock_state_nm</p>
+								<product>
+									<p>tc/dt</p>
+									<p>tc/par/lock_rate</p>
+									<p>tyre/fr/tc_lock_err</p>
+									<p>tyre/fr/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_nm = tc_lock_on * tc_temp_factor * max(0.0, min(brake_front_nm, tc_lock_state_nm + tc_lock_p_gain * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/fr/tc_lock_nm">
+			<function>
+				<product>
+					<p>tyre/fr/tc_lock_on</p>
+					<p>tyre/fr/tc_temp_factor</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_front_nm</p>
+							<sum>
+								<p>tyre/fr/tc_lock_state_nm</p>
+								<product>
+									<p>tc/par/lock_p_gain</p>
+									<p>tyre/fr/tc_lock_err</p>
+									<p>tyre/fr/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_resid = tc_slip - tc_lock_on * tc_temp_factor * lt(tc_lock_state_nm, 0.98 * brake_front_nm) * max(0.0, tc_lock_err) -->
+		<fcs_function name="tyre/fr/tc_resid">
+			<function>
+				<difference>
+					<p>tyre/fr/tc_slip</p>
+					<product>
+						<p>tyre/fr/tc_lock_on</p>
+						<p>tyre/fr/tc_temp_factor</p>
+						<lt>
+							<p>tyre/fr/tc_lock_state_nm</p>
+							<product>
+								<v>0.98</v>
+								<p>driveline/par/brake_front_nm</p>
+							</product>
+						</lt>
+						<max>
+							<v>0.0</v>
+							<p>tyre/fr/tc_lock_err</p>
+						</max>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_err = min(tc_slip - partner_tc_slip - tc_lock_deadband, tc_slip - tc_target_slip) -->
+		<fcs_function name="tyre/bl/tc_lock_err">
+			<function>
+				<min>
+					<difference>
+						<difference>
+							<p>tyre/bl/tc_slip</p>
+							<p>tyre/br/tc_slip</p>
+						</difference>
+						<p>tc/par/lock_deadband</p>
+					</difference>
+					<difference>
+						<p>tyre/bl/tc_slip</p>
+						<p>tc/par/target_slip</p>
+					</difference>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_on = lock_allowed * rear_driven * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0, lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, tc_lock_state_nm)) -->
+		<fcs_function name="tyre/bl/tc_lock_on">
+			<function>
+				<product>
+					<p>tc/lock_allowed</p>
+					<p>tc/rear_driven</p>
+					<ifthen>
+						<lt>
+							<p>tc/speed_kmh</p>
+							<p>tc/par/lock_engage_kmh</p>
+						</lt>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<p>tc/speed_kmh</p>
+								<p>tc/par/lock_cutout_kmh</p>
+							</lt>
+							<lt>
+								<v>0.0</v>
+								<p>tyre/bl/tc_lock_state_nm</p>
+							</lt>
+						</product>
+					</ifthen>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_state_nm = tc_lock_on * max(0.0, min(brake_rear_nm, stab_brake_nm + dt * brake_rear_nm / tc_pump_time_s, tc_lock_state_nm + dt * tc_lock_rate * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/bl/tc_lock_state_nm">
+			<function>
+				<product>
+					<p>tyre/bl/tc_lock_on</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_rear_nm</p>
+							<sum>
+								<p>tyre/bl/stab_brake_nm</p>
+								<quotient>
+									<product>
+										<p>tc/dt</p>
+										<p>driveline/par/brake_rear_nm</p>
+									</product>
+									<p>tc/par/pump_time_s</p>
+								</quotient>
+							</sum>
+							<sum>
+								<p>tyre/bl/tc_lock_state_nm</p>
+								<product>
+									<p>tc/dt</p>
+									<p>tc/par/lock_rate</p>
+									<p>tyre/bl/tc_lock_err</p>
+									<p>tyre/bl/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_nm = tc_lock_on * tc_temp_factor * max(0.0, min(brake_rear_nm, tc_lock_state_nm + tc_lock_p_gain * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/bl/tc_lock_nm">
+			<function>
+				<product>
+					<p>tyre/bl/tc_lock_on</p>
+					<p>tyre/bl/tc_temp_factor</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_rear_nm</p>
+							<sum>
+								<p>tyre/bl/tc_lock_state_nm</p>
+								<product>
+									<p>tc/par/lock_p_gain</p>
+									<p>tyre/bl/tc_lock_err</p>
+									<p>tyre/bl/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_resid = tc_slip - tc_lock_on * tc_temp_factor * lt(tc_lock_state_nm, 0.98 * brake_rear_nm) * max(0.0, tc_lock_err) -->
+		<fcs_function name="tyre/bl/tc_resid">
+			<function>
+				<difference>
+					<p>tyre/bl/tc_slip</p>
+					<product>
+						<p>tyre/bl/tc_lock_on</p>
+						<p>tyre/bl/tc_temp_factor</p>
+						<lt>
+							<p>tyre/bl/tc_lock_state_nm</p>
+							<product>
+								<v>0.98</v>
+								<p>driveline/par/brake_rear_nm</p>
+							</product>
+						</lt>
+						<max>
+							<v>0.0</v>
+							<p>tyre/bl/tc_lock_err</p>
+						</max>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_err = min(tc_slip - partner_tc_slip - tc_lock_deadband, tc_slip - tc_target_slip) -->
+		<fcs_function name="tyre/br/tc_lock_err">
+			<function>
+				<min>
+					<difference>
+						<difference>
+							<p>tyre/br/tc_slip</p>
+							<p>tyre/bl/tc_slip</p>
+						</difference>
+						<p>tc/par/lock_deadband</p>
+					</difference>
+					<difference>
+						<p>tyre/br/tc_slip</p>
+						<p>tc/par/target_slip</p>
+					</difference>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_on = lock_allowed * rear_driven * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0, lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, tc_lock_state_nm)) -->
+		<fcs_function name="tyre/br/tc_lock_on">
+			<function>
+				<product>
+					<p>tc/lock_allowed</p>
+					<p>tc/rear_driven</p>
+					<ifthen>
+						<lt>
+							<p>tc/speed_kmh</p>
+							<p>tc/par/lock_engage_kmh</p>
+						</lt>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<p>tc/speed_kmh</p>
+								<p>tc/par/lock_cutout_kmh</p>
+							</lt>
+							<lt>
+								<v>0.0</v>
+								<p>tyre/br/tc_lock_state_nm</p>
+							</lt>
+						</product>
+					</ifthen>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_state_nm = tc_lock_on * max(0.0, min(brake_rear_nm, stab_brake_nm + dt * brake_rear_nm / tc_pump_time_s, tc_lock_state_nm + dt * tc_lock_rate * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/br/tc_lock_state_nm">
+			<function>
+				<product>
+					<p>tyre/br/tc_lock_on</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_rear_nm</p>
+							<sum>
+								<p>tyre/br/stab_brake_nm</p>
+								<quotient>
+									<product>
+										<p>tc/dt</p>
+										<p>driveline/par/brake_rear_nm</p>
+									</product>
+									<p>tc/par/pump_time_s</p>
+								</quotient>
+							</sum>
+							<sum>
+								<p>tyre/br/tc_lock_state_nm</p>
+								<product>
+									<p>tc/dt</p>
+									<p>tc/par/lock_rate</p>
+									<p>tyre/br/tc_lock_err</p>
+									<p>tyre/br/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_lock_nm = tc_lock_on * tc_temp_factor * max(0.0, min(brake_rear_nm, tc_lock_state_nm + tc_lock_p_gain * tc_lock_err * tc_wheel_torque_nm)) -->
+		<fcs_function name="tyre/br/tc_lock_nm">
+			<function>
+				<product>
+					<p>tyre/br/tc_lock_on</p>
+					<p>tyre/br/tc_temp_factor</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_rear_nm</p>
+							<sum>
+								<p>tyre/br/tc_lock_state_nm</p>
+								<product>
+									<p>tc/par/lock_p_gain</p>
+									<p>tyre/br/tc_lock_err</p>
+									<p>tyre/br/tc_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tc_resid = tc_slip - tc_lock_on * tc_temp_factor * lt(tc_lock_state_nm, 0.98 * brake_rear_nm) * max(0.0, tc_lock_err) -->
+		<fcs_function name="tyre/br/tc_resid">
+			<function>
+				<difference>
+					<p>tyre/br/tc_slip</p>
+					<product>
+						<p>tyre/br/tc_lock_on</p>
+						<p>tyre/br/tc_temp_factor</p>
+						<lt>
+							<p>tyre/br/tc_lock_state_nm</p>
+							<product>
+								<v>0.98</v>
+								<p>driveline/par/brake_rear_nm</p>
+							</product>
+						</lt>
+						<max>
+							<v>0.0</v>
+							<p>tyre/br/tc_lock_err</p>
+						</max>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- axle_front = (tc_resid_fl + tc_resid_fr) / 2.0 -->
+		<fcs_function name="tc/axle_front">
+			<function>
+				<quotient>
+					<sum>
+						<p>tyre/fl/tc_resid</p>
+						<p>tyre/fr/tc_resid</p>
+					</sum>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- axle_rear = (tc_resid_bl + tc_resid_br) / 2.0 -->
+		<fcs_function name="tc/axle_rear">
+			<function>
+				<quotient>
+					<sum>
+						<p>tyre/bl/tc_resid</p>
+						<p>tyre/br/tc_resid</p>
+					</sum>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- awd = front_driven * rear_driven -->
+		<fcs_function name="tc/awd">
+			<function>
+				<product>
+					<p>tc/front_driven</p>
+					<p>tc/rear_driven</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- lock_front_temp = min(tc_temp_factor_fl, tc_temp_factor_fr) -->
+		<fcs_function name="tc/lock_front_temp">
+			<function>
+				<min>
+					<p>tyre/fl/tc_temp_factor</p>
+					<p>tyre/fr/tc_temp_factor</p>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- lock_front_wheel_torque_nm = max_torque_nm * gear * front_torque_share / 2.0 -->
+		<fcs_function name="tc/lock_front_wheel_torque_nm">
+			<function>
+				<quotient>
+					<product>
+						<p>driveline/par/max_torque_nm</p>
+						<p>driveline/par/gear</p>
+						<p>driveline/par/front_torque_share</p>
+					</product>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- lock_front_err = min(axle_front - axle_rear - tc_lock_deadband, axle_front - tc_target_slip) -->
+		<fcs_function name="tc/lock_front_err">
+			<function>
+				<min>
+					<difference>
+						<difference>
+							<p>tc/axle_front</p>
+							<p>tc/axle_rear</p>
+						</difference>
+						<p>tc/par/lock_deadband</p>
+					</difference>
+					<difference>
+						<p>tc/axle_front</p>
+						<p>tc/par/target_slip</p>
+					</difference>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- lock_front_on = lock_allowed * awd * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0, lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, lock_front_state_nm)) -->
+		<fcs_function name="tc/lock_front_on">
+			<function>
+				<product>
+					<p>tc/lock_allowed</p>
+					<p>tc/awd</p>
+					<ifthen>
+						<lt>
+							<p>tc/speed_kmh</p>
+							<p>tc/par/lock_engage_kmh</p>
+						</lt>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<p>tc/speed_kmh</p>
+								<p>tc/par/lock_cutout_kmh</p>
+							</lt>
+							<lt>
+								<v>0.0</v>
+								<p>tc/lock_front_state_nm</p>
+							</lt>
+						</product>
+					</ifthen>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- lock_front_state_nm = lock_front_on * max(0.0, min(brake_front_nm, min(stab_brake_nm_fl, stab_brake_nm_fr) + dt * brake_front_nm / tc_pump_time_s, lock_front_state_nm + dt * tc_lock_rate * lock_front_err * lock_front_wheel_torque_nm)) -->
+		<fcs_function name="tc/lock_front_state_nm">
+			<function>
+				<product>
+					<p>tc/lock_front_on</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_front_nm</p>
+							<sum>
+								<min>
+									<p>tyre/fl/stab_brake_nm</p>
+									<p>tyre/fr/stab_brake_nm</p>
+								</min>
+								<quotient>
+									<product>
+										<p>tc/dt</p>
+										<p>driveline/par/brake_front_nm</p>
+									</product>
+									<p>tc/par/pump_time_s</p>
+								</quotient>
+							</sum>
+							<sum>
+								<p>tc/lock_front_state_nm</p>
+								<product>
+									<p>tc/dt</p>
+									<p>tc/par/lock_rate</p>
+									<p>tc/lock_front_err</p>
+									<p>tc/lock_front_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- lock_front_nm = lock_front_on * lock_front_temp * max(0.0, min(brake_front_nm, lock_front_state_nm + tc_lock_p_gain * lock_front_err * lock_front_wheel_torque_nm)) -->
+		<fcs_function name="tc/lock_front_nm">
+			<function>
+				<product>
+					<p>tc/lock_front_on</p>
+					<p>tc/lock_front_temp</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_front_nm</p>
+							<sum>
+								<p>tc/lock_front_state_nm</p>
+								<product>
+									<p>tc/par/lock_p_gain</p>
+									<p>tc/lock_front_err</p>
+									<p>tc/lock_front_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- prop_front = axle_front - lock_front_on * lock_front_temp * lt(lock_front_state_nm, 0.98 * brake_front_nm) * max(0.0, lock_front_err) -->
+		<fcs_function name="tc/prop_front">
+			<function>
+				<difference>
+					<p>tc/axle_front</p>
+					<product>
+						<p>tc/lock_front_on</p>
+						<p>tc/lock_front_temp</p>
+						<lt>
+							<p>tc/lock_front_state_nm</p>
+							<product>
+								<v>0.98</v>
+								<p>driveline/par/brake_front_nm</p>
+							</product>
+						</lt>
+						<max>
+							<v>0.0</v>
+							<p>tc/lock_front_err</p>
+						</max>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- lock_rear_temp = min(tc_temp_factor_bl, tc_temp_factor_br) -->
+		<fcs_function name="tc/lock_rear_temp">
+			<function>
+				<min>
+					<p>tyre/bl/tc_temp_factor</p>
+					<p>tyre/br/tc_temp_factor</p>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- lock_rear_wheel_torque_nm = max_torque_nm * gear * (1.0 - front_torque_share) / 2.0 -->
+		<fcs_function name="tc/lock_rear_wheel_torque_nm">
+			<function>
+				<quotient>
+					<product>
+						<p>driveline/par/max_torque_nm</p>
+						<p>driveline/par/gear</p>
+						<difference>
+							<v>1.0</v>
+							<p>driveline/par/front_torque_share</p>
+						</difference>
+					</product>
+					<v>2.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- lock_rear_err = min(axle_rear - axle_front - tc_lock_deadband, axle_rear - tc_target_slip) -->
+		<fcs_function name="tc/lock_rear_err">
+			<function>
+				<min>
+					<difference>
+						<difference>
+							<p>tc/axle_rear</p>
+							<p>tc/axle_front</p>
+						</difference>
+						<p>tc/par/lock_deadband</p>
+					</difference>
+					<difference>
+						<p>tc/axle_rear</p>
+						<p>tc/par/target_slip</p>
+					</difference>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- lock_rear_on = lock_allowed * awd * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0, lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, lock_rear_state_nm)) -->
+		<fcs_function name="tc/lock_rear_on">
+			<function>
+				<product>
+					<p>tc/lock_allowed</p>
+					<p>tc/awd</p>
+					<ifthen>
+						<lt>
+							<p>tc/speed_kmh</p>
+							<p>tc/par/lock_engage_kmh</p>
+						</lt>
+						<v>1.0</v>
+						<product>
+							<lt>
+								<p>tc/speed_kmh</p>
+								<p>tc/par/lock_cutout_kmh</p>
+							</lt>
+							<lt>
+								<v>0.0</v>
+								<p>tc/lock_rear_state_nm</p>
+							</lt>
+						</product>
+					</ifthen>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- lock_rear_state_nm = lock_rear_on * max(0.0, min(brake_rear_nm, min(stab_brake_nm_bl, stab_brake_nm_br) + dt * brake_rear_nm / tc_pump_time_s, lock_rear_state_nm + dt * tc_lock_rate * lock_rear_err * lock_rear_wheel_torque_nm)) -->
+		<fcs_function name="tc/lock_rear_state_nm">
+			<function>
+				<product>
+					<p>tc/lock_rear_on</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_rear_nm</p>
+							<sum>
+								<min>
+									<p>tyre/bl/stab_brake_nm</p>
+									<p>tyre/br/stab_brake_nm</p>
+								</min>
+								<quotient>
+									<product>
+										<p>tc/dt</p>
+										<p>driveline/par/brake_rear_nm</p>
+									</product>
+									<p>tc/par/pump_time_s</p>
+								</quotient>
+							</sum>
+							<sum>
+								<p>tc/lock_rear_state_nm</p>
+								<product>
+									<p>tc/dt</p>
+									<p>tc/par/lock_rate</p>
+									<p>tc/lock_rear_err</p>
+									<p>tc/lock_rear_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- lock_rear_nm = lock_rear_on * lock_rear_temp * max(0.0, min(brake_rear_nm, lock_rear_state_nm + tc_lock_p_gain * lock_rear_err * lock_rear_wheel_torque_nm)) -->
+		<fcs_function name="tc/lock_rear_nm">
+			<function>
+				<product>
+					<p>tc/lock_rear_on</p>
+					<p>tc/lock_rear_temp</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/brake_rear_nm</p>
+							<sum>
+								<p>tc/lock_rear_state_nm</p>
+								<product>
+									<p>tc/par/lock_p_gain</p>
+									<p>tc/lock_rear_err</p>
+									<p>tc/lock_rear_wheel_torque_nm</p>
+								</product>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- prop_rear = axle_rear - lock_rear_on * lock_rear_temp * lt(lock_rear_state_nm, 0.98 * brake_rear_nm) * max(0.0, lock_rear_err) -->
+		<fcs_function name="tc/prop_rear">
+			<function>
+				<difference>
+					<p>tc/axle_rear</p>
+					<product>
+						<p>tc/lock_rear_on</p>
+						<p>tc/lock_rear_temp</p>
+						<lt>
+							<p>tc/lock_rear_state_nm</p>
+							<product>
+								<v>0.98</v>
+								<p>driveline/par/brake_rear_nm</p>
+							</product>
+						</lt>
+						<max>
+							<v>0.0</v>
+							<p>tc/lock_rear_err</p>
+						</max>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- slip = front_torque_share * prop_front + (1.0 - front_torque_share) * prop_rear -->
+		<fcs_function name="tc/slip">
+			<function>
+				<sum>
+					<product>
+						<p>driveline/par/front_torque_share</p>
+						<p>tc/prop_front</p>
+					</product>
+					<product>
+						<difference>
+							<v>1.0</v>
+							<p>driveline/par/front_torque_share</p>
+						</difference>
+						<p>tc/prop_rear</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- mu_lateral = (mu_y_fl + mu_y_fr + mu_y_bl + mu_y_br) / 4.0 -->
+		<fcs_function name="tc/mu_lateral">
+			<function>
+				<quotient>
+					<sum>
+						<p>tyre/fl/mu_y</p>
+						<p>tyre/fr/mu_y</p>
+						<p>tyre/bl/mu_y</p>
+						<p>tyre/br/mu_y</p>
+					</sum>
+					<v>4.0</v>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- lateral_use = min(1.0, abs(ny) / max(mu_lateral, 0.05)) -->
+		<fcs_function name="tc/lateral_use">
+			<function>
+				<min>
+					<v>1.0</v>
+					<quotient>
+						<abs>
+							<p>accelerations/Ny</p>
+						</abs>
+						<max>
+							<p>tc/mu_lateral</p>
+							<v>0.05</v>
+						</max>
+					</quotient>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- target = tc_target_slip * max(tc_corner_min, sqrt(max(0.0, 1.0 - lateral_use * lateral_use))) -->
+		<fcs_function name="tc/target">
+			<function>
+				<product>
+					<p>tc/par/target_slip</p>
+					<max>
+						<p>tc/par/corner_min</p>
+						<sqrt>
+							<max>
+								<v>0.0</v>
+								<difference>
+									<v>1.0</v>
+									<product>
+										<p>tc/lateral_use</p>
+										<p>tc/lateral_use</p>
+									</product>
+								</difference>
+							</max>
+						</sqrt>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- wheel_max = max(front_driven * max(tc_resid_fl, tc_resid_fr), rear_driven * max(tc_resid_bl, tc_resid_br)) -->
+		<fcs_function name="tc/wheel_max">
+			<function>
+				<max>
+					<product>
+						<p>tc/front_driven</p>
+						<max>
+							<p>tyre/fl/tc_resid</p>
+							<p>tyre/fr/tc_resid</p>
+						</max>
+					</product>
+					<product>
+						<p>tc/rear_driven</p>
+						<max>
+							<p>tyre/bl/tc_resid</p>
+							<p>tyre/br/tc_resid</p>
+						</max>
+					</product>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- error = min(tc_error_limit, max(slip - target, wheel_max - tc_wheel_limit)) -->
+		<fcs_function name="tc/error">
+			<function>
+				<min>
+					<p>tc/par/error_limit</p>
+					<max>
+						<difference>
+							<p>tc/slip</p>
+							<p>tc/target</p>
+						</difference>
+						<difference>
+							<p>tc/wheel_max</p>
+							<p>tc/par/wheel_limit</p>
+						</difference>
+					</max>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- request_nm = abs(request_torque_nm) -->
+		<fcs_function name="tc/request_nm">
+			<function>
+				<abs>
+					<p>driveline/request_torque_nm</p>
+				</abs>
+			</function>
+		</fcs_function>
+		<!-- engaged = tc_enabled * lt(0.5, request_nm) * max(lt(0.0, error), engaged * lt(cap_nm, request_nm - 0.5)) -->
+		<fcs_function name="tc/engaged">
+			<function>
+				<product>
+					<p>tc/par/enabled</p>
+					<lt>
+						<v>0.5</v>
+						<p>tc/request_nm</p>
+					</lt>
+					<max>
+						<lt>
+							<v>0.0</v>
+							<p>tc/error</p>
+						</lt>
+						<product>
+							<p>tc/engaged</p>
+							<lt>
+								<p>tc/cap_nm</p>
+								<difference>
+									<p>tc/request_nm</p>
+									<v>0.5</v>
+								</difference>
+							</lt>
+						</product>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- cap_nm = ifthen(engaged, max(0.0, min(max_torque_nm, min(cap_nm, request_nm) - dt * max_torque_nm * error * ifthen(lt(0.0, error), tc_cut_rate, tc_restore_rate))), max_torque_nm) -->
+		<fcs_function name="tc/cap_nm">
+			<function>
+				<ifthen>
+					<p>tc/engaged</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<p>driveline/par/max_torque_nm</p>
+							<difference>
+								<min>
+									<p>tc/cap_nm</p>
+									<p>tc/request_nm</p>
+								</min>
+								<product>
+									<p>tc/dt</p>
+									<p>driveline/par/max_torque_nm</p>
+									<p>tc/error</p>
+									<ifthen>
+										<lt>
+											<v>0.0</v>
+											<p>tc/error</p>
+										</lt>
+										<p>tc/par/cut_rate</p>
+										<p>tc/par/restore_rate</p>
+									</ifthen>
+								</product>
+							</difference>
+						</min>
+					</max>
+					<p>driveline/par/max_torque_nm</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- motor_cap_nm = ifthen(engaged, max(0.0, cap_nm - tc_p_gain * error * max_torque_nm), 1000000.0) -->
+		<fcs_function name="tc/motor_cap_nm">
+			<function>
+				<ifthen>
+					<p>tc/engaged</p>
+					<max>
+						<v>0.0</v>
+						<difference>
+							<p>tc/cap_nm</p>
+							<product>
+								<p>tc/par/p_gain</p>
+								<p>tc/error</p>
+								<p>driveline/par/max_torque_nm</p>
+							</product>
+						</difference>
+					</max>
+					<v>1000000.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- active = max(engaged * lt(motor_cap_nm, request_nm - 0.5), lt(1.0, max(tc_lock_nm_fl, tc_lock_nm_fr, tc_lock_nm_bl, tc_lock_nm_br, lock_front_nm, lock_rear_nm))) -->
+		<fcs_function name="tc/active">
+			<function>
+				<max>
+					<product>
+						<p>tc/engaged</p>
+						<lt>
+							<p>tc/motor_cap_nm</p>
+							<difference>
+								<p>tc/request_nm</p>
+								<v>0.5</v>
+							</difference>
+						</lt>
+					</product>
+					<lt>
+						<v>1.0</v>
+						<max>
+							<p>tyre/fl/tc_lock_nm</p>
+							<p>tyre/fr/tc_lock_nm</p>
+							<p>tyre/bl/tc_lock_nm</p>
+							<p>tyre/br/tc_lock_nm</p>
+							<p>tc/lock_front_nm</p>
+							<p>tc/lock_rear_nm</p>
+						</max>
+					</lt>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- drag_slip_max = max(front_driven * max(tc_brake_slip_fl, tc_brake_slip_fr), rear_driven * max(tc_brake_slip_bl, tc_brake_slip_br)) -->
+		<fcs_function name="tc/drag_slip_max">
+			<function>
+				<max>
+					<product>
+						<p>tc/front_driven</p>
+						<max>
+							<p>tyre/fl/tc_brake_slip</p>
+							<p>tyre/fr/tc_brake_slip</p>
+						</max>
+					</product>
+					<product>
+						<p>tc/rear_driven</p>
+						<max>
+							<p>tyre/bl/tc_brake_slip</p>
+							<p>tyre/br/tc_brake_slip</p>
+						</max>
+					</product>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- drag_factor = ifthen(tc_enabled, max(0.0, min(1.0, drag_factor + dt * ifthen(lt(tc_drag_slip, drag_slip_max), -1.0 * tc_drag_cut_rate, tc_drag_restore_rate))), 1.0) -->
+		<fcs_function name="tc/drag_factor">
+			<function>
+				<ifthen>
+					<p>tc/par/enabled</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<sum>
+								<p>tc/drag_factor</p>
+								<product>
+									<p>tc/dt</p>
+									<ifthen>
+										<lt>
+											<p>tc/par/drag_slip</p>
+											<p>tc/drag_slip_max</p>
+										</lt>
+										<product>
+											<v>-1.0</v>
+											<p>tc/par/drag_cut_rate</p>
+										</product>
+										<p>tc/par/drag_restore_rate</p>
+									</ifthen>
+								</product>
+							</sum>
+						</min>
+					</max>
+					<v>1.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- stab_target_nm = min(brake_front_nm, tc_lock_nm + lock_front_nm) -->
+		<fcs_function name="tyre/fl/stab_target_nm">
+			<function>
+				<min>
+					<p>driveline/par/brake_front_nm</p>
+					<sum>
+						<p>tyre/fl/tc_lock_nm</p>
+						<p>tc/lock_front_nm</p>
+					</sum>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- stab_brake_nm = min(stab_target_nm, stab_brake_nm + dt * brake_front_nm / tc_pump_time_s) -->
+		<fcs_function name="tyre/fl/stab_brake_nm">
+			<function>
+				<min>
+					<p>tyre/fl/stab_target_nm</p>
+					<sum>
+						<p>tyre/fl/stab_brake_nm</p>
+						<quotient>
+							<product>
+								<p>tc/dt</p>
+								<p>driveline/par/brake_front_nm</p>
+							</product>
+							<p>tc/par/pump_time_s</p>
+						</quotient>
+					</sum>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- stab_target_nm = min(brake_front_nm, tc_lock_nm + lock_front_nm) -->
+		<fcs_function name="tyre/fr/stab_target_nm">
+			<function>
+				<min>
+					<p>driveline/par/brake_front_nm</p>
+					<sum>
+						<p>tyre/fr/tc_lock_nm</p>
+						<p>tc/lock_front_nm</p>
+					</sum>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- stab_brake_nm = min(stab_target_nm, stab_brake_nm + dt * brake_front_nm / tc_pump_time_s) -->
+		<fcs_function name="tyre/fr/stab_brake_nm">
+			<function>
+				<min>
+					<p>tyre/fr/stab_target_nm</p>
+					<sum>
+						<p>tyre/fr/stab_brake_nm</p>
+						<quotient>
+							<product>
+								<p>tc/dt</p>
+								<p>driveline/par/brake_front_nm</p>
+							</product>
+							<p>tc/par/pump_time_s</p>
+						</quotient>
+					</sum>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- stab_target_nm = min(brake_rear_nm, tc_lock_nm + lock_rear_nm) -->
+		<fcs_function name="tyre/bl/stab_target_nm">
+			<function>
+				<min>
+					<p>driveline/par/brake_rear_nm</p>
+					<sum>
+						<p>tyre/bl/tc_lock_nm</p>
+						<p>tc/lock_rear_nm</p>
+					</sum>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- stab_brake_nm = min(stab_target_nm, stab_brake_nm + dt * brake_rear_nm / tc_pump_time_s) -->
+		<fcs_function name="tyre/bl/stab_brake_nm">
+			<function>
+				<min>
+					<p>tyre/bl/stab_target_nm</p>
+					<sum>
+						<p>tyre/bl/stab_brake_nm</p>
+						<quotient>
+							<product>
+								<p>tc/dt</p>
+								<p>driveline/par/brake_rear_nm</p>
+							</product>
+							<p>tc/par/pump_time_s</p>
+						</quotient>
+					</sum>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- stab_target_nm = min(brake_rear_nm, tc_lock_nm + lock_rear_nm) -->
+		<fcs_function name="tyre/br/stab_target_nm">
+			<function>
+				<min>
+					<p>driveline/par/brake_rear_nm</p>
+					<sum>
+						<p>tyre/br/tc_lock_nm</p>
+						<p>tc/lock_rear_nm</p>
+					</sum>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- stab_brake_nm = min(stab_target_nm, stab_brake_nm + dt * brake_rear_nm / tc_pump_time_s) -->
+		<fcs_function name="tyre/br/stab_brake_nm">
+			<function>
+				<min>
+					<p>tyre/br/stab_target_nm</p>
+					<sum>
+						<p>tyre/br/stab_brake_nm</p>
+						<quotient>
+							<product>
+								<p>tc/dt</p>
+								<p>driveline/par/brake_rear_nm</p>
+							</product>
+							<p>tc/par/pump_time_s</p>
+						</quotient>
+					</sum>
+				</min>
+			</function>
 		</fcs_function>
 	</channel>
 
@@ -199,8 +1829,8 @@
 				</max>
 			</function>
 		</fcs_function>
-		<!-- drive_torque_nm = throttle_norm * direction * rev_limit * min(max_torque_nm, max_power_w / max(abs(motor_rad_sec), 1.0)) -->
-		<fcs_function name="driveline/drive_torque_nm">
+		<!-- request_torque_nm = throttle_norm * direction * rev_limit * min(max_torque_nm, max_power_w / max(abs(motor_rad_sec), 1.0)) -->
+		<fcs_function name="driveline/request_torque_nm">
 			<function>
 				<product>
 					<p>driveline/in/throttle_norm</p>
@@ -215,6 +1845,26 @@
 									<p>driveline/motor_rad_sec</p>
 								</abs>
 								<v>1.0</v>
+							</max>
+						</quotient>
+					</min>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- drive_torque_nm = request_torque_nm * min(1.0, motor_cap_nm / max(abs(request_torque_nm), 0.001)) -->
+		<fcs_function name="driveline/drive_torque_nm">
+			<function>
+				<product>
+					<p>driveline/request_torque_nm</p>
+					<min>
+						<v>1.0</v>
+						<quotient>
+							<p>tc/motor_cap_nm</p>
+							<max>
+								<abs>
+									<p>driveline/request_torque_nm</p>
+								</abs>
+								<v>0.001</v>
 							</max>
 						</quotient>
 					</min>
@@ -250,7 +1900,7 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- motor_torque_nm = motor_on * (drive_torque_nm + coast_torque_nm * (1.0 - abs_any)) -->
+		<!-- motor_torque_nm = motor_on * (drive_torque_nm + coast_torque_nm * drag_factor * (1.0 - abs_any)) -->
 		<fcs_function name="driveline/motor_torque_nm">
 			<function>
 				<product>
@@ -259,6 +1909,7 @@
 						<p>driveline/drive_torque_nm</p>
 						<product>
 							<p>driveline/coast_torque_nm</p>
+							<p>tc/drag_factor</p>
 							<difference>
 								<v>1.0</v>
 								<p>abs/active</p>
@@ -366,13 +2017,19 @@
 	</channel>
 
 	<channel name="ABS">
-		<!-- brake_request_nm = service_front * brake_front_nm -->
+		<!-- brake_request_nm = min(brake_front_nm, service_front * brake_front_nm + stab_brake_nm) -->
 		<fcs_function name="tyre/fl/brake_request_nm">
 			<function>
-				<product>
-					<p>brakes/service_front</p>
+				<min>
 					<p>driveline/par/brake_front_nm</p>
-				</product>
+					<sum>
+						<product>
+							<p>brakes/service_front</p>
+							<p>driveline/par/brake_front_nm</p>
+						</product>
+						<p>tyre/fl/stab_brake_nm</p>
+					</sum>
+				</min>
 			</function>
 		</fcs_function>
 		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
@@ -445,13 +2102,19 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = service_front * brake_front_nm -->
+		<!-- brake_request_nm = min(brake_front_nm, service_front * brake_front_nm + stab_brake_nm) -->
 		<fcs_function name="tyre/fr/brake_request_nm">
 			<function>
-				<product>
-					<p>brakes/service_front</p>
+				<min>
 					<p>driveline/par/brake_front_nm</p>
-				</product>
+					<sum>
+						<product>
+							<p>brakes/service_front</p>
+							<p>driveline/par/brake_front_nm</p>
+						</product>
+						<p>tyre/fr/stab_brake_nm</p>
+					</sum>
+				</min>
 			</function>
 		</fcs_function>
 		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
@@ -524,13 +2187,19 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = service_rear * brake_rear_nm -->
+		<!-- brake_request_nm = min(brake_rear_nm, service_rear * brake_rear_nm + stab_brake_nm) -->
 		<fcs_function name="tyre/bl/brake_request_nm">
 			<function>
-				<product>
-					<p>brakes/service_rear</p>
+				<min>
 					<p>driveline/par/brake_rear_nm</p>
-				</product>
+					<sum>
+						<product>
+							<p>brakes/service_rear</p>
+							<p>driveline/par/brake_rear_nm</p>
+						</product>
+						<p>tyre/bl/stab_brake_nm</p>
+					</sum>
+				</min>
 			</function>
 		</fcs_function>
 		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
@@ -603,13 +2272,19 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = service_rear * brake_rear_nm -->
+		<!-- brake_request_nm = min(brake_rear_nm, service_rear * brake_rear_nm + stab_brake_nm) -->
 		<fcs_function name="tyre/br/brake_request_nm">
 			<function>
-				<product>
-					<p>brakes/service_rear</p>
+				<min>
 					<p>driveline/par/brake_rear_nm</p>
-				</product>
+					<sum>
+						<product>
+							<p>brakes/service_rear</p>
+							<p>driveline/par/brake_rear_nm</p>
+						</product>
+						<p>tyre/br/stab_brake_nm</p>
+					</sum>
+				</min>
 			</function>
 		</fcs_function>
 		<!-- abs_slip = max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip -->
@@ -795,11 +2470,20 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- service_brake_nm = ifthen(partner_abs_active, min(abs_valve_nm, partner_service_nm + abs_yaw_margin_nm), abs_valve_nm) -->
+		<!-- service_brake_nm = ifthen(partner_abs_active * (1.0 - lt(0.0, stab_brake_nm)), min(abs_valve_nm, partner_service_nm + abs_yaw_margin_nm), abs_valve_nm) -->
 		<fcs_function name="tyre/fl/service_brake_nm">
 			<function>
 				<ifthen>
-					<p>tyre/fr/abs_active</p>
+					<product>
+						<p>tyre/fr/abs_active</p>
+						<difference>
+							<v>1.0</v>
+							<lt>
+								<v>0.0</v>
+								<p>tyre/fl/stab_brake_nm</p>
+							</lt>
+						</difference>
+					</product>
 					<min>
 						<p>tyre/fl/abs_valve_nm</p>
 						<sum>
@@ -924,11 +2608,20 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- service_brake_nm = ifthen(partner_abs_active, min(abs_valve_nm, partner_service_nm + abs_yaw_margin_nm), abs_valve_nm) -->
+		<!-- service_brake_nm = ifthen(partner_abs_active * (1.0 - lt(0.0, stab_brake_nm)), min(abs_valve_nm, partner_service_nm + abs_yaw_margin_nm), abs_valve_nm) -->
 		<fcs_function name="tyre/fr/service_brake_nm">
 			<function>
 				<ifthen>
-					<p>tyre/fl/abs_active</p>
+					<product>
+						<p>tyre/fl/abs_active</p>
+						<difference>
+							<v>1.0</v>
+							<lt>
+								<v>0.0</v>
+								<p>tyre/fr/stab_brake_nm</p>
+							</lt>
+						</difference>
+					</product>
 					<min>
 						<p>tyre/fr/abs_valve_nm</p>
 						<sum>
@@ -940,13 +2633,23 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- abs_mode = min(abs_wheel_mode, partner_wheel_mode) -->
+		<!-- abs_mode = ifthen(lt(0.0, stab_brake_nm + partner_stab_brake_nm), abs_wheel_mode, min(abs_wheel_mode, partner_wheel_mode)) -->
 		<fcs_function name="tyre/bl/abs_mode">
 			<function>
-				<min>
+				<ifthen>
+					<lt>
+						<v>0.0</v>
+						<sum>
+							<p>tyre/bl/stab_brake_nm</p>
+							<p>tyre/br/stab_brake_nm</p>
+						</sum>
+					</lt>
 					<p>tyre/bl/abs_wheel_mode</p>
-					<p>tyre/br/abs_wheel_mode</p>
-				</min>
+					<min>
+						<p>tyre/bl/abs_wheel_mode</p>
+						<p>tyre/br/abs_wheel_mode</p>
+					</min>
+				</ifthen>
 			</function>
 		</fcs_function>
 		<!-- abs_active = abs_enabled * lt(abs_min_speed_mps, abs(vx_wheel_mps)) * lt(0.0, brake_request_nm) * max(abs_active, lt(abs_mode, -0.5)) * (1.0 - lt(0.5, abs_mode) * lt(brake_request_nm - 1.0, service_brake_nm)) -->
@@ -1045,13 +2748,23 @@
 				<p>tyre/bl/abs_valve_nm</p>
 			</function>
 		</fcs_function>
-		<!-- abs_mode = min(abs_wheel_mode, partner_wheel_mode) -->
+		<!-- abs_mode = ifthen(lt(0.0, stab_brake_nm + partner_stab_brake_nm), abs_wheel_mode, min(abs_wheel_mode, partner_wheel_mode)) -->
 		<fcs_function name="tyre/br/abs_mode">
 			<function>
-				<min>
+				<ifthen>
+					<lt>
+						<v>0.0</v>
+						<sum>
+							<p>tyre/br/stab_brake_nm</p>
+							<p>tyre/bl/stab_brake_nm</p>
+						</sum>
+					</lt>
 					<p>tyre/br/abs_wheel_mode</p>
-					<p>tyre/bl/abs_wheel_mode</p>
-				</min>
+					<min>
+						<p>tyre/br/abs_wheel_mode</p>
+						<p>tyre/bl/abs_wheel_mode</p>
+					</min>
+				</ifthen>
 			</function>
 		</fcs_function>
 		<!-- abs_active = abs_enabled * lt(abs_min_speed_mps, abs(vx_wheel_mps)) * lt(0.0, brake_request_nm) * max(abs_active, lt(abs_mode, -0.5)) * (1.0 - lt(0.5, abs_mode) * lt(brake_request_nm - 1.0, service_brake_nm)) -->
@@ -2238,6 +3951,49 @@
 				</product>
 			</function>
 		</fcs_function>
+		<!-- disc_temp_c = disc_temp_c + dt_s * ((service_brake_nm + 0.0) * abs(omega_rad_sec) - (disc_cooling_w_k + disc_cooling_w_k_per_mps * abs(vx_wheel_mps)) * (disc_temp_c - ambient_c)) / (disc_kg_front * disc_heat_j_kgk) -->
+		<fcs_function name="tyre/fl/disc_temp_c">
+			<function>
+				<sum>
+					<p>tyre/fl/disc_temp_c</p>
+					<quotient>
+						<product>
+							<p>driveline/dt_s</p>
+							<difference>
+								<product>
+									<sum>
+										<p>tyre/fl/service_brake_nm</p>
+										<v>0.0</v>
+									</sum>
+									<abs>
+										<p>tyre/fl/omega_rad_sec</p>
+									</abs>
+								</product>
+								<product>
+									<sum>
+										<p>driveline/par/disc_cooling_w_k</p>
+										<product>
+											<p>driveline/par/disc_cooling_w_k_per_mps</p>
+											<abs>
+												<p>tyre/fl/vx_wheel_mps</p>
+											</abs>
+										</product>
+									</sum>
+									<difference>
+										<p>tyre/fl/disc_temp_c</p>
+										<p>driveline/par/ambient_c</p>
+									</difference>
+								</product>
+							</difference>
+						</product>
+						<product>
+							<p>driveline/par/disc_kg_front</p>
+							<p>driveline/par/disc_heat_j_kgk</p>
+						</product>
+					</quotient>
+				</sum>
+			</function>
+		</fcs_function>
 	</channel>
 
 	<channel name="Tyre fr">
@@ -3315,6 +5071,49 @@
 				</product>
 			</function>
 		</fcs_function>
+		<!-- disc_temp_c = disc_temp_c + dt_s * ((service_brake_nm + 0.0) * abs(omega_rad_sec) - (disc_cooling_w_k + disc_cooling_w_k_per_mps * abs(vx_wheel_mps)) * (disc_temp_c - ambient_c)) / (disc_kg_front * disc_heat_j_kgk) -->
+		<fcs_function name="tyre/fr/disc_temp_c">
+			<function>
+				<sum>
+					<p>tyre/fr/disc_temp_c</p>
+					<quotient>
+						<product>
+							<p>driveline/dt_s</p>
+							<difference>
+								<product>
+									<sum>
+										<p>tyre/fr/service_brake_nm</p>
+										<v>0.0</v>
+									</sum>
+									<abs>
+										<p>tyre/fr/omega_rad_sec</p>
+									</abs>
+								</product>
+								<product>
+									<sum>
+										<p>driveline/par/disc_cooling_w_k</p>
+										<product>
+											<p>driveline/par/disc_cooling_w_k_per_mps</p>
+											<abs>
+												<p>tyre/fr/vx_wheel_mps</p>
+											</abs>
+										</product>
+									</sum>
+									<difference>
+										<p>tyre/fr/disc_temp_c</p>
+										<p>driveline/par/ambient_c</p>
+									</difference>
+								</product>
+							</difference>
+						</product>
+						<product>
+							<p>driveline/par/disc_kg_front</p>
+							<p>driveline/par/disc_heat_j_kgk</p>
+						</product>
+					</quotient>
+				</sum>
+			</function>
+		</fcs_function>
 	</channel>
 
 	<channel name="Tyre bl">
@@ -4389,6 +6188,49 @@
 				</product>
 			</function>
 		</fcs_function>
+		<!-- disc_temp_c = disc_temp_c + dt_s * ((service_brake_nm + mechanical_rear_nm) * abs(omega_rad_sec) - (disc_cooling_w_k + disc_cooling_w_k_per_mps * abs(vx_wheel_mps)) * (disc_temp_c - ambient_c)) / (disc_kg_rear * disc_heat_j_kgk) -->
+		<fcs_function name="tyre/bl/disc_temp_c">
+			<function>
+				<sum>
+					<p>tyre/bl/disc_temp_c</p>
+					<quotient>
+						<product>
+							<p>driveline/dt_s</p>
+							<difference>
+								<product>
+									<sum>
+										<p>tyre/bl/service_brake_nm</p>
+										<p>brakes/mechanical_rear_nm</p>
+									</sum>
+									<abs>
+										<p>tyre/bl/omega_rad_sec</p>
+									</abs>
+								</product>
+								<product>
+									<sum>
+										<p>driveline/par/disc_cooling_w_k</p>
+										<product>
+											<p>driveline/par/disc_cooling_w_k_per_mps</p>
+											<abs>
+												<p>tyre/bl/vx_wheel_mps</p>
+											</abs>
+										</product>
+									</sum>
+									<difference>
+										<p>tyre/bl/disc_temp_c</p>
+										<p>driveline/par/ambient_c</p>
+									</difference>
+								</product>
+							</difference>
+						</product>
+						<product>
+							<p>driveline/par/disc_kg_rear</p>
+							<p>driveline/par/disc_heat_j_kgk</p>
+						</product>
+					</quotient>
+				</sum>
+			</function>
+		</fcs_function>
 	</channel>
 
 	<channel name="Tyre br">
@@ -5461,6 +7303,49 @@
 						</min>
 					</max>
 				</product>
+			</function>
+		</fcs_function>
+		<!-- disc_temp_c = disc_temp_c + dt_s * ((service_brake_nm + mechanical_rear_nm) * abs(omega_rad_sec) - (disc_cooling_w_k + disc_cooling_w_k_per_mps * abs(vx_wheel_mps)) * (disc_temp_c - ambient_c)) / (disc_kg_rear * disc_heat_j_kgk) -->
+		<fcs_function name="tyre/br/disc_temp_c">
+			<function>
+				<sum>
+					<p>tyre/br/disc_temp_c</p>
+					<quotient>
+						<product>
+							<p>driveline/dt_s</p>
+							<difference>
+								<product>
+									<sum>
+										<p>tyre/br/service_brake_nm</p>
+										<p>brakes/mechanical_rear_nm</p>
+									</sum>
+									<abs>
+										<p>tyre/br/omega_rad_sec</p>
+									</abs>
+								</product>
+								<product>
+									<sum>
+										<p>driveline/par/disc_cooling_w_k</p>
+										<product>
+											<p>driveline/par/disc_cooling_w_k_per_mps</p>
+											<abs>
+												<p>tyre/br/vx_wheel_mps</p>
+											</abs>
+										</product>
+									</sum>
+									<difference>
+										<p>tyre/br/disc_temp_c</p>
+										<p>driveline/par/ambient_c</p>
+									</difference>
+								</product>
+							</difference>
+						</product>
+						<product>
+							<p>driveline/par/disc_kg_rear</p>
+							<p>driveline/par/disc_heat_j_kgk</p>
+						</product>
+					</quotient>
+				</sum>
 			</function>
 		</fcs_function>
 	</channel>

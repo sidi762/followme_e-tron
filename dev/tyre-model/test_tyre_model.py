@@ -14,12 +14,13 @@ import pytest
 
 import generate
 import mass
-from sim import KMH, WHEELS, Car, corner, launch, mean, moved, stop
+from sim import KMH, SPLIT_ICE, WHEELS, Car, corner, full_throttle, late_slip, launch, mean, moved, stop
 
 REAR_DRIVE = {"driveline/par/front_torque_share": 0.0}
 FRONT_DRIVE = {"driveline/par/front_torque_share": 1.0}
-# For the tests of what the tyres themselves do when a wheel locks.
+# For the tests of what the tyres themselves do when a wheel locks or spins.
 NO_ABS = {"abs/par/enabled": 0.0}
+NO_TC = {"tc/par/enabled": 0.0}
 
 
 def test_generated_files_are_current():
@@ -76,20 +77,20 @@ def test_occupants_add_their_weight_where_they_sit():
 
 
 def test_launch_on_a_dry_road_is_quick_and_only_the_front_slips():
-    result, rows = launch("tyre")
+    result, rows = launch("tyre", params=NO_TC)
     assert 3.0 < result["time"] < 3.8
     # The open 50:50 centre differential gives the front axle half the torque
     # while the start moves weight rearward, so the front tyres slip past their
     # peak, lose grip there and spin up. A rear bias would hook up here but let
     # the rear spin first on a slippery road, which with nothing to catch it
-    # turns the car round. Traction control is what should stop the spin.
+    # turns the car round. Traction control stops both (tests further down).
     assert max(max(r["slip_ratio_bl"], r["slip_ratio_br"]) for r in rows) < 0.1
     assert result["max_slip"] < 1.5
 
 
 def test_launch_on_a_slippery_road_spins_the_wheels_and_is_slow():
-    dry, _ = launch("tyre")
-    slippery, _ = launch("tyre", surface=0.3)
+    dry, _ = launch("tyre", params=NO_TC)
+    slippery, _ = launch("tyre", surface=0.3, params=NO_TC)
     assert slippery["reached"]
     assert slippery["time"] > 2.5 * dry["time"]
     assert slippery["peak_g"] < 0.4
@@ -99,7 +100,7 @@ def test_launch_on_a_slippery_road_spins_the_wheels_and_is_slow():
 
 
 def test_smoke_follows_the_sliding_axle():
-    car = Car("tyre", params=REAR_DRIVE)
+    car = Car("tyre", params=dict(REAR_DRIVE, **NO_TC))
     car.run(1, throttle=1, brake=1, rear_brake=0)
     for wheel in ("fl", "fr"):
         assert car.fdm[f"tyre/{wheel}/smoke_norm"] == 0
@@ -234,15 +235,17 @@ def test_cornering_has_a_grip_limit_and_understeers_towards_it():
     assert too_much_lock["lat_g"] < limit["lat_g"]      # over-slipped front tyres lose grip
 
 
-def test_drive_layout_decides_what_full_throttle_does_in_a_corner():
-    def body_slip(params):
-        car = Car("tyre", speed=40 * KMH, params=params)
-        car.run(4.0, steer=0.2, cruise=40 * KMH)
-        rows = car.run(3.0, steer=0.2, throttle=1.0)
-        return max(abs(math.degrees(math.atan2(r["v"], max(r["u"], 0.1)))) for r in rows)
+def power_in_a_bend(params):
+    """Full throttle from a steady 40 km/h bend; the largest body sideslip in deg."""
+    car = Car("tyre", speed=40 * KMH, params=params)
+    car.run(4.0, steer=0.2, cruise=40 * KMH)
+    rows = car.run(3.0, steer=0.2, throttle=1.0)
+    return max(abs(math.degrees(math.atan2(r["v"], max(r["u"], 0.1)))) for r in rows)
 
-    assert body_slip(REAR_DRIVE) > 45.0     # power oversteer: it spins
-    assert body_slip(FRONT_DRIVE) < 10.0    # it pushes wide instead
+
+def test_drive_layout_decides_what_full_throttle_does_in_a_corner():
+    assert power_in_a_bend(dict(REAR_DRIVE, **NO_TC)) > 45.0     # power oversteer: it spins
+    assert power_in_a_bend(dict(FRONT_DRIVE, **NO_TC)) < 10.0    # it pushes wide instead
 
 
 @pytest.mark.parametrize("forward,right", [(0.10, 0.0), (0.0, 0.10), (0.30, 0.0), (0.0, 0.30), (-0.2, 0.2)])
@@ -465,3 +468,125 @@ def test_results_do_not_depend_on_the_fdm_rate(hz):
                          (lambda **kw: corner("tyre", 60, 0.2, **kw), "lat_g")):
             reference = run(params=params)[0][key]
             assert run(dt=dt, params=params)[0][key] == pytest.approx(reference, rel=0.08)
+
+
+# --------------------------------------------------------------------------
+# Traction control (Docs/ESC/tc-esc-engineering-manual.md, section 6)
+# --------------------------------------------------------------------------
+MU0 = dict((name, value) for name, value, _ in generate.TYRE_PARAMS)["mu0"]
+
+
+@pytest.mark.parametrize("surface", [1.0, 0.3])
+def test_traction_control_launches_faster_and_keeps_the_wheels_near_their_peak(surface):
+    off = full_throttle(params=NO_TC, surface=surface)
+    on = full_throttle(surface=surface)
+    assert on[-1]["t"] <= 1.01 * off[-1]["t"]
+    assert late_slip(on) < 1.5                        # the tyres start sliding past 1.5
+    if surface < 1.0:
+        assert late_slip(off) > 50.0                  # without TC the wheels spin freely
+        friction_limit = 100 * KMH / (surface * MU0 * 9.80665)
+        assert on[-1]["t"] < 1.15 * friction_limit
+        assert on[-1]["t"] < 0.85 * off[-1]["t"]
+
+
+@pytest.mark.parametrize("params", [{"driveline/par/front_torque_share": 0.3}, REAR_DRIVE])
+def test_traction_control_keeps_a_rear_biased_car_straight_on_ice(params):
+    off = full_throttle(params=dict(params, **NO_TC), surface=0.3, until_kmh=60, seconds=15)
+    on = full_throttle(params=params, surface=0.3, until_kmh=60, seconds=15)
+    assert max(abs(r["heading_deg"]) for r in off) > 90.0     # the spinning rear wheels turn it round
+    assert on[-1]["u"] >= 60 * KMH
+    assert max(abs(r["heading_deg"]) for r in on) < 15.0
+
+
+def test_traction_control_stops_power_oversteer():
+    assert power_in_a_bend(REAR_DRIVE) < 10.0
+
+
+def test_differential_locks_brake_the_spinning_wheels_on_split_grip():
+    off = full_throttle(params=NO_TC, grip=SPLIT_ICE, until_kmh=60, hold_heading=True)
+    on = full_throttle(grip=SPLIT_ICE, until_kmh=60, hold_heading=True)
+    # Without the locks the wheels on ice spin up until the motor reaches its
+    # speed limit, which then cuts the torque of all four.
+    assert late_slip(off, ("fr", "br")) > 50.0
+    assert on[-1]["t"] < 0.4 * off[-1]["t"]
+    assert late_slip(on, ("fr", "br")) < 1.6
+    middle = on[len(on) // 2]
+    assert middle["stab_brake_nm_fr"] > 100.0 and middle["stab_brake_nm_br"] > 100.0
+    assert middle["stab_brake_nm_fl"] == 0.0 and middle["stab_brake_nm_bl"] == 0.0
+    # The drive force on the asphalt side pulls the car round; a driver holds it
+    # (left alone it turns about 30 deg by 60 km/h, which stability control
+    # is to take on).
+    assert max(abs(r["heading_deg"]) for r in on) < 5.0
+
+
+def test_differential_locks_engage_only_at_low_speed_and_never_against_the_brake_pedal():
+    # not above 40 km/h: the motor alone takes the spinning wheels
+    rows = full_throttle(car=Car("tyre", speed=50 * KMH), grip=SPLIT_ICE, seconds=2.0)
+    assert max(r["stab_brake_nm_" + w] for r in rows for w in WHEELS) == 0.0
+    assert any(r["tc_active"] for r in rows)
+    # engaged below 40 km/h, they cut out at 80 km/h
+    rows = full_throttle(grip=SPLIT_ICE, until_kmh=90)
+    assert max(r["stab_brake_nm_" + w] for r in rows if r["u"] < 70 * KMH for w in WHEELS) > 500.0
+    assert max(r["stab_brake_nm_" + w] for r in rows if r["u"] > 80.5 * KMH for w in WHEELS) == 0.0
+    # pressing the brake pedal releases them at once (VW SSP 374)
+    car = Car("tyre")
+    full_throttle(car=car, grip=SPLIT_ICE, seconds=1.0)
+    assert max(car.fdm[f"tyre/{w}/stab_brake_nm"] for w in WHEELS) > 100.0
+    for _ in range(3):
+        car.step(throttle=1.0, brake_front=0.1, brake_rear=0.1)
+    assert max(car.fdm[f"tyre/{w}/stab_brake_nm"] for w in WHEELS) == 0.0
+
+
+def test_hot_brake_discs_fade_the_differential_locks_out():
+    def launch_with_discs_at(temp_c):
+        car = Car("tyre")
+        rows = []
+        for _ in range(int(2.0 / car.dt)):
+            for unit, g in enumerate(SPLIT_ICE):
+                car.fdm[f"gear/unit[{unit}]/static-friction-factor"] = g
+            for w in WHEELS:
+                car.fdm[f"tyre/{w}/disc_temp_c"] = max(temp_c, car.fdm[f"tyre/{w}/disc_temp_c"])
+            car.step(throttle=1.0)
+            rows.append(car.sample())
+        return rows
+
+    cold, hot = launch_with_discs_at(20.0), launch_with_discs_at(600.0)
+    assert max(r["stab_brake_nm_fr"] for r in cold) > 500.0
+    assert max(r["stab_brake_nm_" + w] for r in hot for w in WHEELS) == 0.0
+    assert hot[-1]["u"] < 0.5 * cold[-1]["u"]          # the motor alone has to hold the ice side back
+
+
+def test_drag_torque_control_keeps_coast_regen_from_locking_the_driven_wheels():
+    def worst_braking_slip(params):
+        car = Car("tyre", speed=40 * KMH, surface=0.1, params=dict(params, **{"driveline/par/coast_regen_nm": 300.0}))
+        car.run(0.5)
+        worst = 0.0
+        for _ in range(int(2.5 / car.dt)):
+            car.step()
+            worst = max(worst, max(car.fdm[f"tyre/{w}/tc_brake_slip"] for w in WHEELS))
+        return worst
+
+    assert worst_braking_slip(NO_TC) > 3.0
+    assert worst_braking_slip({}) < 1.3
+
+
+def test_traction_control_works_in_reverse():
+    off = full_throttle(params=NO_TC, surface=0.3, until_kmh=20, direction=-1.0)
+    on = full_throttle(surface=0.3, until_kmh=20, direction=-1.0)
+    assert on[-1]["u"] <= -20 * KMH
+    assert on[-1]["t"] < off[-1]["t"]
+    assert late_slip(on) < 1.5
+
+
+def test_traction_control_stays_out_of_moderate_driving():
+    car = Car("tyre")
+    rows = car.run(6.0, throttle=0.3)
+    _, bend = corner("tyre", 60, 0.1)
+    assert not any(r["tc_active"] for r in rows + bend)
+
+
+@pytest.mark.parametrize("hz", [60, 240])
+def test_traction_control_does_not_depend_on_the_fdm_rate(hz):
+    for kw in (dict(surface=0.3), dict(grip=SPLIT_ICE, until_kmh=60)):
+        reference = full_throttle(**kw)[-1]["t"]
+        assert full_throttle(dt=1.0 / hz, **kw)[-1]["t"] == pytest.approx(reference, rel=0.08)

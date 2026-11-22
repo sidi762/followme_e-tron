@@ -25,13 +25,14 @@ The scalar tuning parameters can be changed while driving, in the property brows
 | Drive update | by a Nasal timer: 10 Hz, or once per frame below 10 fps | every FDM frame (120 Hz) |
 | Wheel speed | not a state: wheels cannot spin or lock | one state per wheel |
 | Braking | pedal times 1.7 g on a dry road; wheels never lock | brake torque per wheel; ABS keeps the wheels from locking |
+| Traction control | none needed: wheels cannot spin | motor torque and wheel brakes keep the driven wheels near their peak slip |
 | Cornering grip | fixed 1.0 g cap, same at any load | peaks, then falls; less per kg on a loaded tyre |
 | Combined | braking and cornering limits are independent | one friction ellipse per tyre |
 | Surface | affects braking and cornering, not acceleration | affects everything |
 | Mass | 1575 kg, 67% on the front wheels, yaw inertia 16,200 kg·m² | 1575 kg from components plus a 60 kg driver: 52% front, yaw inertia 1,830 kg·m² |
 
 `report.py` prints current numbers for both. On flat dry ground at 120 Hz the standard FDM
-reaches 100 km/h in 3.8 s and the tyre model in 3.6 s. The nominal 100 km/h stop takes about
+reaches 100 km/h in 3.8 s and the tyre model in 3.5 s (3.6 s without traction control). The nominal 100 km/h stop takes about
 23 m for the standard FDM. The tyre model takes 38.8 m at 80% pedal and 36.9 m at full pedal with
 ABS. Without ABS full pedal locks the front wheels and takes 42.6 m, and the best hand-found split
 of the pedals, 83% front and 90% rear, takes 37.0 m.
@@ -55,6 +56,8 @@ on the frame rate: at about 4 fps it took 4 s to reach 89 km/h.
 | `dev/tyre-model/sim.py` | runs either FDM headless in JSBSim |
 | `dev/tyre-model/test_tyre_model.py` | behaviour checks |
 | `dev/tyre-model/report.py` | standard FDM against tyre model, as a table |
+| `dev/tyre-model/manual_figures.py` | draws the figures of `Docs/ESC/tc-esc-engineering-manual.md` |
+| `dev/tyre-model/manual_pdf.py` | prints that manual to PDF with a headless Chrome |
 | `dev/tyre-model/fg/` | a scripted drive in a real, headless FlightGear |
 
 To change the model, edit `generate.py` (or the standard FDM, which the wheel positions, mass and
@@ -145,9 +148,9 @@ the front axle reaches its limit first at any deceleration up to 1.15 g. With th
 middle that is 836 N·m per rear wheel instead of 580.
 
 The centre differential stays at 50:50. With the weight further back, a full-throttle start on dry
-asphalt now slips the front tyres past their peak, where they lose grip and spin up. A rear bias
+asphalt slips the front tyres past their peak, where they lose grip and spin up. A rear bias
 hooks up on dry but spins the rear first on a slippery road, and with the lower yaw inertia the
-car then turns round. Traction control is meant to deal with both.
+car then turns round. Traction control deals with both (see below).
 
 To audit the body shell against the 3D model (needs NumPy):
 
@@ -196,6 +199,49 @@ left wheels on asphalt, right on ice) a driver holding the heading keeps it with
 Without ABS the locked wheels cannot steer and the car turns more than 90°, as each of NHTSA's cars
 yawed out of its lane on split grip with ABS disabled.
 
+## Traction control
+
+`Docs/ESC/tc-esc-engineering-manual.md` is the full design: sources, equations, parameters, tests
+and the plan for stability control. In short, it follows the traction control Bosch describes for
+a car with one engine, an open centre differential and two open axle differentials, which is this
+car's layout. It runs in the `Traction control` channel, before the driveline, one frame behind the
+wheels like ABS. Each controller regulates one thing:
+
+- **Motor torque**, a PI controller on the torque-weighted drive slip of the driven wheels (each
+  wheel's drive slip over its tyre's peak drive slip at its load). It aims at `target_slip` (0.85)
+  of the peak, less in a bend so that the tyres keep lateral grip, and no wheel the brakes leave
+  alone may pass `wheel_limit` (1.4; the tyre starts sliding at 1.5). Its integral state is the torque
+  limit itself, so it starts from the torque being driven and does not wind up. An electric motor
+  follows within milliseconds, so the limit acts in the same frame.
+- **Differential locks**, on the brakes. A wheel that slips more than its axle partner is braked
+  (transversal lock), and so are both wheels of an axle that slips more than the other axle
+  (longitudinal lock). The open differentials then pass the torque to the wheels with grip. The
+  locks engage below 40 km/h and cut out above 80 km/h, let go when the driver touches the brake
+  pedal, and fade out between 450 and 550 °C of brake disc temperature, which the model now
+  computes for each disc. A lock brakes at most with the full-pedal torque; past that the motor takes
+  over.
+- **Drag torque control**: when coast regen makes a driven wheel slip past its peak, it is scaled
+  down, quickly, and comes back slowly.
+
+The brakes do the part where wheels slip differently, the motor the part they share. A lock's
+request (`stab_brake_nm`) is added to the driver's in front of ABS, built up by the hydraulic pump
+in `pump_time_s` (0.15 s for the full-pedal torque) and released at once. ABS treats a wheel with
+such a request on its own: the rear pair leaves select-low and the front yaw delay does not hold it
+back.
+
+| Full throttle | Without TC | With TC |
+|---|---|---|
+| 0-100 km/h, dry | 3.64 s, front right wheel to 6.7 times its peak slip | 3.53 s, at most 1.45 |
+| 0-100 km/h, grip x0.3 | 11.9 s, every wheel spinning near the motor speed limit | 9.07 s (grip alone allows 8.6 s), at most 1.48 |
+| 0-60 km/h, grip x0.3, 30:70 | spins round | 5.3 s, heading within 2.2° |
+| 0-60 km/h, right wheels on ice | 16.7 s: the spinning wheels drive the motor to its speed limit | 4.05 s, wheels on ice at most 1.4 |
+| Full throttle in a 40 km/h bend, rear drive | spins (sideslip over 45°) | sideslip under 5° |
+
+On split grip the drive force on the asphalt side pulls the car towards the ice side: left alone it
+turns about 32° by 60 km/h, a driver holding the heading keeps it within 2°. Stability control is
+to take that on. Its parameters are under `/fdm/jsbsim/tc/par`; `tc/par/enabled` = 0 switches traction
+control off.
+
 ## How it works
 
 JSBSim keeps doing the suspension: the four `BOGEY` contacts still carry the car. Their friction
@@ -224,7 +270,8 @@ rear wheels:
 - **Service brakes**, hydraulic, all four wheels: the pedal of that axle, automatic braking (AEB
   and cruise control) and Auto Hold, whichever asks for most. Each wheel turns the demand into
   `brake_request_nm`, and the ABS channel passes on as much of it as the wheel can take as
-  `service_brake_nm` (see ABS above). Stability control will add its own requests there later.
+  `service_brake_nm` (see ABS above). Traction control adds its requests there, and stability
+  control will too.
 - **Handbrake lever** (held with `b`): the rear wheels only, mechanically, past the hydraulics.
   `handbrake_nm` locks them while driving. Held on a straight at speed, the locked rear wheels let
   the car swing round.
@@ -301,6 +348,12 @@ Outputs worth knowing, per wheel `fl`, `fr`, `bl`, `br`:
 | `tyre/<wheel>/abs_mode` | -1 releasing, 0 holding, 1 rebuilding |
 | `tyre/<wheel>/abs_slip` | braking slip over the tyre's peak braking slip at its load |
 | `driveline/motor_rad_sec`, `driveline/motor_torque_nm` | motor speed and torque |
+| `driveline/request_torque_nm`, `drive_torque_nm` | drive torque the pedal asks for, and what traction control lets through |
+| `tc/active` | traction control is limiting the motor or braking a wheel |
+| `tc/motor_cap_nm` | traction control's motor torque limit (a very large number while it does not limit) |
+| `tyre/<wheel>/tc_slip` | drive slip over the tyre's peak drive slip at its load |
+| `tyre/<wheel>/stab_brake_nm` | traction control's brake request on this wheel, as the pump has built it up |
+| `tyre/<wheel>/disc_temp_c` | brake disc temperature |
 
 Parameters are listed with a comment each at the top of `Systems/tyre-model.xml`.
 
@@ -308,7 +361,8 @@ Parameters are listed with a comment each at the top of `Systems/tyre-model.xml`
 
 `Nasal/engine.nas` looks for `driveline/in/throttle_norm` when it loads. If it is there, the
 engine passes pedal, direction and gear ratio to the FDM and reads the motor speed back, instead
-of writing forces. `Nasal/steering.nas` skips turning the old drive forces when they do not exist.
+of writing forces. The battery load uses `driveline/drive_torque_nm`, the torque after traction
+control. `Nasal/steering.nas` skips turning the old drive forces when they do not exist.
 With the standard or the limo FDM neither property exists and both scripts behave as before.
 
 The pedal still reaches the FDM on the engine's 0.1 s timer, so it is up to 0.1 s late (one frame
@@ -351,7 +405,11 @@ with locked wheels, a locked tyre's sliding friction, the friction ellipse, mixe
 cornering limit and understeer, power oversteer by drive layout, holding and releasing on slopes,
 pulling away at full lock, each wheel's brake request, ABS on dry, wet and icy roads, while
 steering and on split grip, the handbrake lever, the parking brake at rest and while moving, Auto
-Hold, and that results do not depend on the FDM rate (60 to 240 Hz). They do not start FlightGear
+Hold, traction control on dry, slippery and split grip, with a rear bias, in a bend, in reverse and
+in moderate driving, the differential locks' speed range, brake pedal and disc temperature rules,
+drag torque control, and that results do not depend on the FDM rate (60 to 240 Hz). The tests of
+what the tyres themselves do when a wheel spins switch traction control off, as the locked-wheel
+tests switch ABS off. They do not start FlightGear
 and do not run any Nasal.
 
 For that there is a scripted drive in a real FlightGear, rendered in software under Xvfb:
@@ -381,8 +439,15 @@ model by hand yet.
   sliding ones too, and slide at a smaller share of their peak on wet roads (0.45 to 0.67 of it in
   NHTSA's tests). Loose gravel would favour a locked, ploughing wheel; NHTSA's cars stopped 27%
   shorter there with ABS disabled.
-- A full-throttle start on dry asphalt slips the front tyres past their peak (see Mass and
-  occupants).
+- Traction control, like ABS, takes the true speed of each contact patch, and the tyre's peak slip
+  does not change with the surface, so it knows the best slip better than a real one would.
+- On split grip traction control pulls the car towards the low-grip side until stability control
+  limits the slip difference it allows.
+- The motor rotor's inertia is shared out to the four wheels, so an open differential lets the
+  wheel with grip keep its share of the torque until the motor reaches its speed limit. With a real,
+  shared rotor that wheel loses torque as soon as the other spins up.
+- The brake disc temperature only decides when the differential locks fade out; the brakes
+  themselves do not fade.
 - Coast regen is a fixed motor torque so that lifting off slows the car as the standard FDM does;
   it does not charge the battery.
 - On every reposition FlightGear 2020.3 prints "Property ... is already defined" once per
@@ -392,8 +457,8 @@ Not done yet:
 
 - "Magic bush tyres" (`reduceRollingFriction`) has no effect; the equivalent is
   `tyre/par/rolling_resistance`.
-- No traction control or stability control. They are planned inside the FDM, acting on the motor
-  torque and on each wheel's brake request. `brakesABS` in `Nasal/systems/brakes.nas` is not used.
+- No stability control yet, and no driver switch, lamp or sound for traction control: steps 3 and
+  4 of `Docs/ESC/tc-esc-engineering-manual.md`. `brakesABS` in `Nasal/systems/brakes.nas` is not used.
 - Outside ABS the hydraulic brakes apply the request at once; there is no pressure build-up time.
 - ABS has no warning lamp or pedal feel, and its sound is synthesised.
 - The limo keeps the standard model.
