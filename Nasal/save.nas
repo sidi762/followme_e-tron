@@ -11,8 +11,6 @@ var savedProperties = [
     ["/orientation/heading-deg", "/save/heading-deg"],
     ["/orientation/pitch-deg", "/save/pitch-deg"],
     ["/orientation/roll-deg", "/save/roll-deg"],
-    ["/sim/model/lights/indicator-left/state", "/save/l/indicator"],
-    ["/sim/model/lights/indicator-right/state", "/save/r/indicator"],
     ["/controls/lighting/headlight", "/save/headlight"],
     ["/systems/horn", "/save/horn"],
     ["/controls/mode", "/save/controls/mode"],
@@ -40,6 +38,9 @@ var save = func {
             if (stale != nil) stale.remove();
         }
     }
+    var indicators = followme.indicatorController;
+    setprop("/save/indicator-mode", indicators.getMode());
+    setprop("/save/indicator-hazards", indicators.falseLight);
     setprop("/save/bkwh", followme.cSource.getRemainingInkWh());
     setprop("/save/br", followme.cSource.getRemainingPercentageFloat());
     setprop("/save/aux-kwh", followme.cSource_small.getRemainingInkWh());
@@ -51,11 +52,36 @@ var save = func {
 # Resume
 
 
+# Restore the switch selection and let the relay drive the lamp outputs.
+var restoreIndicators = func {
+    var indicators = followme.indicatorController;
+    var modes = indicators.IND_MODES;
+    var mode = getprop("/save/indicator-mode");
+    var hazards = getprop("/save/indicator-hazards");
+    if (mode == nil) {
+        # Older snapshots stored only the two visible lamps.
+        var left = getprop("/save/l/indicator");
+        var right = getprop("/save/r/indicator");
+        if (left == nil and right == nil) return;
+        hazards = left and right;
+        if (hazards) mode = modes.BOTH_WITHOUT_LED;
+        elsif (left) mode = modes.LEFT_WITH_LED;
+        elsif (right) mode = modes.RIGHT_WITH_LED;
+        else mode = modes.OFF;
+    }
+    indicators.falseLight = hazards or 0;
+    indicators.stalkTarget = (mode == modes.LEFT_WITH_LED) - (mode == modes.RIGHT_WITH_LED);
+    interpolate(indicators.stalkPosition);
+    indicators.stalkPosition.setDoubleValue(indicators.stalkTarget);
+    if (indicators.getMode() != mode) indicators.setMode(mode);
+};
+
 var resume = func {
     foreach (var paths; savedProperties) {
         var value = getprop(paths[1]);
         if (value != nil) setprop(paths[0], value);
     }
+    restoreIndicators();
     var aux = getprop("/save/aux-kwh");
     if (aux != nil and num(aux) != nil) followme.cSource_small.setRemainingKWh(num(aux));
     var bkwh = getprop("/save/bkwh");

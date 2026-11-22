@@ -28,7 +28,8 @@ var Indicator = {
     new: func(type) { 
         var newIndicator = { parents:[Indicator] };
         newIndicator.type = type;  
-        newIndicator.fgLight = aircraft.light.new("/sim/model/lights/indicator-"~type, [0.5, 0.5], poweredAuxSwitch("/controls/lighting/indicator-"~type));
+        newIndicator.powered = poweredAuxSwitch("/controls/lighting/indicator-" ~ type);
+        newIndicator.lamp = props.globals.getNode("/sim/model/lights/indicator-" ~ type ~ "/state", 1);
         return newIndicator;
     },
     state: 0,
@@ -65,7 +66,52 @@ var IndicatorController = {
         BOTH_WITH_LED: 6 # WIP
     },
 
-    new: func() { return { parents:[IndicatorController]}; },
+    new: func() {
+        var m = { parents: [IndicatorController] };
+        var left = m.leftIndicator;
+        var right = m.rightIndicator;
+        var relay = props.globals.getNode("/sim/model/lights/indicator-relay", 1);
+        # 0 is silent at startup. +1 and -1 select the two recorded contacts.
+        relay.setIntValue(0);
+        var setPhase = func(phase) {
+            left.lamp.setBoolValue(phase == 1 and left.powered.getBoolValue());
+            right.lamp.setBoolValue(phase == 1 and right.powered.getBoolValue());
+            relay.setIntValue(phase);
+        };
+        # Successive clicks in indicatorFlashing.wav are 0.4 seconds apart.
+        var timer = maketimer(0.4, func { setPhase(-relay.getValue()); });
+        timer.simulatedTime = 1;
+        var refresh = func {
+            var phase = relay.getValue();
+            if (left.powered.getBoolValue() or right.powered.getBoolValue()) {
+                if (!timer.isRunning) {
+                    phase = 1;
+                    timer.start();
+                }
+            } elsif (timer.isRunning) {
+                timer.stop();
+                phase = -1;
+            }
+            setPhase(phase);
+        };
+        setlistener(left.powered, refresh, 0, 0);
+        setlistener(right.powered, refresh, 1, 0);
+
+        m.stalkPosition = vInfo.lighting.indicator.getNode("stalk-position-norm", 1);
+        m.stalkPosition.setDoubleValue(0);
+        setlistener(m.stalkPosition, func(node) {
+            var pos = node.getValue();
+            m.leftIndicatorSwitchNode.setDoubleValue(math.max(0, pos));
+            m.rightIndicatorSwitchNode.setDoubleValue(math.max(0, -pos));
+            # The contacts close at the detents and open as the stalk leaves them.
+            var modes = m.IND_MODES;
+            if (pos == 1) m.setMode(modes.LEFT_WITH_LED);
+            elsif (pos == -1) m.setMode(modes.RIGHT_WITH_LED);
+            elsif (m.mode == modes.LEFT_WITH_LED or m.mode == modes.RIGHT_WITH_LED)
+                m.setMode(modes.OFF);
+        }, 1, 0);
+        return m;
+    },
 
     leftIndicator: Indicator.new("left"),
     rightIndicator: Indicator.new("right"),
@@ -120,14 +166,14 @@ var IndicatorController = {
         return me.mode;
     },
     setMode: func(targetMode){
+        if(targetMode == me.IND_MODES.OFF and me.falseLight){
+            targetMode = me.IND_MODES.BOTH_WITHOUT_LED;
+        }
         if(targetMode == me.IND_MODES.OFF){
             me.resumeLedMessage();
             me.rightIndicator.switchOff();
             me.leftIndicator.switchOff();
             me.mode = targetMode;
-            if(me.falseLight == 1){
-                me.setMode(me.IND_MODES.BOTH_WITHOUT_LED);
-            }
         }else if(targetMode == me.IND_MODES.RIGHT_WITHOUT_LED){
             me.resumeLedMessage();
             me.rightIndicator.switchOn();
@@ -135,8 +181,8 @@ var IndicatorController = {
             me.mode = targetMode;
         }else if(targetMode == me.IND_MODES.LEFT_WITHOUT_LED){
             me.resumeLedMessage();
-            me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
+            me.rightIndicator.switchOff();
             me.mode = targetMode;
         }else if(targetMode == me.IND_MODES.BOTH_WITHOUT_LED){
             me.resumeLedMessage();
@@ -153,8 +199,8 @@ var IndicatorController = {
         }else if(targetMode == me.IND_MODES.LEFT_WITH_LED){
             me.resumeLedMessage();
             me.saveLedMessage();
-            me.rightIndicator.switchOff();
             me.leftIndicator.switchOn();
+            me.rightIndicator.switchOff();
             me.setLedMessage(me.textureLeft);
             me.mode = targetMode;
         }else if(targetMode == me.IND_MODES.BOTH_WITH_LED){
@@ -165,32 +211,21 @@ var IndicatorController = {
         }
     },
 
-    right_indicator_toggle: func(){
-        if(isInternalView()) playAudio('IndicatorEnd.wav');
+    stalkTarget: 0, # +1 left, 0 neutral, -1 right
+    stalkTravelSec: 0.24, # center to detent, estimated from IndicatorEnd.wav
 
-        if(me.getMode() != me.IND_MODES.RIGHT_WITH_LED){
-            me.setMode(me.IND_MODES.RIGHT_WITH_LED);
-            me.rightIndicatorSwitchNode.setValue(1);
-            me.leftIndicatorSwitchNode.setValue(0);
-            return 0;
-        }else if(me.getMode() == me.IND_MODES.RIGHT_WITH_LED){
-            me.setMode(me.IND_MODES.OFF);
-            me.rightIndicatorSwitchNode.setValue(0);
-            return 0;
-        }else{
-            return -1;
-        }
+    toggleStalk: func(side) {
+        me.stalkTarget = me.stalkTarget == side ? 0 : side;
+        if (isInternalView()) playAudio(file: "IndicatorEnd.wav", queue: "instant");
+        var distance = math.abs(me.stalkTarget - me.stalkPosition.getValue());
+        interpolate(me.stalkPosition, me.stalkTarget, distance * me.stalkTravelSec);
     },
-    left_indicator_toggle: func(){
-        if(isInternalView()) playAudio('IndicatorEnd.wav');
-        if(me.getMode() != me.IND_MODES.LEFT_WITH_LED){
-            me.setMode(me.IND_MODES.LEFT_WITH_LED);
-            me.leftIndicatorSwitchNode.setValue(1);
-            me.rightIndicatorSwitchNode.setValue(0);
-        }else if(me.getMode() == me.IND_MODES.LEFT_WITH_LED){
-            me.setMode(me.IND_MODES.OFF);
-            me.leftIndicatorSwitchNode.setValue(0);
-        }
+    right_indicator_toggle: func {
+        me.toggleStalk(-1);
+        return 0;
+    },
+    left_indicator_toggle: func {
+        me.toggleStalk(1);
     },
 
     # quiet: switched by a system rather than the driver's button, so no click
