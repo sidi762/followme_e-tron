@@ -17,6 +17,15 @@
 var BrakeController = {
 	new: func() {
 		var controller = {parents: [BrakeController]};
+		# Cancel a pending actuator command if FlightGear restores or changes the brake.
+		controller.handBrakeTimer = maketimer(0.5, func {
+			controller.parkingBrakeNode.setValue(controller._handBrakeIsOn);
+		});
+		controller.handBrakeTimer.singleShot = 1;
+		setlistener(controller.parkingBrakeNode, func(n) {
+			controller.handBrakeTimer.stop();
+			controller._handBrakeIsOn = n.getBoolValue();
+		}, 1, 0);
 		foreach (var pedal; [controller.leftBrakeNode, controller.rightBrakeNode]) {
 			setlistener(pedal, func { controller.updateBrakeOutputs(); }, 0, 0);
 		}
@@ -93,43 +102,23 @@ var BrakeController = {
         me.updateBrakeOutputs();
     },
 
-    _activeHandBrake: func(){
-        # for internal use
-        me._handBrakeIsOn = 1;
-        if(isInternalView()) playAudio("handbrake_on.wav");
-        settimer(func(){ #Delay for 0.5 seconds
-            me.parkingBrakeNode.setValue(1);
-        }, 0.5);
-    },
-    _deactiveHandBrake: func(){
-        # for internal use
-        me._handBrakeIsOn = 0;
-        if(isInternalView()) playAudio("handbrake_off.wav");
-        settimer(func(){ #Delay for 0.5 seconds
-            me.parkingBrakeNode.setValue(0);
-        }, 0.5);
-    },
-    enableHandBrake: func(){
-        # enable handbrake from button
-        if(!me._handBrakeIsOn){
-            me._activeHandBrake();
-        }
-    },
-    disableHandBrake: func(){
-        # disable handbrake from button
-        if(me._handBrakeIsOn){
-            me._deactiveHandBrake();
-        }
-    },
-    toggleHandBrake: func(){
-        # Toggle handbrake from button
-        if(isInternalView()) playAudio("electric_handbrake.wav");
-        if(!me._handBrakeIsOn){
-            me.enableHandBrake();
-        }else{
-            me.disableHandBrake();
-        }
-    },
+	# The switch changes the requested state immediately. The actuator takes half a second.
+	setHandBrake: func(engaged) {
+		if (me._handBrakeIsOn == engaged) return;
+		me._handBrakeIsOn = engaged;
+		if (isInternalView()) playAudio(engaged ? "handbrake_on.wav" : "handbrake_off.wav");
+		me.handBrakeTimer.restart(0.5);
+	},
+	enableHandBrake: func() {
+		me.setHandBrake(1);
+	},
+	disableHandBrake: func() {
+		me.setHandBrake(0);
+	},
+	toggleHandBrake: func() {
+		if (isInternalView()) playAudio("electric_handbrake.wav");
+		me.setHandBrake(!me._handBrakeIsOn);
+	},
     activeEmergencyBrake: func(){
         me.setAebBrakes(1);
         safety.emergencyMode();
