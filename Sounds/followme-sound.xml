@@ -406,7 +406,8 @@
                 </and>
             </condition>
             <volume>
-                <factor>0.7</factor>
+                <property>sim/current-view/internal</property>
+                <factor>0.35</factor>
             </volume>
         </abs>
 
