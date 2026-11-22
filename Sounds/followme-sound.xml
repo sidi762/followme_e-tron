@@ -406,7 +406,7 @@
                 </and>
             </condition>
             <volume>
-                <value>0.5</value>
+                <factor>0.7</factor>
             </volume>
         </abs>
 
