@@ -17,4 +17,9 @@ Splash/Removed
 ͼͼ
 
 # SAE papers are copyrighted by SAE: keep local copies out of the repository
-Docs/sae*.pdf
+Docs/**/sae*.pdf
+# Copyrighted manufacturer and publisher material behind Docs/ESC/tc-esc-engineering-manual.md
+Docs/ESC/978-3-658-03978-3.pdf
+Docs/ESC/994475AG.pdf
+Docs/ESC/ECS-RSP-Study-4-TP-vehicle-dynamic-controllers.pdf
+Docs/ESC/VWUSA.COM_SSP_374_Traction_Control.pdf
