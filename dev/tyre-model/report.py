@@ -7,10 +7,27 @@ Numbers, not pass/fail: use it to see what a parameter change did.
 """
 import sys
 
-from sim import SPLIT_ICE, corner, full_throttle, late_slip, launch, stop
+from sim import (SPLIT_ICE, corner, full_throttle, late_slip, launch, sine_with_dwell_series, slowly_increasing_steer,
+                 stop)
 
 NO_ABS = {"abs/par/enabled": 0.0}
 NO_TC = {"tc/par/enabled": 0.0}
+NO_ESC = {"esc/par/enabled": 0.0}
+
+
+def stability_control(dt):
+    a = round(sum(abs(slowly_increasing_steer(sign, dt=dt)) for sign in (1.0, -1.0)) / 2.0, 1)
+    print("\nStability control: FMVSS 126 sine with dwell at 80 km/h, A = %.1f deg of steering wheel" % a)
+    for name, params in (("without ESC", NO_ESC), ("with ESC", {})):
+        runs = [(amp, r) for sign in (1.0, -1.0) for amp, r in sine_with_dwell_series(a, sign, params=params, dt=dt)]
+        failing = [amp for amp, r in runs if not r["stable"] or (amp >= 5 * a and r["lateral_1_07"] < 1.83)]
+        spun = sum(1 for _, r in runs if r["peak_yaw"] != r["peak_yaw"])
+        measured = [r for _, r in runs if r["peak_yaw"] == r["peak_yaw"]]
+        print("  %-12s %2d of %d runs fail (%d spun without a second yaw peak); yaw rate after 1.0 s up to"
+              " %4.0f %% of its peak, after 1.75 s %4.0f %%; lateral move at least %.2f m; sideslip up to %.1f deg"
+              % (name, len(failing), len(runs), spun, 100 * max(r["yaw_1_0"] for r in measured),
+                 100 * max(r["yaw_1_75"] for r in measured),
+                 min(r["lateral_1_07"] for amp, r in runs if amp >= 5 * a), max(r["max_beta"] for _, r in runs)))
 
 
 def traction_control(dt):
@@ -43,6 +60,7 @@ def main():
               % (surface, a["time"], a["peak_g"], b["time"], b["peak_g"], b["max_slip"]))
 
     traction_control(dt)
+    stability_control(dt)
 
     print("\n100-0 km/h")
     for surface in (1.0, 0.3):

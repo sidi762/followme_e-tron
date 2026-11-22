@@ -68,8 +68,8 @@ wheels, rear axle select-low, front yaw moment build-up delay. See the tyre mode
 | Mass with driver | 1635 kg, 52 % front | `mass.py` |
 | Yaw inertia | 1830 kg·m², dynamic index 0.72 | S4 measured 0.66 (A-Class, 1200 kg·m²) and 0.85 (330xi, 2730 kg·m²) |
 | Springs, track | 78.8 kN/m at every corner, 1.32 m front and rear, no anti-roll bars | roll stiffness 50:50 |
-| Understeer gradient at 80 km/h | about 0.09 deg/g | nearly neutral |
-| Characteristic speed | about 125 m/s | from the understeer gradient; ESC needs the measured value (7.1) |
+| Understeer gradient | 0.11 deg/g at 40 km/h rising to 0.30 at 120 km/h, 0.21 at 80 km/h | nearly neutral; steady turns up to 4 m/s² |
+| Characteristic speed | 111 m/s at 40 km/h to 68 m/s at 120 km/h, 82 m/s at 80 km/h | ESC's reference uses the 80 km/h value (7.1) |
 
 A prototype front anti-roll bar moved the understeer gradient only from 0.09 to 0.36 deg/g at 70 %
 front roll stiffness: the KIT tyre's cornering stiffness is nearly proportional to load below 4 kN.
@@ -89,8 +89,8 @@ drive slip at its load.
 | Grip x0.3, 30:70 | spins round (120 deg) |
 | Split grip, right side x0.3 | 0-60 km/h 5.6 s, right wheels to 140 times their peak slip |
 | Split grip, right side x0.1 | 0-60 km/h 16.7 s: the spinning wheels drive the motor to its speed limit, which cuts the torque of all four |
-| Sine with dwell (S8), 80 km/h, coasting | spins at 5A, 6.5A and 270 deg steering wheel angle; passes at 8A (A = 17 deg steering wheel, 0.85 deg at the road wheels) |
-| Same, flooring it at 10 deg sideslip | 50:50 and front drive recover (sideslip at most 11-18 deg); 30:70 and rear drive spin harder |
+| Sine with dwell (S8), 80 km/h, coasting, A = 19.7 deg of steering wheel, 1.5A to 270 deg both ways | 38 of 52 runs fail, 13 of them turn round (sideslip up to 89 deg) |
+| Same at 6.5A, flooring it at 10 deg sideslip | 50:50 and front drive recover (sideslip at most 11-18 deg); 30:70 and rear drive spin harder |
 
 ![Sine with dwell without ESC](figures/sine-with-dwell-baseline.svg)
 
@@ -104,18 +104,18 @@ sideslip recovers it with 50:50 drive.*
 ### 4.1 Channel order
 
 ```
-Occupants -> Traction control (new) -> Driveline -> Brakes -> ABS -> Tyre fl, fr, bl, br
+Occupants -> Traction and stability control (new) -> Driveline -> Brakes -> ABS -> Tyre fl, fr, bl, br
 ```
 
 ![Channel order in one FDM frame](figures/architecture.svg)
 
-*Figure 3. What the generated system computes in one FDM frame. Traction control reads the
-previous frame's tyre and body state and sets the motor torque limit and the stability brake
+*Figure 3. What the generated system computes in one FDM frame. Traction and stability control
+read the previous frame's tyre and body state and set the motor torque limit and the stability brake
 requests.*
 
-The `Traction control` channel holds TC and, from step 3, ESC. Like ABS it works one frame behind
-(8.3 ms at 120 Hz): it reads what the tyre channels computed in the previous frame and sets this
-frame's motor torque limit and stability brake requests.
+The `Traction and stability control` channel holds TC and then ESC. Like ABS it works one frame
+behind (8.3 ms at 120 Hz): it reads what the tyre channels computed in the previous frame and sets
+this frame's motor torque limit and stability brake requests.
 
 ### 4.2 Hierarchy (S1)
 
@@ -129,9 +129,11 @@ through ABS.
 1. Motor torque limit `tc/motor_cap_nm`: the Driveline channel drives with the smaller of the
    driver's request (`driveline/request_torque_nm`) and this limit (`driveline/drive_torque_nm`).
    An electric motor sets its torque within milliseconds (S7), so the limit takes effect in the same
-   frame. ESC (step 3) acts on it through TC's target slip and its own limit.
+   frame. ESC multiplies the torque by its own factor (`esc/torque_factor`, 7.2).
 2. Stability brake request `tyre/<w>/stab_brake_nm` per wheel, added to the driver's service brake
    request in front of ABS. It is built up by the pump at a limited rate and released quickly.
+3. Pressure release `esc/keep_<w>`: the share of the driver's service brake request a wheel keeps,
+   below 1 only while ESC lets pressure off (7.2).
 
 ### 4.4 Sensors
 
@@ -283,56 +285,54 @@ It never adds drive torque. ABS already removes coast regen while it works.
 | SPORT | target slip raised (`sport_target`) below 68 km/h (S5: more slip allowed up to 42 mph) | yes | sideslip allowed to grow further, no torque cut for oversteer (S2: A6/A7 quattro) |
 | OFF | no | below 40 km/h only (S7: low-speed slip control remains for starting off) | no |
 
-## 7. Electronic stability control (step 3)
+## 7. Electronic stability control
+
+S8 asks for brake torques adjusted at each wheel, a closed loop on yaw rate and sideslip against the
+driver's steering, a means to modify the motor torque, and operation above 20 km/h going forwards,
+also while ABS or TC work. The model does each of these; `dev/tyre-model/README.md` (Stability
+control) lists the parameters and results.
 
 ### 7.1 Reference yaw rate
 
-```
-yaw_ref = v * delta / (L * (1 + (v / v_char)^2)),   |yaw_ref| <= mu_eff * g / v
-```
-
-- `delta` is the front road wheel angle; S4 delays it with an all-pass filter so that reference
-  and measured yaw rate are in phase.
-- `v_char` is this car's own characteristic speed from a steady-state circle test (S1: the data
-  come from the vehicle's skid-pad tests). It must not be copied from another car: with the
-  330xi's 16.7 m/s, an ordinary 0.3 g bend at 80 km/h would already count as oversteer here.
-  A script in step 3 measures it and stores it as a parameter.
-- S4 assumed `mu = 1`; this model uses `mu_eff`.
+`yaw_ref = v * delta / (L * (1 + (v / v_char)^2))`, limited to `mu_eff * g / v` and lagged by
+0.1 s (S4 delays the steering with an all-pass filter instead). `v_char` is this car's own, 82 m/s,
+measured at 80 km/h by `characteristic_speed()` in `sim.py`; S4's 16.7 m/s would flag ordinary bends
+as oversteer here. For the torque cut alone, understeer is also measured against a reference that may
+reach 1.5 times `mu_eff * g / v`.
 
 ### 7.2 Controller
 
-S1 computes a yaw moment from yaw rate and sideslip errors and turns it into slip targets for
-selected wheels. S4 models the same behaviour as staged interventions with fixed brake torques and
-fitted the stages to the driving tests of the two cars. This model takes S4's form, which comes with
-parameters, and S1's execution: the brake torques go through ABS.
+S4's thresholds and torque levels, made continuous and scaled by the road's friction as S1's
+yaw-moment controller is (S4's fixed steps switch on and off at each threshold, and do not change
+with the friction):
 
-Yaw rate error `e = yaw - yaw_ref`, signed into the direction of the turn. Starting values from
-S4's BMW 330xi (four-wheel drive, nearly 50:50):
-
-| Stage | Threshold (rad/s) | Action |
+| Error (rad/s) | Action | Source |
 |---|---|---|
-| bend detected | yaw rate 0.05 | none |
-| slight under- or oversteer | 0.07 | motor torque to a quarter of the request (through TC's limit) |
-| understeer | 0.10 | inner rear wheel 600 N·m |
-| oversteer 1 | 0.098 | outer front wheel 1200 N·m |
-| oversteer 2 | 0.115 | outer front wheel 1800 N·m |
-| oversteer 3 | 0.15 | outer front wheel 2400 N·m |
+| yaw rate above 0.05, over 20 km/h, forwards | nothing below | S4, S8 |
+| oversteer 0.07 to 0.15 | outer front brake 0 to 2000 N·m; inner wheels keep down to 20 % of the driver's pressure | S4 (600 N·m at 0.098 to 2400 at 0.15); S2, S8 (pressure reduction) |
+| understeer 0.07 to 0.10 | inner rear brake 0 to 600 N·m | S4 |
+| either, 0.07 to 0.15 | motor torque down to a quarter of what TC allows; held 0.3 s after the error eases, back within 0.3 s | S4 (quarter; it holds 2 s) |
+| sideslip over 10 deg | front wheel on the side the car slides towards, 300 to 600 N·m, replacing yaw control; yaw control's brakes then scaled by 0.6 until the steering is centred | S4 (it uses a rear wheel for one direction) |
 
-- Torque comes back only after 2 s without a new reduction, then ramps up over about 0.2 s
-  (5 Hz in S4).
-- Sideslip limitation (S4): beyond 10 deg and 12 deg of sideslip, counter-brakes (half and full
-  first stage). After it has acted, yaw control's brake torques are multiplied by 0.6 on each return,
-  to stop yaw oscillation on ice; the factor resets when the steering returns to the centre.
-- Active above 15 km/h and going forwards.
-- Brake build-up through the pump rate of 6.4. S4: 0.05 s (330xi) to 0.15 s (A-Class).
+All brake torques are multiplied by `min(1, mu_eff)`. Found while tuning:
+
+- The pressure release was added because braking on split grip with nobody steering still turned
+  the car 126 deg with brake additions alone; at 50 % release it still did, at 80 % it turns 27 deg.
+- Raising the reference limit above `mu g / v` for oversteer or for the understeer brake fails the
+  sine with dwell (13 to 36 of 52 runs): the inner rear brake adds rotation. Only the torque cut uses
+  the wider understeer reference.
+- S4's 2 s torque hold made split-grip starts with nobody steering slow (10.3 s to 60 km/h); with the
+  0.3 s hold they take 5.3 s but turn 25 deg instead of 10 deg.
 
 ### 7.3 Interaction
 
-- Driver braking: ESC adds to the driver's pressure (S2), through ABS.
-- Throttle: in ON the torque is cut for oversteer as S4's BMW does, four-wheel drive or not. In
-  SPORT it is not, so the 50:50 throttle save stays available.
-- Handbrake lever: ESC counteracts the swing, as on a real car; drifting needs SPORT or OFF.
-- AEB, cruise control and Auto Hold: unchanged, their braking is service braking.
+- Driver braking: ESC adds pressure on one wheel and lets it off the yaw-adding wheels, all through
+  ABS; ABS leaves select-low for a rear wheel with a stability request.
+- TC: ESC's torque share multiplies TC's limit; lock and ESC brake requests add up on a wheel.
+- Throttle: ON cuts the torque in oversteer as S4's BMW does, four-wheel drive or not; SPORT will not
+  (step 4).
+- Handbrake lever: it locks the rear wheels past the hydraulics; ESC cannot stop the swing (80 deg
+  of sideslip instead of 89).
 
 ## 8. Driver controls, lamps and sound (step 4)
 
@@ -386,20 +386,21 @@ reaches its 836 N·m limit, so the motor controller takes the torque down briefl
 within about 0.7 s.*
 
 Left alone on split grip the car turns about 32° by 60 km/h: the asphalt side drives, the ice side
-is braked. ESC is to limit the slip difference TC allows while the car yaws (S1: ESP passes TC
-offsets for the permissible slip difference).
+is braked. With ESC it turns 25° (7.2).
 
 ### 9.2 ESC
 
-| Test | Pass |
-|---|---|
-| Sine with dwell (S8), 80 km/h, 1.5A upwards to the larger of 6.5A and 270 deg, both directions | yaw rate at most 35 % of its peak 1.0 s after the steering ends and 20 % after 1.75 s; lateral displacement at least 1.83 m 1.07 s after it starts, from 5A |
-| Steady cornering in the linear range (S1: up to 4 m/s²) | ESC never acts |
-| Rear drive, full throttle in a bend | sideslip stays small |
-| Grip x0.3 understeer, too much steering | slows down and tightens the line |
-| Split grip full braking | ABS behaviour unchanged, heading held |
-| Handbrake lever at 50 km/h | swing limited in ON, as before in OFF |
-| FDM rate 60 and 240 Hz | same results |
+| Test | Pass | Result (120 Hz) |
+|---|---|---|
+| Sine with dwell (S8), 80 km/h coasting, A = 19.7 deg, 1.5A to 270 deg both directions, 52 runs | yaw rate at most 35 % of the peak after 1.0 s and 20 % after 1.75 s; lateral move at least 1.83 m after 1.07 s from 5A; a run without a second yaw peak (spun) fails | all pass (38 fail without ESC, 13 spin); sideslip at most 8.8 deg; lateral move at least 3.05 m |
+| Steady bends up to 4 m/s² (S1 linear range), 2A sine with dwell, straight starts and stops | ESC never acts | never; nor in steady bends up to 8 m/s² |
+| Far too much steering, dry, 90 km/h | slower, tighter path | 68 km/h, 40 m (88 km/h, 73 m) |
+| Rear drive, TC off, full throttle in a 40 km/h bend | sideslip under 15 deg | 13 deg (over 45 without) |
+| Split grip braking, nobody steering / driver holding the heading | under 45 deg / at most 3 % longer stop | 27 deg (126) / 47.1 m (47.7) |
+| Split grip full throttle, nobody steering | less pull, not much slower | 25 deg in 5.3 s (32 deg in 4.2 s) |
+| Below 20 km/h and in reverse | never acts | never |
+| Characteristic speed | parameter within 10 % of the measured one | 82 against 85 m/s |
+| FDM rate 60 and 240 Hz | sine with dwell criteria hold, lateral move within 8 % | as required |
 
 ### 9.3 FlightGear
 
@@ -425,7 +426,7 @@ reposition while TC is working, and a drive with each mode.
 |---|---|---|---|
 | 1 | Signals (5), propshaft speed controller (6.1), EDTC (6.6), `tc/par` parameters; Driveline splits the driver's request (`request_torque_nm`) from the torque driven (`drive_torque_nm`, which `Nasal/engine.nas` reads for the battery) | `generate.py`, `Systems/tyre-model.xml`, `sim.py`, tests, `report.py`, README | done, tested in standalone JSBSim |
 | 2 | Lock controllers (6.2, 6.3), brake path and pump (6.4), disc temperature (6.5), ABS changes | same | done, tested in standalone JSBSim |
-| 3 | `v_char` measurement, ESC (7), sine with dwell; FMVSS 126 final rule into `Docs/ESC/` | same, plus a measuring script | planned |
+| 3 | `v_char` measurement, ESC (7), FMVSS 126 manoeuvres in `sim.py`, 9 tests | `generate.py`, `sim.py`, tests, `report.py`, README | done, tested in standalone JSBSim; figures, PDF and the FlightGear check not redone |
 | 4 | Mode property, button, dialog, lamps, sound, FlightGear checks (8, 9.3) | `Nasal/`, `gui/`, `Models/Interior/Instruments/Smart/dashboard.svg`, `Sounds/followme-sound.xml`, `-set.xml` | planned |
 | 5 | Optional: front/rear split review, friction estimate from accelerations, shared rotor inertia, wheel-selective torque control (S2's electronic transverse lock) | | open |
 
@@ -459,3 +460,4 @@ properties and sit with the other brake parameters under `driveline/par/`. Value
 | `driveline/par/disc_cooling_w_k`, `disc_cooling_w_k_per_mps` | 20, 2 | cooling at rest and per m/s | estimate |
 | `driveline/par/ambient_c` | 20 | air temperature the discs cool to | |
 | `sport_target` | step 4 | target slip in SPORT | S5 |
+| `esc/par/*` | see `Systems/tyre-model.xml` | each listed with its meaning and source in `generate.py` (ESC_PARAMS) | S4, S8 |

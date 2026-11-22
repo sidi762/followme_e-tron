@@ -177,6 +177,7 @@ class Car:
         }
         if self.kind == "tyre":
             row["tc_active"] = fdm["tc/active"]
+            row["esc_active"] = fdm["esc/active"]
             row["drive_nm"] = fdm["driveline/drive_torque_nm"]
         for unit, wheel in enumerate(WHEELS):
             row["jsb_slip_deg_" + wheel] = fdm["gear/unit[%d]/slip-angle-deg" % unit]
@@ -253,6 +254,125 @@ def full_throttle(params=None, surface=1.0, grip=None, until_kmh=100.0, seconds=
 def late_slip(rows, wheels=WHEELS):
     """Largest drive slip over the tyre's peak drive slip after the first half second."""
     return max(r["tc_slip_" + w] for r in rows if r["t"] > 0.5 for w in wheels)
+
+
+# FlightGear turns the steering wheel 900 deg for full rudder (Nasal/steering.nas)
+# and the front wheels 45 deg (max_steer).
+STEER_WHEEL_DEG = 900.0
+
+
+def cruise_pedal(fdm, speed):
+    """The pedal Car.run uses to hold a speed in m/s."""
+    return max(0.0, min(1.0, 0.4 * (speed - fdm["velocities/u-fps"] * FT) + 0.02))
+
+
+def characteristic_speed(kmh=80.0, lateral=(1.0, 2.0, 3.0, 4.0), params=None):
+    """Steady turns at a held speed in the linear range (up to 4 m/s^2).
+
+    Fits the road wheel angle less the kinematic L/R against the lateral
+    acceleration; the slope is the understeer gradient K, and the
+    characteristic speed is sqrt(L / K). Returns (K in deg/g, v_char in m/s).
+    """
+    from generate import STOCK_FDM, read_text, read_vehicle, wheelbase
+    length = wheelbase(read_vehicle(read_text(STOCK_FDM)[0])[2])
+    u = kmh * KMH
+    points = []
+    for ay in lateral:
+        steer = (length / u ** 2) * ay / math.radians(45.0)     # what a neutral car would need
+        rows = Car("tyre", speed=u, params=params).run(8.0, steer=steer, cruise=u)[-180:]
+        yaw, speed = mean(rows, "yaw_rate"), mean(rows, "u")
+        points.append((yaw * speed, math.radians(steer * 45.0) - length * yaw / speed))
+    n = len(points)
+    sx, sy = sum(a for a, _ in points), sum(d for _, d in points)
+    sxx, sxy = sum(a * a for a, _ in points), sum(a * d for a, d in points)
+    gradient = (n * sxy - sx * sy) / (n * sxx - sx * sx)
+    return math.degrees(gradient) * G, math.sqrt(length / gradient) if gradient > 0 else float("inf")
+
+
+def slowly_increasing_steer(sign=1.0, kmh=80.0, rate_dps=13.5, until_g=0.5, params=None, dt=1.0 / 120.0):
+    """FMVSS 126 S7.6: steering wheel turned at 13.5 deg/s at a held 80 km/h up to about 0.5 g.
+
+    Returns A, the steering wheel angle in deg giving 0.3 g, from a linear fit of
+    steering wheel angle against lateral acceleration between 0.1 and 0.375 g.
+    """
+    car = Car("tyre", speed=kmh * KMH, params=params, dt=dt)
+    fdm, wheel, points = car.fdm, 0.0, []
+    while abs(fdm["accelerations/Ny"]) < until_g and wheel < STEER_WHEEL_DEG:
+        wheel += rate_dps * car.dt
+        car.step(throttle=cruise_pedal(fdm, kmh * KMH), steer=sign * wheel / STEER_WHEEL_DEG)
+        points.append((abs(fdm["accelerations/Ny"]), wheel))
+    fit = [(g, w) for g, w in points if 0.1 <= g <= 0.375]
+    n = len(fit)
+    sx, sy = sum(g for g, _ in fit), sum(w for _, w in fit)
+    sxx, sxy = sum(g * g for g, _ in fit), sum(g * w for g, w in fit)
+    slope = (n * sxy - sx * sy) / (n * sxx - sx * sx)
+    return (sy - slope * sx) / n + slope * 0.3
+
+
+def sine_with_dwell(amplitude_deg, sign=1.0, kmh=80.0, params=None, dt=1.0 / 120.0, throttle_at_beta=None):
+    """FMVSS 126 S7.9: 0.7 Hz sine of the steering wheel with a 500 ms dwell at its
+    second peak, coasting from 80 km/h. sign 1 turns right first.
+
+    Returns a dict with the rows and the S5.2 measures: yaw rate 1.0 s and 1.75 s
+    after the steering ends over the first yaw rate peak after the steering
+    reverses, and the lateral displacement 1.07 s after the steering begins (at
+    5 deg of steering wheel angle). With throttle_at_beta the driver floors the
+    accelerator once the sideslip reaches that many degrees.
+    """
+    car = Car("tyre", speed=kmh * KMH, params=params, dt=dt, settle=1.0)
+    fdm = car.fdm
+    freq = 0.7
+    t_reverse = 0.5 / freq
+    t_dwell = 0.75 / freq
+    t_end = t_dwell + 0.5 + 0.25 / freq
+    start, heading, lateral, floor_it, rows = fdm.get_sim_time(), 0.0, 0.0, False, []
+    while fdm.get_sim_time() - start < t_end + 2.5:
+        t = fdm.get_sim_time() - start
+        if t < t_dwell:
+            wheel = amplitude_deg * math.sin(2 * math.pi * freq * t)
+        elif t < t_dwell + 0.5:
+            wheel = -amplitude_deg
+        elif t < t_end:
+            wheel = amplitude_deg * math.sin(2 * math.pi * freq * (t - 0.5))
+        else:
+            wheel = 0.0
+        u, v = fdm["velocities/u-fps"] * FT, fdm["velocities/v-fps"] * FT
+        beta = math.degrees(math.atan2(v, max(abs(u), 0.3)))
+        floor_it = floor_it or (throttle_at_beta is not None and abs(beta) >= throttle_at_beta)
+        car.step(throttle=1.0 if floor_it else 0.0, steer=sign * wheel / STEER_WHEEL_DEG)
+        row = car.sample()
+        heading += row["yaw_rate"] * car.dt
+        lateral += (row["u"] * math.sin(heading) + row["v"] * math.cos(heading)) * car.dt
+        row.update(t=t, wheel_deg=sign * wheel, beta_deg=beta, lateral_m=lateral)
+        rows.append(row)
+
+    def at(time):
+        return min(rows, key=lambda r: abs(r["t"] - time))
+
+    t_begin = next(r["t"] for r in rows if abs(r["wheel_deg"]) >= 5.0)
+    second = [r for r in rows if t_reverse <= r["t"] <= t_end and r["yaw_rate"] * sign < 0]
+    # A car that keeps turning the first way has no second peak: it has spun.
+    peak = max(second, key=lambda r: abs(r["yaw_rate"]))["yaw_rate"] if second else float("nan")
+    yaw_1_0 = at(t_end + 1.0)["yaw_rate"] / peak
+    yaw_1_75 = at(t_end + 1.75)["yaw_rate"] / peak
+    lateral = abs(at(t_begin + 1.07)["lateral_m"] - at(t_begin)["lateral_m"])
+    return {"rows": rows, "t_begin": t_begin, "t_end": t_end, "peak_yaw": peak,
+            "yaw_1_0": yaw_1_0, "yaw_1_75": yaw_1_75, "lateral_1_07": lateral,
+            # S5.2.1 and S5.2.2; a missing peak (NaN) fails them
+            "stable": bool(yaw_1_0 <= 0.35 and yaw_1_75 <= 0.20),
+            "max_beta": max(abs(r["beta_deg"]) for r in rows)}
+
+
+def sine_with_dwell_series(a_deg, sign=1.0, params=None, dt=1.0 / 120.0):
+    """FMVSS 126 S7.9.2-S7.9.4: 1.5A upwards in steps of 0.5A to the larger of 6.5A
+    and 270 deg (300 deg if 6.5A would pass it). Returns [(amplitude, result)]."""
+    last = 300.0 if 6.5 * a_deg > 300.0 else max(6.5 * a_deg, 270.0)
+    amplitudes, k = [], 3
+    while k * 0.5 * a_deg < last:
+        amplitudes.append(k * 0.5 * a_deg)
+        k += 1
+    amplitudes.append(last)
+    return [(amplitude, sine_with_dwell(amplitude, sign, params=params, dt=dt)) for amplitude in amplitudes]
 
 
 def stop(kind, pedal=1.0, surface=1.0, steer=0.0, speed=100 * KMH, rear_pedal=None, **kw):

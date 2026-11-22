@@ -14,13 +14,15 @@ import pytest
 
 import generate
 import mass
-from sim import KMH, SPLIT_ICE, WHEELS, Car, corner, full_throttle, late_slip, launch, mean, moved, stop
+from sim import (KMH, SPLIT_ICE, WHEELS, Car, characteristic_speed, corner, full_throttle, late_slip, launch, mean,
+                 moved, sine_with_dwell, sine_with_dwell_series, slowly_increasing_steer, stop)
 
 REAR_DRIVE = {"driveline/par/front_torque_share": 0.0}
 FRONT_DRIVE = {"driveline/par/front_torque_share": 1.0}
 # For the tests of what the tyres themselves do when a wheel locks or spins.
 NO_ABS = {"abs/par/enabled": 0.0}
 NO_TC = {"tc/par/enabled": 0.0}
+NO_ESC = {"esc/par/enabled": 0.0}
 
 
 def test_generated_files_are_current():
@@ -223,15 +225,15 @@ def test_each_wheel_uses_its_own_surface_for_grip_and_rolling_resistance():
 
 
 def test_cornering_has_a_grip_limit_and_understeers_towards_it():
-    gentle, _ = corner("tyre", 30, 0.05)
+    gentle, _ = corner("tyre", 30, 0.05, params=NO_ESC)
     assert gentle["radius"] == pytest.approx(gentle["geometric_radius"], rel=0.05)
-    brisk, _ = corner("tyre", 90, 0.05)
+    brisk, _ = corner("tyre", 90, 0.05, params=NO_ESC)
     assert brisk["radius"] > 1.15 * brisk["geometric_radius"]
     assert brisk["front_slip_deg"] > brisk["rear_slip_deg"]
-    limit, _ = corner("tyre", 60, 0.2)
+    limit, _ = corner("tyre", 60, 0.2, params=NO_ESC)
     assert 0.85 < limit["lat_g"] < 1.02
     assert limit["noise_g"] < 0.01
-    too_much_lock, _ = corner("tyre", 90, 0.4)
+    too_much_lock, _ = corner("tyre", 90, 0.4, params=NO_ESC)
     assert too_much_lock["lat_g"] < limit["lat_g"]      # over-slipped front tyres lose grip
 
 
@@ -244,8 +246,8 @@ def power_in_a_bend(params):
 
 
 def test_drive_layout_decides_what_full_throttle_does_in_a_corner():
-    assert power_in_a_bend(dict(REAR_DRIVE, **NO_TC)) > 45.0     # power oversteer: it spins
-    assert power_in_a_bend(dict(FRONT_DRIVE, **NO_TC)) < 10.0    # it pushes wide instead
+    assert power_in_a_bend(dict(REAR_DRIVE, **NO_TC, **NO_ESC)) > 45.0     # power oversteer: it spins
+    assert power_in_a_bend(dict(FRONT_DRIVE, **NO_TC, **NO_ESC)) < 10.0    # it pushes wide instead
 
 
 @pytest.mark.parametrize("forward,right", [(0.10, 0.0), (0.0, 0.10), (0.30, 0.0), (0.0, 0.30), (-0.2, 0.2)])
@@ -430,14 +432,14 @@ def split_grip_stop(params, steer_against_yaw):
 
 
 def test_abs_on_split_grip_brakes_each_front_wheel_for_its_own_grip_and_stays_steerable():
-    rows = split_grip_stop({}, steer_against_yaw=True)
+    rows = split_grip_stop(NO_ESC, steer_against_yaw=True)
     middle = rows[len(rows) // 3]
     assert middle["brake_fl"] > 1.5 * middle["brake_fr"]         # asphalt side brakes harder
     assert middle["brake_bl"] == middle["brake_br"]             # rear pair: select low
     assert max(abs(r["heading_deg"]) for r in rows) < 10.0
     assert all(r["slip_ratio_" + w] > -0.9 for r in rows if r["u"] > 3.0 for w in WHEELS)
     # without ABS the locked wheels cannot steer and the car turns round
-    locked = split_grip_stop(NO_ABS, steer_against_yaw=True)
+    locked = split_grip_stop(dict(NO_ABS, **NO_ESC), steer_against_yaw=True)
     assert max(abs(r["heading_deg"]) for r in locked) > 45.0
 
 
@@ -446,7 +448,8 @@ def test_abs_lets_split_grip_yaw_build_up_gradually():
         rows = split_grip_stop(params, steer_against_yaw=False)
         return abs(min(rows, key=lambda r: abs(r["t"] - rows[0]["t"] - 1.0))["heading_deg"])
 
-    assert heading_after_one_second({}) < 0.9 * heading_after_one_second({"abs/par/yaw_delay_start": 1.0})
+    assert heading_after_one_second(NO_ESC) < 0.9 * heading_after_one_second(
+        dict(NO_ESC, **{"abs/par/yaw_delay_start": 1.0}))
 
 
 @pytest.mark.parametrize("params", [{}, REAR_DRIVE, FRONT_DRIVE])
@@ -590,3 +593,101 @@ def test_traction_control_does_not_depend_on_the_fdm_rate(hz):
     for kw in (dict(surface=0.3), dict(grip=SPLIT_ICE, until_kmh=60)):
         reference = full_throttle(**kw)[-1]["t"]
         assert full_throttle(dt=1.0 / hz, **kw)[-1]["t"] == pytest.approx(reference, rel=0.08)
+
+
+# --------------------------------------------------------------------------
+# Stability control (Docs/ESC/tc-esc-engineering-manual.md, section 7)
+# --------------------------------------------------------------------------
+def fmvss_126_a():
+    """A, the steering wheel angle for 0.3 g at 80 km/h: mean of both directions (S7.6)."""
+    return round(sum(abs(slowly_increasing_steer(sign)) for sign in (1.0, -1.0)) / 2.0, 1)
+
+
+def fmvss_126_failures(params):
+    """Sine with dwell runs of both series that miss S5.2.1 to S5.2.3."""
+    a = fmvss_126_a()
+    failures = []
+    for sign in (1.0, -1.0):
+        for amplitude, run in sine_with_dwell_series(a, sign, params=params):
+            if not run["stable"] or (amplitude >= 5.0 * a and run["lateral_1_07"] < 1.83):
+                failures.append((sign, amplitude, run["yaw_1_0"], run["yaw_1_75"], run["lateral_1_07"]))
+    return failures
+
+
+def test_stability_control_passes_the_fmvss_126_sine_with_dwell():
+    assert 15.0 < fmvss_126_a() < 25.0
+    # without ESC the car turns round from 5A on
+    assert len(fmvss_126_failures(NO_ESC)) > 10
+    assert fmvss_126_failures({}) == []
+
+
+def test_stability_control_stays_out_of_the_linear_range_and_straight_driving():
+    # Bosch: up to 4 m/s^2 of lateral acceleration a car responds linearly
+    for kmh in (40, 80, 120):
+        u = kmh * KMH
+        for ay in (2.0, 4.0):
+            _, rows = corner("tyre", kmh, (2.48 / u ** 2) * ay / math.radians(45.0))
+            assert not any(r["esc_active"] for r in rows)
+    assert not any(r["esc_active"] for r in sine_with_dwell(2.0 * fmvss_126_a())["rows"])
+    assert not any(r["esc_active"] for r in full_throttle())
+    assert not any(r["esc_active"] for r in stop("tyre", pedal=1.0)[1])
+
+
+def test_stability_control_slows_an_understeering_car_and_tightens_its_line():
+    def steady(params):
+        car = Car("tyre", speed=90 * KMH, params=params)
+        tail = car.run(6.0, steer=0.4, cruise=90 * KMH)[-120:]
+        speed = math.hypot(mean(tail, "u"), mean(tail, "v"))
+        return speed, speed ** 2 / (mean(tail, "ny", abs) * 9.80665)
+
+    off, on = steady(NO_ESC), steady({})
+    assert on[0] < off[0] - 10 * KMH         # slower
+    assert on[1] < 0.8 * off[1]              # tighter path
+
+
+def test_stability_control_stops_power_oversteer_without_traction_control():
+    assert power_in_a_bend(dict(REAR_DRIVE, **NO_TC)) < 15.0       # over 45 deg without ESC
+
+
+def test_stability_control_holds_split_grip_yaw_without_a_driver():
+    # braking: the asphalt side's pressure is let off while the car turns too much
+    off = split_grip_stop(NO_ESC, steer_against_yaw=False)
+    on = split_grip_stop({}, steer_against_yaw=False)
+    assert max(abs(r["heading_deg"]) for r in off) > 90.0
+    assert max(abs(r["heading_deg"]) for r in on) < 45.0
+    held_off = split_grip_stop(NO_ESC, steer_against_yaw=True)
+    held_on = split_grip_stop({}, steer_against_yaw=True)
+    assert moved(held_on) < 1.03 * moved(held_off)       # with a driver it costs no stopping distance
+    # accelerating: the motor torque cut takes some of the pull out (a driver holds it all)
+    off = full_throttle(params=NO_ESC, grip=SPLIT_ICE, until_kmh=60)
+    on = full_throttle(grip=SPLIT_ICE, until_kmh=60)
+    assert max(abs(r["heading_deg"]) for r in off) > 25.0
+    assert max(abs(r["heading_deg"]) for r in on) < 0.85 * max(abs(r["heading_deg"]) for r in off)
+    assert on[-1]["t"] < 1.5 * off[-1]["t"]
+
+
+def test_stability_control_is_off_below_20_kmh_and_in_reverse():
+    car = Car("tyre", speed=15 * KMH)
+    rows = car.run(3.0, steer=0.6, cruise=15 * KMH)
+    assert not any(r["esc_active"] for r in rows)
+    car = Car("tyre", params={"driveline/in/direction": -1.0})
+    car.run(4.0, throttle=1.0)
+    assert car.fdm["velocities/u-fps"] * 0.3048 < -20 * KMH
+    rows = car.run(2.0, throttle=1.0, steer=0.3)
+    assert not any(r["esc_active"] for r in rows)
+
+
+@pytest.mark.parametrize("hz", [60, 240])
+def test_stability_control_does_not_depend_on_the_fdm_rate(hz):
+    a = fmvss_126_a()
+    for amplitude in (5.0 * a, 270.0):
+        run = sine_with_dwell(amplitude, dt=1.0 / hz)
+        assert run["stable"]
+        assert run["lateral_1_07"] == pytest.approx(sine_with_dwell(amplitude)["lateral_1_07"], rel=0.08)
+
+
+def test_stability_control_reference_uses_this_cars_characteristic_speed():
+    gradient, v_char = characteristic_speed(80.0)
+    assert 0.0 < gradient < 1.0                               # nearly neutral, slightly understeering
+    parameter = dict((n, v) for n, v, _ in generate.ESC_PARAMS)["v_char_mps"]
+    assert parameter == pytest.approx(v_char, rel=0.1)

@@ -26,6 +26,7 @@ The scalar tuning parameters can be changed while driving, in the property brows
 | Wheel speed | not a state: wheels cannot spin or lock | one state per wheel |
 | Braking | pedal times 1.7 g on a dry road; wheels never lock | brake torque per wheel; ABS keeps the wheels from locking |
 | Traction control | none needed: wheels cannot spin | motor torque and wheel brakes keep the driven wheels near their peak slip |
+| Stability control | none | yaw rate and sideslip held with single wheel brakes and the motor torque; passes FMVSS 126 |
 | Cornering grip | fixed 1.0 g cap, same at any load | peaks, then falls; less per kg on a loaded tyre |
 | Combined | braking and cornering limits are independent | one friction ellipse per tyre |
 | Surface | affects braking and cornering, not acceleration | affects everything |
@@ -201,11 +202,11 @@ yawed out of its lane on split grip with ABS disabled.
 
 ## Traction control
 
-`Docs/ESC/tc-esc-engineering-manual.md` is the full design: sources, equations, parameters, tests
-and the plan for stability control. In short, it follows the traction control Bosch describes for
-a car with one engine, an open centre differential and two open axle differentials, which is this
-car's layout. It runs in the `Traction control` channel, before the driveline, one frame behind the
-wheels like ABS. Each controller regulates one thing:
+`Docs/ESC/tc-esc-engineering-manual.md` is the full design of traction and stability control:
+sources, equations, parameters, tests and results. In short, traction control follows the one Bosch
+describes for a car with one engine, an open centre differential and two open axle differentials,
+which is this car's layout. It runs in the `Traction and stability control` channel, before the
+driveline, one frame behind the wheels like ABS. Each controller regulates one thing:
 
 - **Motor torque**, a PI controller on the torque-weighted drive slip of the driven wheels (each
   wheel's drive slip over its tyre's peak drive slip at its load). It aims at `target_slip` (0.85)
@@ -237,10 +238,55 @@ back.
 | 0-60 km/h, right wheels on ice | 16.7 s: the spinning wheels drive the motor to its speed limit | 4.05 s, wheels on ice at most 1.4 |
 | Full throttle in a 40 km/h bend, rear drive | spins (sideslip over 45°) | sideslip under 5° |
 
-On split grip the drive force on the asphalt side pulls the car towards the ice side: left alone it
-turns about 32° by 60 km/h, a driver holding the heading keeps it within 2°. Stability control is
-to take that on. Its parameters are under `/fdm/jsbsim/tc/par`; `tc/par/enabled` = 0 switches traction
-control off.
+On split grip the drive force on the asphalt side pulls the car towards the ice side: without stability
+control, left alone, it turns about 32° by 60 km/h; a driver holding the heading keeps it within 2°.
+Its parameters are under `/fdm/jsbsim/tc/par`; `tc/par/enabled` = 0 switches traction control off.
+
+## Stability control
+
+Stability control (ESC) runs in the same channel after traction control. Its thresholds and torque
+levels come from the controller models ika fitted to driving tests of a BMW 330xi (four-wheel drive,
+nearly 50:50) for CITA. Its outputs grow smoothly with the error and with the road's friction, as
+Bosch describes ESP, instead of ika's fixed steps:
+
+- **Reference yaw rate** from a single-track model with this car's own characteristic speed,
+  `v_char_mps` (82 m/s, measured at 80 km/h: the car is nearly neutral), limited to the friction's
+  `mu g / v`, and lagged by 0.1 s so that it is in phase with the car.
+- **Oversteer** (turning more than the reference): the outer front wheel is braked, from nothing
+  at 0.07 rad/s of yaw rate error to 2000 N·m at 0.15. While the driver brakes, the inner wheels,
+  whose braking turns the car further, keep only part of the driver's pressure (down to 20 %).
+- **Understeer**: the inner rear wheel is braked, up to 600 N·m at 0.10 rad/s.
+- All brake torques are scaled by the road's friction, so on ice ESC does not drive a wheel deep
+  into ABS.
+- **Motor torque**: from 0.07 rad/s of error it is cut further the larger the error, down to a
+  quarter at 0.15, on top of what traction control allows. Once the error eases it holds 0.3 s, then
+  comes back within 0.3 s (ika holds 2 s, which makes the car feel dead coming out of a quick bend).
+  For this cut alone, understeer is measured against a reference that may reach 1.5 times
+  `mu g / v`, so driving on with the wheel turned past the grip takes the torque off. Braking the
+  inner rear wheel against that wider reference spins the car in the sine with dwell, so the brake
+  uses the friction-limited one.
+- **Sideslip limitation**: from 10° of body sideslip the front wheel on the side the car slides
+  towards is braked (half at 10°, 600 N·m at 12°). It takes over from yaw control, whose brakes are
+  scaled by 0.6 each time it does, until the steering is back in the centre.
+
+ESC works above 20 km/h going forwards (FMVSS 126 lets it rest below that and in reverse), and while
+ABS or traction control works. Its brake requests go the same way as the differential locks': the
+pump, then ABS.
+
+| | Without ESC | With ESC |
+|---|---|---|
+| FMVSS 126 sine with dwell, 80 km/h, A = 19.7° of steering wheel, 1.5A to 270° both ways (52 runs) | 38 runs fail, 13 of them turn round (sideslip up to 89°) | all pass: yaw rate gone 1 s after the steering, sideslip at most 8.8°, lateral move at least 3.05 m (1.83 m needed) |
+| 90 km/h, far too much steering on dry | path radius 73 m at 88 km/h | 40 m at 68 km/h |
+| Grip x0.3, full throttle for 3 s in a 30 km/h bend | path radius 45 m, 41 km/h | 42 m, 39 km/h |
+| Split grip braking from 80 km/h, nobody steering | turns 126° | turns 27°, 4 m longer stop |
+| Split grip, full throttle to 60 km/h, nobody steering | turns 32° in 4.2 s | turns 25° in 5.3 s |
+| Rear drive, full throttle in a 40 km/h bend, traction control off | spins | sideslip 13° |
+
+It does not act in steady bends up to 8 m/s² of lateral acceleration, in sine with dwell runs up to
+2A, or in straight full-throttle starts and full stops. With a driver holding the heading on split
+grip it does not act at all. The handbrake lever locks the rear wheels past the hydraulics, so ESC
+cannot stop a handbrake turn. Its parameters are under `/fdm/jsbsim/esc/par`; `esc/par/enabled` = 0
+switches it off.
 
 ## How it works
 
@@ -354,6 +400,10 @@ Outputs worth knowing, per wheel `fl`, `fr`, `bl`, `br`:
 | `tyre/<wheel>/tc_slip` | drive slip over the tyre's peak drive slip at its load |
 | `tyre/<wheel>/stab_brake_nm` | traction control's brake request on this wheel, as the pump has built it up |
 | `tyre/<wheel>/disc_temp_c` | brake disc temperature |
+| `esc/active` | stability control is braking, letting off pressure or cutting the motor torque |
+| `esc/ref`, `esc/oversteer`, `esc/understeer` | reference yaw rate and the errors against it, rad/s |
+| `esc/beta_deg`, `esc/torque_factor` | body sideslip, and the share of the requested motor torque ESC allows |
+| `esc/brake_<wheel>`, `esc/keep_<wheel>` | ESC's brake torque on each wheel, and the share of the driver's pressure each keeps |
 
 Parameters are listed with a comment each at the top of `Systems/tyre-model.xml`.
 
@@ -407,9 +457,11 @@ pulling away at full lock, each wheel's brake request, ABS on dry, wet and icy r
 steering and on split grip, the handbrake lever, the parking brake at rest and while moving, Auto
 Hold, traction control on dry, slippery and split grip, with a rear bias, in a bend, in reverse and
 in moderate driving, the differential locks' speed range, brake pedal and disc temperature rules,
-drag torque control, and that results do not depend on the FDM rate (60 to 240 Hz). The tests of
-what the tyres themselves do when a wheel spins switch traction control off, as the locked-wheel
-tests switch ABS off. They do not start FlightGear
+drag torque control, stability control in the whole FMVSS 126 sine with dwell series, in the linear
+range and straight driving, with understeer, power oversteer and split grip, below 20 km/h and in
+reverse, and that results do not depend on the FDM rate (60 to 240 Hz). The tests of what the tyres
+and ABS themselves do switch traction and stability control off, as the locked-wheel tests switch
+ABS off. `sim.py` carries the FMVSS 126 slowly increasing steer and sine with dwell manoeuvres. They do not start FlightGear
 and do not run any Nasal.
 
 For that there is a scripted drive in a real FlightGear, rendered in software under Xvfb:
@@ -441,8 +493,13 @@ model by hand yet.
   shorter there with ABS disabled.
 - Traction control, like ABS, takes the true speed of each contact patch, and the tyre's peak slip
   does not change with the surface, so it knows the best slip better than a real one would.
-- On split grip traction control pulls the car towards the low-grip side until stability control
-  limits the slip difference it allows.
+- On split grip with full throttle and nobody steering, stability control can only hold the pull
+  by cutting the motor torque and braking the asphalt front wheel, and it takes out only a little
+  (25° instead of 32°). Bosch's ESP narrows the slip difference traction control allows instead,
+  but in this model, where every wheel has a fixed share of the torque, that would not take drive
+  force off the asphalt side.
+- With full throttle on ice in a bend the car still runs a little wide: holding the line would need
+  a deeper torque cut than ika's quarter.
 - The motor rotor's inertia is shared out to the four wheels, so an open differential lets the
   wheel with grip keep its share of the torque until the motor reaches its speed limit. With a real,
   shared rotor that wheel loses torque as soon as the other spins up.
@@ -457,8 +514,11 @@ Not done yet:
 
 - "Magic bush tyres" (`reduceRollingFriction`) has no effect; the equivalent is
   `tyre/par/rolling_resistance`.
-- No stability control yet, and no driver switch, lamp or sound for traction control: steps 3 and
-  4 of `Docs/ESC/tc-esc-engineering-manual.md`. `brakesABS` in `Nasal/systems/brakes.nas` is not used.
+- No driver switch, lamp or sound for traction and stability control yet: step 4 of
+  `Docs/ESC/tc-esc-engineering-manual.md`.
+- Stability control, too, takes true values: the body sideslip and the road's friction, which a
+  real one estimates. Its thresholds come from another car (ika's BMW 330xi) and were checked here
+  against FMVSS 126, not fitted to this car's own driving tests. `brakesABS` in `Nasal/systems/brakes.nas` is not used.
 - Outside ABS the hydraulic brakes apply the request at once; there is no pressure build-up time.
 - ABS has no warning lamp or pedal feel, and its sound is synthesised.
 - The limo keeps the standard model.

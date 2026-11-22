@@ -72,12 +72,39 @@
 	<property value="20.0">tc/par/drag_cut_rate</property> <!-- coast regen falls by this share per second while a driven wheel slips -->
 	<property value="2.0">tc/par/drag_restore_rate</property> <!-- and recovers by this share per second -->
 
+	<!-- Stability control parameters -->
+	<property value="1.0">esc/par/enabled</property> <!-- 0 switches stability control off -->
+	<property value="20.0">esc/par/min_speed_kmh</property> <!-- acts above this speed, going forwards (FMVSS 126 S4: may be off below 20 km/h and in reverse) -->
+	<property value="82.0">esc/par/v_char_mps</property> <!-- this car's characteristic speed in the reference yaw rate, measured at 80 km/h (characteristic_speed in sim.py) -->
+	<property value="2.49">esc/par/wheelbase_m</property> <!-- front to rear axle, from the standard FDM -->
+	<property value="0.1">esc/par/ref_lag_s</property> <!-- the reference follows the steering with this lag, in phase with the car (ika: all-pass filter) -->
+	<property value="1.0">esc/par/yaw_limit_share</property> <!-- the reference yaw rate is at most this share of mu g / v (ika: mu = 1) -->
+	<property value="1.5">esc/par/understeer_limit_share</property> <!-- for the torque cut in understeer the reference may go up to this share of mu g / v, so that driving on with the wheel turned past the grip counts -->
+	<property value="0.05">esc/par/bend_yaw_rate</property> <!-- rad/s of yaw rate that make a bend; nothing acts below (ika) -->
+	<property value="0.07">esc/par/cut_error</property> <!-- rad/s of yaw rate error from which the motor torque is cut (ika) -->
+	<property value="0.15">esc/par/cut_full</property> <!-- rad/s of yaw rate error at which the cut reaches torque_share -->
+	<property value="0.25">esc/par/torque_share</property> <!-- the motor torque is cut down to this share of the request at most (ika) -->
+	<property value="0.3">esc/par/torque_hold_s</property> <!-- the cut holds this long after the error has eased (ika: 2 s, too long for daily driving) -->
+	<property value="0.3">esc/par/torque_restore_s</property> <!-- then the torque returns from torque_share to the request in this time -->
+	<property value="0.07">esc/par/oversteer_start</property> <!-- rad/s of oversteer error at which the outer front brake starts -->
+	<property value="0.15">esc/par/oversteer_full</property> <!-- and at which it reaches oversteer_nm (ika, BMW 330xi: 600 N m at 0.098 to 2400 at 0.15) -->
+	<property value="2000.0">esc/par/oversteer_nm</property> <!-- outer front brake torque at oversteer_full -->
+	<property value="0.07">esc/par/understeer_start</property> <!-- rad/s of understeer error at which the inner rear brake starts -->
+	<property value="0.1">esc/par/understeer_full</property> <!-- and at which it reaches understeer_nm (ika) -->
+	<property value="600.0">esc/par/understeer_nm</property> <!-- inner rear brake torque at understeer_full (ika) -->
+	<property value="10.0">esc/par/beta_start_deg</property> <!-- sideslip limitation: half its torque from this body sideslip (ika) -->
+	<property value="12.0">esc/par/beta_full_deg</property> <!-- and all of it from this one (ika) -->
+	<property value="600.0">esc/par/beta_nm</property> <!-- front brake torque on the side the car slides towards (ika) -->
+	<property value="0.6">esc/par/beta_damping</property> <!-- each return from the sideslip limitation scales yaw control's brakes by this (ika) -->
+	<property value="0.8">esc/par/release_share</property> <!-- oversteer while braking: the driver's pressure on the inner wheels, which turn the car further, is reduced by up to this share (Audi SSP: pressure reduction) -->
+	<property value="1.0">esc/par/reset_steer_deg</property> <!-- with the road wheels within this angle and no bend the scaling resets to 1 -->
+
 	<!-- Inputs -->
 	<property value="0.0">driveline/in/throttle_norm</property> <!-- accelerator pedal, 0 to 1 -->
 	<property value="1.0">driveline/in/direction</property> <!-- 1 = forward, -1 = reverse -->
 	<property value="1.0">driveline/in/motor_on</property> <!-- 0 switches the motor off: no drive, no coast regen, park lock on -->
 
-	<!-- State: wheel speeds, and what the ABS and traction control channels read before the wheels compute it -->
+	<!-- State: wheel speeds, and what the ABS and stability control channels read before the wheels compute it -->
 	<property value="0.0">tyre/fl/omega_rad_sec</property>
 	<property value="0.0">tyre/fl/slip_ratio</property>
 	<property value="0.0">tyre/fl/vx_wheel_mps</property>
@@ -137,6 +164,12 @@
 	<property value="1.0">tc/drag_factor</property>
 	<property value="0.0">tc/lock_front_state_nm</property>
 	<property value="0.0">tc/lock_rear_state_nm</property>
+	<property value="0.0">esc/ref</property>
+	<property value="0.0">esc/ref_us</property>
+	<property value="1.0">esc/damping</property>
+	<property value="0.0">esc/beta_was_active</property>
+	<property value="0.0">esc/hold_s</property>
+	<property value="1.0">esc/torque_factor</property>
 
 	<channel name="Occupants">
 		<!-- driver_lbs = max(0.0, driver_kg) * 2.2046226 -->
@@ -168,7 +201,7 @@
 		</fcs_function>
 	</channel>
 
-	<channel name="Traction control">
+	<channel name="Traction and stability control">
 		<!-- dt = max(sim_dt, 0.0005) -->
 		<fcs_function name="tc/dt">
 			<function>
@@ -1623,7 +1656,669 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- stab_target_nm = min(brake_front_nm, tc_lock_nm + lock_front_nm) -->
+		<!-- speed_mps = u_fps * 0.3048 -->
+		<fcs_function name="esc/speed_mps">
+			<function>
+				<product>
+					<p>velocities/u-fps</p>
+					<v>0.3048</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- on = esc_enabled * lt(esc_min_speed_kmh / 3.6, speed_mps) -->
+		<fcs_function name="esc/on">
+			<function>
+				<product>
+					<p>esc/par/enabled</p>
+					<lt>
+						<quotient>
+							<p>esc/par/min_speed_kmh</p>
+							<v>3.6</v>
+						</quotient>
+						<p>esc/speed_mps</p>
+					</lt>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- delta_rad = steer_front_deg * 0.017453293 -->
+		<fcs_function name="esc/delta_rad">
+			<function>
+				<product>
+					<p>fcs/steer-pos-deg[0]</p>
+					<v>0.017453293</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- ref_steady = speed_mps * delta_rad / (esc_wheelbase_m * (1.0 + pow(speed_mps / esc_v_char_mps, 2.0))) -->
+		<fcs_function name="esc/ref_steady">
+			<function>
+				<quotient>
+					<product>
+						<p>esc/speed_mps</p>
+						<p>esc/delta_rad</p>
+					</product>
+					<product>
+						<p>esc/par/wheelbase_m</p>
+						<sum>
+							<v>1.0</v>
+							<pow>
+								<quotient>
+									<p>esc/speed_mps</p>
+									<p>esc/par/v_char_mps</p>
+								</quotient>
+								<v>2.0</v>
+							</pow>
+						</sum>
+					</product>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- ref_limit = esc_yaw_limit_share * mu_lateral * 9.80665 / max(speed_mps, 1.0) -->
+		<fcs_function name="esc/ref_limit">
+			<function>
+				<quotient>
+					<product>
+						<p>esc/par/yaw_limit_share</p>
+						<p>tc/mu_lateral</p>
+						<v>9.80665</v>
+					</product>
+					<max>
+						<p>esc/speed_mps</p>
+						<v>1.0</v>
+					</max>
+				</quotient>
+			</function>
+		</fcs_function>
+		<!-- ref = ref + (max(-1.0 * ref_limit, min(ref_limit, ref_steady)) - ref) * min(1.0, dt / esc_ref_lag_s) -->
+		<fcs_function name="esc/ref">
+			<function>
+				<sum>
+					<p>esc/ref</p>
+					<product>
+						<difference>
+							<max>
+								<product>
+									<v>-1.0</v>
+									<p>esc/ref_limit</p>
+								</product>
+								<min>
+									<p>esc/ref_limit</p>
+									<p>esc/ref_steady</p>
+								</min>
+							</max>
+							<p>esc/ref</p>
+						</difference>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<p>tc/dt</p>
+								<p>esc/par/ref_lag_s</p>
+							</quotient>
+						</min>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- ref_us = ref_us + (max(-1.0 * esc_understeer_limit_share * ref_limit, min(esc_understeer_limit_share * ref_limit, ref_steady)) - ref_us) * min(1.0, dt / esc_ref_lag_s) -->
+		<fcs_function name="esc/ref_us">
+			<function>
+				<sum>
+					<p>esc/ref_us</p>
+					<product>
+						<difference>
+							<max>
+								<product>
+									<v>-1.0</v>
+									<p>esc/par/understeer_limit_share</p>
+									<p>esc/ref_limit</p>
+								</product>
+								<min>
+									<product>
+										<p>esc/par/understeer_limit_share</p>
+										<p>esc/ref_limit</p>
+									</product>
+									<p>esc/ref_steady</p>
+								</min>
+							</max>
+							<p>esc/ref_us</p>
+						</difference>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<p>tc/dt</p>
+								<p>esc/par/ref_lag_s</p>
+							</quotient>
+						</min>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- turn = ifthen(lt(0.0, r), 1.0, -1.0) -->
+		<fcs_function name="esc/turn">
+			<function>
+				<ifthen>
+					<lt>
+						<v>0.0</v>
+						<p>velocities/r-rad_sec</p>
+					</lt>
+					<v>1.0</v>
+					<v>-1.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- bend = on * lt(esc_bend_yaw_rate, abs(r)) -->
+		<fcs_function name="esc/bend">
+			<function>
+				<product>
+					<p>esc/on</p>
+					<lt>
+						<p>esc/par/bend_yaw_rate</p>
+						<abs>
+							<p>velocities/r-rad_sec</p>
+						</abs>
+					</lt>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- oversteer = bend * (r - ref) * turn -->
+		<fcs_function name="esc/oversteer">
+			<function>
+				<product>
+					<p>esc/bend</p>
+					<difference>
+						<p>velocities/r-rad_sec</p>
+						<p>esc/ref</p>
+					</difference>
+					<p>esc/turn</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- understeer = bend * (ref - r) * turn -->
+		<fcs_function name="esc/understeer">
+			<function>
+				<product>
+					<p>esc/bend</p>
+					<difference>
+						<p>esc/ref</p>
+						<p>velocities/r-rad_sec</p>
+					</difference>
+					<p>esc/turn</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- understeer_drive = bend * (ref_us - r) * turn -->
+		<fcs_function name="esc/understeer_drive">
+			<function>
+				<product>
+					<p>esc/bend</p>
+					<difference>
+						<p>esc/ref_us</p>
+						<p>velocities/r-rad_sec</p>
+					</difference>
+					<p>esc/turn</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- beta_deg = atan(v_fps / max(abs(u_fps), 1.0)) * 57.29578 -->
+		<fcs_function name="esc/beta_deg">
+			<function>
+				<product>
+					<atan>
+						<quotient>
+							<p>velocities/v-fps</p>
+							<max>
+								<abs>
+									<p>velocities/u-fps</p>
+								</abs>
+								<v>1.0</v>
+							</max>
+						</quotient>
+					</atan>
+					<v>57.29578</v>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- grip = min(1.0, mu_lateral) -->
+		<fcs_function name="esc/grip">
+			<function>
+				<min>
+					<v>1.0</v>
+					<p>tc/mu_lateral</p>
+				</min>
+			</function>
+		</fcs_function>
+		<!-- oversteer_nm = grip * esc_oversteer_nm * max(0.0, min(1.0, (oversteer - esc_oversteer_start) / (esc_oversteer_full - esc_oversteer_start))) -->
+		<fcs_function name="esc/oversteer_nm">
+			<function>
+				<product>
+					<p>esc/grip</p>
+					<p>esc/par/oversteer_nm</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>esc/oversteer</p>
+									<p>esc/par/oversteer_start</p>
+								</difference>
+								<difference>
+									<p>esc/par/oversteer_full</p>
+									<p>esc/par/oversteer_start</p>
+								</difference>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- understeer_nm = grip * esc_understeer_nm * max(0.0, min(1.0, (understeer - esc_understeer_start) / (esc_understeer_full - esc_understeer_start))) -->
+		<fcs_function name="esc/understeer_nm">
+			<function>
+				<product>
+					<p>esc/grip</p>
+					<p>esc/par/understeer_nm</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>esc/understeer</p>
+									<p>esc/par/understeer_start</p>
+								</difference>
+								<difference>
+									<p>esc/par/understeer_full</p>
+									<p>esc/par/understeer_start</p>
+								</difference>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- beta_nm = on * grip * lt(esc_beta_start_deg, abs(beta_deg)) * esc_beta_nm * (0.5 + 0.5 * min(1.0, (abs(beta_deg) - esc_beta_start_deg) / (esc_beta_full_deg - esc_beta_start_deg))) -->
+		<fcs_function name="esc/beta_nm">
+			<function>
+				<product>
+					<p>esc/on</p>
+					<p>esc/grip</p>
+					<lt>
+						<p>esc/par/beta_start_deg</p>
+						<abs>
+							<p>esc/beta_deg</p>
+						</abs>
+					</lt>
+					<p>esc/par/beta_nm</p>
+					<sum>
+						<v>0.5</v>
+						<product>
+							<v>0.5</v>
+							<min>
+								<v>1.0</v>
+								<quotient>
+									<difference>
+										<abs>
+											<p>esc/beta_deg</p>
+										</abs>
+										<p>esc/par/beta_start_deg</p>
+									</difference>
+									<difference>
+										<p>esc/par/beta_full_deg</p>
+										<p>esc/par/beta_start_deg</p>
+									</difference>
+								</quotient>
+							</min>
+						</product>
+					</sum>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- beta_active = lt(1.0, beta_nm) -->
+		<fcs_function name="esc/beta_active">
+			<function>
+				<lt>
+					<v>1.0</v>
+					<p>esc/beta_nm</p>
+				</lt>
+			</function>
+		</fcs_function>
+		<!-- damping = ifthen(lt(abs(steer_front_deg), esc_reset_steer_deg) * lt(abs(r), esc_bend_yaw_rate), 1.0, ifthen(beta_was_active * (1.0 - beta_active), damping * esc_beta_damping, damping)) -->
+		<fcs_function name="esc/damping">
+			<function>
+				<ifthen>
+					<product>
+						<lt>
+							<abs>
+								<p>fcs/steer-pos-deg[0]</p>
+							</abs>
+							<p>esc/par/reset_steer_deg</p>
+						</lt>
+						<lt>
+							<abs>
+								<p>velocities/r-rad_sec</p>
+							</abs>
+							<p>esc/par/bend_yaw_rate</p>
+						</lt>
+					</product>
+					<v>1.0</v>
+					<ifthen>
+						<product>
+							<p>esc/beta_was_active</p>
+							<difference>
+								<v>1.0</v>
+								<p>esc/beta_active</p>
+							</difference>
+						</product>
+						<product>
+							<p>esc/damping</p>
+							<p>esc/par/beta_damping</p>
+						</product>
+						<p>esc/damping</p>
+					</ifthen>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- beta_was_active = beta_active -->
+		<fcs_function name="esc/beta_was_active">
+			<function>
+				<p>esc/beta_active</p>
+			</function>
+		</fcs_function>
+		<!-- brake_fl = ifthen(beta_active, beta_nm * lt(beta_deg, 0.0), damping * oversteer_nm * lt(0.0, turn)) -->
+		<fcs_function name="esc/brake_fl">
+			<function>
+				<ifthen>
+					<p>esc/beta_active</p>
+					<product>
+						<p>esc/beta_nm</p>
+						<lt>
+							<p>esc/beta_deg</p>
+							<v>0.0</v>
+						</lt>
+					</product>
+					<product>
+						<p>esc/damping</p>
+						<p>esc/oversteer_nm</p>
+						<lt>
+							<v>0.0</v>
+							<p>esc/turn</p>
+						</lt>
+					</product>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- brake_fr = ifthen(beta_active, beta_nm * lt(0.0, beta_deg), damping * oversteer_nm * lt(turn, 0.0)) -->
+		<fcs_function name="esc/brake_fr">
+			<function>
+				<ifthen>
+					<p>esc/beta_active</p>
+					<product>
+						<p>esc/beta_nm</p>
+						<lt>
+							<v>0.0</v>
+							<p>esc/beta_deg</p>
+						</lt>
+					</product>
+					<product>
+						<p>esc/damping</p>
+						<p>esc/oversteer_nm</p>
+						<lt>
+							<p>esc/turn</p>
+							<v>0.0</v>
+						</lt>
+					</product>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- brake_bl = (1.0 - beta_active) * damping * understeer_nm * lt(turn, 0.0) -->
+		<fcs_function name="esc/brake_bl">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>esc/beta_active</p>
+					</difference>
+					<p>esc/damping</p>
+					<p>esc/understeer_nm</p>
+					<lt>
+						<p>esc/turn</p>
+						<v>0.0</v>
+					</lt>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- brake_br = (1.0 - beta_active) * damping * understeer_nm * lt(0.0, turn) -->
+		<fcs_function name="esc/brake_br">
+			<function>
+				<product>
+					<difference>
+						<v>1.0</v>
+						<p>esc/beta_active</p>
+					</difference>
+					<p>esc/damping</p>
+					<p>esc/understeer_nm</p>
+					<lt>
+						<v>0.0</v>
+						<p>esc/turn</p>
+					</lt>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- release = esc_release_share * max(0.0, min(1.0, (oversteer - esc_oversteer_start) / (esc_oversteer_full - esc_oversteer_start))) -->
+		<fcs_function name="esc/release">
+			<function>
+				<product>
+					<p>esc/par/release_share</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<quotient>
+								<difference>
+									<p>esc/oversteer</p>
+									<p>esc/par/oversteer_start</p>
+								</difference>
+								<difference>
+									<p>esc/par/oversteer_full</p>
+									<p>esc/par/oversteer_start</p>
+								</difference>
+							</quotient>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- keep_fl = 1.0 - release * lt(turn, 0.0) -->
+		<fcs_function name="esc/keep_fl">
+			<function>
+				<difference>
+					<v>1.0</v>
+					<product>
+						<p>esc/release</p>
+						<lt>
+							<p>esc/turn</p>
+							<v>0.0</v>
+						</lt>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- keep_fr = 1.0 - release * lt(0.0, turn) -->
+		<fcs_function name="esc/keep_fr">
+			<function>
+				<difference>
+					<v>1.0</v>
+					<product>
+						<p>esc/release</p>
+						<lt>
+							<v>0.0</v>
+							<p>esc/turn</p>
+						</lt>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- keep_bl = 1.0 - release * lt(turn, 0.0) -->
+		<fcs_function name="esc/keep_bl">
+			<function>
+				<difference>
+					<v>1.0</v>
+					<product>
+						<p>esc/release</p>
+						<lt>
+							<p>esc/turn</p>
+							<v>0.0</v>
+						</lt>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- keep_br = 1.0 - release * lt(0.0, turn) -->
+		<fcs_function name="esc/keep_br">
+			<function>
+				<difference>
+					<v>1.0</v>
+					<product>
+						<p>esc/release</p>
+						<lt>
+							<v>0.0</v>
+							<p>esc/turn</p>
+						</lt>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- cut_target = 1.0 - (1.0 - esc_torque_share) * max(0.0, min(1.0, (max(oversteer, understeer_drive) - esc_cut_error) / (esc_cut_full - esc_cut_error))) -->
+		<fcs_function name="esc/cut_target">
+			<function>
+				<difference>
+					<v>1.0</v>
+					<product>
+						<difference>
+							<v>1.0</v>
+							<p>esc/par/torque_share</p>
+						</difference>
+						<max>
+							<v>0.0</v>
+							<min>
+								<v>1.0</v>
+								<quotient>
+									<difference>
+										<max>
+											<p>esc/oversteer</p>
+											<p>esc/understeer_drive</p>
+										</max>
+										<p>esc/par/cut_error</p>
+									</difference>
+									<difference>
+										<p>esc/par/cut_full</p>
+										<p>esc/par/cut_error</p>
+									</difference>
+								</quotient>
+							</min>
+						</max>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- hold_s = ifthen(lt(cut_target, torque_factor + 0.001), esc_torque_hold_s, max(0.0, hold_s - dt)) -->
+		<fcs_function name="esc/hold_s">
+			<function>
+				<ifthen>
+					<lt>
+						<p>esc/cut_target</p>
+						<sum>
+							<p>esc/torque_factor</p>
+							<v>0.001</v>
+						</sum>
+					</lt>
+					<p>esc/par/torque_hold_s</p>
+					<max>
+						<v>0.0</v>
+						<difference>
+							<p>esc/hold_s</p>
+							<p>tc/dt</p>
+						</difference>
+					</max>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- torque_factor = ifthen(on, ifthen(lt(cut_target, torque_factor), cut_target, ifthen(lt(0.0, hold_s), torque_factor, min(cut_target, torque_factor + dt * (1.0 - esc_torque_share) / esc_torque_restore_s))), 1.0) -->
+		<fcs_function name="esc/torque_factor">
+			<function>
+				<ifthen>
+					<p>esc/on</p>
+					<ifthen>
+						<lt>
+							<p>esc/cut_target</p>
+							<p>esc/torque_factor</p>
+						</lt>
+						<p>esc/cut_target</p>
+						<ifthen>
+							<lt>
+								<v>0.0</v>
+								<p>esc/hold_s</p>
+							</lt>
+							<p>esc/torque_factor</p>
+							<min>
+								<p>esc/cut_target</p>
+								<sum>
+									<p>esc/torque_factor</p>
+									<quotient>
+										<product>
+											<p>tc/dt</p>
+											<difference>
+												<v>1.0</v>
+												<p>esc/par/torque_share</p>
+											</difference>
+										</product>
+										<p>esc/par/torque_restore_s</p>
+									</quotient>
+								</sum>
+							</min>
+						</ifthen>
+					</ifthen>
+					<v>1.0</v>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- active = on * max(lt(1.0, max(brake_fl, brake_fr, brake_bl, brake_br)), lt(0.001, release), lt(torque_factor, 0.99) * lt(1.0, abs(request_torque_nm))) -->
+		<fcs_function name="esc/active">
+			<function>
+				<product>
+					<p>esc/on</p>
+					<max>
+						<lt>
+							<v>1.0</v>
+							<max>
+								<p>esc/brake_fl</p>
+								<p>esc/brake_fr</p>
+								<p>esc/brake_bl</p>
+								<p>esc/brake_br</p>
+							</max>
+						</lt>
+						<lt>
+							<v>0.001</v>
+							<p>esc/release</p>
+						</lt>
+						<product>
+							<lt>
+								<p>esc/torque_factor</p>
+								<v>0.99</v>
+							</lt>
+							<lt>
+								<v>1.0</v>
+								<abs>
+									<p>driveline/request_torque_nm</p>
+								</abs>
+							</lt>
+						</product>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- stab_target_nm = min(brake_front_nm, tc_lock_nm + lock_front_nm + esc_brake_fl) -->
 		<fcs_function name="tyre/fl/stab_target_nm">
 			<function>
 				<min>
@@ -1631,6 +2326,7 @@
 					<sum>
 						<p>tyre/fl/tc_lock_nm</p>
 						<p>tc/lock_front_nm</p>
+						<p>esc/brake_fl</p>
 					</sum>
 				</min>
 			</function>
@@ -1653,7 +2349,7 @@
 				</min>
 			</function>
 		</fcs_function>
-		<!-- stab_target_nm = min(brake_front_nm, tc_lock_nm + lock_front_nm) -->
+		<!-- stab_target_nm = min(brake_front_nm, tc_lock_nm + lock_front_nm + esc_brake_fr) -->
 		<fcs_function name="tyre/fr/stab_target_nm">
 			<function>
 				<min>
@@ -1661,6 +2357,7 @@
 					<sum>
 						<p>tyre/fr/tc_lock_nm</p>
 						<p>tc/lock_front_nm</p>
+						<p>esc/brake_fr</p>
 					</sum>
 				</min>
 			</function>
@@ -1683,7 +2380,7 @@
 				</min>
 			</function>
 		</fcs_function>
-		<!-- stab_target_nm = min(brake_rear_nm, tc_lock_nm + lock_rear_nm) -->
+		<!-- stab_target_nm = min(brake_rear_nm, tc_lock_nm + lock_rear_nm + esc_brake_bl) -->
 		<fcs_function name="tyre/bl/stab_target_nm">
 			<function>
 				<min>
@@ -1691,6 +2388,7 @@
 					<sum>
 						<p>tyre/bl/tc_lock_nm</p>
 						<p>tc/lock_rear_nm</p>
+						<p>esc/brake_bl</p>
 					</sum>
 				</min>
 			</function>
@@ -1713,7 +2411,7 @@
 				</min>
 			</function>
 		</fcs_function>
-		<!-- stab_target_nm = min(brake_rear_nm, tc_lock_nm + lock_rear_nm) -->
+		<!-- stab_target_nm = min(brake_rear_nm, tc_lock_nm + lock_rear_nm + esc_brake_br) -->
 		<fcs_function name="tyre/br/stab_target_nm">
 			<function>
 				<min>
@@ -1721,6 +2419,7 @@
 					<sum>
 						<p>tyre/br/tc_lock_nm</p>
 						<p>tc/lock_rear_nm</p>
+						<p>esc/brake_br</p>
 					</sum>
 				</min>
 			</function>
@@ -1851,7 +2550,7 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- drive_torque_nm = request_torque_nm * min(1.0, motor_cap_nm / max(abs(request_torque_nm), 0.001)) -->
+		<!-- drive_torque_nm = request_torque_nm * min(1.0, motor_cap_nm / max(abs(request_torque_nm), 0.001)) * torque_factor -->
 		<fcs_function name="driveline/drive_torque_nm">
 			<function>
 				<product>
@@ -1868,6 +2567,7 @@
 							</max>
 						</quotient>
 					</min>
+					<p>esc/torque_factor</p>
 				</product>
 			</function>
 		</fcs_function>
@@ -2017,7 +2717,7 @@
 	</channel>
 
 	<channel name="ABS">
-		<!-- brake_request_nm = min(brake_front_nm, service_front * brake_front_nm + stab_brake_nm) -->
+		<!-- brake_request_nm = min(brake_front_nm, service_front * brake_front_nm * esc_keep_fl + stab_brake_nm) -->
 		<fcs_function name="tyre/fl/brake_request_nm">
 			<function>
 				<min>
@@ -2026,6 +2726,7 @@
 						<product>
 							<p>brakes/service_front</p>
 							<p>driveline/par/brake_front_nm</p>
+							<p>esc/keep_fl</p>
 						</product>
 						<p>tyre/fl/stab_brake_nm</p>
 					</sum>
@@ -2102,7 +2803,7 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = min(brake_front_nm, service_front * brake_front_nm + stab_brake_nm) -->
+		<!-- brake_request_nm = min(brake_front_nm, service_front * brake_front_nm * esc_keep_fr + stab_brake_nm) -->
 		<fcs_function name="tyre/fr/brake_request_nm">
 			<function>
 				<min>
@@ -2111,6 +2812,7 @@
 						<product>
 							<p>brakes/service_front</p>
 							<p>driveline/par/brake_front_nm</p>
+							<p>esc/keep_fr</p>
 						</product>
 						<p>tyre/fr/stab_brake_nm</p>
 					</sum>
@@ -2187,7 +2889,7 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = min(brake_rear_nm, service_rear * brake_rear_nm + stab_brake_nm) -->
+		<!-- brake_request_nm = min(brake_rear_nm, service_rear * brake_rear_nm * esc_keep_bl + stab_brake_nm) -->
 		<fcs_function name="tyre/bl/brake_request_nm">
 			<function>
 				<min>
@@ -2196,6 +2898,7 @@
 						<product>
 							<p>brakes/service_rear</p>
 							<p>driveline/par/brake_rear_nm</p>
+							<p>esc/keep_bl</p>
 						</product>
 						<p>tyre/bl/stab_brake_nm</p>
 					</sum>
@@ -2272,7 +2975,7 @@
 				</ifthen>
 			</function>
 		</fcs_function>
-		<!-- brake_request_nm = min(brake_rear_nm, service_rear * brake_rear_nm + stab_brake_nm) -->
+		<!-- brake_request_nm = min(brake_rear_nm, service_rear * brake_rear_nm * esc_keep_br + stab_brake_nm) -->
 		<fcs_function name="tyre/br/brake_request_nm">
 			<function>
 				<min>
@@ -2281,6 +2984,7 @@
 						<product>
 							<p>brakes/service_rear</p>
 							<p>driveline/par/brake_rear_nm</p>
+							<p>esc/keep_br</p>
 						</product>
 						<p>tyre/br/stab_brake_nm</p>
 					</sum>

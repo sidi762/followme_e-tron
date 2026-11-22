@@ -163,7 +163,7 @@ ABS_PARAMS = [
 # Pass one, every wheel: the request and what this wheel alone would need.
 ABS_WHEEL_EQS = [
     # the driver's service brakes plus traction or stability control's request
-    ("brake_request_nm", "min({brake_par}, {service_cmd} * {brake_par} + stab_brake_nm)"),
+    ("brake_request_nm", "min({brake_par}, {service_cmd} * {brake_par} * {esc_keep} + stab_brake_nm)"),
     # braking slip over the tyre's peak braking slip: above 1 the wheel is past its grip peak
     ("abs_slip", "max(0.0, -1.0 * slip_ratio * ifthen(lt(vx_wheel_mps, 0.0), -1.0, 1.0)) / brake_peak_slip"),
     ("abs_slip_rate", "(abs_slip - abs_slip_last) / dt_s"),
@@ -320,10 +320,108 @@ TC_MOTOR_EQS = [
                     " -1.0 * tc_drag_cut_rate, tc_drag_restore_rate))), 1.0)"),
 ]
 
+# --------------------------------------------------------------------------
+# Stability control (ESC), manual section 7. It follows the controller models
+# ika fitted to driving tests of a BMW 330xi (four-wheel drive, nearly 50:50):
+# the yaw rate is compared with a single-track reference of this car, and
+# fixed thresholds of the error bring in a motor torque cut, the outer front
+# brake (oversteer) or the inner rear brake (understeer). A sideslip
+# limitation takes over beyond 10 deg. Like TC it runs one frame behind.
+# --------------------------------------------------------------------------
+ESC_PARAMS = [
+    ("enabled", 1.0, "0 switches stability control off"),
+    ("min_speed_kmh", 20.0, "acts above this speed, going forwards (FMVSS 126 S4: may be off below 20 km/h and in reverse)"),
+    ("v_char_mps", 82.0, "this car's characteristic speed in the reference yaw rate, measured at 80 km/h"
+                         " (characteristic_speed in sim.py)"),
+    ("wheelbase_m", None, "front to rear axle, from the standard FDM"),
+    ("ref_lag_s", 0.1, "the reference follows the steering with this lag, in phase with the car (ika: all-pass filter)"),
+    ("yaw_limit_share", 1.0, "the reference yaw rate is at most this share of mu g / v (ika: mu = 1)"),
+    ("understeer_limit_share", 1.5, "for the torque cut in understeer the reference may go up to this share of"
+                                    " mu g / v, so that driving on with the wheel turned past the grip counts"),
+    ("bend_yaw_rate", 0.05, "rad/s of yaw rate that make a bend; nothing acts below (ika)"),
+    ("cut_error", 0.07, "rad/s of yaw rate error from which the motor torque is cut (ika)"),
+    ("cut_full", 0.15, "rad/s of yaw rate error at which the cut reaches torque_share"),
+    ("torque_share", 0.25, "the motor torque is cut down to this share of the request at most (ika)"),
+    ("torque_hold_s", 0.3, "the cut holds this long after the error has eased (ika: 2 s, too long for daily driving)"),
+    ("torque_restore_s", 0.3, "then the torque returns from torque_share to the request in this time"),
+    ("oversteer_start", 0.07, "rad/s of oversteer error at which the outer front brake starts"),
+    ("oversteer_full", 0.15, "and at which it reaches oversteer_nm (ika, BMW 330xi: 600 N m at 0.098 to 2400 at 0.15)"),
+    ("oversteer_nm", 2000.0, "outer front brake torque at oversteer_full"),
+    ("understeer_start", 0.07, "rad/s of understeer error at which the inner rear brake starts"),
+    ("understeer_full", 0.10, "and at which it reaches understeer_nm (ika)"),
+    ("understeer_nm", 600.0, "inner rear brake torque at understeer_full (ika)"),
+    ("beta_start_deg", 10.0, "sideslip limitation: half its torque from this body sideslip (ika)"),
+    ("beta_full_deg", 12.0, "and all of it from this one (ika)"),
+    ("beta_nm", 600.0, "front brake torque on the side the car slides towards (ika)"),
+    ("beta_damping", 0.6, "each return from the sideslip limitation scales yaw control's brakes by this (ika)"),
+    ("release_share", 0.8, "oversteer while braking: the driver's pressure on the inner wheels, which turn the car"
+                           " further, is reduced by up to this share (Audi SSP: pressure reduction)"),
+    ("reset_steer_deg", 1.0, "with the road wheels within this angle and no bend the scaling resets to 1"),
+]
+
+# Global, after TC's motor controller; values under esc/.
+ESC_EQS = [
+    ("speed_mps", "u_fps * 0.3048"),
+    ("on", "esc_enabled * lt(esc_min_speed_kmh / 3.6, speed_mps)"),
+    ("delta_rad", "steer_front_deg * 0.017453293"),
+    # single-track reference with this car's characteristic speed, limited by the friction
+    ("ref_steady", "speed_mps * delta_rad / (esc_wheelbase_m * (1.0 + pow(speed_mps / esc_v_char_mps, 2.0)))"),
+    ("ref_limit", "esc_yaw_limit_share * mu_lateral * 9.80665 / max(speed_mps, 1.0)"),
+    ("ref", "ref + (max(-1.0 * ref_limit, min(ref_limit, ref_steady)) - ref) * min(1.0, dt / esc_ref_lag_s)"),
+    ("ref_us", "ref_us + (max(-1.0 * esc_understeer_limit_share * ref_limit, min(esc_understeer_limit_share * ref_limit,"
+               " ref_steady)) - ref_us) * min(1.0, dt / esc_ref_lag_s)"),
+    # errors signed into the direction the car turns: oversteer turns it too much
+    ("turn", "ifthen(lt(0.0, r), 1.0, -1.0)"),
+    ("bend", "on * lt(esc_bend_yaw_rate, abs(r))"),
+    ("oversteer", "bend * (r - ref) * turn"),
+    ("understeer", "bend * (ref - r) * turn"),
+    # past the grip: braking the inner rear wheel there would only spin the car (sine with
+    # dwell), but the motor torque can still be taken off
+    ("understeer_drive", "bend * (ref_us - r) * turn"),
+    ("beta_deg", "atan(v_fps / max(abs(u_fps), 1.0)) * 57.29578"),
+    # Brake torques grow with the error past its threshold, and with the road's friction: on ice
+    # a dry-road torque would only drive the wheel deep into ABS.
+    ("grip", "min(1.0, mu_lateral)"),
+    ("oversteer_nm", "grip * esc_oversteer_nm * max(0.0, min(1.0, (oversteer - esc_oversteer_start)"
+                     " / (esc_oversteer_full - esc_oversteer_start)))"),
+    ("understeer_nm", "grip * esc_understeer_nm * max(0.0, min(1.0, (understeer - esc_understeer_start)"
+                      " / (esc_understeer_full - esc_understeer_start)))"),
+    # sideslip limitation: brake the front wheel on the side the car slides towards
+    ("beta_nm", "on * grip * lt(esc_beta_start_deg, abs(beta_deg)) * esc_beta_nm * (0.5 + 0.5 * min(1.0,"
+                " (abs(beta_deg) - esc_beta_start_deg) / (esc_beta_full_deg - esc_beta_start_deg)))"),
+    ("beta_active", "lt(1.0, beta_nm)"),
+    ("damping", "ifthen(lt(abs(steer_front_deg), esc_reset_steer_deg) * lt(abs(r), esc_bend_yaw_rate), 1.0,"
+                " ifthen(beta_was_active * (1.0 - beta_active), damping * esc_beta_damping, damping))"),
+    ("beta_was_active", "beta_active"),
+    # turning right (r > 0) the outer front wheel is the left one, the inner rear the right one
+    ("brake_fl", "ifthen(beta_active, beta_nm * lt(beta_deg, 0.0), damping * oversteer_nm * lt(0.0, turn))"),
+    ("brake_fr", "ifthen(beta_active, beta_nm * lt(0.0, beta_deg), damping * oversteer_nm * lt(turn, 0.0))"),
+    ("brake_bl", "(1.0 - beta_active) * damping * understeer_nm * lt(turn, 0.0)"),
+    ("brake_br", "(1.0 - beta_active) * damping * understeer_nm * lt(0.0, turn)"),
+    # the share of the driver's brake pressure each wheel keeps: in oversteer the
+    # inner wheels' braking turns the car further (split grip), so it is reduced
+    ("release", "esc_release_share * max(0.0, min(1.0, (oversteer - esc_oversteer_start)"
+                " / (esc_oversteer_full - esc_oversteer_start)))"),
+    ("keep_fl", "1.0 - release * lt(turn, 0.0)"),
+    ("keep_fr", "1.0 - release * lt(0.0, turn)"),
+    ("keep_bl", "1.0 - release * lt(turn, 0.0)"),
+    ("keep_br", "1.0 - release * lt(0.0, turn)"),
+    # Motor torque: cut with the error, down to torque_share, at once; once the error
+    # eases it holds a moment, then the torque comes back smoothly.
+    ("cut_target", "1.0 - (1.0 - esc_torque_share) * max(0.0, min(1.0, (max(oversteer, understeer_drive) - esc_cut_error)"
+                   " / (esc_cut_full - esc_cut_error)))"),
+    ("hold_s", "ifthen(lt(cut_target, torque_factor + 0.001), esc_torque_hold_s, max(0.0, hold_s - dt))"),
+    ("torque_factor", "ifthen(on, ifthen(lt(cut_target, torque_factor), cut_target, ifthen(lt(0.0, hold_s),"
+                      " torque_factor, min(cut_target, torque_factor + dt * (1.0 - esc_torque_share)"
+                      " / esc_torque_restore_s))), 1.0)"),
+    ("active", "on * max(lt(1.0, max(brake_fl, brake_fr, brake_bl, brake_br)), lt(0.001, release),"
+               " lt(torque_factor, 0.99) * lt(1.0, abs(request_torque_nm)))"),
+]
+
 # Every wheel: the stability brake request, built up by the pump and released
 # at once. ABS limits it like the driver's request.
 TC_WHEEL_BRAKE_EQS = [
-    ("stab_target_nm", "min({brake_par}, tc_lock_nm + {axle_lock})"),
+    ("stab_target_nm", "min({brake_par}, tc_lock_nm + {axle_lock} + {esc_brake})"),
     ("stab_brake_nm", "min(stab_target_nm, stab_brake_nm + dt * {brake_par} / tc_pump_time_s)"),
 ]
 
@@ -373,8 +471,9 @@ DRIVELINE_EQS = [
     # the driver's request: constant torque up to the power limit, then constant power
     ("request_torque_nm", "throttle_norm * direction * rev_limit"
                           " * min(max_torque_nm, max_power_w / max(abs(motor_rad_sec), 1.0))"),
-    # what the motor drives: the request, limited by traction control
-    ("drive_torque_nm", "request_torque_nm * min(1.0, motor_cap_nm / max(abs(request_torque_nm), 0.001))"),
+    # what the motor drives: the request, limited by traction control, and ESC's share of that
+    ("drive_torque_nm", "request_torque_nm * min(1.0, motor_cap_nm / max(abs(request_torque_nm), 0.001))"
+                        " * torque_factor"),
     # pedal released: a small torque against the rotation, zero at standstill
     ("coast_torque_nm", "-1.0 * coast_regen_nm * (1.0 - min(1.0, 20.0 * throttle_norm))"
                         " * max(-1.0, min(1.0, motor_rad_sec / coast_regen_fade_rad_sec))"),
@@ -556,6 +655,13 @@ def read_vehicle(stock_text):
     return cg, mass_kg, wheels
 
 
+def wheelbase(wheels):
+    """Front to rear axle in metres."""
+    front_x = sum(w.x for w in wheels if w.front) / 2.0
+    rear_x = sum(w.x for w in wheels if not w.front) / 2.0
+    return round(rear_x - front_x, 3)
+
+
 def rear_brake_nm(front_nm, cg, mass_kg, wheels):
     """Rear brake torque that shares braking out like the axle loads at BRAKE_BALANCE_G.
 
@@ -638,30 +744,43 @@ def build_system(stock_text):
     shared.update((name, "driveline/in/" + name) for name, _, _ in DRIVELINE_INPUTS)
     shared.update(("abs_" + name, "abs/par/" + name) for name, _, _ in ABS_PARAMS)
     shared.update(("tc_" + name, "tc/par/" + name) for name, _, _ in TC_PARAMS)
+    shared.update(("esc_" + name, "esc/par/" + name) for name, _, _ in ESC_PARAMS)
     shared["abs_any"] = "abs/active"
+    shared["steer_front_deg"] = "fcs/steer-pos-deg[%d]" % front[0].unit
+    esc_params = [(name, wheelbase(wheels) if value is None else value, note) for name, value, note in ESC_PARAMS]
     for w in wheels:
         shared["omega_" + w.name] = "tyre/%s/omega_rad_sec" % w.name
+        shared["esc_brake_" + w.name] = "esc/brake_" + w.name
+        shared["esc_keep_" + w.name] = "esc/keep_" + w.name
         for key in TC_WHEEL_SHARED:
             shared["%s_%s" % (key, w.name)] = "tyre/%s/%s" % (w.name, key)
     driveline_names = [name for name, _ in DRIVELINE_EQS]
     brake_names = [name for name, _ in BRAKE_EQS]
     wheel_names = (set(LOAD_CURVES) | {eq[0] for eq in WHEEL_EQS}
                    | {name for name, _ in ABS_WHEEL_EQS + ABS_VALVE_EQS + TC_WHEEL_EQS})
-    longitudinal =[(name.format(**fields), expr.format(**fields))
+    longitudinal = [(name.format(**fields), expr.format(**fields))
                     for fields in (tc_axle_fields("front", front), tc_axle_fields("rear", rear))
                     for name, expr in TC_LONGITUDINAL_EQS]
     tc_names = {name for name, _ in TC_PRE_EQS + TC_AXLE_EQS + TC_MOTOR_EQS + longitudinal}
+    esc_names = {name for name, _ in ESC_EQS}
 
     def resolve_tc(name):
         if name in tc_names:
             return "tc/" + name
         return resolve_brakes(name)
 
+    def resolve_esc(name):
+        if name in esc_names:
+            return "esc/" + name
+        return resolve_tc(name)
+
     def resolve_driveline(name):
         if name in driveline_names:
             return "driveline/" + name
         if name in tc_names:
             return "tc/" + name
+        if name in esc_names:
+            return "esc/" + name
         return shared[name]
 
     def resolve_brakes(name):
@@ -715,6 +834,8 @@ def build_system(stock_text):
             "axle_share": "front_torque_share" if w.front else "(1.0 - front_torque_share)",
             "driven": "front_driven" if w.front else "rear_driven",
             "axle_lock": "lock_front_nm" if w.front else "lock_rear_nm",
+            "esc_brake": "esc_brake_" + w.name,
+            "esc_keep": "esc_keep_" + w.name,
             "reference_mu": LOAD_CURVES["brake_peak_mu"][1],
             # The rear pair follows the wheel that needs less (select low), except
             # while traction or stability control brakes one of them on purpose.
@@ -741,8 +862,9 @@ def build_system(stock_text):
            _property_lines("driveline/par", driveline_params), "\n",
            INDENT + "<!-- ABS parameters -->\n", _property_lines("abs/par", ABS_PARAMS), "\n",
            INDENT + "<!-- Traction control parameters -->\n", _property_lines("tc/par", TC_PARAMS), "\n",
+           INDENT + "<!-- Stability control parameters -->\n", _property_lines("esc/par", esc_params), "\n",
            INDENT + "<!-- Inputs -->\n", _property_lines("driveline/in", DRIVELINE_INPUTS), "\n",
-           INDENT + "<!-- State: wheel speeds, and what the ABS and traction control channels read"
+           INDENT + "<!-- State: wheel speeds, and what the ABS and stability control channels read"
                     " before the wheels compute it -->\n"]
     ambient = dict((name, value) for name, value, _ in DRIVELINE_PARAMS)["ambient_c"]
     for w in wheels:
@@ -753,7 +875,9 @@ def build_system(stock_text):
             out.append('%s<property value="%r">tyre/%s/%s</property>\n' % (INDENT, value, w.name, name))
     for name, value in (("abs/active", 0.0), ("driveline/request_torque_nm", 0.0), ("tc/engaged", 0.0),
                         ("tc/cap_nm", 0.0), ("tc/drag_factor", 1.0),
-                        ("tc/lock_front_state_nm", 0.0), ("tc/lock_rear_state_nm", 0.0)):
+                        ("tc/lock_front_state_nm", 0.0), ("tc/lock_rear_state_nm", 0.0), ("esc/ref", 0.0), ("esc/ref_us", 0.0),
+                        ("esc/damping", 1.0), ("esc/beta_was_active", 0.0), ("esc/hold_s", 0.0),
+                        ("esc/torque_factor", 1.0)):
         out.append('%s<property value="%r">%s</property>\n' % (INDENT, value, name))
 
     out.append('\n%s<channel name="Occupants">\n' % INDENT)
@@ -761,7 +885,7 @@ def build_system(stock_text):
         out.append(fcs_function("occupants/" + name, expr, shared.__getitem__, outputs))
     out.append("%s</channel>\n" % INDENT)
 
-    out.append('\n%s<channel name="Traction control">\n' % INDENT)
+    out.append('\n%s<channel name="Traction and stability control">\n' % INDENT)
     for name, expr in TC_PRE_EQS:
         out.append(fcs_function("tc/" + name, expr, resolve_tc))
     for eqs in (TC_WHEEL_SIGNAL_EQS, TC_WHEEL_LOCK_EQS):
@@ -771,6 +895,8 @@ def build_system(stock_text):
                                         wheel_resolver(w)))
     for name, expr in TC_AXLE_EQS + longitudinal + TC_MOTOR_EQS:
         out.append(fcs_function("tc/" + name, expr, resolve_tc))
+    for name, expr in ESC_EQS:
+        out.append(fcs_function("esc/" + name, expr, resolve_esc))
     for w in wheels:
         for name, expr in TC_WHEEL_BRAKE_EQS:
             out.append(fcs_function("tyre/%s/%s" % (w.name, name), expr.format(**wheel_fields(w)), wheel_resolver(w)))
@@ -904,9 +1030,11 @@ def check_equations():
                     for name, expr in TC_LONGITUDINAL_EQS]
     known |= {"tc_" + n for n, _, _ in TC_PARAMS} | {n for n, _ in TC_PRE_EQS + TC_AXLE_EQS + TC_MOTOR_EQS + longitudinal}
     known |= {n for n, _ in TC_WHEEL_EQS} | {"partner_tc_slip", "partner_stab_brake_nm"}
+    known |= {"esc_" + n for n, _, _ in ESC_PARAMS} | {n for n, _ in ESC_EQS} | {"steer_front_deg"}
+    known |= {prefix + w for prefix in ("esc_brake_", "esc_keep_") for w in ("fl", "fr", "bl", "br")}
     known |= {"%s_%s" % (key, w) for key in TC_WHEEL_SHARED for w in ("fl", "fr", "bl", "br")}
     for eq in (OCCUPANT_EQS + DRIVELINE_EQS + BRAKE_EQS + ABS_WHEEL_EQS + ABS_VALVE_EQS + WHEEL_EQS
-               + TC_PRE_EQS + TC_WHEEL_EQS + TC_AXLE_EQS + longitudinal + TC_MOTOR_EQS):
+               + TC_PRE_EQS + TC_WHEEL_EQS + TC_AXLE_EQS + longitudinal + TC_MOTOR_EQS + ESC_EQS):
         expr = re.sub(r"\{\w+\}", "0.0", eq[1])
         unknown = names(expr) - known
         if unknown:
