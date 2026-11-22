@@ -14,6 +14,45 @@
 		The Follow Me EV on an experimental tyre and driveline model: the wheels have their own speed, so they can spin and lock, and grip is shared between cornering, braking and accelerating.
 	</long-description>
 	<aero>followme_e-tron-tyre</aero>
+	<menubar>
+		<default>
+			<menu n="10">
+				<item n="10">
+					<label>Toggle ABS</label>
+					<binding>
+						<command>nasal</command>
+						<script>
+							var v = !getprop("/fdm/jsbsim/abs/par/enabled");
+							setprop("/fdm/jsbsim/abs/par/enabled", v);
+							gui.popupTip("ABS " ~ (v ? "ON" : "OFF"));
+						</script>
+					</binding>
+				</item>
+				<item n="11">
+					<label>Toggle TC</label>
+					<binding>
+						<command>nasal</command>
+						<script>
+							var v = !getprop("/fdm/jsbsim/tc/par/enabled");
+							setprop("/fdm/jsbsim/tc/par/enabled", v);
+							gui.popupTip("TC " ~ (v ? "ON" : "OFF"));
+						</script>
+					</binding>
+				</item>
+				<item n="12">
+					<label>Toggle ESC</label>
+					<binding>
+						<command>nasal</command>
+						<script>
+							var v = !getprop("/fdm/jsbsim/esc/par/enabled");
+							setprop("/fdm/jsbsim/esc/par/enabled", v);
+							gui.popupTip("ESC " ~ (v ? "ON" : "OFF"));
+						</script>
+					</binding>
+				</item>
+			</menu>
+		</default>
+	</menubar>
 	<multiplay>
 		<generic>
 			<!-- Signed wheel angular speed (rad/s) and sliding smoke intensity (0..1). -->

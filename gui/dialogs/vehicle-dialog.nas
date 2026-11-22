@@ -54,6 +54,14 @@ var vehicleDialog = {
 		me._choice(right, y, half, "Comfort", mode, 0.65);
 		me._choice(0, y + 29, half, "Low Power", mode, 0.4);
 
+		if (props.getNode("/fdm/jsbsim/abs/par/enabled") != nil) {
+			y = me._heading(y + 65, "Braking & stability");
+			me._checkbox(y, "Enable ABS", "/fdm/jsbsim/abs/par/enabled");
+			me._checkbox(y + 27, "Enable traction control (TC)", "/fdm/jsbsim/tc/par/enabled");
+			me._checkbox(y + 54, "Enable stability control (ESC)", "/fdm/jsbsim/esc/par/enabled");
+			y += 25;
+		}
+
 		y = me._heading(y + 65, "Realistic steering");
 		var on = me._button(0, y, half, "Enable", func { followme.enableAdvancedSteering(); vehicleDialog._syncSteering(); });
 		var off = me._button(right, y, half, "Disable", func { followme.disableAdvancedSteering(); vehicleDialog._syncSteering(); });
