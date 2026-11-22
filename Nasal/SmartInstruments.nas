@@ -133,7 +133,8 @@ var SmartInstruments = {
         m.flowArrows = m.details.flow.createChild("image").setFile(artDir ~ "energy-flow-arrows.png")
                                .setTranslation(663, 316).setSize(196, 120);
         m.flowPower = panelText(m.details.flow, 754, 504, 29);
-		m.bearing = panelText(m.details.compass, 754, 297, 36);
+		# Half the degree sign's advance in Exo at size 36 keeps the three digits centered.
+		m.bearing = panelText(m.details.compass, 754 + 5.45, 297, 36);
 		m.cardinals = [];
 		foreach (var letter; ["N", "E", "S", "W"]) {
 			var marker = m.details.compass.createChild("group");
