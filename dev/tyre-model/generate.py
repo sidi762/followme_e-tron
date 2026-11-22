@@ -74,6 +74,10 @@ DRIVELINE_PARAMS = [
     ("coast_regen_fade_rad_sec", 100.0, "coast regen fades out below this motor speed"),
     ("brake_front_nm", 2300.0, "brake torque per front wheel at full pedal"),
     ("brake_rear_nm", None, "brake torque per rear wheel at full pedal; follows the CG, see rear_brake_nm() in generate.py"),
+    ("handbrake_nm", 1500.0, "handbrake lever torque per rear wheel, enough to lock them while driving"),
+    ("parking_nm", 1500.0, "electric parking brake clamp torque per rear wheel"),
+    ("epb_dynamic_mps", 2.0, "above this the parking brake switch brakes all four wheels hydraulically instead"),
+    ("epb_dynamic_norm", 0.5, "service brake demand of that dynamic emergency braking"),
     ("park_lock_nm", 1000.0, "holding torque per wheel while the motor is switched off"),
 ]
 
@@ -103,6 +107,30 @@ OCCUPANT_EQS = [
      ["inertia/pointmass-weight-lbs[1]"]),
 ]
 
+# Braking intents, read separately from FlightGear properties instead of the
+# two axle commands FlightGear hands JSBSim, which fold the parking brake into
+# both. Nasal/systems/brakes.nas publishes the automatic ones.
+BRAKE_INPUTS = {
+    "pedal_front": "/controls/gear/brake-left",                 # LEFT is the front axle
+    "pedal_rear": "/controls/gear/brake-right",
+    "automatic": "/systems/BrakeController/automatic-norm",     # AEB and cruise control
+    "hold": "/systems/BrakeController/hold-norm",               # Auto Hold at a standstill
+    "handbrake": "/systems/BrakeController/handbrake-norm",     # the lever, held
+    "parking": "/controls/gear/brake-parking",                  # electric parking brake
+}
+
+# Evaluated after the driveline, before the wheels; values under brakes/.
+BRAKE_EQS = [
+    # The parking brake switch clamps the rear wheels at a standstill. Moving,
+    # it brakes all four wheels through the hydraulics, as real ones do.
+    ("epb_dynamic", "parking * max(0.0, min(1.0, abs(u_mps) - epb_dynamic_mps + 0.5))"),
+    # Service brake demand per axle: pedal, automatic braking, Auto Hold.
+    ("service_front", "max(pedal_front, automatic, hold, epb_dynamic * epb_dynamic_norm)"),
+    ("service_rear", "max(pedal_rear, automatic, hold, epb_dynamic * epb_dynamic_norm)"),
+    # Lever and parking clamp act on the rear wheels mechanically, past the hydraulics.
+    ("mechanical_rear_nm", "max(handbrake * handbrake_nm, (parking - epb_dynamic) * parking_nm)"),
+]
+
 # --------------------------------------------------------------------------
 # Equations, evaluated top to bottom on every FDM frame.
 # A name is resolved, in this order, to: a value computed earlier in the same
@@ -120,9 +148,6 @@ EXTERNAL = {
     "cg_x_in": "inertia/cg-x-in",
     "cg_y_in": "inertia/cg-y-in",
     "cg_z_in": "inertia/cg-z-in",
-    # In this FDM the LEFT brake group is the front axle and RIGHT the rear
-    "brake_front": "fcs/left-brake-cmd-norm",
-    "brake_rear": "fcs/right-brake-cmd-norm",
 }
 
 # {front_omega} / {rear_omega} expand to the mean wheel speed of each axle.
@@ -189,7 +214,11 @@ WHEEL_EQS = [
     # The park lock only bites below walking pace, so switching the motor off
     # at speed does not lock the wheels.
     ("park_torque_nm", "(1.0 - motor_on) * park_lock_nm * max(0.0, min(1.0, 1.5 - abs(vx_wheel_mps)))"),
-    ("brake_torque_nm", "{brake_cmd} * {brake_par} + park_torque_nm"
+    # This wheel's own brake. The hydraulic unit passes the service request on
+    # unchanged for now; ABS and stability control will modulate it here.
+    ("brake_request_nm", "{service_cmd} * {brake_par}"),
+    ("service_brake_nm", "brake_request_nm"),
+    ("brake_torque_nm", "service_brake_nm + {mechanical} + park_torque_nm"
                         " + rolling_resistance * roll_factor * load_n * radius_m"),
     ("implicit_gain", "radius_m * radius_m * stiffness_x_n / v_ref_mps"),
     ("numerator", "wheel_inertia_kgm2 * omega_rad_sec / dt_s + drive_torque_nm"
@@ -373,18 +402,25 @@ def build_system(stock_text):
                         for name, value, note in DRIVELINE_PARAMS]
     shared = dict(EXTERNAL)
     shared.update(OCCUPANT_INPUTS)
+    shared.update(BRAKE_INPUTS)
     shared.update((name, "tyre/par/" + name) for name, _, _ in tyre_params)
     shared.update((name, "driveline/par/" + name) for name, _, _ in DRIVELINE_PARAMS)
     shared.update((name, "driveline/in/" + name) for name, _, _ in DRIVELINE_INPUTS)
     for w in wheels:
         shared["omega_" + w.name] = "tyre/%s/omega_rad_sec" % w.name
     driveline_names = [name for name, _ in DRIVELINE_EQS]
+    brake_names = [name for name, _ in BRAKE_EQS]
     wheel_names = set(LOAD_CURVES) | {eq[0] for eq in WHEEL_EQS}
 
     def resolve_driveline(name):
         if name in driveline_names:
             return "driveline/" + name
         return shared[name]
+
+    def resolve_brakes(name):
+        if name in brake_names:
+            return "brakes/" + name
+        return resolve_driveline(name)
 
     def axle_mean(axle):
         return "(%s) / %r" % (" + ".join("omega_" + w.name for w in axle), float(len(axle)))
@@ -415,6 +451,11 @@ def build_system(stock_text):
         out.append(fcs_function("driveline/" + name, expr.format(**fields), resolve_driveline))
     out.append("%s</channel>\n" % INDENT)
 
+    out.append('\n%s<channel name="Brakes">\n' % INDENT)
+    for name, expr in BRAKE_EQS:
+        out.append(fcs_function("brakes/" + name, expr, resolve_brakes))
+    out.append("%s</channel>\n" % INDENT)
+
     for w in wheels:
         local = {
             "comp_ft": "gear/unit[%d]/compression-ft" % w.unit,
@@ -429,9 +470,7 @@ def build_system(stock_text):
                 return "tyre/%s/%s" % (w.name, name)
             if name in local:
                 return local[name]
-            if name in driveline_names:
-                return "driveline/" + name
-            return shared[name]
+            return resolve_brakes(name)
 
         fields = {
             "wheel": w.name,
@@ -445,8 +484,9 @@ def build_system(stock_text):
             "steer": "steer_deg * 0.017453293" if w.steered else "0.0",
             "axle_torque": "axle_torque_front_nm" if w.front else "axle_torque_rear_nm",
             "wheels_on_axle": repr(float(len(front if w.front else rear))),
-            "brake_cmd": "brake_front" if w.front else "brake_rear",
+            "service_cmd": "service_front" if w.front else "service_rear",
             "brake_par": "brake_front_nm" if w.front else "brake_rear_nm",
+            "mechanical": "0.0" if w.front else "mechanical_rear_nm",
             "reference_mu": LOAD_CURVES["brake_peak_mu"][1],
         }
         out.append('\n%s<channel name="Tyre %s">\n' % (INDENT, w.name))
@@ -540,9 +580,9 @@ def check_equations():
     """Catch a typo in an equation before JSBSim does, with a clearer message."""
     known = set(EXTERNAL) | set(LOAD_CURVES) | {"comp_ft", "comp_vel_fps", "steer_deg", "surface", "roll_factor"}
     known |= {n for n, _, _ in TYRE_PARAMS + DRIVELINE_PARAMS + DRIVELINE_INPUTS} | {"load_nominal_n"}
-    known |= {"omega_fl", "omega_fr", "omega_bl", "omega_br"} | set(OCCUPANT_INPUTS)
-    known |= {n for n, _ in DRIVELINE_EQS} | {eq[0] for eq in WHEEL_EQS}
-    for eq in OCCUPANT_EQS + DRIVELINE_EQS + WHEEL_EQS:
+    known |= {"omega_fl", "omega_fr", "omega_bl", "omega_br"} | set(OCCUPANT_INPUTS) | set(BRAKE_INPUTS)
+    known |= {n for n, _ in DRIVELINE_EQS + BRAKE_EQS} | {eq[0] for eq in WHEEL_EQS}
+    for eq in OCCUPANT_EQS + DRIVELINE_EQS + BRAKE_EQS + WHEEL_EQS:
         expr = re.sub(r"\{\w+\}", "0.0", eq[1])
         unknown = names(expr) - known
         if unknown:

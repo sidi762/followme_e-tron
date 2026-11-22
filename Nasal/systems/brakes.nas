@@ -39,6 +39,11 @@ var BrakeController = {
 	pedalPressed: props.getNode("/systems/BrakeController/pedal-pressed", 1),
 	pedalPosition: props.getNode("/systems/BrakeController/pedal-position-norm", 1),
 	frontBrakeOutput: props.getNode("/systems/BrakeController/front-brake-output", 1),
+	# Separate braking intents for the tyre model's FDM, which reads them with
+	# the pedals and the parking brake instead of the combined outputs below.
+	automaticOutput: props.getNode("/systems/BrakeController/automatic-norm", 1),
+	holdOutput: props.getNode("/systems/BrakeController/hold-norm", 1),
+	handBrakeLever: props.getNode("/systems/BrakeController/handbrake-norm", 1),
 	applyingFeetBrake: 0,
 	_handBrakeIsOn: 0,
 	_manualHandBrakeIsPulled: 0,
@@ -59,6 +64,9 @@ var BrakeController = {
 	updateBrakeOutputs: func() {
 		var left = me.leftBrakeNode.getValue();
 		var right = me.rightBrakeNode.getValue();
+		me.automaticOutput.setDoubleValue(math.max(me.aebDemand, me.cruiseDemand));
+		me.holdOutput.setDoubleValue(me.holdDemand);
+		me.handBrakeLever.setDoubleValue(me._manualHandBrakeIsPulled);
 		var automatic = math.max(me.aebDemand, me.holdDemand, me.cruiseDemand);
 		me.leftBrakeValue = math.max(left, automatic);
 		me.rightBrakeValue = math.max(right, automatic, me._manualHandBrakeIsPulled);

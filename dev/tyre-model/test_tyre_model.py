@@ -266,6 +266,81 @@ def test_braking_to_rest_ends_at_rest():
     assert max(abs(r["u"]) for r in rows[-120:]) < 0.002
 
 
+def brake_torques(fdm, key):
+    return [fdm[f"tyre/{w}/{key}"] for w in WHEELS]
+
+
+def test_each_wheel_has_its_own_brake_request():
+    car = Car("tyre", speed=20.0, settle=0.5)
+    fdm = car.fdm
+    front_nm, rear_nm = fdm["driveline/par/brake_front_nm"], fdm["driveline/par/brake_rear_nm"]
+    car.run(0.1, brake=0.4, rear_brake=0.0)
+    assert brake_torques(fdm, "brake_request_nm") == pytest.approx([0.4 * front_nm, 0.4 * front_nm, 0.0, 0.0])
+    car.run(0.1, brake=0.0, rear_brake=0.7)
+    assert brake_torques(fdm, "brake_request_nm") == pytest.approx([0.0, 0.0, 0.7 * rear_nm, 0.7 * rear_nm])
+    # automatic braking (AEB, cruise control) reaches all four wheels like the pedal
+    fdm["/systems/BrakeController/automatic-norm"] = 0.5
+    car.run(0.1)
+    assert brake_torques(fdm, "service_brake_nm") == pytest.approx(
+        [0.5 * front_nm, 0.5 * front_nm, 0.5 * rear_nm, 0.5 * rear_nm])
+
+
+def test_the_handbrake_lever_locks_only_the_rear_wheels():
+    car = Car("tyre", speed=50 * KMH, settle=0.5)
+    fdm = car.fdm
+    fdm["/systems/BrakeController/handbrake-norm"] = 1.0
+    rows = car.run(1.0)
+    assert brake_torques(fdm, "service_brake_nm") == [0.0] * 4    # past the hydraulics
+    assert min(r["slip_ratio_bl"] for r in rows[-30:]) < -0.9
+    assert min(r["slip_ratio_br"] for r in rows[-30:]) < -0.9
+    assert min(r["slip_ratio_fl"] for r in rows) > -0.05
+    assert rows[-1]["u"] < rows[0]["u"] - 2.0
+    # held through a corner it swings the tail out
+    car = Car("tyre", speed=50 * KMH, settle=0.5)
+    car.run(1.5, steer=0.1, cruise=50 * KMH)
+    yaw_before = abs(car.fdm["velocities/r-rad_sec"])
+    car.fdm["/systems/BrakeController/handbrake-norm"] = 1.0
+    rows = car.run(1.0, steer=0.1)
+    assert max(abs(r["yaw_rate"]) for r in rows) > 1.5 * yaw_before
+
+
+@pytest.mark.parametrize("forward", [0.2, -0.2])
+def test_the_parking_brake_holds_on_a_slope_by_the_rear_wheels(forward):
+    car = Car("tyre")
+    car.fdm["/controls/gear/brake-parking"] = 1.0
+    car.run(0.5)
+    car.push(forward=forward)
+    assert moved(car.run(30.0)) < 0.01
+    fdm = car.fdm
+    assert brake_torques(fdm, "service_brake_nm") == [0.0] * 4
+    assert fdm["brakes/mechanical_rear_nm"] == pytest.approx(fdm["driveline/par/parking_nm"])
+
+
+def test_the_parking_brake_switched_on_while_driving_brakes_all_four_wheels():
+    car = Car("tyre", speed=60 * KMH, settle=0.5)
+    fdm = car.fdm
+    fdm["/controls/gear/brake-parking"] = 1.0
+    rows = car.run(1.0)
+    norm = fdm["driveline/par/epb_dynamic_norm"]
+    assert brake_torques(fdm, "brake_request_nm") == pytest.approx([
+        norm * fdm["driveline/par/brake_front_nm"]] * 2 + [norm * fdm["driveline/par/brake_rear_nm"]] * 2)
+    assert fdm["brakes/mechanical_rear_nm"] == 0.0
+    assert 0.4 < -mean(rows[30:], "ax_g") < 0.8
+    assert max(abs(r["yaw_rate"]) for r in rows) < 0.02             # no rear lock, no spin
+    car.run(5.0)
+    assert abs(fdm["velocities/u-fps"]) < 0.01
+    assert fdm["brakes/mechanical_rear_nm"] == pytest.approx(fdm["driveline/par/parking_nm"])
+    assert fdm["brakes/service_front"] == 0.0                        # at rest the clamp takes over
+
+
+def test_auto_hold_holds_on_a_slope_with_the_service_brakes():
+    car = Car("tyre")
+    car.fdm["/systems/BrakeController/hold-norm"] = 1.0
+    car.push(forward=0.2)
+    assert moved(car.run(30.0)) < 0.01
+    assert min(brake_torques(car.fdm, "service_brake_nm")) > 0.0
+
+
 @pytest.mark.parametrize("params", [{}, REAR_DRIVE, FRONT_DRIVE])
 def test_pulling_away_at_full_steering_lock(params):
     car = Car("tyre", params=params)

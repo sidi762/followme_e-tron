@@ -27,6 +27,10 @@
 	<property value="100.0">driveline/par/coast_regen_fade_rad_sec</property> <!-- coast regen fades out below this motor speed -->
 	<property value="2300.0">driveline/par/brake_front_nm</property> <!-- brake torque per front wheel at full pedal -->
 	<property value="836.4">driveline/par/brake_rear_nm</property> <!-- brake torque per rear wheel at full pedal; follows the CG, see rear_brake_nm() in generate.py -->
+	<property value="1500.0">driveline/par/handbrake_nm</property> <!-- handbrake lever torque per rear wheel, enough to lock them while driving -->
+	<property value="1500.0">driveline/par/parking_nm</property> <!-- electric parking brake clamp torque per rear wheel -->
+	<property value="2.0">driveline/par/epb_dynamic_mps</property> <!-- above this the parking brake switch brakes all four wheels hydraulically instead -->
+	<property value="0.5">driveline/par/epb_dynamic_norm</property> <!-- service brake demand of that dynamic emergency braking -->
 	<property value="1000.0">driveline/par/park_lock_nm</property> <!-- holding torque per wheel while the motor is switched off -->
 
 	<!-- Inputs -->
@@ -238,6 +242,78 @@
 						<p>driveline/par/front_torque_share</p>
 					</difference>
 				</product>
+			</function>
+		</fcs_function>
+	</channel>
+
+	<channel name="Brakes">
+		<!-- epb_dynamic = parking * max(0.0, min(1.0, abs(u_mps) - epb_dynamic_mps + 0.5)) -->
+		<fcs_function name="brakes/epb_dynamic">
+			<function>
+				<product>
+					<p>/controls/gear/brake-parking</p>
+					<max>
+						<v>0.0</v>
+						<min>
+							<v>1.0</v>
+							<sum>
+								<difference>
+									<abs>
+										<p>driveline/u_mps</p>
+									</abs>
+									<p>driveline/par/epb_dynamic_mps</p>
+								</difference>
+								<v>0.5</v>
+							</sum>
+						</min>
+					</max>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- service_front = max(pedal_front, automatic, hold, epb_dynamic * epb_dynamic_norm) -->
+		<fcs_function name="brakes/service_front">
+			<function>
+				<max>
+					<p>/controls/gear/brake-left</p>
+					<p>/systems/BrakeController/automatic-norm</p>
+					<p>/systems/BrakeController/hold-norm</p>
+					<product>
+						<p>brakes/epb_dynamic</p>
+						<p>driveline/par/epb_dynamic_norm</p>
+					</product>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- service_rear = max(pedal_rear, automatic, hold, epb_dynamic * epb_dynamic_norm) -->
+		<fcs_function name="brakes/service_rear">
+			<function>
+				<max>
+					<p>/controls/gear/brake-right</p>
+					<p>/systems/BrakeController/automatic-norm</p>
+					<p>/systems/BrakeController/hold-norm</p>
+					<product>
+						<p>brakes/epb_dynamic</p>
+						<p>driveline/par/epb_dynamic_norm</p>
+					</product>
+				</max>
+			</function>
+		</fcs_function>
+		<!-- mechanical_rear_nm = max(handbrake * handbrake_nm, (parking - epb_dynamic) * parking_nm) -->
+		<fcs_function name="brakes/mechanical_rear_nm">
+			<function>
+				<max>
+					<product>
+						<p>/systems/BrakeController/handbrake-norm</p>
+						<p>driveline/par/handbrake_nm</p>
+					</product>
+					<product>
+						<difference>
+							<p>/controls/gear/brake-parking</p>
+							<p>brakes/epb_dynamic</p>
+						</difference>
+						<p>driveline/par/parking_nm</p>
+					</product>
+				</max>
 			</function>
 		</fcs_function>
 	</channel>
@@ -709,14 +785,27 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- brake_torque_nm = brake_front * brake_front_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<!-- brake_request_nm = service_front * brake_front_nm -->
+		<fcs_function name="tyre/fl/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_front</p>
+					<p>driveline/par/brake_front_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = brake_request_nm -->
+		<fcs_function name="tyre/fl/service_brake_nm">
+			<function>
+				<p>tyre/fl/brake_request_nm</p>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = service_brake_nm + 0.0 + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
 		<fcs_function name="tyre/fl/brake_torque_nm">
 			<function>
 				<sum>
-					<product>
-						<p>fcs/left-brake-cmd-norm</p>
-						<p>driveline/par/brake_front_nm</p>
-					</product>
+					<p>tyre/fl/service_brake_nm</p>
+					<v>0.0</v>
 					<p>tyre/fl/park_torque_nm</p>
 					<product>
 						<p>tyre/par/rolling_resistance</p>
@@ -1642,14 +1731,27 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- brake_torque_nm = brake_front * brake_front_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<!-- brake_request_nm = service_front * brake_front_nm -->
+		<fcs_function name="tyre/fr/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_front</p>
+					<p>driveline/par/brake_front_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = brake_request_nm -->
+		<fcs_function name="tyre/fr/service_brake_nm">
+			<function>
+				<p>tyre/fr/brake_request_nm</p>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = service_brake_nm + 0.0 + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
 		<fcs_function name="tyre/fr/brake_torque_nm">
 			<function>
 				<sum>
-					<product>
-						<p>fcs/left-brake-cmd-norm</p>
-						<p>driveline/par/brake_front_nm</p>
-					</product>
+					<p>tyre/fr/service_brake_nm</p>
+					<v>0.0</v>
 					<p>tyre/fr/park_torque_nm</p>
 					<product>
 						<p>tyre/par/rolling_resistance</p>
@@ -2572,14 +2674,27 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- brake_torque_nm = brake_rear * brake_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<!-- brake_request_nm = service_rear * brake_rear_nm -->
+		<fcs_function name="tyre/bl/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_rear</p>
+					<p>driveline/par/brake_rear_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = brake_request_nm -->
+		<fcs_function name="tyre/bl/service_brake_nm">
+			<function>
+				<p>tyre/bl/brake_request_nm</p>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = service_brake_nm + mechanical_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
 		<fcs_function name="tyre/bl/brake_torque_nm">
 			<function>
 				<sum>
-					<product>
-						<p>fcs/right-brake-cmd-norm</p>
-						<p>driveline/par/brake_rear_nm</p>
-					</product>
+					<p>tyre/bl/service_brake_nm</p>
+					<p>brakes/mechanical_rear_nm</p>
 					<p>tyre/bl/park_torque_nm</p>
 					<product>
 						<p>tyre/par/rolling_resistance</p>
@@ -3502,14 +3617,27 @@
 				</product>
 			</function>
 		</fcs_function>
-		<!-- brake_torque_nm = brake_rear * brake_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
+		<!-- brake_request_nm = service_rear * brake_rear_nm -->
+		<fcs_function name="tyre/br/brake_request_nm">
+			<function>
+				<product>
+					<p>brakes/service_rear</p>
+					<p>driveline/par/brake_rear_nm</p>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- service_brake_nm = brake_request_nm -->
+		<fcs_function name="tyre/br/service_brake_nm">
+			<function>
+				<p>tyre/br/brake_request_nm</p>
+			</function>
+		</fcs_function>
+		<!-- brake_torque_nm = service_brake_nm + mechanical_rear_nm + park_torque_nm + rolling_resistance * roll_factor * load_n * radius_m -->
 		<fcs_function name="tyre/br/brake_torque_nm">
 			<function>
 				<sum>
-					<product>
-						<p>fcs/right-brake-cmd-norm</p>
-						<p>driveline/par/brake_rear_nm</p>
-					</product>
+					<p>tyre/br/service_brake_nm</p>
+					<p>brakes/mechanical_rear_nm</p>
 					<p>tyre/br/park_torque_nm</p>
 					<product>
 						<p>tyre/par/rolling_resistance</p>

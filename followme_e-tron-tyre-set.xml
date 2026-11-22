@@ -36,5 +36,12 @@
 		<driver-kg type="double">60</driver-kg>
 		<codriver-kg type="double">60</codriver-kg>
 	</occupants>
+	<!-- Braking intents the FDM reads besides the pedals and the parking brake.
+	     Nasal/systems/brakes.nas keeps them up to date. -->
+	<BrakeController>
+		<automatic-norm type="double">0</automatic-norm>
+		<hold-norm type="double">0</hold-norm>
+		<handbrake-norm type="double">0</handbrake-norm>
+	</BrakeController>
 </systems>
 </PropertyList>

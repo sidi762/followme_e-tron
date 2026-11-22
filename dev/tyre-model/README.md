@@ -165,6 +165,23 @@ coefficients are zero and they are in no brake group, so JSBSim adds no force in
 The driveline is a motor with a torque limit and a power limit, a single gear, and open
 differentials (equal torque to each wheel of an axle, `front_torque_share` between the axles).
 
+Each wheel has its own brake. The `Brakes` channel combines the braking intents, which arrive
+separately (see Properties), into a service brake demand per axle and a mechanical torque on the
+rear wheels:
+
+- **Service brakes**, hydraulic, all four wheels: the pedal of that axle, automatic braking (AEB
+  and cruise control) and Auto Hold, whichever asks for most. Each wheel turns the demand into
+  `brake_request_nm` and passes it on as `service_brake_nm`. That second step is where ABS and
+  stability control will modulate each wheel; for now it changes nothing.
+- **Handbrake lever** (held with `b`): the rear wheels only, mechanically, past the hydraulics.
+  `handbrake_nm` locks them while driving. Held on a straight at speed, the locked rear wheels let
+  the car swing round.
+- **Electric parking brake** (`B`): at a standstill it clamps the rear wheels with `parking_nm`.
+  Switched on above `epb_dynamic_mps` it brakes all four wheels hydraulically at
+  `epb_dynamic_norm` instead, as real ones do, and clamps once the car has stopped.
+
+The park lock (motor off) and rolling resistance add to each wheel's total `brake_torque_nm`.
+
 Three things are less obvious:
 
 - **The wheel speed update is implicit.** A free-rolling wheel reacts to slip far faster than
@@ -192,14 +209,21 @@ Inputs, written by `Nasal/engine.nas`:
 | `driveline/in/direction` | 1 forward, -1 reverse |
 | `driveline/in/motor_on` | 0: no drive, no coast regen, and a park lock below walking pace |
 
-Brakes and steering need nothing new: the model reads `fcs/left-brake-cmd-norm` (front axle),
-`fcs/right-brake-cmd-norm` (rear axle) and `fcs/steer-pos-deg`, which FlightGear already fills from
-`/controls/gear/brake-left`, `brake-right`, `brake-parking` and the rudder.
+Steering needs nothing new: the model reads `fcs/steer-pos-deg`, which FlightGear fills from the
+rudder.
 
-The occupants are read from FlightGear properties outside `/fdm/jsbsim/`:
+The brakes and the occupants are read from FlightGear properties outside `/fdm/jsbsim/`. The brakes
+skip FlightGear's own brake commands for JSBSim, which fold the parking brake into both axles.
+`Nasal/systems/brakes.nas` publishes the automatic intents.
 
 | Property | |
 |---|---|
+| `/controls/gear/brake-left` | front axle pedal, 0 to 1 (joystick axis, or both with the S key) |
+| `/controls/gear/brake-right` | rear axle pedal |
+| `/systems/BrakeController/automatic-norm` | AEB and cruise control braking |
+| `/systems/BrakeController/hold-norm` | Auto Hold at a standstill |
+| `/systems/BrakeController/handbrake-norm` | 1 while the handbrake lever is held |
+| `/controls/gear/brake-parking` | electric parking brake, after its half-second actuator |
 | `/systems/occupants/driver-kg` | driver weight, 60 kg by default |
 | `/systems/occupants/codriver-kg` | co-driver weight on the rear right seat, 60 kg by default |
 | `/systems/codriver-enable` | 1 while "Enable co-driver model" is ticked; the co-driver counts only then |
@@ -217,6 +241,10 @@ Outputs worth knowing, per wheel `fl`, `fr`, `bl`, `br`:
 | `tyre/<wheel>/mu_x`, `mu_y` | longitudinal and lateral peak coefficients after load and surface scaling |
 | `tyre/<wheel>/locked`, `stick` | wheel not turning; wheel handed to JSBSim's static friction |
 | `tyre/<wheel>/squeal` | 0 to 1, how far past the grip peak the tyre is sliding |
+| `tyre/<wheel>/brake_request_nm`, `service_brake_nm` | hydraulic brake torque asked for and applied |
+| `tyre/<wheel>/brake_torque_nm` | all of it: service, mechanical, park lock, rolling resistance |
+| `brakes/service_front`, `service_rear` | service brake demand per axle, 0 to 1 |
+| `brakes/mechanical_rear_nm` | handbrake lever or parking clamp on each rear wheel |
 | `driveline/motor_rad_sec`, `driveline/motor_torque_nm` | motor speed and torque |
 
 Parameters are listed with a comment each at the top of `Systems/tyre-model.xml`.
@@ -246,9 +274,10 @@ python3 dev/tyre-model/report.py
 The tests run the generated FDM in standalone JSBSim on flat ground: wheel loads and occupant
 weights, launch on dry and slippery surfaces, threshold braking against locked wheels, steering
 with locked wheels, the friction ellipse, mixed surfaces, the cornering limit and understeer, power
-oversteer by drive layout, holding and releasing on slopes, pulling away at full lock, and that
-results do not depend on the FDM rate (60 to 240 Hz). They do not start FlightGear and do not run
-any Nasal.
+oversteer by drive layout, holding and releasing on slopes, pulling away at full lock, each
+wheel's brake request, the handbrake lever, the parking brake at rest and while moving, Auto
+Hold, and that results do not depend on the FDM rate (60 to 240 Hz). They do not start FlightGear
+and do not run any Nasal.
 
 For that there is a scripted drive in a real FlightGear, rendered in software under Xvfb:
 
@@ -259,7 +288,8 @@ dev/tyre-model/fg/run.sh followme_e-tron-tyre reposition.nas    # reposition whi
 ```
 
 It prints what the car did and fails on a Nasal error. It has been run on FlightGear 2020.3.18
-(Ubuntu 24.04 package) only. The occupant weights and the driver weight buttons have also been
+(Ubuntu 24.04 package) only. The occupant weights, the driver weight buttons and each braking
+intent (S key, handbrake lever, parking brake at rest and moving, Auto Hold) have also been
 checked in FlightGear 2024.1.8 on macOS, including after a reposition. Nobody has driven the tyre
 model by hand yet.
 
@@ -286,7 +316,8 @@ Not done yet:
   moving. `tyre/<wheel>/squeal` is there for them.
 - "Magic bush tyres" (`reduceRollingFriction`) has no effect; the equivalent is
   `tyre/par/rolling_resistance`.
-- The handbrake uses the rear service brakes, which are too weak to lock the rear wheels.
-- No ABS or traction control. `brakesABS` in `Nasal/systems/brakes.nas` could now work from
-  `tyre/<wheel>/slip_ratio`.
+- No ABS, traction control or stability control. They are planned inside the FDM, acting on each
+  wheel's `service_brake_nm` and on the motor torque. `brakesABS` in `Nasal/systems/brakes.nas`
+  is not used.
+- The hydraulic brakes apply the request at once; there is no pressure build-up time yet.
 - The limo keeps the standard model.

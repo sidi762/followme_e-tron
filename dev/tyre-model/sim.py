@@ -30,6 +30,13 @@ FG_SIDE_PROPS = {
     "/systems/occupants/driver-kg": 60.0,
     "/systems/occupants/codriver-kg": 60.0,
     "/systems/codriver-enable": 0.0,
+    # braking intents the tyre model reads (Nasal/systems/brakes.nas)
+    "/controls/gear/brake-left": 0.0,
+    "/controls/gear/brake-right": 0.0,
+    "/controls/gear/brake-parking": 0.0,
+    "/systems/BrakeController/automatic-norm": 0.0,
+    "/systems/BrakeController/hold-norm": 0.0,
+    "/systems/BrakeController/handbrake-norm": 0.0,
 }
 
 _test_dir = None
@@ -143,8 +150,12 @@ class Car:
     def step(self, throttle=0.0, steer=0.0, brake_front=0.0, brake_rear=0.0):
         fdm = self.fdm
         fdm["fcs/steer-cmd-norm"] = steer
+        # The standard FDM brakes through JSBSim's brake groups, which FlightGear
+        # fills from the pedals; the tyre model reads the pedals themselves.
         fdm["fcs/left-brake-cmd-norm"] = brake_front    # LEFT group is the front axle
         fdm["fcs/right-brake-cmd-norm"] = brake_rear
+        fdm["/controls/gear/brake-left"] = brake_front
+        fdm["/controls/gear/brake-right"] = brake_rear
         if self.kind == "stock":
             self.stock_drive.step(throttle, steer)
         else:
