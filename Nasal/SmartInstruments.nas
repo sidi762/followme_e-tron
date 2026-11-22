@@ -133,13 +133,15 @@ var SmartInstruments = {
         m.flowArrows = m.details.flow.createChild("image").setFile(artDir ~ "energy-flow-arrows.png")
                                .setTranslation(663, 316).setSize(196, 120);
         m.flowPower = panelText(m.details.flow, 754, 504, 29);
-        m.bearing = panelText(m.details.compass, 754, 304, 40);
-        m.cardinals = [];
-        foreach (var letter; ["N","E","S","W"]) {
-            var label = panelText(m.details.compass, 0, 0, 24).setText(letter);
-            if (letter == "N") label.setColor(1, 0.35, 0.3);
-            append(m.cardinals, label);
-        }
+		m.bearing = panelText(m.details.compass, 754, 297, 36);
+		m.cardinals = [];
+		foreach (var letter; ["N", "E", "S", "W"]) {
+			var marker = m.details.compass.createChild("group");
+			if (letter == "N")
+				marker.createChild("path").circle(16, 0, 0).setColorFill(0.83, 0.08, 0.11);
+			panelText(marker, 0, 0, 24).setText(letter);
+			append(m.cardinals, marker);
+		}
         m.assistState = panelText(m.details.assist, 754, 340, 36);
 		var radarDrawing = m.details.radar.createChild("group");
 		canvas.parsesvg(radarDrawing, artDir ~ "parking-radar.svg");
