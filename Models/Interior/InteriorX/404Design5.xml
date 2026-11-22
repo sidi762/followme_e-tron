@@ -384,10 +384,6 @@
 </animation>
 
 <!-- Hand brake -->
-<effect>
-    <inherits-from>Aircraft/followme_e-tron/Models/parkingbrake</inherits-from>
-    <object-name>handbrake.001</object-name>
-</effect>
 <animation>
 		<type>pick</type>
 		<object-name>handbrake.001</object-name>
