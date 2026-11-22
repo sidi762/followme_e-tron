@@ -17,11 +17,13 @@ import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle  # noqa: E402
 
 import generate  # noqa: E402
-from sim import KMH, SPLIT_ICE, Car, full_throttle  # noqa: E402
+from sim import KMH, SPLIT_ICE, Car, full_throttle, sine_with_dwell as sim_sine_with_dwell, slowly_increasing_steer  # noqa: E402
 
 OUT = generate.REPO / "Docs" / "ESC" / "figures"
 NO_TC = {"tc/par/enabled": 0.0}
+NO_ESC = {"esc/par/enabled": 0.0}
 PARAMS = {name: value for name, value, _ in generate.TC_PARAMS}
+ESC_PAR = {name: value for name, value, _ in generate.ESC_PARAMS}
 TYRE = {name: value for name, value, _ in generate.TYRE_PARAMS}
 
 INK, BLUE, ORANGE, GREEN, RED, GREY, PURPLE = "#1f2933", "#2f6db3", "#d9822b", "#2e8b57", "#c0392b", "#7b8794", "#7d5ba6"
@@ -78,7 +80,7 @@ def arrow(ax, start, end, text=None, color=INK, dashed=False, rad=0.0, text_at=0
 def fig_architecture():
     fig, ax = canvas(8.6, 4.4)
     y, h, w = 21, 8, 11.5
-    names = [("Occupants", "plant"), ("Traction\ncontrol\n+ ESC (step 3)", "tc"), ("Driveline", "plant"),
+    names = [("Occupants", "plant"), ("Traction &\nstability\ncontrol", "tc"), ("Driveline", "plant"),
              ("Brakes", "plant"), ("ABS", "abs"), ("Tyre\nfl fr bl br", "plant")]
     centres = []
     for i, (name, kind) in enumerate(names):
@@ -87,8 +89,8 @@ def fig_architecture():
     for a, b in zip(centres, centres[1:]):
         arrow(ax, (a[0] + w / 2 + 0.3, y + h / 2), (b[0] - w / 2 - 0.3, y + h / 2),
               color=GREEN if a is centres[1] else INK)
-    ax.text(36.5, 18.3, "motor torque limit", ha="center", fontsize=7.5, color=GREEN)
-    ax.text(2, 15, "Channels run left to right,\nevery FDM frame (120 Hz).", fontsize=7.5, color=GREY)
+    ax.text(36.5, 17.5, "tc/motor_cap_nm,\nesc/torque_factor,\ntc/drag_factor", ha="center", fontsize=6.8, color=GREEN)
+    ax.text(2, 14.5, "Channels run left to right,\nevery FDM frame (120 Hz).", fontsize=7.5, color=GREY)
 
     # driver inputs
     box(ax, 14, 36, 58, 5.5, "Driver and Nasal: accelerator, direction, brake pedals, handbrake, steering;"
@@ -96,17 +98,17 @@ def fig_architecture():
     for cx in (centres[1][0], centres[2][0], centres[3][0], centres[5][0]):
         arrow(ax, (cx, 35.4), (cx, y + h + 0.6), color=GREY)
 
-    # brake requests from traction control into ABS
+    # brake requests from traction/stability control into ABS
     arrow(ax, (centres[1][0] + 2.5, y + h + 0.5), (centres[4][0], y + h + 0.5), None, ORANGE, rad=-0.25)
-    ax.text(66.0, 31.0, "stability\nbrake requests", ha="left", fontsize=7, color=ORANGE)
+    ax.text(65.0, 30.8, "stab_brake_nm,\nesc/keep_<w>", ha="left", fontsize=7, color=ORANGE)
 
     # body and feedback
     box(ax, 50, 2, 34, 6.5, "JSBSim: tyre forces at the contact patches\nmove the body; struts carry the load", "plant",
         size=7.5)
     arrow(ax, (centres[5][0], y - 0.6), (centres[5][0], 9.1))
     arrow(ax, (49.6, 6.0), (centres[1][0], y - 0.6), None, GREEN, dashed=True)
-    ax.text(25, 2.5, "next frame: wheel slip and speed, peak slip, load, disc\ntemperature, body velocities, "
-            "yaw rate, accelerations", ha="center", fontsize=7, color=GREEN)
+    ax.text(25, 2.5, "previous frame (8.3 ms delay): wheel slip & speed, peak slip, load,\ndisc temperature, "
+            "body velocities (u, v), yaw rate r, lateral accel Ny", ha="center", fontsize=6.8, color=GREEN)
     save(fig, "architecture.svg")
 
 
@@ -146,15 +148,15 @@ def fig_drivetrain():
             ha="center", fontsize=7, color=GREY)
 
     # controllers
-    c1 = box(ax, 65, 34, 20, 9, "Propshaft speed\ncontroller (PI)\nweighted drive slip", "tc", size=7.5)
+    c1 = box(ax, 65, 34, 20, 9, "Propshaft speed\ncontroller (PID-like)\nweighted drive slip", "tc", size=7.5)
     arrow(ax, (65, c1[1]), (cx + 4.5, 38), "torque limit", GREEN, offset=(0, 0.8))
     c2 = box(ax, 65, 20, 20, 8, "Longitudinal lock (PI)\nfront axle vs rear axle", "tc", size=7.5)
     arrow(ax, (65, c2[1] + 1), (discs["fr"][0] + 1.2, discs["fr"][1] - 0.6), None, ORANGE, rad=-0.2)
     arrow(ax, (65, c2[1] - 1), (discs["br"][0] + 1.2, discs["br"][1] + 0.6), None, ORANGE, rad=0.2)
     ax.text(75, 15.5, "both brakes\nof one axle", ha="center", fontsize=7.5, color=ORANGE)
-    c3 = box(ax, 1, 46, 20, 8, "Transversal lock, front\n(PI) fl vs fr", "tc", size=7.5)
+    c3 = box(ax, 1, 46, 20, 8, "Transversal lock, front\n(PI + hysteresis) fl vs fr", "tc", size=7.2)
     arrow(ax, (21, c3[1]), (discs["fl"][0] - 1.2, discs["fl"][1]), "one brake", ORANGE, text_at=0.4, offset=(0, 0.8))
-    c4 = box(ax, 1, 10, 20, 8, "Transversal lock, rear\n(PI) bl vs br", "tc", size=7.5)
+    c4 = box(ax, 1, 10, 20, 8, "Transversal lock, rear\n(PI + hysteresis) bl vs br", "tc", size=7.2)
     arrow(ax, (21, c4[1]), (discs["bl"][0] - 1.2, discs["bl"][1]), "one brake", ORANGE, text_at=0.4, offset=(0, 0.8))
     box(ax, 1, 28, 20, 9, "all brake requests pass\nthe pump (0.15 s) and ABS,\nadded to the driver's", "abs", size=7)
     save(fig, "drivetrain.svg")
@@ -170,30 +172,30 @@ def fig_signal_flow():
     b1 = box(ax, 16, 55, 54, 5.5, "n_w = drive slip / peak drive slip, per wheel"
              "\n(positive while the wheel turns faster than the road in the drive direction)", "tc", size=7.5)
     arrow(ax, (b0[0], 65.4), (b1[0], 61.2))
-    b2 = box(ax, 6, 40, 31, 9, "Transversal lock, per wheel (PI)\nerror = min(n_w - n_partner - deadband,\n"
-             "n_w - target_slip)\nbrake torque <= pump-built torque", "tc", size=7.2)
-    b3 = box(ax, 44, 40, 40, 9, "Residual slip r_w = n_w minus the part\nthe lock is working on (unless the lock is"
-             "\nout or at its limit)", "tc", size=7.2)
+    b2 = box(ax, 6, 40, 31, 9, "Transversal lock, per wheel (PI)\nhysteresis: engage > 0.5, hold at 1.0 -> 0.1\n"
+             "capped by pump & requested wheel torque", "tc", size=7.0)
+    b3 = box(ax, 44, 40, 40, 9, "Residual slip r_w = n_w minus the part\nthe lock is working on (soft saturation:\n"
+             "at brake limit, hands <= wheel_limit + 0.5)", "tc", size=7.0)
     arrow(ax, (b1[0] - 10, 54.4), (b2[0], 49.6))
     arrow(ax, (b1[0] + 10, 54.4), (b3[0], 49.6))
     arrow(ax, (37.5, 44.5), (43.4, 44.5), None, GREY, dashed=True)
     b4 = box(ax, 6, 25, 31, 9, "Longitudinal lock, per axle (PI)\naxle mean of r_w, front vs rear\n"
              "(both wheels of the faster axle)", "tc", size=7.2)
-    b5 = box(ax, 44, 25, 40, 9, "Propshaft slip = share-weighted mean of the\naxles' residual slip; error = max(slip - target,"
-             "\nlargest wheel residual - wheel_limit), capped", "tc", size=7.2)
+    b5 = box(ax, 44, 25, 40, 9, "Propshaft slip + filtered derivative (d_time * dn/dt)\nerror = max(slip + d_time * rate - target,"
+             "\nlargest wheel residual - wheel_limit), capped", "tc", size=7.0)
     arrow(ax, (b3[0] - 8, 39.4), (b4[0] + 6, 34.6))
     arrow(ax, (b3[0], 39.4), (b5[0], 34.6))
-    b6 = box(ax, 44, 11, 40, 8, "Motor PI: integral state = torque limit\n(never above the request; falls fast, rises slowly)"
-             "\n-> Driveline: drive torque = min(request, limit)", "tc", size=7.2)
+    b6 = box(ax, 44, 11, 40, 8, "Motor PID-like: integral state = torque limit\n(never above request; falls fast, rises slowly)"
+             "\n-> Driveline: drive torque = min(request, limit) * esc_factor", "tc", size=7.0)
     arrow(ax, (b5[0], 24.4), (b6[0], 19.6))
-    b7 = box(ax, 1, 11, 36, 8, "Pump: full-pedal torque in 0.15 s, released at once\n-> + driver's request -> ABS"
-             " -> wheel brake", "abs", size=7.2)
+    b7 = box(ax, 1, 11, 36, 8, "Pump: full-pedal torque in 0.15 s, released at once\n-> + driver's request * esc_keep -> ABS"
+             " -> wheel brake", "abs", size=7.0)
     ax.plot([5.4, 2.5, 2.5], [44.5, 44.5, 20.0], color=ORANGE, lw=1.0)
     arrow(ax, (2.5, 20.4), (2.5, 19.6), None, ORANGE)
     arrow(ax, (b4[0], 24.4), (b4[0], 19.6), None, ORANGE)
     box(ax, 1, 1.5, 83, 5, "Locks only with the accelerator pressed and no brake pedal; engage below 40 km/h, cut out "
-        "above 80 km/h;\nfade out between 450 and 550 °C disc temperature. Drag torque control cuts coast regen "
-        "while a driven wheel brake-slips.", "note", size=7)
+        "above 80 km/h;\nfade out between 450 and 550 °C disc temperature. EDTC cuts coast regen above 0.35 of peak "
+        "braking slip.", "note", size=7)
     save(fig, "tc-signal-flow.svg")
 
 
@@ -249,13 +251,13 @@ def fig_tc_functions():
 
 
 # --------------------------------------------------------------------------
-# Figure: baseline sine with dwell (why ESC)
+# Figure: baseline sine with dwell (why ESC) & ESC comparison
 # --------------------------------------------------------------------------
-STEER_A = 0.0189   # rudder giving 0.3 g at 80 km/h (sim.corner), 0.85 deg at the road wheels
+STEER_A = 19.7 / 900.0   # A = 19.7 deg steering wheel giving 0.3 g at 80 km/h (FMVSS 126 S7.6)
 
 
-def sine_with_dwell(amplitude, floor_it_at_beta=None):
-    car = Car("tyre", speed=80 * KMH, settle=1.0)
+def sine_with_dwell(amplitude, floor_it_at_beta=None, params=None):
+    car = Car("tyre", speed=80 * KMH, settle=1.0, params=params)
     fdm = car.fdm
     freq = 0.7
     t_q3 = 0.75 / freq
@@ -275,18 +277,20 @@ def sine_with_dwell(amplitude, floor_it_at_beta=None):
         if floor_it_at_beta is not None and abs(beta) >= floor_it_at_beta:
             on = True
         car.step(throttle=1.0 if on else 0.0, steer=steer)
-        rows.append((t, steer * 45.0, math.degrees(fdm["velocities/r-rad_sec"]), beta))
+        rows.append((t, steer * 45.0, math.degrees(fdm["velocities/r-rad_sec"]), beta,
+                     math.degrees(fdm["esc/ref"]), fdm["tyre/fl/stab_brake_nm"], fdm["tyre/fr/stab_brake_nm"]))
     return rows, t_end
 
 
 def fig_sine_with_dwell():
-    coast, t_end = sine_with_dwell(6.5 * STEER_A)
-    save_run, _ = sine_with_dwell(6.5 * STEER_A, floor_it_at_beta=10.0)
+    coast, t_end = sine_with_dwell(6.5 * STEER_A, params=NO_ESC)
+    save_run, _ = sine_with_dwell(6.5 * STEER_A, floor_it_at_beta=10.0, params=NO_ESC)
     fig, axes = plt.subplots(3, 1, figsize=(7.5, 5.6), sharex=True)
     axes[0].plot([r[0] for r in coast], [r[1] for r in coast], color=INK)
     axes[0].set_ylabel("road wheel angle (deg)")
-    axes[0].set_title("Sine with dwell, 6.5A (111 deg at the steering wheel), 80 km/h, no ESC", fontsize=9)
-    for rows, label, color in ((coast, "coasting", RED), (save_run, "flooring it at 10 deg sideslip (50:50)", GREEN)):
+    axes[0].set_title("Sine with dwell, 6.5A (128 deg at the steering wheel), 80 km/h, no ESC", fontsize=9)
+    for rows, label, color in ((coast, "coasting (no ESC)", RED),
+                               (save_run, "flooring it at 10 deg sideslip (50:50, no ESC)", GREEN)):
         axes[1].plot([r[0] for r in rows], [r[2] for r in rows], color=color, label=label)
         axes[2].plot([r[0] for r in rows], [r[3] for r in rows], color=color, label=label)
     axes[1].set_ylabel("yaw rate (deg/s)")
@@ -300,6 +304,40 @@ def fig_sine_with_dwell():
         axes[1].text(t_end + dt + 0.03, axes[1].get_ylim()[1] * 0.9, label, fontsize=7, color=GREY)
     fig.tight_layout()
     save(fig, "sine-with-dwell-baseline.svg")
+
+
+def fig_esc_sine_with_dwell():
+    off, t_end = sine_with_dwell(6.5 * STEER_A, params=NO_ESC)
+    on, _ = sine_with_dwell(6.5 * STEER_A)
+    fig, axes = plt.subplots(4, 1, figsize=(7.5, 7.2), sharex=True)
+    axes[0].plot([r[0] for r in on], [r[1] for r in on], color=INK)
+    axes[0].set_ylabel("road wheel (deg)")
+    axes[0].set_title("FMVSS 126 sine with dwell at 6.5A (128 deg steering wheel), 80 km/h: ESC ON vs OFF", fontsize=9)
+
+    axes[1].plot([r[0] for r in off], [r[2] for r in off], color=RED, ls="--", lw=1.0, label="without ESC")
+    axes[1].plot([r[0] for r in on], [r[4] for r in on], color=GREY, ls=":", lw=1.0, label="reference yaw rate")
+    axes[1].plot([r[0] for r in on], [r[2] for r in on], color=GREEN, lw=1.2, label="with ESC")
+    axes[1].set_ylabel("yaw rate (deg/s)")
+    axes[1].legend(loc="upper right", fontsize=7.2, ncol=3)
+
+    axes[2].plot([r[0] for r in off], [r[3] for r in off], color=RED, ls="--", lw=1.0, label="without ESC")
+    axes[2].plot([r[0] for r in on], [r[3] for r in on], color=GREEN, lw=1.2, label="with ESC")
+    axes[2].set_ylabel("sideslip (deg)")
+    axes[2].legend(loc="upper left", fontsize=7.5)
+
+    axes[3].plot([r[0] for r in on], [r[5] for r in on], color=BLUE, lw=1.1, label="front left brake (N m)")
+    axes[3].plot([r[0] for r in on], [r[6] for r in on], color=PURPLE, lw=1.1, label="front right brake (N m)")
+    axes[3].set_ylabel("ESC brake (N m)")
+    axes[3].set_xlabel("time (s)")
+    axes[3].legend(loc="upper right", fontsize=7.5, ncol=2)
+
+    for ax in axes[1:]:
+        for dt in (0.0, 1.0, 1.75):
+            ax.axvline(t_end + dt, color=GREY, lw=0.8, ls=":")
+    for dt, label in ((0.0, "steering ends"), (1.0, "+1.0 s (<=35%)"), (1.75, "+1.75 s (<=20%)")):
+        axes[1].text(t_end + dt + 0.03, axes[1].get_ylim()[1] * 0.85, label, fontsize=6.8, color=GREY)
+    fig.tight_layout()
+    save(fig, "esc-sine-with-dwell.svg")
 
 
 # --------------------------------------------------------------------------
@@ -388,7 +426,8 @@ def fig_modes():
 
 
 FIGURES = {"architecture": fig_architecture, "drivetrain": fig_drivetrain, "signal-flow": fig_signal_flow,
-           "functions": fig_tc_functions, "sine-with-dwell": fig_sine_with_dwell, "low-grip": fig_low_grip_launch,
+           "functions": fig_tc_functions, "sine-with-dwell": fig_sine_with_dwell,
+           "esc-sine-with-dwell": fig_esc_sine_with_dwell, "low-grip": fig_low_grip_launch,
            "split-grip": fig_split_launch, "modes": fig_modes}
 
 
