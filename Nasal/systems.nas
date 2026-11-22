@@ -85,6 +85,7 @@ var indicatorController = IndicatorController.new();
 # Brakes
 io.include("systems/brakes.nas");
 var brakeController = BrakeController.new();
+var emergencyStopSignal = EmergencyStopSignal.new(indicatorController);
 
 # All cockpit parking brake picks use this entry point.
 var toggleHandBrake = func {

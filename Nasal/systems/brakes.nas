@@ -94,9 +94,7 @@ var BrakeController = {
 	applyFeetBrakes: func(value) {
 		me.leftBrakeNode.setValue(value);
 		me.rightBrakeNode.setValue(value);
-        # Double blink when applying full brakes, should look for a better solution
-        if(value == 1) settimer(func{if(me.applyingFeetBrake) safety.emergencyMode();}, 0.6);
-    },
+	},
 
     manualHandBrakePull: func(){
         me._manualHandBrakeIsPulled = 1;
@@ -136,7 +134,6 @@ var BrakeController = {
     },
     keyboardBrakeRelease: func(){
         me.applyFeetBrakes(0);
-        if(vInfo.getSpeedKMH() > 10 and safety.emergencyModeState) safety.disableEmergencyMode();
     },
 	releaseAebBrakes: func() {
 		me.setAebBrakes(0);
@@ -156,6 +153,69 @@ var BrakeController = {
     manualHandBrakeIsPulled: func(){
         return me._manualHandBrakeIsPulled;
     },
+};
+
+# Emergency stop signal, after UN Regulation 48: braking hard above 50 km/h,
+# with ABS working or decelerating at more than 6 m/s^2, switches the hazard
+# lights on. Letting go of the brake before stopping switches them off again;
+# after a stop they stay on until the car drives off. The driver's hazard
+# button overrides it either way. Only the tyre model's FDM has ABS; with the
+# standard one the deceleration alone triggers it.
+var EmergencyStopSignal = {
+	new: func(indicators) {
+		var m = {parents: [EmergencyStopSignal], indicators: indicators};
+		m.timer = maketimer(0.05, func m.update());
+		m.timer.simulatedTime = 1;
+		m.timer.start();
+		return m;
+	},
+	activationKmh: 50,
+	decelerationMps2: 6,
+	stoppedKmh: 1,
+	resumeKmh: 10,
+	active: 0,      # the hazard lights are on because of an emergency stop
+	stopped: 0,     # and that stop has brought the car to rest
+	overridden: 0,  # the driver switched them off; leave them until this braking ends
+	pedal: props.getNode("/systems/BrakeController/pedal-position-norm", 1),
+
+	update: func {
+		var kmh = vInfo.getSpeedKMH();
+		var braking = me.pedal.getValue() > 0;
+		if (!braking) me.overridden = 0;
+		if (!me.active) {
+			var decel = -(getprop("/fdm/jsbsim/accelerations/udot-ft_sec2") or 0) * 0.3048;
+			var absActive = getprop("/fdm/jsbsim/abs/active") or 0;
+			if (braking and !me.overridden and kmh > me.activationKmh
+					and (absActive > 0.5 or decel > me.decelerationMps2))
+				me.switchOn();
+			return;
+		}
+		if (!me.indicators.falseLight) {
+			me.reset();             # the driver switched the hazard lights off
+			me.overridden = braking;
+		} elsif (me.stopped) {
+			if (kmh > me.resumeKmh) me.switchOff();
+		} elsif (kmh < me.stoppedKmh) {
+			me.stopped = 1;
+		} elsif (!braking) {
+			me.switchOff();
+		}
+	},
+	switchOn: func {
+		# Hazard lights already on (the driver's button, an airbag, AEB) are not ours to switch off.
+		if (me.indicators.falseLight) return;
+		me.indicators.falseLightOn(1);
+		me.active = 1;
+		me.stopped = 0;
+	},
+	switchOff: func {
+		me.indicators.falseLightOff(1);
+		me.reset();
+	},
+	reset: func {
+		me.active = 0;
+		me.stopped = 0;
+	},
 };
 
 var brakesABS = func(){

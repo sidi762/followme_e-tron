@@ -193,8 +193,9 @@ var IndicatorController = {
         }
     },
 
-    falseLightOn: func(){
-        if(isInternalView()) playAudio("electric_handbrake.wav");
+    # quiet: switched by a system rather than the driver's button, so no click
+    falseLightOn: func(quiet=0){
+        if(!quiet and isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 1;
         #//origin: 1,2,4,5
         if(me.mode == me.IND_MODES.RIGHT_WITHOUT_LED or
@@ -208,8 +209,8 @@ var IndicatorController = {
         }
 
     },
-    falseLightOff: func(){
-        if(isInternalView()) playAudio("electric_handbrake.wav");
+    falseLightOff: func(quiet=0){
+        if(!quiet and isInternalView()) playAudio("electric_handbrake.wav");
         me.falseLight = 0;
         #//origin: 1,2,4,5
         if(me.mode == me.IND_MODES.RIGHT_WITHOUT_LED or

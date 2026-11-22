@@ -318,6 +318,25 @@ FlightGear resets the FDM's properties when it repositions the car, so the engin
 state on every update, and anything tuned by hand in the property browser is back at its default
 after a reposition.
 
+## Hazard lights and sounds
+
+An emergency stop switches the hazard lights on, after UN Regulation 48's emergency stop signal:
+braking above 50 km/h with ABS working, or at more than 6 m/s². They go off again if the driver
+lets go of the brake before the car stops; after a stop they stay on until the car drives off
+above 10 km/h. Pressing the hazard button switches them off for the rest of that stop, and hazard
+lights the driver or another system switched on are left alone. It is `EmergencyStopSignal` in
+`Nasal/systems/brakes.nas` and serves both FDMs: the standard one has no ABS, so there only the
+deceleration counts. It replaces the old double blink after 0.6 s at full pedal.
+
+`Sounds/followme-sound.xml` has two sets of sounds for this model, silent with the standard FDM:
+
+- Each tyre squeals (`tires-screech-asphalt.wav`) from its `tyre/<wheel>/squeal`, so only past the
+  grip peak: wheelspin, a locked wheel, a slide, or briefly while ABS catches a wheel. Unlike the
+  standard model's drifting sound it does not depend on the "drifting sound" option.
+- While ABS works, the hydraulic unit buzzes in the cabin (`Sounds/abs.wav`). No recording was at
+  hand, so `dev/sounds/make_abs_sound.py` synthesises it from the pump motor, its pistons, the
+  valves and the pedal thump; replace the file with a recording to do better.
+
 ## Tests
 
 ```bash
@@ -345,8 +364,9 @@ dev/tyre-model/fg/run.sh followme_e-tron-tyre reposition.nas    # reposition whi
 
 It prints what the car did and fails on a Nasal error. It has been run on FlightGear 2020.3.18
 (Ubuntu 24.04 package) only. The occupant weights, the driver weight buttons and each braking
-intent (S key, handbrake lever, parking brake at rest and moving, Auto Hold) and ABS on a full
-stop from 98 km/h (37.5 m, no wheel locked) have also been
+intent (S key, handbrake lever, parking brake at rest and moving, Auto Hold), ABS on a full
+stop from 98 km/h (37.5 m, no wheel locked) and the emergency stop hazard lights (also with the
+standard FDM) have also been
 checked in FlightGear 2024.1.8 on macOS, including after a reposition. Nobody has driven the tyre
 model by hand yet.
 
@@ -370,12 +390,10 @@ model by hand yet.
 
 Not done yet:
 
-- Tyre squeal: the sounds still listen to JSBSim's `side_friction_coeff`, which is now zero while
-  moving. `tyre/<wheel>/squeal` is there for them.
 - "Magic bush tyres" (`reduceRollingFriction`) has no effect; the equivalent is
   `tyre/par/rolling_resistance`.
 - No traction control or stability control. They are planned inside the FDM, acting on the motor
   torque and on each wheel's brake request. `brakesABS` in `Nasal/systems/brakes.nas` is not used.
 - Outside ABS the hydraulic brakes apply the request at once; there is no pressure build-up time.
-- ABS has no warning lamp, sound or pedal feel yet.
+- ABS has no warning lamp or pedal feel, and its sound is synthesised.
 - The limo keeps the standard model.
