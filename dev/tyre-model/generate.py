@@ -211,10 +211,14 @@ TC_PARAMS = [
     ("wheel_limit", 1.4, "no driven wheel the locks leave alone may slip more than this share of its peak"
                          " (the tyre starts sliding at 1.5)"),
     ("p_gain", 0.3, "motor limit, proportional part: share of the motor's maximum torque per unit slip error"),
+    ("d_time", 0.025, "motor limit, derivative look-ahead time on the measured propshaft slip, in seconds"),
+    ("d_filter_s", 0.025, "low-pass filter time constant for the propshaft slip rate, in seconds"),
     ("cut_rate", 10.0, "motor limit falls by this share of the maximum torque per second per unit slip error"),
     ("restore_rate", 5.0, "and rises by this share per second per unit of slip below the reference"),
     ("error_limit", 2.0, "the motor limit acts on at most this much slip error, so one flaring wheel cannot cut it all"),
-    ("lock_deadband", 0.5, "differential locks leave slip differences up to this share of the peak slip alone"),
+    ("lock_deadband", 0.5, "differential locks engage once the slip difference passes this share of the peak"),
+    ("lock_release", 0.1, "an engaged differential lock holds on down to this slip difference"),
+    ("lock_target", 1.0, "an engaged differential lock brings the wheel back towards this share of its peak slip"),
     ("lock_p_gain", 0.2, "lock brake, proportional part: share of the wheel's maximum drive torque per unit slip error"),
     ("lock_rate", 8.0, "lock brake rises by this share of the wheel's maximum drive torque per second per unit error"),
     ("lock_engage_kmh", 40.0, "differential locks engage below this speed (Audi A4 workshop manual; ika: 38 km/h)"),
@@ -222,7 +226,7 @@ TC_PARAMS = [
     ("pump_time_s", 0.15, "the pump builds a wheel's full-pedal brake torque in this time (Audi e-tron; ika 0.05-0.15 s)"),
     ("temp_fade_c", 450.0, "the locks start to fade out at this brake disc temperature (estimate)"),
     ("temp_off_c", 550.0, "and are out at this one"),
-    ("drag_slip", 1.0, "drag torque control cuts coast regen above this braking slip, as a share of the peak"),
+    ("drag_slip", 0.35, "drag torque control cuts coast regen above this braking slip, as a share of the peak"),
     ("drag_cut_rate", 20.0, "coast regen falls by this share per second while a driven wheel slips"),
     ("drag_restore_rate", 2.0, "and recovers by this share per second"),
 ]
@@ -247,23 +251,28 @@ TC_WHEEL_SIGNAL_EQS = [
     # the brake temperature model fades the locks out between these temperatures
     ("tc_temp_factor", "max(0.0, min(1.0, (tc_temp_off_c - disc_temp_c) / (tc_temp_off_c - tc_temp_fade_c)))"),
     ("tc_wheel_torque_nm", "max_torque_nm * gear * {axle_share} / 2.0"),
+    ("tc_request_wheel_nm", "abs(request_torque_nm) * gear * {axle_share} / 2.0"),
 ]
 
 # Every wheel: transversal differential lock, braking the wheel that slips more
 # than its axle partner, PI with the integral state as the brake torque.
 TC_WHEEL_LOCK_EQS = [
-    ("tc_lock_err", "min(tc_slip - partner_tc_slip - tc_lock_deadband, tc_slip - tc_target_slip)"),
+    ("tc_lock_err", "min(tc_slip - tc_lock_target, tc_slip - partner_tc_slip"
+                    " - ifthen(lt(0.0, tc_lock_state_nm), tc_lock_release, tc_lock_deadband))"),
     # engages below lock_engage_kmh; once braking, holds on up to lock_cutout_kmh
     ("tc_lock_on", "lock_allowed * {driven} * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0,"
                    " lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, tc_lock_state_nm))"),
     # never ahead of what the pump can have built by the next frame (no wind-up)
     ("tc_lock_state_nm", "tc_lock_on * max(0.0, min({brake_par}, stab_brake_nm + dt * {brake_par} / tc_pump_time_s,"
                          " tc_lock_state_nm + dt * tc_lock_rate * tc_lock_err * tc_wheel_torque_nm))"),
-    ("tc_lock_nm", "tc_lock_on * tc_temp_factor * max(0.0, min({brake_par},"
+    # never harder than the torque the driver's pedal asks for at this wheel
+    ("tc_lock_nm", "tc_lock_on * tc_temp_factor * max(0.0, min({brake_par}, tc_request_wheel_nm,"
                    " tc_lock_state_nm + tc_lock_p_gain * tc_lock_err * tc_wheel_torque_nm))"),
     # what the motor controller sees: the slip this wheel's lock leaves, unless
-    # the lock is out (fast, hot) or already at its limit
-    ("tc_resid", "tc_slip - tc_lock_on * tc_temp_factor * lt(tc_lock_state_nm, 0.98 * {brake_par}) * max(0.0, tc_lock_err)"),
+    # the lock is out (fast, hot) or at its brake limit, where it hands over at
+    # most 0.5 above the single-wheel limit
+    ("tc_resid", "ifthen(tc_lock_on * lt(0.98 * {brake_par}, tc_lock_nm), min(tc_slip, tc_wheel_limit + 0.5),"
+                 " tc_slip - tc_lock_on * tc_temp_factor * max(0.0, tc_lock_err))"),
 ]
 
 # Global; values under tc/.
@@ -277,16 +286,19 @@ TC_AXLE_EQS = [
 TC_LONGITUDINAL_EQS = [
     ("{lock}_temp", "min(tc_temp_factor_{w1}, tc_temp_factor_{w2})"),
     ("{lock}_wheel_torque_nm", "max_torque_nm * gear * {axle_share} / 2.0"),
+    ("{lock}_request_wheel_nm", "abs(request_torque_nm) * gear * {axle_share} / 2.0"),
     # longitudinal differential lock: brakes both wheels of the axle that slips more
-    ("{lock}_err", "min(axle_{axle} - axle_{other} - tc_lock_deadband, axle_{axle} - tc_target_slip)"),
+    ("{lock}_err", "min(axle_{axle} - tc_lock_target, axle_{axle} - axle_{other}"
+                   " - ifthen(lt(0.0, {lock}_state_nm), tc_lock_release, tc_lock_deadband))"),
     ("{lock}_on", "lock_allowed * awd * ifthen(lt(speed_kmh, tc_lock_engage_kmh), 1.0,"
                   " lt(speed_kmh, tc_lock_cutout_kmh) * lt(0.0, {lock}_state_nm))"),
     ("{lock}_state_nm", "{lock}_on * max(0.0, min({brake_par},"
                         " min(stab_brake_nm_{w1}, stab_brake_nm_{w2}) + dt * {brake_par} / tc_pump_time_s,"
                         " {lock}_state_nm + dt * tc_lock_rate * {lock}_err * {lock}_wheel_torque_nm))"),
-    ("{lock}_nm", "{lock}_on * {lock}_temp * max(0.0, min({brake_par},"
+    ("{lock}_nm", "{lock}_on * {lock}_temp * max(0.0, min({brake_par}, {lock}_request_wheel_nm,"
                   " {lock}_state_nm + tc_lock_p_gain * {lock}_err * {lock}_wheel_torque_nm))"),
-    ("prop_{axle}", "axle_{axle} - {lock}_on * {lock}_temp * lt({lock}_state_nm, 0.98 * {brake_par}) * max(0.0, {lock}_err)"),
+    ("prop_{axle}", "ifthen({lock}_on * lt(0.98 * {brake_par}, {lock}_nm), min(axle_{axle}, tc_wheel_limit + 0.5),"
+                    " axle_{axle} - {lock}_on * {lock}_temp * max(0.0, {lock}_err))"),
 ]
 
 # Global; values under tc/.
@@ -294,6 +306,10 @@ TC_MOTOR_EQS = [
     # Propshaft speed controller: the torque-weighted slip of the driven wheels
     # against a reference that leaves room for the lateral force in a bend.
     ("slip", "front_torque_share * prop_front + (1.0 - front_torque_share) * prop_rear"),
+    ("raw_slip", "front_torque_share * (tc_slip_fl + tc_slip_fr) / 2.0"
+                 " + (1.0 - front_torque_share) * (tc_slip_bl + tc_slip_br) / 2.0"),
+    ("slip_rate", "(raw_slip - raw_slip_last + tc_d_filter_s * slip_rate) / (tc_d_filter_s + dt)"),
+    ("raw_slip_last", "raw_slip"),
     ("mu_lateral", "(mu_y_fl + mu_y_fr + mu_y_bl + mu_y_br) / 4.0"),
     ("lateral_use", "min(1.0, abs(ny) / max(mu_lateral, 0.05))"),
     ("target", "tc_target_slip * max(tc_corner_min, sqrt(max(0.0, 1.0 - lateral_use * lateral_use)))"),
@@ -301,7 +317,7 @@ TC_MOTOR_EQS = [
     # locks' speed range nothing else would stop it (ika: a wider band for the
     # faster wheel than for the slower one).
     ("wheel_max", "max(front_driven * max(tc_resid_fl, tc_resid_fr), rear_driven * max(tc_resid_bl, tc_resid_br))"),
-    ("error", "min(tc_error_limit, max(slip - target, wheel_max - tc_wheel_limit))"),
+    ("error", "min(tc_error_limit, max(slip + tc_d_time * slip_rate - target, wheel_max - tc_wheel_limit))"),
     ("request_nm", "abs(request_torque_nm)"),
     # Engaged when the slip passes the reference while torque is asked for;
     # it stays engaged while the limit is below the request.
@@ -421,7 +437,7 @@ ESC_EQS = [
 # Every wheel: the stability brake request, built up by the pump and released
 # at once. ABS limits it like the driver's request.
 TC_WHEEL_BRAKE_EQS = [
-    ("stab_target_nm", "min({brake_par}, tc_lock_nm + {axle_lock} + {esc_brake})"),
+    ("stab_target_nm", "min({brake_par}, min(tc_request_wheel_nm, tc_lock_nm + {axle_lock}) + {esc_brake})"),
     ("stab_brake_nm", "min(stab_target_nm, stab_brake_nm + dt * {brake_par} / tc_pump_time_s)"),
 ]
 
@@ -874,7 +890,7 @@ def build_system(stock_text):
         for name, value in (("brake_peak_slip", 0.1), ("drive_peak_slip", 0.1), ("mu_y", 1.0), ("disc_temp_c", ambient)):
             out.append('%s<property value="%r">tyre/%s/%s</property>\n' % (INDENT, value, w.name, name))
     for name, value in (("abs/active", 0.0), ("driveline/request_torque_nm", 0.0), ("tc/engaged", 0.0),
-                        ("tc/cap_nm", 0.0), ("tc/drag_factor", 1.0),
+                        ("tc/cap_nm", 0.0), ("tc/raw_slip_last", 0.0), ("tc/slip_rate", 0.0), ("tc/drag_factor", 1.0),
                         ("tc/lock_front_state_nm", 0.0), ("tc/lock_rear_state_nm", 0.0), ("esc/ref", 0.0), ("esc/ref_us", 0.0),
                         ("esc/damping", 1.0), ("esc/beta_was_active", 0.0), ("esc/hold_s", 0.0),
                         ("esc/torque_factor", 1.0)):

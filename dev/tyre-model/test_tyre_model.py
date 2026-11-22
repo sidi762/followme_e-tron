@@ -513,6 +513,8 @@ def test_differential_locks_brake_the_spinning_wheels_on_split_grip():
     assert late_slip(off, ("fr", "br")) > 50.0
     assert on[-1]["t"] < 0.4 * off[-1]["t"]
     assert late_slip(on, ("fr", "br")) < 1.6
+    assert max(r["stab_brake_nm_fr"] for r in on) <= 1120.0
+    assert min(r["drive_nm"] for r in on if 0.05 < r["t"] < 1.5) > 50.0
     middle = on[len(on) // 2]
     assert middle["stab_brake_nm_fr"] > 100.0 and middle["stab_brake_nm_br"] > 100.0
     assert middle["stab_brake_nm_fl"] == 0.0 and middle["stab_brake_nm_bl"] == 0.0
@@ -570,7 +572,7 @@ def test_drag_torque_control_keeps_coast_regen_from_locking_the_driven_wheels():
         return worst
 
     assert worst_braking_slip(NO_TC) > 3.0
-    assert worst_braking_slip({}) < 1.3
+    assert worst_braking_slip({}) < 0.7
 
 
 def test_traction_control_works_in_reverse():

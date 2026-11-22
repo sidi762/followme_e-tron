@@ -194,8 +194,10 @@ they leave goes to the motor controller.*
   yaw rate and steering as inputs to the reference slip; S4's thresholds are about a third lower
   when cornering. The friction ellipse expresses the same: drive slip that leaves room for the
   lateral force. ESC adds an offset in step 3.
-- Controller: PI acting on the motor torque limit (S1 calls it PID-like; the derivative is left out
-  because slip at 120 Hz is noisy).
+- Controller: PID-like controller acting on the motor torque limit (S1 calls it PID-like; the
+  derivative acts on the measured propshaft slip rate through a first-order low-pass filter
+  `d_filter_s` of 0.025 s with look-ahead `d_time` of 0.025 s, where `dt` cancels between the
+  difference and the filter weight so that 60 to 240 Hz give the same response).
     - The integral state is the torque limit itself. It is never above the driver's request, so it
     does not wind up, and it starts from the current torque when it first acts.
     - It falls fast (`cut_rate`) when the slip is above the reference and rises more slowly
@@ -214,14 +216,17 @@ brake disc temperature (6.5).*
 
 ### 6.2 Transversal differential lock controllers (brakes, one per axle)
 
-- Controlled variable: `n_left - n_right` beyond a deadband (`lock_deadband`, 0.5 of the peak),
-  and only the part above `target_slip`: error `min(n_w - n_partner - deadband, n_w - target_slip)`.
+- Controlled variable: `n_left - n_right` with hysteresis — engages beyond `lock_deadband` (0.5 of
+  the peak), then holds the wheel near its peak (`lock_target`, 1.0) down to `lock_release` (0.1):
+  error `min(n_w - lock_target, n_w - n_partner - (lock_release if engaged else lock_deadband))`.
 - The wheel that slips more is braked; each wheel has its own integral state, so the brake moves
   to the other side on its own when the difference changes sign. PI (S1: PI with nonlinear parts),
   in units of the wheel's largest drive torque.
-- The integral state may not run ahead of what the pump can have built by the next frame. Without
-  that limit it reached its maximum within three frames while the pump had built a third of it.
-  The motor controller then took the lock for saturated and cut the motor to nothing.
+- The integral state may not run ahead of what the pump can have built by the next frame, and the
+  lock output never exceeds the drive torque the driver's pedal requests at that wheel (up to
+  1119 N·m at full pedal). When a lock reaches its full-pedal brake limit (836 N·m on a rear
+  wheel), it hands the motor controller at most 0.5 of slip beyond `wheel_limit` so that the motor
+  does not cut torque to zero.
 - Braking a spinning wheel lets the open differential put the same torque, plus the brake torque,
   on the other wheel (S1, S2). In this model each wheel already gets its fixed share; the lock keeps
   the spinning wheel near its peak slip so that the motor does not reach its speed limit and the
@@ -361,15 +366,15 @@ run with TC and ESC off, as the ABS-off tests do now.
 | Test | Pass | Result (120 Hz) |
 |---|---|---|
 | Dry launch, 50:50 | no slower than without TC; no wheel past 1.5 times its peak slip after 0.5 s | 0-100 km/h 3.53 s (3.64 s without), slip at most 1.45 (6.7) |
-| Grip x0.3 launch | much faster than without TC, within 15 % of the friction limit | 9.07 s (11.9 s without, 8.6 s limit), slip at most 1.48 (150) |
-| Split grip, right wheels on ice, driver holding the heading | under 0.4 of the time without TC; ice wheels near their peak; only they are braked | 0-60 km/h 4.05 s (16.7 s), slip at most 1.4, heading within 2.2° |
-| Grip x0.3, 30:70 and rear drive | no spin | 30:70: 0-60 km/h 5.3 s, heading within 2.2° (spins round without TC); rear drive 11.2 s, within 11° |
+| Grip x0.3 launch | much faster than without TC, within 15 % of the friction limit | 9.05 s (11.9 s without, 8.6 s limit), slip at most 1.43 (150) |
+| Split grip, right wheels on ice, driver holding the heading | under 0.4 of the time without TC; ice wheels near their peak; only they are braked | 0-60 km/h 3.95 s (16.7 s), slip at most 1.4, heading within 2.2° |
+| Grip x0.3, 30:70 and rear drive | no spin | 30:70: 0-60 km/h 5.3 s, heading within 2.5° (spins round without TC); rear drive 11.2 s, within 11° |
 | Full throttle in a 40 km/h bend, rear drive | sideslip under 10° | 4.6° (over 45° without TC) |
 | Reverse on grip x0.3 | faster than without TC, slip below 1.5 | 0-20 km/h 1.76 s (2.32 s) |
 | Moderate throttle on dry, steady bend | TC never acts | never |
 | Locks | not above 40 km/h, off above 80 km/h, off at once with the brake pedal, out with 600 °C discs | as required |
-| EDTC | 300 N·m coast regen on grip x0.1 does not lock the driven wheels | braking slip at most 1.09 of the peak (7.4 without) |
-| FDM rate 60 and 240 Hz | same results within 8 % | within 3.5 % |
+| EDTC | 300 N·m coast regen on grip x0.1 does not lock the driven wheels | braking slip at most 0.56 of the peak (7.4 without) |
+| FDM rate 60 and 240 Hz | same results within 8 % | within 3.0 % |
 
 ![Launch on low grip](figures/launch-low-grip.svg)
 
@@ -444,16 +449,17 @@ properties and sit with the other brake parameters under `driveline/par/`. Value
 | `tc/par/corner_min` | 0.4 | smallest share of the target left at full lateral use | S4 (cornering thresholds about a third lower) |
 | `tc/par/wheel_limit` | 1.4 | no driven wheel the locks leave alone may pass this share of its peak | tyre model: sliding starts at 1.5; S4 |
 | `tc/par/p_gain` | 0.3 | proportional part, share of the motor's maximum torque per unit slip error | tuned |
+| `tc/par/d_time`, `d_filter_s` | 0.025, 0.025 | derivative look-ahead time and low-pass filter time constant on measured propshaft slip rate (s) | tuned; S1 (PID-like) |
 | `tc/par/cut_rate` | 10 | integral rate while slipping too much, per second per unit error | tuned; S4 (reduce) |
 | `tc/par/restore_rate` | 5 | integral rate while slipping too little (8 lets a wheel on ice pass 1.5) | tuned; S4 (increase) |
 | `tc/par/error_limit` | 2 | the motor controller acts on at most this error | tuned |
-| `tc/par/lock_deadband` | 0.5 | slip difference (share of peak) the locks leave alone | tuned; S4 (select-high thresholds) |
+| `tc/par/lock_deadband`, `lock_release`, `lock_target` | 0.5, 0.1, 1.0 | lock engagement deadband, release difference and active target slip (shares of peak) | tuned; S4 |
 | `tc/par/lock_p_gain`, `lock_rate` | 0.2, 8 | lock PI gains, in units of the wheel's largest drive torque | tuned; S1 (PI) |
 | `tc/par/lock_engage_kmh` | 40 | locks engage below this | S6, S4 (38 km/h) |
 | `tc/par/lock_cutout_kmh` | 80 | engaged locks cut out above this | S6, S3 |
 | `tc/par/pump_time_s` | 0.15 | time for the pump to build a wheel's full-pedal brake torque | S7, S4 |
 | `tc/par/temp_fade_c`, `temp_off_c` | 450, 550 | locks fade out between these disc temperatures | estimate (S2, S6 give no values) |
-| `tc/par/drag_slip` | 1.0 | braking slip (share of peak) at which EDTC cuts coast regen | |
+| `tc/par/drag_slip` | 0.35 | braking slip (share of peak) at which EDTC cuts coast regen | tuned (preserves lateral grip) |
 | `tc/par/drag_cut_rate`, `drag_restore_rate` | 20, 2 | per second | |
 | `driveline/par/disc_kg_front`, `disc_kg_rear` | 9, 7 | disc mass | estimate |
 | `driveline/par/disc_heat_j_kgk` | 460 | heat capacity of grey cast iron | |

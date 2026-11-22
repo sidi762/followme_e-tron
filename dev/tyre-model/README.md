@@ -208,21 +208,24 @@ describes for a car with one engine, an open centre differential and two open ax
 which is this car's layout. It runs in the `Traction and stability control` channel, before the
 driveline, one frame behind the wheels like ABS. Each controller regulates one thing:
 
-- **Motor torque**, a PI controller on the torque-weighted drive slip of the driven wheels (each
-  wheel's drive slip over its tyre's peak drive slip at its load). It aims at `target_slip` (0.85)
-  of the peak, less in a bend so that the tyres keep lateral grip, and no wheel the brakes leave
-  alone may pass `wheel_limit` (1.4; the tyre starts sliding at 1.5). Its integral state is the torque
-  limit itself, so it starts from the torque being driven and does not wind up. An electric motor
-  follows within milliseconds, so the limit acts in the same frame.
+- **Motor torque**, a PID-like controller on the torque-weighted drive slip of the driven wheels
+  (each wheel's drive slip over its tyre's peak drive slip at its load), with a low-pass filtered
+  derivative term on the measured propshaft slip rate. It aims at `target_slip` (0.85) of the peak,
+  less in a bend so that the tyres keep lateral grip, and no wheel the brakes leave alone may pass
+  `wheel_limit` (1.4; the tyre starts sliding at 1.5). Its integral state is the torque limit itself,
+  so it starts from the torque being driven and does not wind up. An electric motor follows within
+  milliseconds, so the limit acts in the same frame.
 - **Differential locks**, on the brakes. A wheel that slips more than its axle partner is braked
   (transversal lock), and so are both wheels of an axle that slips more than the other axle
-  (longitudinal lock). The open differentials then pass the torque to the wheels with grip. The
-  locks engage below 40 km/h and cut out above 80 km/h, let go when the driver touches the brake
-  pedal, and fade out between 450 and 550 °C of brake disc temperature, which the model now
-  computes for each disc. A lock brakes at most with the full-pedal torque; past that the motor takes
-  over.
-- **Drag torque control**: when coast regen makes a driven wheel slip past its peak, it is scaled
-  down, quickly, and comes back slowly.
+  (longitudinal lock). Once the slip difference passes `lock_deadband` (0.5), the lock brings the
+  faster wheel back towards its peak (`lock_target`, 1.0) and holds on down to `lock_release` (0.1).
+  The open differentials then pass the torque to the wheels with grip. The locks engage below
+  40 km/h and cut out above 80 km/h, let go when the driver touches the brake pedal, and fade out
+  between 450 and 550 °C of brake disc temperature, which the model now computes for each disc. A
+  lock never brakes harder than the drive torque the driver's pedal asks for at that wheel, nor
+  harder than the full-pedal brake torque; past the brake limit the motor takes over smoothly.
+- **Drag torque control**: when coast regen makes a driven wheel brake-slip past `drag_slip` (0.35)
+  of its peak, it is scaled down quickly and comes back slowly, keeping lateral grip available.
 
 The brakes do the part where wheels slip differently, the motor the part they share. A lock's
 request (`stab_brake_nm`) is added to the driver's in front of ABS, built up by the hydraulic pump
@@ -233,9 +236,9 @@ back.
 | Full throttle | Without TC | With TC |
 |---|---|---|
 | 0-100 km/h, dry | 3.64 s, front right wheel to 6.7 times its peak slip | 3.53 s, at most 1.45 |
-| 0-100 km/h, grip x0.3 | 11.9 s, every wheel spinning near the motor speed limit | 9.07 s (grip alone allows 8.6 s), at most 1.48 |
-| 0-60 km/h, grip x0.3, 30:70 | spins round | 5.3 s, heading within 2.2° |
-| 0-60 km/h, right wheels on ice | 16.7 s: the spinning wheels drive the motor to its speed limit | 4.05 s, wheels on ice at most 1.4 |
+| 0-100 km/h, grip x0.3 | 11.9 s, every wheel spinning near the motor speed limit | 9.05 s (grip alone allows 8.6 s), at most 1.43 |
+| 0-60 km/h, grip x0.3, 30:70 | spins round | 5.3 s, heading within 2.5° |
+| 0-60 km/h, right wheels on ice | 16.7 s: the spinning wheels drive the motor to its speed limit | 3.95 s, wheels on ice at most 1.4 |
 | Full throttle in a 40 km/h bend, rear drive | spins (sideslip over 45°) | sideslip under 5° |
 
 On split grip the drive force on the asphalt side pulls the car towards the ice side: without stability
