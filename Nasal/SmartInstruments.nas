@@ -101,6 +101,7 @@ var SmartInstruments = {
         m.highbeamSign = m.signGroup.getElementById("highbeam_sign");
         m.foglightSign = m.signGroup.getElementById("foglight_sign");
         m.escOffSign = m.signGroup.getElementById("escoff_sign");
+        m.escSign = m.signGroup.getElementById("esc_sign");
         m.readySign = m.signGroup.getElementById("ready_sign");
         m.autopilotSign = m.signGroup.getElementById("zidongshengtian_sign");
         m.cruiseSign = m.signGroup.getElementById("cruise_sign");
@@ -358,10 +359,31 @@ var SmartInstruments = {
         me.tripDisplay.setText(sprintf("TRIP 1   %.1f km", me.counterDistanceKm("trip1")));
         me.distanceDisplay.setText(sprintf("TOTAL   %.1f km", me.km));
     },
+    # Traction and stability control of the tyre model's FDM; nil with the standard FDM.
+    tcEnabled: props.getNode("/fdm/jsbsim/tc/par/enabled"),
+    escEnabled: props.getNode("/fdm/jsbsim/esc/par/enabled"),
+    tcActive: props.getNode("/fdm/jsbsim/tc/active"),
+    escActive: props.getNode("/fdm/jsbsim/esc/active"),
+    escLastActive: -1,
+    elapsedNode: props.getNode("/sim/time/elapsed-sec", 1),
+    # The ESC lamp flashes while traction or stability control works, and for half a second after,
+    # so that a short intervention still shows at the 10 Hz update (FMVSS 126 S5.3.8, Audi's K155).
+    # ESC OFF stays lit while either is switched off (S5.5).
+    updateStabilityLamps: func() {
+        if (me.escEnabled == nil) {
+            me.escSign.hide();
+            me.escOffSign.hide();
+            return;
+        }
+        var now = me.elapsedNode.getValue();
+        if (me.tcActive.getBoolValue() or me.escActive.getBoolValue()) me.escLastActive = now;
+        me.escSign.setVisible(now - me.escLastActive < 0.5 and math.mod(now, 0.4) < 0.2);
+        me.escOffSign.setVisible(!me.tcEnabled.getBoolValue() or !me.escEnabled.getBoolValue());
+    },
     updateLamps: func() {
-        # These two lamps only light during the ignition test.
+        # This lamp only lights during the ignition test.
         me.foglightSign.hide();
-        me.escOffSign.hide();
+        me.updateStabilityLamps();
         var safety = followme.safety;
         me.airbagSign.setVisible(!safety.isOn or safety.frontAirbagProp.getBoolValue()
                                               or safety.sideAirbagProp.getBoolValue());
@@ -380,7 +402,7 @@ var SmartInstruments = {
         # Visibility is cached per Canvas wrapper. Use the same ones as the live display.
         foreach (var sign; [me.airbagSign, me.handBrakeSign, me.autoholdSign,
                             me.positionLightSign, me.headlightSign, me.highbeamSign,
-                            me.foglightSign, me.escOffSign, me.readySign,
+                            me.foglightSign, me.escOffSign, me.escSign, me.readySign,
                             me.autopilotSign, me.cruiseSign]) {
             sign.show();
         }

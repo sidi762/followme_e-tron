@@ -517,8 +517,13 @@ Not done yet:
 
 - "Magic bush tyres" (`reduceRollingFriction`) has no effect; the equivalent is
   `tyre/par/rolling_resistance`.
-- No driver switch, lamp or sound for traction and stability control yet: step 4 of
-  `Docs/ESC/tc-esc-engineering-manual.md`.
+- Traction and stability control have dashboard lamps: the skidding car (`esc_sign`) flashes while
+  either works and for half a second after, and ESC OFF (`escoff_sign`) stays lit while either is
+  switched off; both light in the ignition self-test (`Nasal/SmartInstruments.nas`,
+  `dev/instruments/esc-lamps.nas` checks them in FlightGear). They are switched by the temporary
+  menu and dialog entries, which set the FDM parameters and so revert after a reposition. The
+  `/controls/esc/mode` switch and the pump sound of step 4 of
+  `Docs/ESC/tc-esc-engineering-manual.md` are not done.
 - Stability control, too, takes true values: the body sideslip and the road's friction, which a
   real one estimates. Its thresholds come from another car (ika's BMW 330xi) and were checked here
   against FMVSS 126, not fitted to this car's own driving tests. `brakesABS` in `Nasal/systems/brakes.nas` is not used.
