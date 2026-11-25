@@ -573,6 +573,8 @@
       </force>
     </external_reactions>
 
+    <system file="armrest"/>
+
     <system name="Followme EV animations">
         <channel name="Stroage" execrate="2">
             <fcs_function name="animation/storage_nul">

@@ -43,11 +43,7 @@
 					<label>Toggle ESC</label>
 					<binding>
 						<command>nasal</command>
-						<script>
-							var v = !getprop("/fdm/jsbsim/esc/par/enabled");
-							setprop("/fdm/jsbsim/esc/par/enabled", v);
-							gui.popupTip("ESC " ~ (v ? "ON" : "OFF"));
-						</script>
+						<script>followme.toggleStabilityControl()</script>
 					</binding>
 				</item>
 			</menu>

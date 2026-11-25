@@ -234,29 +234,6 @@
      <texture>panel_black.png</texture>
 </animation>
 
-<!-- AEB -->
-<animation>
-     <type>material</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-     <texture>AEB_LIT.png</texture>
-</animation>
-<animation>
-     <type>material</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>0</value>
-	     </equals>
-     </condition>
-     <texture>panel_black.png</texture>
-</animation>
 
 <!-- Headlight -->
 <animation>
@@ -393,10 +370,10 @@
     <type>select</type>
     <object-name>storage</object-name>
     <condition>
-        <equals>
-            <property>sim/multiplay/generic/float[24]</property>
-            <value>1</value>
-        </equals>
+        <greater-than>
+            <property>sim/multiplay/generic/float[23]</property>
+            <value>0.001</value>
+        </greater-than>
     </condition>
 </animation>
 

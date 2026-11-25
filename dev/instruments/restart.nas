@@ -31,7 +31,7 @@ var checkPage = func(name) {
 # Read the displayed Canvas properties independently of the controller's cache.
 var checkLamps = func(expected = nil) {
     var lamps = panel.signGroup.getChildren();
-    if (!panel.signGroup.getVisible() or size(lamps) != 11) die("missing instrument lamps");
+    if (!panel.signGroup.getVisible() or size(lamps) != 12) die("missing instrument lamps");
     foreach (var lamp; lamps) {
         var id = lamp.get("id");
         var lit = expected == nil or contains(expected, id);

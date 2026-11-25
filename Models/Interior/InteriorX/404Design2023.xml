@@ -78,17 +78,6 @@
     </axis>
 </animation>
 
-<!-- AEB -->
-<animation>
-     <type>select</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-</animation>
 
 	<controls include="404Design-driving-controls.xml" omit-node="y"/>
 </PropertyList>

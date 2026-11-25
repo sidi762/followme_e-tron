@@ -101,3 +101,24 @@ var targetSpeedChange = func(speed){
     }
     targetSpeed = speed;
 }
+
+# SET captures current speed; RES recalls the stored target after cancellation.
+# While holding speed the two keys change the set point by one displayed km/h.
+var wheelSet = func {
+	if (active) {
+		targetSpeedChange(targetSpeed + 1 / 1.852);
+	} elsif (getprop("/sim/multiplay/generic/float[15]") > 0) {
+		toggleSpeedHold();
+	}
+};
+var wheelResume = func {
+	if (active) {
+		targetSpeedChange(math.max(1 / 1.852, targetSpeed - 1 / 1.852));
+	} elsif (targetSpeed > 0) {
+		mode = 1;
+		startAutoSpeed();
+	}
+};
+var cancelSpeedHold = func {
+	if (active) stopAutoSpeed();
+};

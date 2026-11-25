@@ -56,6 +56,7 @@ def tyre_aircraft_dir():
         fdm_xml, system_xml = generate(read_text(STOCK_FDM)[0], test_forces=True)
         (_test_dir / OUT_FDM.name).write_text(fdm_xml, encoding="utf-8")
         (_test_dir / "Systems").mkdir()
+        shutil.copy(REPO / "Systems" / "armrest.xml", _test_dir / "Systems")
         (_test_dir / "Systems" / OUT_SYSTEM.name).write_text(system_xml, encoding="utf-8")
     return _test_dir
 

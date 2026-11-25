@@ -17,6 +17,36 @@
 
 var warningLight = aircraft.light.new("/sim/model/lights/warning", [0.5, 0.5], "/controls/lighting/warning" );
 
+# The dial has OFF, AUTO, position and dipped detents. Existing lighting users
+# (including the keyboard and multiplayer lamps) still read the effective 0/1/2.
+var headlightSelector = props.globals.initNode("/controls/lighting/headlight-selector", 0, "INT");
+var sunAngle = props.globals.getNode("/sim/time/sun-angle-rad", 1);
+var effectiveHeadlights = func {
+	var detent = headlightSelector.getValue();
+	if (detent == 1) return sunAngle.getDoubleValue() >= 1.50 ? 2 : 0;
+	return detent > 1 ? detent - 1 : 0;
+};
+var applyHeadlights = func {
+	var level = effectiveHeadlights();
+	if (vInfo.lighting.headlight.getValue() != level)
+		vInfo.lighting.headlight.setIntValue(level);
+};
+var stepHeadlightSelector = func(direction, wrap = 0) {
+	var next = headlightSelector.getValue() + direction;
+	headlightSelector.setIntValue(wrap ? math.mod(next + 4, 4) : math.clamp(next, 0, 3));
+};
+setlistener(headlightSelector, applyHeadlights);
+setlistener(sunAngle, func { if (headlightSelector.getValue() == 1) applyHeadlights(); });
+setlistener(vInfo.lighting.headlight, func(n) {
+	var level = n.getIntValue();
+	if (level != effectiveHeadlights())
+		headlightSelector.setIntValue(level == 0 ? 0 : level + 1);
+}, 1);
+
+# Fog switches retain their positions if the auxiliary bus loses power.
+var frontFogPowered = poweredAuxSwitch("/controls/lighting/front-fog");
+var rearFogPowered = poweredAuxSwitch("/controls/lighting/rear-fog");
+
 var Indicator = {
 
     #     Usage:                                        #

@@ -27,6 +27,84 @@
 
 
 
+	<controls include="driver-controls.xml" omit-node="y"/>
+	<controls include="esc-switch.xml" omit-node="y"/>
+
+	<animation>
+		<type>rotate</type>
+		<object-name>armrest_lid</object-name>
+		<property>sim/multiplay/generic/float[39]</property>
+		<factor>72</factor>
+		<center>
+			<x-m>2.007</x-m>
+			<y-m>0.002</y-m>
+			<z-m>0.749</z-m>
+		</center>
+		<axis>
+			<x>0</x>
+			<y>1</y>
+			<z>0</z>
+		</axis>
+	</animation>
+
+	<animation>
+		<type>rotate</type>
+		<object-name>headlight_switch</object-name>
+		<property>sim/multiplay/generic/int[17]</property>
+		<interpolation>
+			<entry>
+				<ind>0</ind>
+				<dep>26</dep>
+			</entry>
+			<entry>
+				<ind>1</ind>
+				<dep>0</dep>
+			</entry>
+			<entry>
+				<ind>2</ind>
+				<dep>-26</dep>
+			</entry>
+			<entry>
+				<ind>3</ind>
+				<dep>-59</dep>
+			</entry>
+		</interpolation>
+		<center>
+			<x-m>1.301833</x-m>
+			<y-m>-0.539152</y-m>
+			<z-m>0.928475</z-m>
+		</center>
+		<axis>
+			<x>0.865311</x>
+			<y>0.039019</y>
+			<z>0.499714</z>
+		</axis>
+	</animation>
+
+	<animation>
+		<type>translate</type>
+		<object-name>front_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[14]</property>
+		<factor>-0.0014</factor>
+		<axis>
+			<x>0.860443</x>
+			<y>0.031316</y>
+			<z>0.508584</z>
+		</axis>
+	</animation>
+
+	<animation>
+		<type>translate</type>
+		<object-name>rear_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[15]</property>
+		<factor>-0.0014</factor>
+		<axis>
+			<x>0.861034</x>
+			<y>0.031337</y>
+			<z>0.507581</z>
+		</axis>
+	</animation>
+
 <!-- STEERINGWHEEL -->
 
 <animation>
@@ -317,17 +395,6 @@
 </animation>
 
 
-<!-- AEB -->
-<animation>
-     <type>select</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-</animation>
 
 
 <!-- Headlight -->

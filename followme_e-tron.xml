@@ -577,6 +577,8 @@
       </force>
     </external_reactions>
 
+    <system file="armrest"/>
+
     <system name="Followme EV animations">
         <channel name="Stroage" execrate="2">
             <fcs_function name="animation/storage_nul">
@@ -601,23 +603,6 @@
 		    </lag_filter>
         </channel>
 
-        <channel name="Armrest" execrate="2">
-            <fcs_function name="animation/armrest_nul">
-			    <function>
-				    <table>
-					    <independentVar lookup="row">/controls/interior/armrest_cover_pos</independentVar>
-					    <tableData>
-						    0.00  0.0
-						    0.95  1.0
-					    </tableData>
-				    </table>
-			    </function>
-		    </fcs_function>
-            <lag_filter name="animation/armrest_cover_pos">
-		        <input>animation/armrest_nul</input>
-			    <c1>8</c1>
-		    </lag_filter>
-        </channel>
 
 
         <channel name="Wiper" execrate="2">

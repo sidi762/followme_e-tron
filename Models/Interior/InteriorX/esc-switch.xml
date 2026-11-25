@@ -1,0 +1,45 @@
+<PropertyList>
+	<animation>
+		<type>pick</type>
+		<object-name>esc_switch</object-name>
+		<object-name>esc_switch_lever</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>nasal</command>
+				<script>followme.toggleStabilityControl()</script>
+			</binding>
+		</action>
+	</animation>
+
+	<animation>
+		<type>material</type>
+		<object-name>esc_switch</object-name>
+		<condition>
+			<and>
+				<property>sim/multiplay/generic/bool[13]</property>
+				<equals>
+					<property>sim/multiplay/generic/bool[16]</property>
+					<value>0</value>
+				</equals>
+			</and>
+		</condition>
+		<texture>control_LIT.png</texture>
+	</animation>
+
+	<animation>
+		<type>material</type>
+		<object-name>esc_switch</object-name>
+		<condition>
+			<and>
+				<property>sim/multiplay/generic/bool[13]</property>
+				<equals>
+					<property>sim/multiplay/generic/bool[16]</property>
+					<value>1</value>
+				</equals>
+			</and>
+		</condition>
+		<texture>control.png</texture>
+	</animation>
+</PropertyList>

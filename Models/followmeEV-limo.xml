@@ -840,9 +840,37 @@
 </animation>
 
 <!-- COMPOSITOR LIGHTS -->
+	<light include="fog-light.xml">
+		<name>left-front-fog</name>
+		<position><x-m>0.12</x-m><y-m>-0.56</y-m><z-m>0.44</z-m></position>
+	</light>
+	<light include="fog-light.xml">
+		<name>right-front-fog</name>
+		<position><x-m>0.12</x-m><y-m>0.56</y-m><z-m>0.44</z-m></position>
+	</light>
+	<light include="fog-light.xml">
+		<name>rear-fog</name>
+		<position><x-m>5.25</x-m><y-m>-0.62</y-m><z-m>0.80</z-m></position>
+		<direction><pitch-deg>-90</pitch-deg></direction>
+		<diffuse><r>1</r><g>0.015</g><b>0.01</b><a>1</a></diffuse>
+		<specular><r>0.25</r><g>0.005</g><b>0</b><a>1</a></specular>
+		<range-m>6</range-m>
+	</light>
+	<animation>
+		<type>select</type>
+		<object-name>left-front-fog</object-name>
+		<object-name>right-front-fog</object-name>
+		<condition><property>sim/multiplay/generic/bool[14]</property></condition>
+	</animation>
+	<animation>
+		<type>select</type>
+		<object-name>rear-fog</object-name>
+		<condition><property>sim/multiplay/generic/bool[15]</property></condition>
+	</animation>
 <light>
   <name>left-headlight-compositor</name>
   <type>spot</type>
+  <dim-factor><property>sim/multiplay/generic/int[3]</property></dim-factor>
   <position>
       <x-m>0.15</x-m>
       <y-m>0.57</y-m>
@@ -883,6 +911,7 @@
 <light>
   <name>right-headlight-compositor</name>
   <type>spot</type>
+  <dim-factor><property>sim/multiplay/generic/int[3]</property></dim-factor>
   <position>
       <x-m>0.15</x-m>
       <y-m>-0.57</y-m>
@@ -953,12 +982,10 @@
  <object-name>left-headlight-compositor</object-name>
  <object-name>right-headlight-compositor</object-name>
  <condition>
-     <and>
-         <equals>
+     <greater-than>
              <property>sim/multiplay/generic/int[3]</property>
-             <value>1</value>
-         </equals>
-     </and>
+             <value>0</value>
+         </greater-than>
  </condition>
 </animation>
 

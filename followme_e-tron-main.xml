@@ -121,6 +121,8 @@
             <bool n="10" alias="/controls/lighting/indicator/right_switch"/>
             <bool n="11" alias="/controls/lighting/reverse_indicator"/>
             <bool n="12" alias="/systems/isParkingRadarActive"/>
+            <bool n="14" alias="/controls/lighting/front-fog/powered"/>
+            <bool n="15" alias="/controls/lighting/rear-fog/powered"/>
 
 
             <int n="0" alias="/sim/model/lights/indicator-left/state"/>
@@ -140,6 +142,7 @@
     	    <!--<int n="14" alias="/systems/instruments/enable_cdu"/>-->
     	    <int n="15" alias="/systems/instruments/enable_switches"/>
             <int n="16" alias="/warninglight/start"/>
+            <int n="17" alias="/controls/lighting/headlight-selector"/>
 
             <!--float current num:28 -->
             <float n="0" alias="/controls/doors/rearright/position-norm"/>
@@ -176,6 +179,7 @@
             <float n="25" alias="/systems/BrakeController/front-brake-output"/>
             <float n="37" alias="/systems/BrakeController/pedal-position-norm"/>
             <float n="38" alias="/controls/interior/leftlower_box/position-norm"/>
+            <float n="39" alias="/fdm/jsbsim/animation/armrest-lid-pos"/>
             <float n="22" alias="/controls/engines/engine/throttle"/>
 
             <float n="23" alias="/fdm/jsbsim/animation/storage_cover_pos"/>
@@ -212,6 +216,9 @@
 	</sim>
 	<controls>
 		<interior>
+			<luxury2>
+				<armrest-open alias="/controls/interior/armrest_cover_pos"/>
+			</luxury2>
 			<leftlower_box>
 				<open type="bool">false</open>
 				<position-norm type="double">0</position-norm>

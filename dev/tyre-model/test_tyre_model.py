@@ -35,6 +35,25 @@ def test_standard_fdm_still_loads():
     assert car.fdm["inertia/mass-slugs"] * 14.5939 == pytest.approx(1575, rel=0.01)
 
 
+@pytest.mark.parametrize("kind", ["stock", "tyre"])
+def test_damped_armrest_reverses_mid_travel(kind):
+    car = Car(kind, settle=0.2)
+    command = "/controls/interior/armrest_cover_pos"
+    position = "animation/armrest-lid-pos"
+    car.fdm[command] = 1
+    car.run(0.15)
+    midway = car.fdm[position]
+    assert 0.1 < midway < 0.8
+    car.fdm[command] = 0
+    car.step()
+    assert abs(car.fdm[position] - midway) < 0.05
+    car.run(1.2)
+    assert car.fdm[position] < 0.01
+    car.fdm[command] = 1
+    car.run(1.2)
+    assert car.fdm[position] > 0.99
+
+
 def test_parked_car_sits_still_with_the_right_wheel_loads():
     car = Car("tyre", settle=5.0)
     fdm = car.fdm

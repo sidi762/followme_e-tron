@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<system name="Center armrest hinges">
+	<channel name="Armrest actuator" execrate="2">
+		<fcs_function name="animation/armrest_nul">
+			<function>
+				<table>
+					<independentVar lookup="row">/controls/interior/armrest_cover_pos</independentVar>
+					<tableData>
+						0.00  0.0
+						0.95  1.0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		<lag_filter name="animation/armrest_cover_pos">
+			<input>animation/armrest_nul</input>
+			<c1>8</c1>
+		</lag_filter>
+	</channel>
+	<!-- The default and Luxury 2.0 lids have a damped hinge after the actuator. -->
+	<channel name="Damped hinge">
+		<lag_filter name="animation/armrest-lid-pos">
+			<input>animation/armrest_cover_pos</input>
+			<c1>8</c1>
+			<output>animation/luxury2-armrest-pos</output>
+		</lag_filter>
+	</channel>
+</system>

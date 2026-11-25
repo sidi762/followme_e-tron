@@ -1,3 +1,5 @@
-<PropertyList include="404Design-driving-controls.xml">
+<PropertyList>
 	<path>404Design_offroad.ac</path>
+	<controls include="404Design-driving-controls.xml" omit-node="y"/>
+	<controls include="esc-switch.xml" omit-node="y"/>
 </PropertyList>

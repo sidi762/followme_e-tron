@@ -101,6 +101,7 @@
 	<animation>
 		<type>pick</type>
 		<object-name>reversing_radar_switch</object-name>
+		<object-name>reversing_radar_switch_lever</object-name>
 		<action>
 			<button>0</button>
 			<repeatable>false</repeatable>
@@ -138,6 +139,7 @@
 	<animation>
 		<type>pick</type>
 		<object-name>aeb_switch</object-name>
+		<object-name>aeb_switch_lever</object-name>
 		<action>
 			<button>0</button>
 			<repeatable>false</repeatable>
@@ -175,6 +177,7 @@
 	<animation>
 		<type>pick</type>
 		<object-name>warninglights_switch</object-name>
+		<object-name>warninglights_switch_lever</object-name>
 		<action>
 			<button>0</button>
 			<repeatable>false</repeatable>
@@ -311,6 +314,7 @@
 	<animation>
 		<type>pick</type>
 		<object-name>doubleflash</object-name>
+		<object-name>doubleflash_lever</object-name>
 		<action>
 			<button>0</button>
 			<repeatable>false</repeatable>

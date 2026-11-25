@@ -381,8 +381,8 @@ var SmartInstruments = {
         me.escOffSign.setVisible(!me.tcEnabled.getBoolValue() or !me.escEnabled.getBoolValue());
     },
     updateLamps: func() {
-        # This lamp only lights during the ignition test.
-        me.foglightSign.hide();
+        me.foglightSign.setVisible(followme.frontFogPowered.getBoolValue()
+                                   or followme.rearFogPowered.getBoolValue());
         me.updateStabilityLamps();
         var safety = followme.safety;
         me.airbagSign.setVisible(!safety.isOn or safety.frontAirbagProp.getBoolValue()

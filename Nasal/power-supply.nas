@@ -42,6 +42,8 @@ var accessoryPowerW = func {
     var watts = powerState != "off" ? 25 : 0;
     if (vInfo.lighting.highBeam.getValue()) watts += 120;
     elsif (vInfo.lighting.headlight.getValue()) watts += 110;
+    if (getprop("/controls/lighting/front-fog/powered")) watts += 110;
+    if (getprop("/controls/lighting/rear-fog/powered")) watts += 21;
     if (getprop("/sim/model/lights/indicator-left/state")) watts += 42;
     if (getprop("/sim/model/lights/indicator-right/state")) watts += 42;
     if (getprop("/controls/wiper/frontwiper/switch")) watts += 45;

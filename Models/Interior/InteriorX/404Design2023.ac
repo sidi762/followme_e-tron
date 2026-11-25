@@ -17,7 +17,7 @@ MATERIAL "DefaultWhite" rgb 0.6 0 0  amb 0.67451 0 0  emis 0 0 0  spec 0 0 0  sh
 MATERIAL "Material_11" rgb 0.101961 0.101961 0.101961  amb 0 0 0  emis 0 0 0  spec 0 0 0  shi 63.3263  trans 0
 MATERIAL "None" rgb 0.65098 0.65098 0.65098  amb 0.423529 0.423529 0.423529  emis 0 0 0  spec 0 0 0  shi 70.0632  trans 0
 OBJECT world
-kids 190
+kids 189
 OBJECT poly
 name "box"
 loc 1.35887 0.928428 0.111688
@@ -397814,23 +397814,4 @@ refs 4
 30 0 0
 34 0 0
 35 0 0
-kids 0
-OBJECT poly
-name "AEB_LIT"
-loc 0.943013 -0.0844443 0.0821277
-texture "AEB_LIT.png"
-crease 45.000000
-numvert 4
-0.3862826 1.11337 0.215226
-0.3862826 1.11337 0.283183
-0.3975151 1.06548 0.283183
-0.3975151 1.06548 0.215226
-numsurf 1
-SURF 0x30
-mat 9
-refs 4
-0 0.893764 0.954889
-1 0.106239 0.954889
-2 0.106239 0.0451111
-3 0.893764 0.0451111
 kids 0
