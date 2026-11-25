@@ -87,7 +87,7 @@
 <!-- GEAR HANDLE -->
 <animation>
     <type>pick</type>
-    <object-name>gear_handle</object-name>
+    <object-name>gearhandle</object-name>
     <action>
       <button>0</button>
       <binding>

@@ -175,6 +175,7 @@
             <float n="19" alias="/controls/gear/brake-parking"/>
             <float n="25" alias="/systems/BrakeController/front-brake-output"/>
             <float n="37" alias="/systems/BrakeController/pedal-position-norm"/>
+            <float n="38" alias="/controls/interior/leftlower_box/position-norm"/>
             <float n="22" alias="/controls/engines/engine/throttle"/>
 
             <float n="23" alias="/fdm/jsbsim/animation/storage_cover_pos"/>
@@ -209,6 +210,14 @@
         </tutorials>
 		<!--<flight-recorder include="Systems/flight-recorder.xml"/>-->
 	</sim>
+	<controls>
+		<interior>
+			<leftlower_box>
+				<open type="bool">false</open>
+				<position-norm type="double">0</position-norm>
+			</leftlower_box>
+		</interior>
+	</controls>
     <input>
     	<keyboard>
     		<key n="91">

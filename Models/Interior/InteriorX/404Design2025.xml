@@ -1,0 +1,40 @@
+<PropertyList>
+	<path>404Design2025.ac</path>
+	<controls include="404Design-driving-controls.xml" omit-node="y"/>
+
+	<animation>
+		<type>pick</type>
+		<object-name>leftlower_box</object-name>
+		<action>
+			<button>0</button>
+			<repeatable>false</repeatable>
+			<binding>
+				<command>property-toggle</command>
+				<property>/controls/interior/leftlower_box/open</property>
+			</binding>
+			<binding>
+				<command>property-interpolate</command>
+				<property>/controls/interior/leftlower_box/position-norm</property>
+				<property>/controls/interior/leftlower_box/open</property>
+				<time>0.35</time>
+			</binding>
+		</action>
+	</animation>
+	<animation>
+		<type>rotate</type>
+		<object-name>leftlower_box</object-name>
+		<property>sim/multiplay/generic/float[38]</property>
+		<factor>20</factor>
+		<!-- Centerline of the modeled hinge cylinder leftlower_box_zhou, in FlightGear axes. -->
+		<center>
+			<x-m>1.28734</x-m>
+			<y-m>-0.569875</y-m>
+			<z-m>0.834828</z-m>
+		</center>
+		<axis>
+			<x>0</x>
+			<y>1</y>
+			<z>0</z>
+		</axis>
+	</animation>
+</PropertyList>

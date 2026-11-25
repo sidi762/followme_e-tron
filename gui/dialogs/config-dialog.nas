@@ -15,7 +15,8 @@ var configDialog = {
 		var third = int((w - 12) / 3);
 		var y = me._heading(0, "Interior style");
 		me._dropdown(y, w, "/systems/interior/type", ["404Design (Default)", "404Design 2.0",
-			"404Design 2022", "404Design 2023", "Luxury", "Luxury 2.0", "Race", "Sport (Legacy)", "Followme Original"]);
+			"404Design 2022", "404Design 2023", "404Design 2025", "404Design Offroad",
+			"Luxury", "Luxury 2.0", "Race", "Sport (Legacy)", "Followme Original"]);
 
 		y = me._heading(y + 37, "Steering wheel travel");
 		var normal = me._button(0, y, third, "Normal", func followme.setSteeringTravelToNormal());
