@@ -247,4 +247,18 @@
 </animation>
 <!-- Brake pedal -->
 <animation include="../Instruments/brake-pedal.xml"/>
+	<wipers include="../Instruments/front-wipers.xml" omit-node="y"/>
+	<animation include="../Instruments/lamp-stalk.xml"/>
+	<stalk include="../Instruments/wiper-stalk.xml" omit-node="y">
+		<animation n="1"><center><x-m>1.3934</x-m><y-m>-0.2713</y-m><z-m>0.8982</z-m></center></animation>
+	</stalk>
+	<animation include="../Instruments/armrest-pick.xml"/>
+	<animation>
+		<type>rotate</type>
+		<object-name>armrest_lid</object-name>
+		<property>sim/multiplay/generic/float[27]</property>
+		<factor>72</factor>
+		<center><x-m>1.933</x-m><y-m>0</y-m><z-m>0.773</z-m></center>
+		<axis><x>0</x><y>1</y><z>0</z></axis>
+	</animation>
 </PropertyList>

@@ -43,28 +43,7 @@
     <type>rotate</type>
     <object-name>armrest_box_cover</object-name>
     <property>sim/multiplay/generic/float[27]</property>
-    <interpolation>
-        <entry>
-            <ind> 0.0 </ind>
-            <dep> 0.0 </dep>
-        </entry>
-        <entry>
-            <ind> 0.1 </ind>
-            <dep> 0.0 </dep>
-        </entry>
-        <entry>
-            <ind> 0.2</ind>
-            <dep> 3 </dep>
-        </entry>
-        <entry>
-            <ind> 0.3</ind>
-            <dep> 18 </dep>
-        </entry>
-        <entry>
-            <ind> 1.0 </ind>
-            <dep> 60.0 </dep>
-        </entry>
-    </interpolation>
+    <factor>60</factor>
     <offset-m>0</offset-m>
     <center>
         <x-m>1.949</x-m>
@@ -80,4 +59,21 @@
 
 
 	<controls include="404Design-driving-controls.xml" omit-node="y"/>
+	<controls include="headlight-controls.xml" omit-node="y"/>
+	<animation include="front-fog-pick.xml"/>
+	<animation include="rear-fog-pick.xml"/>
+	<animation>
+		<type>rotate</type><object-name>headlight_switch</object-name><object-name>headlight_index</object-name>
+		<property>sim/multiplay/generic/int[17]</property>
+		<interpolation>
+			<entry><ind>0</ind><dep>33.4</dep></entry>
+			<entry><ind>1</ind><dep>0.0</dep></entry>
+			<entry><ind>2</ind><dep>-38.0</dep></entry>
+			<entry><ind>3</ind><dep>-76.7</dep></entry>
+		</interpolation>
+		<center><x-m>1.3616904</x-m><y-m>-0.5534030</y-m><z-m>0.9221941</z-m></center>
+		<axis><x>0.7755673</x><y>-0.0000046</y><z>0.6312648</z></axis>
+	</animation>
+	<controls include="esc-switch.xml" omit-node="y"/>
+	<controls include="panel-brightness.xml" omit-node="y"/>
 </PropertyList>

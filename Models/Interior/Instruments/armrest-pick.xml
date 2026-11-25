@@ -1,0 +1,11 @@
+<PropertyList>
+	<type>pick</type>
+	<object-name>armrest_lid</object-name>
+	<action>
+		<button>0</button>
+		<binding>
+			<command>property-toggle</command>
+			<property>/controls/interior/armrest_cover_pos</property>
+		</binding>
+	</action>
+</PropertyList>

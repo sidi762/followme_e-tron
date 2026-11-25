@@ -76,7 +76,8 @@ var poweredAuxSwitch = func(path) {
 
 # Wiper
 io.include("systems/wiper.nas");
-frontWiper = wiper.new("/controls/wiper/frontwiper");
+var frontWiper = wiper.new("/controls/wiper/frontwiper");
+var rearWiper = wiper.new("/controls/wiper/rearwiper", 1);
 
 # Lights
 io.include("systems/lights.nas");

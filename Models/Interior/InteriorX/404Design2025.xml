@@ -37,4 +37,78 @@
 			<z>0</z>
 		</axis>
 	</animation>
+	<animation include="../Instruments/armrest-pick.xml"/>
+	<animation>
+		<type>rotate</type>
+		<object-name>armrest_lid</object-name>
+		<property>sim/multiplay/generic/float[27]</property>
+		<factor>60</factor>
+		<center><x-m>1.949</x-m><y-m>0</y-m><z-m>0.766</z-m></center>
+		<axis><x>0</x><y>1</y><z>0</z></axis>
+	</animation>
+	<controls include="headlight-controls.xml" omit-node="y"/>
+	<animation include="front-fog-pick.xml"/>
+	<animation include="rear-fog-pick.xml"/>
+	<animation>
+		<type>select</type><object-name>headlight_detent_0</object-name>
+		<condition><equals><property>sim/multiplay/generic/int[17]</property><value>0</value></equals></condition>
+	</animation>
+	<animation>
+		<type>select</type><object-name>headlight_detent_1</object-name>
+		<condition><equals><property>sim/multiplay/generic/int[17]</property><value>1</value></equals></condition>
+	</animation>
+	<animation>
+		<type>select</type><object-name>headlight_detent_2</object-name>
+		<condition><equals><property>sim/multiplay/generic/int[17]</property><value>2</value></equals></condition>
+	</animation>
+	<animation>
+		<type>select</type><object-name>headlight_detent_3</object-name>
+		<condition><equals><property>sim/multiplay/generic/int[17]</property><value>3</value></equals></condition>
+	</animation>
+	<animation>
+		<type>translate</type><object-name>front_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[14]</property>
+		<factor>-0.0012</factor>
+		<axis><x>0.6343096</x><y>0.0000081</y><z>0.7730791</z></axis>
+	</animation>
+	<animation>
+		<type>translate</type><object-name>rear_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[15]</property>
+		<factor>-0.0012</factor>
+		<axis><x>0.6343096</x><y>0.0000081</y><z>0.7730791</z></axis>
+	</animation>
+	<controls include="esc-switch.xml" omit-node="y"/>
+	<controls include="panel-brightness.xml" omit-node="y"/>
+	<animation>
+		<type>pick</type><object-name>beam_up</object-name>
+		<visible>false</visible>
+		<action><button>0</button><binding><command>nasal</command><script>followme.adjustHeadlightLevel(-1)</script></binding></action>
+	</animation>
+	<animation>
+		<type>pick</type><object-name>beam_down</object-name>
+		<visible>false</visible>
+		<action><button>0</button><binding><command>nasal</command><script>followme.adjustHeadlightLevel(1)</script></binding></action>
+	</animation>
+	<animation>
+		<type>translate</type>
+		<object-name>headlight_switch</object-name><object-name>headlight_mode_key</object-name>
+		<property>controls/lighting/selector-pressed</property><factor>-0.0015</factor>
+		<axis><x>0</x><y>0</y><z>1</z></axis>
+	</animation>
+	<animation>
+		<type>select</type><object-name>headlight_unlit_0</object-name>
+		<condition><not><equals><property>sim/multiplay/generic/int[17]</property><value>0</value></equals></not></condition>
+	</animation>
+	<animation>
+		<type>select</type><object-name>headlight_unlit_1</object-name>
+		<condition><not><equals><property>sim/multiplay/generic/int[17]</property><value>1</value></equals></not></condition>
+	</animation>
+	<animation>
+		<type>select</type><object-name>headlight_unlit_2</object-name>
+		<condition><not><equals><property>sim/multiplay/generic/int[17]</property><value>2</value></equals></not></condition>
+	</animation>
+	<animation>
+		<type>select</type><object-name>headlight_unlit_3</object-name>
+		<condition><not><equals><property>sim/multiplay/generic/int[17]</property><value>3</value></equals></not></condition>
+	</animation>
 </PropertyList>

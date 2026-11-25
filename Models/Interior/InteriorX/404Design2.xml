@@ -29,9 +29,15 @@
 
 <!-- STEERINGWHEEL -->
 
+	<model>
+		<name>wheel-keycaps</name>
+		<path>wheel-buttons.ac</path>
+	</model>
+	<controls include="wheel-controls.xml" omit-node="y"/>
 <animation>
  <type>rotate</type>
  <object-name>steeringwheel</object-name>
+		<object-name>wheel-keycaps</object-name>
  <property>sim/multiplay/generic/float[18]</property>
  <factor>-1</factor>
  <center>
@@ -422,44 +428,9 @@
 </animation>
 
 <!-- Rain wiper -->
-<animation>
-    <type>rotate</type>
-    <object-name>frontwiper1</object-name>
-    <property>/fdm/jsbsim/animation/wiper_pos</property>
-    <factor> 75 </factor>
-    <center>
-      <x-m> 0.89 </x-m>
-      <y-m> 0.11 </y-m>
-      <z-m> 1.02 </z-m>
-    </center>
-    <axis>
-        <x1-m>0</x1-m>
-        <y1-m>0</y1-m>
-        <z1-m>0</z1-m>
-        <x2-m>1</x2-m>
-        <y2-m>0</y2-m>
-        <z2-m>-1</z2-m>
-    </axis>
-</animation>
-<animation>
-    <type>rotate</type>
-    <object-name>frontwiper2</object-name>
-    <property>/fdm/jsbsim/animation/wiper_pos</property>
-    <factor> 75 </factor>
-    <center>
-      <x-m> 0.89 </x-m>
-      <y-m> -0.52 </y-m>
-      <z-m> 1.02 </z-m>
-    </center>
-    <axis>
-        <x1-m>0</x1-m>
-        <y1-m>0</y1-m>
-        <z1-m>0</z1-m>
-        <x2-m>1</x2-m>
-        <y2-m>0</y2-m>
-        <z2-m>-1.3</z2-m>
-    </axis>
-</animation>
+	<wipers include="../Instruments/front-wipers.xml" omit-node="y"/>
+	<animation include="../Instruments/lamp-stalk.xml"/>
+	<stalk include="../Instruments/wiper-stalk.xml" omit-node="y"/>
 
 <!-- Accelerator -->
 <animation>
@@ -475,4 +446,42 @@
 </animation>
 <!-- Brake pedal -->
 <animation include="../Instruments/brake-pedal.xml"/>
+	<animation include="../Instruments/armrest-pick.xml"/>
+	<animation>
+		<type>rotate</type>
+		<object-name>armrest_lid</object-name>
+		<property>sim/multiplay/generic/float[27]</property>
+		<factor>72</factor>
+		<center><x-m>2.005</x-m><y-m>0.002</y-m><z-m>0.79</z-m></center>
+		<axis><x>0</x><y>1</y><z>0</z></axis>
+	</animation>
+	<controls include="headlight-controls.xml" omit-node="y"/>
+	<animation include="front-fog-pick.xml"/>
+	<animation include="rear-fog-pick.xml"/>
+	<animation>
+		<type>rotate</type><object-name>headlight_switch</object-name>
+		<property>sim/multiplay/generic/int[17]</property>
+		<interpolation>
+			<entry><ind>0</ind><dep>33.6</dep></entry>
+			<entry><ind>1</ind><dep>0.0</dep></entry>
+			<entry><ind>2</ind><dep>-37.3</dep></entry>
+			<entry><ind>3</ind><dep>-74.3</dep></entry>
+		</interpolation>
+		<center><x-m>1.3572930</x-m><y-m>-0.4920752</y-m><z-m>1.0215486</z-m></center>
+		<axis><x>0.9990687</x><y>0.0388507</y><z>-0.0187706</z></axis>
+	</animation>
+	<animation>
+		<type>translate</type><object-name>front_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[14]</property>
+		<factor>-0.0012</factor>
+		<axis><x>0.9990687</x><y>0.0388507</y><z>-0.0187706</z></axis>
+	</animation>
+	<animation>
+		<type>translate</type><object-name>rear_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[15]</property>
+		<factor>-0.0012</factor>
+		<axis><x>0.9990687</x><y>0.0388507</y><z>-0.0187706</z></axis>
+	</animation>
+	<controls include="esc-switch.xml" omit-node="y"/>
+	<controls include="panel-brightness.xml" omit-node="y"/>
 </PropertyList>

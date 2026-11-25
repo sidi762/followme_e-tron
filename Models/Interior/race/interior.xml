@@ -280,4 +280,12 @@
 </animation>
 <!-- Brake pedal -->
 <animation include="../Instruments/brake-pedal.xml"/>
+	<animation>
+		<type>rotate</type>
+		<object-name>frontwiper2</object-name>
+		<property>sim/multiplay/generic/int[18]</property>
+		<factor>0.114</factor>
+		<center><x-m>0.933</x-m><y-m>-0.201</y-m><z-m>1.003</z-m></center>
+		<axis><x>1</x><y>0</y><z>-1.1</z></axis>
+	</animation>
 </PropertyList>

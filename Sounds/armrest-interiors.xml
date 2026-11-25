@@ -1,0 +1,42 @@
+<PropertyList>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>404Design (Default)</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>404Design 2.0</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>404Design 2022</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>404Design 2023</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>404Design 2025</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>404Design Offroad</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>Luxury</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>Luxury 2.0</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>Sport (Legacy)</value>
+	</equals>
+	<equals>
+		<property>systems/interior/type</property>
+		<value>Followme Original</value>
+	</equals>
+</PropertyList>

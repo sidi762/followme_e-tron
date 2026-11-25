@@ -80,6 +80,14 @@ var vehicleDialog = {
 
 		y = me._heading(y + 54, "Keyboard braking intensity");
 		me._brakeSlider(y);
+		y = me._heading(y + 36, "Front wipers");
+		var quarter = int((w - 18) / 4);
+		foreach (var item; [[0, "Off", 0], [1, "Intermittent", 3], [2, "Low", 2], [3, "High", 1]])
+			me._choice(item[0] * (quarter + 6), y, quarter, item[1], "/controls/wiper/frontwiper/mode", item[2]);
+		y = me._heading(y + 36, "Rear wiper");
+		me._choice(0, y, third, "Off", "/controls/wiper/rearwiper/mode", 0);
+		me._choice(third + 6, y, third, "Intermittent", "/controls/wiper/rearwiper/mode", 3);
+		me._choice(2 * (third + 6), y, third, "Continuous", "/controls/wiper/rearwiper/mode", 2);
 		y = me._heading(y + 36, "Welcome message & startup sound");
 		me._button(0, y, half, "Set Startup Sound…", func smartInstruments.setStartupSound_dlg.open());
 		me._choice(right, y, half, "Message Off", welcome, 0);

@@ -143,6 +143,8 @@
     	    <int n="15" alias="/systems/instruments/enable_switches"/>
             <int n="16" alias="/warninglight/start"/>
             <int n="17" alias="/controls/lighting/headlight-selector"/>
+            <int n="18" alias="/fdm/jsbsim/wipers/front/position-permille"/>
+            <int n="19" alias="/fdm/jsbsim/wipers/rear/position-permille"/>
 
             <!--float current num:28 -->
             <float n="0" alias="/controls/doors/rearright/position-norm"/>
@@ -461,16 +463,18 @@
                     <value type="double">1</value>
                 </binding>
             </key>
-            <key n="121">
-                <name>y</name>
-                <desc>toggle_wiper</desc>
-                <repeatable>false</repeatable>
-    			<binding>
-    				<command>nasal</command>
-                    <!-- <script>followme.toggleWiper();</script> -->
-                    <script>followme.frontWiper.toggleMode();</script>
-    			</binding>
-            </key>
+			<key n="121">
+				<name>y</name>
+				<desc>Cycle front wipers</desc>
+				<repeatable>false</repeatable>
+				<binding><command>nasal</command><script>followme.frontWiper.cycleMode()</script></binding>
+			</key>
+			<key n="89">
+				<name>Y</name>
+				<desc>Cycle rear wiper</desc>
+				<repeatable>false</repeatable>
+				<binding><command>nasal</command><script>followme.rearWiper.cycleMode()</script></binding>
+			</key>
             <key n="66">
                 <name>B</name>
                 <desc>handbrake</desc>

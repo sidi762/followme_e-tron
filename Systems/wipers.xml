@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<system name="Wiper motors">
+	<!-- One turn is an out-and-back sweep. Negative phase counts down a parked pause. -->
+	<property value="0">wipers/front/phase</property>
+	<channel name="Front wiper motor">
+		<switch name="wipers/front/rate">
+			<default value="/controls/wiper/frontwiper/sweeps-per-sec"/>
+			<test value="1">wipers/front/phase lt 0</test>
+		</switch>
+		<fcs_function name="wipers/front/next-phase">
+			<function>
+				<sum>
+					<p>wipers/front/phase</p>
+					<product>
+						<p>simulation/dt</p>
+						<p>wipers/front/rate</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<switch name="wipers/front/phase">
+			<default value="wipers/front/next-phase"/>
+			<test value="wipers/front/phase">/systems/electrical/e-tron/aux-bus-powered eq 0</test>
+			<test logic="AND" value="0">
+				/controls/wiper/frontwiper/switch eq 0
+				wipers/front/phase le 0
+			</test>
+			<test logic="AND" value="0">
+				/controls/wiper/frontwiper/pause-sec eq 0
+				wipers/front/phase lt 0
+			</test>
+			<test value="-/controls/wiper/frontwiper/pause-sec">wipers/front/next-phase ge 1</test>
+		</switch>
+		<fcs_function name="animation/wiper_pos">
+			<function>
+				<product>
+					<v>0.5</v>
+					<difference>
+						<v>1</v>
+						<cos>
+							<product>
+								<v>6.283185307179586</v>
+								<max>
+									<v>0</v>
+									<p>wipers/front/phase</p>
+								</max>
+							</product>
+						</cos>
+					</difference>
+				</product>
+			</function>
+			<output>/controls/wiper/frontwiper/state</output>
+		</fcs_function>
+		<pure_gain name="wipers/front/position-permille">
+			<input>animation/wiper_pos</input>
+			<gain>1000</gain>
+		</pure_gain>
+	</channel>
+	<property value="0">wipers/rear/phase</property>
+	<channel name="Rear wiper motor">
+		<switch name="wipers/rear/rate">
+			<default value="/controls/wiper/rearwiper/sweeps-per-sec"/>
+			<test value="1">wipers/rear/phase lt 0</test>
+		</switch>
+		<fcs_function name="wipers/rear/next-phase">
+			<function>
+				<sum>
+					<p>wipers/rear/phase</p>
+					<product>
+						<p>simulation/dt</p>
+						<p>wipers/rear/rate</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<switch name="wipers/rear/phase">
+			<default value="wipers/rear/next-phase"/>
+			<test value="wipers/rear/phase">/systems/electrical/e-tron/aux-bus-powered eq 0</test>
+			<test logic="AND" value="0">
+				/controls/wiper/rearwiper/switch eq 0
+				wipers/rear/phase le 0
+			</test>
+			<test logic="AND" value="0">
+				/controls/wiper/rearwiper/pause-sec eq 0
+				wipers/rear/phase lt 0
+			</test>
+			<test value="-/controls/wiper/rearwiper/pause-sec">wipers/rear/next-phase ge 1</test>
+		</switch>
+		<fcs_function name="animation/rear_wiper_pos">
+			<function>
+				<product>
+					<v>0.5</v>
+					<difference>
+						<v>1</v>
+						<cos>
+							<product>
+								<v>6.283185307179586</v>
+								<max>
+									<v>0</v>
+									<p>wipers/rear/phase</p>
+								</max>
+							</product>
+						</cos>
+					</difference>
+				</product>
+			</function>
+			<output>/controls/wiper/rearwiper/state</output>
+		</fcs_function>
+		<pure_gain name="wipers/rear/position-permille">
+			<input>animation/rear_wiper_pos</input>
+			<gain>1000</gain>
+		</pure_gain>
+	</channel>
+</system>

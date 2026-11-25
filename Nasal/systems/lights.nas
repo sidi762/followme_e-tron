@@ -20,6 +20,19 @@ var warningLight = aircraft.light.new("/sim/model/lights/warning", [0.5, 0.5], "
 # The dial has OFF, AUTO, position and dipped detents. Existing lighting users
 # (including the keyboard and multiplayer lamps) still read the effective 0/1/2.
 var headlightSelector = props.globals.initNode("/controls/lighting/headlight-selector", 0, "INT");
+var headlightLevel = props.globals.initNode("/controls/lighting/headlight-level", 0, "INT");
+var panelBrightness = props.globals.initNode("/controls/lighting/instrument-brightness", 1);
+
+# Higher thumbwheel numbers aim the dipped beams lower; the cluster dimmer is independent.
+var adjustHeadlightLevel = func(step, wrap = 0) {
+	var level = headlightLevel.getIntValue() + step;
+	headlightLevel.setIntValue(wrap ? math.mod(level + 4, 4) : math.clamp(level, 0, 3));
+	gui.popupTip("Headlamp level " ~ headlightLevel.getIntValue());
+};
+var adjustPanelBrightness = func(step) {
+	panelBrightness.setDoubleValue(math.clamp(panelBrightness.getDoubleValue() + 0.1 * step, 0.3, 1));
+};
+
 var sunAngle = props.globals.getNode("/sim/time/sun-angle-rad", 1);
 var effectiveHeadlights = func {
 	var detent = headlightSelector.getValue();

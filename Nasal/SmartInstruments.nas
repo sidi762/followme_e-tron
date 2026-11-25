@@ -178,6 +178,12 @@ var SmartInstruments = {
                 if (m.phase == "driving") m.update();
             }
         }, 0, 0);
+		# Dim the entire finished display, including gauges, telltales and text.
+		var shade = m.instrumentCanvas.createGroup().createChild("path").rect(0, 0, 1509, 736);
+		shade.set("fill", "#000000");
+		setlistener(followme.panelBrightness, func(n) {
+			shade.set("fill-opacity", 1 - n.getDoubleValue());
+		}, 1);
         return m;
     },
     startupSoundIsEnabled: 0, startupSound: nil, showingWarningMessage: 0,

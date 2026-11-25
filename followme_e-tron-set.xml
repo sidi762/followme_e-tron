@@ -321,6 +321,8 @@
 			<desc>Toggle parking radar</desc>
 		</key>
 		<!-- Start text -->
+		<key><name>y</name><desc>Front wipers: intermittent, low, high, off</desc></key>
+		<key><name>Y</name><desc>Rear wiper: intermittent, continuous, off</desc></key>
 		<text>
         Follow me EV, brought to you by FGPRC.
 

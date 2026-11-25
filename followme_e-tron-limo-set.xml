@@ -252,6 +252,8 @@
 			<desc>Toggle parking radar system</desc>
 		</key>
 		<!-- Start text -->
+		<key><name>y</name><desc>Front wipers: intermittent, low, high, off</desc></key>
+		<key><name>Y</name><desc>Rear wiper: intermittent, continuous, off</desc></key>
 		<text>
         Follow me e-tron Brought to you by FGPRC.
 

@@ -1,28 +1,104 @@
 <?xml version="1.0"?>
 <system name="Center armrest hinges">
-	<channel name="Armrest actuator" execrate="2">
-		<fcs_function name="animation/armrest_nul">
+	<property value="0">animation/armrest-command</property>
+	<property value="0">animation/armrest-start</property>
+	<property value="2">animation/armrest-seconds</property>
+	<property value="0">animation/armrest_cover_pos</property>
+	<channel name="Armrest latch and hinge">
+		<switch name="animation/armrest-edge">
+			<default value="0"/>
+			<test value="1">/controls/interior/armrest_cover_pos ne animation/armrest-command</test>
+		</switch>
+		<switch name="animation/armrest-start">
+			<default value="animation/armrest-start"/>
+			<test value="animation/armrest_cover_pos">animation/armrest-edge eq 1</test>
+		</switch>
+		<fcs_function name="animation/armrest-seconds">
+			<function>
+				<ifthen>
+					<p>animation/armrest-edge</p>
+					<v>0</v>
+					<min>
+						<v>2</v>
+						<sum>
+							<p>animation/armrest-seconds</p>
+							<p>simulation/dt</p>
+						</sum>
+					</min>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<pure_gain name="animation/armrest-command">
+			<input>/controls/interior/armrest_cover_pos</input>
+			<gain>1</gain>
+		</pure_gain>
+		<!-- The lid is already lifting at the first loud click (0.31 s).
+		     The release clicks continue to 0.42 s; the opening stop is at 0.73 s. -->
+		<fcs_function name="animation/armrest-open-travel">
 			<function>
 				<table>
-					<independentVar lookup="row">/controls/interior/armrest_cover_pos</independentVar>
+					<independentVar lookup="row">animation/armrest-seconds</independentVar>
 					<tableData>
-						0.00  0.0
-						0.95  1.0
-					</tableData>
+					0.000  0.000
+					0.060  0.008
+					0.120  0.035
+					0.185  0.078
+					0.230  0.120
+					0.309  0.240
+					0.349  0.335
+					0.389  0.450
+					0.424  0.550
+					0.460  0.635
+					0.560  0.805
+					0.650  0.930
+					0.700  0.980
+					0.735  1.000
+				</tableData>
 				</table>
 			</function>
 		</fcs_function>
-		<lag_filter name="animation/armrest_cover_pos">
-			<input>animation/armrest_nul</input>
-			<c1>8</c1>
-		</lag_filter>
-	</channel>
-	<!-- The default and Luxury 2.0 lids have a damped hinge after the actuator. -->
-	<channel name="Damped hinge">
-		<lag_filter name="animation/armrest-lid-pos">
-			<input>animation/armrest_cover_pos</input>
-			<c1>8</c1>
+		<fcs_function name="animation/armrest-close-travel">
+			<function>
+				<table>
+					<independentVar lookup="row">animation/armrest-seconds</independentVar>
+					<tableData>
+					0.000  0.000
+					0.035  0.014
+					0.100  0.110
+					0.200  0.370
+					0.280  0.620
+					0.350  0.840
+					0.390  0.955
+					0.409  1.000
+				</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		<fcs_function name="animation/armrest_cover_pos">
+			<function>
+				<ifthen>
+					<p>animation/armrest-command</p>
+					<sum>
+						<p>animation/armrest-start</p>
+						<product>
+							<difference>
+								<v>1</v>
+								<p>animation/armrest-start</p>
+							</difference>
+							<p>animation/armrest-open-travel</p>
+						</product>
+					</sum>
+					<product>
+						<p>animation/armrest-start</p>
+						<difference>
+							<v>1</v>
+							<p>animation/armrest-close-travel</p>
+						</difference>
+					</product>
+				</ifthen>
+			</function>
+			<output>animation/armrest-lid-pos</output>
 			<output>animation/luxury2-armrest-pos</output>
-		</lag_filter>
+		</fcs_function>
 	</channel>
 </system>

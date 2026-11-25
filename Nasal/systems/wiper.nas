@@ -14,55 +14,45 @@
 #// You should have received a copy of the GNU General Public License
 #// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Nasal owns the stalk contacts; JSBSim runs the crank until it parks.
 var wiper = {
-    WIPER_MODE: {
-        STOP: 0,
-        FAST: 1,
-        MID: 2,
-        SLOW: 3,
-    },
-    mode: 0,
-    controller: nil,
-    pattern: [1, 1],
-    switchNode: nil,
-    
-    new: func(wiperNode){
-        var m = {parents:[wiper]};
-        m.switchNode = props.globals.getNode(wiperNode~"/switch", 1);
-        m.controller = aircraft.light.new(wiperNode, [1, 1], poweredAuxSwitch(wiperNode ~ "/switch"));
-        m.controller.stateN = m.controller.node.initNode("state", 0, "DOUBLE");
-        m.switchNode.setBoolValue(0);
-        return m;
-    },
-    Stop: func(){
-        me.switchNode.setValue(0);
-        me.mode = me.WIPER_MODE.STOP;
-    },
-    Fast: func(){
-        me.controller.pattern = [0.5, 0.5];
-        me.switchNode.setValue(1);
-        me.mode = me.WIPER_MODE.FAST;
-    },
-    Mid: func(){
-        me.controller.pattern = [0.7, 0.7];
-        me.switchNode.setValue(1);
-        me.mode = me.WIPER_MODE.MID;
-    },
-    Slow: func(){
-        me.controller.pattern = [0.7, 2];
-        me.switchNode.setValue(1);
-        me.mode = me.WIPER_MODE.SLOW;
-    },
-    cycleMode: func(){
-        if(me.mode == me.WIPER_MODE.STOP){
-            me.Slow();
-        }else if(me.mode == me.WIPER_MODE.SLOW){
-            me.Mid();
-        }else if(me.mode == me.WIPER_MODE.MID){
-            me.Fast();
-        }else if(me.mode == me.WIPER_MODE.FAST){
-            me.Stop();
-        }
-    },
+	WIPER_MODE: { STOP: 0, FAST: 1, MID: 2, SLOW: 3 },
 
+	new: func(path, rear = 0) {
+		var m = {parents: [wiper], rear: rear, mode: 0};
+		m.node = props.globals.getNode(path, 1);
+		m.modeNode = m.node.initNode("mode", 0, "INT");
+		m.switchNode = m.node.initNode("switch", 0, "BOOL");
+		m.rateNode = m.node.getNode("sweeps-per-sec", 1);
+		m.pauseNode = m.node.getNode("pause-sec", 1);
+		poweredAuxSwitch(path ~ "/switch");
+		setlistener(m.modeNode, func(n) { m.setMode(n.getIntValue()); }, 1);
+		# A direct write to the original on/off switch still operates the motor.
+		setlistener(m.switchNode, func(n) {
+			if (n.getBoolValue() != (m.mode != 0)) m.setMode(n.getBoolValue() ? 3 : 0);
+		});
+		return m;
+	},
+
+	setMode: func(mode) {
+		if (mode < 0 or mode > 3) mode = 0;
+		if (me.rear and mode == 1) mode = 2;
+		me.mode = mode;
+		if (me.modeNode.getIntValue() != mode) me.modeNode.setIntValue(mode);
+		# OFF keeps the selected motor speed for the rest of an unfinished sweep.
+		if (mode or !me.rateNode.getDoubleValue())
+			me.rateNode.setDoubleValue(me.rear ? 1 / 1.6 : (mode == 1 ? 1 : 1 / 1.4));
+		me.pauseNode.setDoubleValue(mode == 3 ? (me.rear ? 3 : 2) : 0);
+		me.switchNode.setBoolValue(mode != 0);
+	},
+
+	Stop: func { me.setMode(0); },
+	Fast: func { me.setMode(1); },
+	Mid: func { me.setMode(2); },
+	Slow: func { me.setMode(3); },
+	cycleMode: func {
+		var next = [3, 0, me.rear ? 0 : 1, 2];
+		me.setMode(next[me.mode]);
+	},
+	toggleMode: func { me.cycleMode(); },
 };

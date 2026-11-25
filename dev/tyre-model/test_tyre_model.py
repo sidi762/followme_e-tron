@@ -36,22 +36,68 @@ def test_standard_fdm_still_loads():
 
 
 @pytest.mark.parametrize("kind", ["stock", "tyre"])
-def test_damped_armrest_reverses_mid_travel(kind):
+def test_armrest_travel_matches_the_recorded_latch(kind):
     car = Car(kind, settle=0.2)
     command = "/controls/interior/armrest_cover_pos"
     position = "animation/armrest-lid-pos"
+    assert car.fdm["animation/armrest-seconds"] > 1.12  # silent at startup
     car.fdm[command] = 1
-    car.run(0.15)
+    car.run(0.32)
+    assert 0.23 < car.fdm[position] < 0.28  # already moving through the first click
+    car.run(0.11)
     midway = car.fdm[position]
-    assert 0.1 < midway < 0.8
+    assert 0.52 < midway < 0.59  # last click of the release cluster
     car.fdm[command] = 0
     car.step()
-    assert abs(car.fdm[position] - midway) < 0.05
-    car.run(1.2)
-    assert car.fdm[position] < 0.01
+    assert car.fdm[position] == pytest.approx(midway)
+    car.run(0.42)
+    assert car.fdm[position] == 0
     car.fdm[command] = 1
-    car.run(1.2)
-    assert car.fdm[position] > 0.99
+    car.run(0.75)
+    assert car.fdm[position] == 1
+    car.fdm[command] = 0
+    car.run(0.35)
+    assert car.fdm[position] > 0.12
+    car.run(0.075)
+    assert car.fdm[position] == 0  # closed on the 0.41 s impact, before its tail
+
+
+@pytest.mark.parametrize("kind", ["stock", "tyre"])
+def test_wipers_park_after_power_returns_and_wait_between_sweeps(kind):
+    car = Car(kind, settle=0.2)
+    fdm = car.fdm
+    front = "/controls/wiper/frontwiper/"
+    rear = "/controls/wiper/rearwiper/"
+    power = "/systems/electrical/e-tron/aux-bus-powered"
+    fdm[front + "switch"] = 1
+    fdm[front + "pause-sec"] = 2
+    car.run(0.70)
+    assert fdm["animation/wiper_pos"] > 0.99
+    assert fdm["animation/rear_wiper_pos"] == 0
+    car.run(1.0)
+    assert fdm["animation/wiper_pos"] == 0
+    fdm[rear + "switch"] = 1
+    car.run(0.4)
+    assert fdm["animation/wiper_pos"] == 0
+    rear_position = fdm["animation/rear_wiper_pos"]
+    assert 0.4 < rear_position < 0.6
+    fdm[power] = 0
+    fdm[rear + "switch"] = 0
+    car.run(1.0)
+    assert fdm["animation/rear_wiper_pos"] == rear_position
+    fdm[power] = 1
+    car.run(1.4)
+    assert fdm["animation/rear_wiper_pos"] == 0
+    car.run(0.6)
+    assert fdm["animation/wiper_pos"] > 0.5
+    fdm[front + "pause-sec"] = 0
+    fdm[front + "sweeps-per-sec"] = 1
+    fdm[front + "switch"] = 0
+    car.run(1.4)
+    assert fdm["animation/wiper_pos"] == 0
+    fdm[front + "switch"] = 1
+    car.run(0.50)
+    assert fdm["animation/wiper_pos"] > 0.99
 
 
 def test_parked_car_sits_still_with_the_right_wheel_loads():

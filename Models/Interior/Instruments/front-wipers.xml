@@ -1,0 +1,34 @@
+<PropertyList>
+	<animation>
+		<type>rotate</type>
+		<object-name>frontwiper1</object-name>
+		<property>sim/multiplay/generic/int[18]</property>
+		<factor>0.104</factor>
+		<center>
+			<x-m>0.89</x-m>
+			<y-m>0.021</y-m>
+			<z-m>1.002</z-m>
+		</center>
+		<axis>
+			<x>1</x>
+			<y>0</y>
+			<z>-1</z>
+		</axis>
+	</animation>
+	<animation>
+		<type>rotate</type>
+		<object-name>frontwiper2</object-name>
+		<property>sim/multiplay/generic/int[18]</property>
+		<factor>0.088</factor>
+		<center>
+			<x-m>0.947</x-m>
+			<y-m>-0.527</y-m>
+			<z-m>0.997</z-m>
+		</center>
+		<axis>
+			<x>1</x>
+			<y>0</y>
+			<z>-1.3</z>
+		</axis>
+	</animation>
+</PropertyList>

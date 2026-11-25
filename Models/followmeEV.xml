@@ -837,10 +837,22 @@
             </binding>
         </action>
     </animation>
-    <animation>
+	<animation>
+		<type>rotate</type>
+		<name>rear-wiper-sweep</name>
+		<object-name>rearwiper</object-name>
+		<property>sim/multiplay/generic/int[19]</property>
+		<!-- Zero motor travel parks the rubber along the lower edge of the left pane. -->
+		<offset-deg>77</offset-deg>
+		<factor>-0.070</factor>
+		<center><x-m>3.774257</x-m><y-m>-0.077783</y-m><z-m>0.985567</z-m></center>
+		<axis><x>1.000000</x><y>-0.039800</y><z>0.135895</z></axis>
+	</animation>
+<animation>
         <type>rotate</type>
         <object-name>door.rl</object-name>
-        <object-name>rearwiper</object-name>
+        <object-name>rear-wiper-sweep</object-name>
+		<object-name>rear-washer-nozzle</object-name>
         <object-name>back_plate</object-name>
         <object-name>back_plate_back</object-name>
         <object-name>high_braking_lights</object-name>
@@ -1191,6 +1203,13 @@
             </and>
         </condition>
     </animation>
+	<animation>
+		<type>rotate</type>
+		<object-name>left-headlight-compositor</object-name><object-name>right-headlight-compositor</object-name>
+		<property>controls/lighting/headlight-level</property><factor>-1</factor>
+		<center><x-m>0.15</x-m><y-m>0</y-m><z-m>0.7</z-m></center>
+		<axis><x>0</x><y>1</y><z>0</z></axis>
+	</animation>
     <animation>
         <type>select</type>
         <object-name>left-headlight-compositor</object-name>

@@ -23,7 +23,13 @@ WHEELBASE = 2.49
 FG_SIDE_PROPS = {
     "/controls/interior/luxury/storage_cover_pos": 0.0,
     "/controls/interior/armrest_cover_pos": 0.0,
-    "/controls/wiper/frontwiper/state": 0.0,
+    "/systems/electrical/e-tron/aux-bus-powered": 1.0,
+    "/controls/wiper/frontwiper/switch": 0.0,
+    "/controls/wiper/frontwiper/sweeps-per-sec": 1 / 1.4,
+    "/controls/wiper/frontwiper/pause-sec": 0.0,
+    "/controls/wiper/rearwiper/switch": 0.0,
+    "/controls/wiper/rearwiper/sweeps-per-sec": 1 / 1.6,
+    "/controls/wiper/rearwiper/pause-sec": 0.0,
     "/controls/steering_wheel/steering_limit-deg": 900.0,
     "/controls/flight/rudder": 0.0,
     # occupant defaults from followme_e-tron-tyre-set.xml and Nasal/node_setup.nas
@@ -56,7 +62,8 @@ def tyre_aircraft_dir():
         fdm_xml, system_xml = generate(read_text(STOCK_FDM)[0], test_forces=True)
         (_test_dir / OUT_FDM.name).write_text(fdm_xml, encoding="utf-8")
         (_test_dir / "Systems").mkdir()
-        shutil.copy(REPO / "Systems" / "armrest.xml", _test_dir / "Systems")
+        for system in ("armrest.xml", "wipers.xml"):
+            shutil.copy(REPO / "Systems" / system, _test_dir / "Systems")
         (_test_dir / "Systems" / OUT_SYSTEM.name).write_text(system_xml, encoding="utf-8")
     return _test_dir
 

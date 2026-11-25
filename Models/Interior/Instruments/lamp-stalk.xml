@@ -1,0 +1,26 @@
+<PropertyList>
+	<type>pick</type>
+	<object-name>left_handle</object-name>
+	<object-name>indicontrol</object-name>
+	<action>
+		<button>0</button>
+		<binding>
+			<command>nasal</command>
+			<script>setprop("/controls/lighting/highBeam", !getprop("/controls/lighting/highBeam"))</script>
+		</binding>
+	</action>
+	<action>
+		<button>3</button>
+		<binding>
+			<command>nasal</command>
+			<script>followme.indicatorController.right_indicator_toggle()</script>
+		</binding>
+	</action>
+	<action>
+		<button>4</button>
+		<binding>
+			<command>nasal</command>
+			<script>followme.indicatorController.left_indicator_toggle()</script>
+		</binding>
+	</action>
+</PropertyList>

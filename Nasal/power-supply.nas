@@ -46,7 +46,10 @@ var accessoryPowerW = func {
     if (getprop("/controls/lighting/rear-fog/powered")) watts += 21;
     if (getprop("/sim/model/lights/indicator-left/state")) watts += 42;
     if (getprop("/sim/model/lights/indicator-right/state")) watts += 42;
-    if (getprop("/controls/wiper/frontwiper/switch")) watts += 45;
+    if (auxBusPowered.getBoolValue()) {
+        if ((getprop("/fdm/jsbsim/wipers/front/phase") or 0) > 0) watts += 45;
+        if ((getprop("/fdm/jsbsim/wipers/rear/phase") or 0) > 0) watts += 25;
+    }
     return watts;
 };
 
