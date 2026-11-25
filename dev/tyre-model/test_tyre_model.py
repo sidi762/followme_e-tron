@@ -758,3 +758,38 @@ def test_stability_control_reference_uses_this_cars_characteristic_speed():
     assert 0.0 < gradient < 1.0                               # nearly neutral, slightly understeering
     parameter = dict((n, v) for n, v, _ in generate.ESC_PARAMS)["v_char_mps"]
     assert parameter == pytest.approx(v_char, rel=0.1)
+
+
+# --------------------------------------------------------------------------
+# 2D Pedal Map & Drive Modes
+# --------------------------------------------------------------------------
+def test_drive_modes_limit_power_and_shape_full_throttle_launch():
+    perf, _ = launch("tyre", params={"driveline/in/drive_mode": 1.0})
+    comfort, _ = launch("tyre", params={"driveline/in/drive_mode": 0.65})
+    eco, _ = launch("tyre", params={"driveline/in/drive_mode": 0.4})
+    assert perf["reached"] and comfort["reached"] and eco["reached"]
+    assert perf["time"] < comfort["time"] < eco["time"]
+
+    # High-speed full throttle must respect each mode's power cap (375 / 210 / 112.5 kW)
+    for mode, expected_kw in ((1.0, 375.0), (0.65, 210.0), (0.4, 112.5)):
+        car = Car("tyre", speed=120 * KMH, settle=0.5, params={"driveline/in/drive_mode": mode})
+        car.run(0.8, throttle=1.0)
+        shaft_kw = car.fdm["driveline/drive_torque_nm"] * car.fdm["driveline/motor_rad_sec"] / 1000.0
+        assert shaft_kw == pytest.approx(expected_kw, rel=0.05)
+
+
+def test_pedal_map_rolls_off_with_speed_at_partial_throttle():
+    low_speed = Car("tyre", speed=10 * KMH, settle=0.5, params={"driveline/in/drive_mode": 0.65})
+    high_speed = Car("tyre", speed=120 * KMH, settle=0.5, params={"driveline/in/drive_mode": 0.65})
+    low_speed.run(0.6, throttle=0.3)
+    high_speed.run(0.6, throttle=0.3)
+    assert low_speed.fdm["driveline/request_torque_nm"] > high_speed.fdm["driveline/request_torque_nm"] * 1.3
+
+
+def test_tip_in_rate_limiter_ramps_smoothly_for_keyboard_taps():
+    # A brief 0.1 s full-throttle tap in Low Power ramps gently instead of snapping to 184 N m
+    car = Car("tyre", speed=5 * KMH, settle=0.5, params={"driveline/in/drive_mode": 0.4})
+    car.run(0.1, throttle=1.0)
+    assert 35.0 < car.fdm["driveline/request_torque_nm"] < 70.0
+    car.run(0.5, throttle=1.0)
+    assert car.fdm["driveline/request_torque_nm"] == pytest.approx(184.0, rel=0.05)

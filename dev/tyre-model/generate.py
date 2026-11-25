@@ -73,6 +73,14 @@ DRIVELINE_PARAMS = [
     ("max_power_w", 375000.0, "motor power limit"),
     ("max_speed_rad_sec", 3000.0, "motor speed limit; only there to stop a spinning wheel running away"),
     ("front_torque_share", 0.5, "0 = rear wheel drive, 1 = front wheel drive"),
+    ("comfort_power_share", 0.56, "Comfort mode power limit as a share of max_power_w (210 kW of 375 kW)"),
+    ("eco_power_share", 0.30, "Low Power mode power limit as a share of max_power_w (112.5 kW of 375 kW)"),
+    ("tip_in_rate_perf", 3000.0, "Performance mode torque ramp-up limit, N m/s"),
+    ("tip_in_rate_comfort", 1000.0, "Comfort mode torque ramp-up limit, N m/s"),
+    ("tip_in_rate_eco", 500.0, "Low Power mode torque ramp-up limit, N m/s"),
+    ("tip_out_rate_perf", 3000.0, "Performance mode torque ramp-down limit, N m/s"),
+    ("tip_out_rate_comfort", 1500.0, "Comfort mode torque ramp-down limit, N m/s"),
+    ("tip_out_rate_eco", 1000.0, "Low Power mode torque ramp-down limit, N m/s"),
     ("coast_regen_nm", 24.0, "motor braking torque with the pedal released (matches the standard FDM's coast-down)"),
     ("coast_regen_fade_rad_sec", 100.0, "coast regen fades out below this motor speed"),
     ("brake_front_nm", 2300.0, "brake torque per front wheel at full pedal"),
@@ -90,11 +98,50 @@ DRIVELINE_PARAMS = [
     ("ambient_c", 20.0, "air temperature the discs cool down to"),
 ]
 
+# 2D accelerator pedal maps: share of max_torque_nm as a function of
+# (throttle_norm, speed_kmh) for each drive mode. Full pedal matches each mode's
+# torque ceiling (1.00 / 0.65 / 0.40) and is further bounded by the mode power cap.
+# Partial-pedal values roll off with speed so a steady pedal settles at a cruise speed.
+PEDAL_MAP_SPEEDS_KMH = (0, 20, 50, 100, 160, 220)
+PEDAL_MAPS = {
+    "pedal_perf": (
+        (0.00, (0.000, 0.000, 0.000, 0.000, 0.000, 0.000)),
+        (0.10, (0.070, 0.060, 0.050, 0.040, 0.030, 0.020)),
+        (0.20, (0.180, 0.160, 0.140, 0.110, 0.090, 0.070)),
+        (0.30, (0.300, 0.280, 0.250, 0.210, 0.170, 0.140)),
+        (0.50, (0.560, 0.540, 0.500, 0.450, 0.400, 0.360)),
+        (0.70, (0.780, 0.760, 0.740, 0.700, 0.660, 0.620)),
+        (0.85, (0.920, 0.910, 0.900, 0.880, 0.860, 0.840)),
+        (1.00, (1.000, 1.000, 1.000, 1.000, 1.000, 1.000)),
+    ),
+    "pedal_comfort": (
+        (0.00, (0.000, 0.000, 0.000, 0.000, 0.000, 0.000)),
+        (0.10, (0.040, 0.035, 0.030, 0.025, 0.020, 0.015)),
+        (0.20, (0.100, 0.090, 0.080, 0.065, 0.050, 0.040)),
+        (0.30, (0.170, 0.160, 0.140, 0.115, 0.090, 0.075)),
+        (0.50, (0.330, 0.310, 0.280, 0.240, 0.200, 0.170)),
+        (0.70, (0.480, 0.460, 0.430, 0.390, 0.350, 0.310)),
+        (0.85, (0.580, 0.570, 0.550, 0.520, 0.490, 0.460)),
+        (1.00, (0.650, 0.650, 0.650, 0.650, 0.650, 0.650)),
+    ),
+    "pedal_eco": (
+        (0.00, (0.000, 0.000, 0.000, 0.000, 0.000, 0.000)),
+        (0.10, (0.025, 0.020, 0.018, 0.015, 0.010, 0.010)),
+        (0.20, (0.060, 0.055, 0.045, 0.035, 0.030, 0.025)),
+        (0.30, (0.100, 0.095, 0.080, 0.065, 0.055, 0.045)),
+        (0.50, (0.190, 0.180, 0.160, 0.135, 0.110, 0.095)),
+        (0.70, (0.290, 0.275, 0.250, 0.220, 0.190, 0.165)),
+        (0.85, (0.350, 0.340, 0.325, 0.300, 0.275, 0.250)),
+        (1.00, (0.400, 0.400, 0.400, 0.400, 0.400, 0.400)),
+    ),
+}
+
 # Written by Nasal/engine.nas in FlightGear, or by a test script.
 DRIVELINE_INPUTS = [
     ("throttle_norm", 0.0, "accelerator pedal, 0 to 1"),
     ("direction", 1.0, "1 = forward, -1 = reverse"),
     ("motor_on", 1.0, "0 switches the motor off: no drive, no coast regen, park lock on"),
+    ("drive_mode", 1.0, "1.0 = Performance, 0.65 = Comfort, 0.4 = Low Power (matches /controls/mode)"),
 ]
 
 # The rear brakes are sized so that on equal grip the front axle reaches its
@@ -479,14 +526,28 @@ DRIVELINE_EQS = [
     ("dt_s", "max(sim_dt, 0.0005)"),
     ("u_mps", "u_fps * 0.3048"),
     ("v_mps", "v_fps * 0.3048"),
+    ("speed_kmh", "abs(u_mps) * 3.6"),
+    # Drive mode selection (matches /controls/mode: 1.0 Performance, 0.65 Comfort, 0.4 Low Power)
+    ("is_perf", "lt(0.85, drive_mode)"),
+    ("is_comfort", "lt(0.50, drive_mode) * (1.0 - is_perf)"),
+    ("is_eco", "1.0 - is_perf - is_comfort"),
+    # 2D pedal maps (pedal_perf / pedal_comfort / pedal_eco) are emitted right after speed_kmh
+    ("pedal_torque_share", "is_perf * pedal_perf + is_comfort * pedal_comfort + is_eco * pedal_eco"),
+    ("mode_power_w", "max_power_w * (is_perf + is_comfort * comfort_power_share + is_eco * eco_power_share)"),
+    ("tip_in_rate", "is_perf * tip_in_rate_perf + is_comfort * tip_in_rate_comfort + is_eco * tip_in_rate_eco"),
+    ("tip_out_rate", "is_perf * tip_out_rate_perf + is_comfort * tip_out_rate_comfort + is_eco * tip_out_rate_eco"),
     # open centre differential: motor speed is the torque-weighted axle speed
     ("motor_rad_sec", "gear * (front_torque_share * {front_omega}"
                       " + (1.0 - front_torque_share) * {rear_omega})"),
     ("rev_limit", "max(0.0, min(1.0, (max_speed_rad_sec - abs(motor_rad_sec))"
                   " / (0.05 * max_speed_rad_sec)))"),
-    # the driver's request: constant torque up to the power limit, then constant power
-    ("request_torque_nm", "throttle_norm * direction * rev_limit"
-                          " * min(max_torque_nm, max_power_w / max(abs(motor_rad_sec), 1.0))"),
+    # raw torque request from the 2D pedal map, capped by the active drive mode's power limit
+    ("target_torque_nm", "direction * rev_limit"
+                         " * min(pedal_torque_share * max_torque_nm, mode_power_w / max(abs(motor_rad_sec), 1.0))"),
+    # tip-in / tip-out torque gradient limiter for drivability and keyboard feathering
+    ("rate_limit", "ifthen(lt(abs(request_torque_nm), abs(target_torque_nm)), tip_in_rate, tip_out_rate)"),
+    ("request_torque_nm", "motor_on * (request_torque_nm + max(-1.0 * rate_limit * dt_s,"
+                          " min(rate_limit * dt_s, target_torque_nm - request_torque_nm)))"),
     # what the motor drives: the request, limited by traction control, and ESC's share of that
     ("drive_torque_nm", "request_torque_nm * min(1.0, motor_cap_nm / max(abs(request_torque_nm), 0.001))"
                         " * torque_factor"),
@@ -741,6 +802,20 @@ def _load_curve_xml(output, load_property, values):
             f'\t\t\t\t</table>\n\t\t\t</function>\n\t\t</fcs_function>\n')
 
 
+def _pedal_map_xml(output, throttle_property, speed_property, rows):
+    header = "\t\t\t\t\t\t     " + " ".join(f"{s:6d}" for s in PEDAL_MAP_SPEEDS_KMH) + "\n"
+    body = "".join(
+        "\t\t\t\t\t\t%4.2f " % pedal + " ".join(f"{v:6.3f}" for v in vals) + "\n"
+        for pedal, vals in rows
+    )
+    return (f'\t\t<fcs_function name="{output}">\n'
+            f'\t\t\t<function>\n\t\t\t\t<table>\n'
+            f'\t\t\t\t\t<independentVar lookup="row">{throttle_property}</independentVar>\n'
+            f'\t\t\t\t\t<independentVar lookup="column">{speed_property}</independentVar>\n'
+            f'\t\t\t\t\t<tableData>\n{header}{body}\t\t\t\t\t</tableData>\n'
+            f'\t\t\t\t</table>\n\t\t\t</function>\n\t\t</fcs_function>\n')
+
+
 def build_system(stock_text):
     cg, mass_kg, wheels = read_vehicle(stock_text)
     front = [w for w in wheels if w.front]
@@ -770,7 +845,7 @@ def build_system(stock_text):
         shared["esc_keep_" + w.name] = "esc/keep_" + w.name
         for key in TC_WHEEL_SHARED:
             shared["%s_%s" % (key, w.name)] = "tyre/%s/%s" % (w.name, key)
-    driveline_names = [name for name, _ in DRIVELINE_EQS]
+    driveline_names = [name for name, _ in DRIVELINE_EQS] + list(PEDAL_MAPS)
     brake_names = [name for name, _ in BRAKE_EQS]
     wheel_names = (set(LOAD_CURVES) | {eq[0] for eq in WHEEL_EQS}
                    | {name for name, _ in ABS_WHEEL_EQS + ABS_VALVE_EQS + TC_WHEEL_EQS})
@@ -922,6 +997,11 @@ def build_system(stock_text):
     fields = {"front_omega": axle_mean(front), "rear_omega": axle_mean(rear)}
     for name, expr in DRIVELINE_EQS:
         out.append(fcs_function("driveline/" + name, expr.format(**fields), resolve_driveline))
+        if name == "speed_kmh":
+            for map_name, rows in PEDAL_MAPS.items():
+                out.append(_pedal_map_xml("driveline/" + map_name,
+                                          resolve_driveline("throttle_norm"),
+                                          resolve_driveline("speed_kmh"), rows))
     out.append("%s</channel>\n" % INDENT)
 
     out.append('\n%s<channel name="Brakes">\n' % INDENT)
@@ -1030,7 +1110,7 @@ def build_fdm(stock_text, test_forces=False):
 
 def check_equations():
     """Catch a typo in an equation before JSBSim does, with a clearer message."""
-    known = set(EXTERNAL) | set(LOAD_CURVES) | {"comp_ft", "comp_vel_fps", "steer_deg", "surface", "roll_factor"}
+    known = set(EXTERNAL) | set(LOAD_CURVES) | set(PEDAL_MAPS) | {"comp_ft", "comp_vel_fps", "steer_deg", "surface", "roll_factor"}
     known |= {n for n, _, _ in TYRE_PARAMS + DRIVELINE_PARAMS + DRIVELINE_INPUTS} | {"load_nominal_n"}
     known |= {"omega_fl", "omega_fr", "omega_bl", "omega_br"} | set(OCCUPANT_INPUTS) | set(BRAKE_INPUTS)
     known |= {n for n, _ in DRIVELINE_EQS + BRAKE_EQS + ABS_WHEEL_EQS + ABS_VALVE_EQS} | {eq[0] for eq in WHEEL_EQS}

@@ -25,6 +25,14 @@
 	<property value="375000.0">driveline/par/max_power_w</property> <!-- motor power limit -->
 	<property value="3000.0">driveline/par/max_speed_rad_sec</property> <!-- motor speed limit; only there to stop a spinning wheel running away -->
 	<property value="0.5">driveline/par/front_torque_share</property> <!-- 0 = rear wheel drive, 1 = front wheel drive -->
+	<property value="0.56">driveline/par/comfort_power_share</property> <!-- Comfort mode power limit as a share of max_power_w (210 kW of 375 kW) -->
+	<property value="0.3">driveline/par/eco_power_share</property> <!-- Low Power mode power limit as a share of max_power_w (112.5 kW of 375 kW) -->
+	<property value="3000.0">driveline/par/tip_in_rate_perf</property> <!-- Performance mode torque ramp-up limit, N m/s -->
+	<property value="1000.0">driveline/par/tip_in_rate_comfort</property> <!-- Comfort mode torque ramp-up limit, N m/s -->
+	<property value="500.0">driveline/par/tip_in_rate_eco</property> <!-- Low Power mode torque ramp-up limit, N m/s -->
+	<property value="3000.0">driveline/par/tip_out_rate_perf</property> <!-- Performance mode torque ramp-down limit, N m/s -->
+	<property value="1500.0">driveline/par/tip_out_rate_comfort</property> <!-- Comfort mode torque ramp-down limit, N m/s -->
+	<property value="1000.0">driveline/par/tip_out_rate_eco</property> <!-- Low Power mode torque ramp-down limit, N m/s -->
 	<property value="24.0">driveline/par/coast_regen_nm</property> <!-- motor braking torque with the pedal released (matches the standard FDM's coast-down) -->
 	<property value="100.0">driveline/par/coast_regen_fade_rad_sec</property> <!-- coast regen fades out below this motor speed -->
 	<property value="2300.0">driveline/par/brake_front_nm</property> <!-- brake torque per front wheel at full pedal -->
@@ -107,6 +115,7 @@
 	<property value="0.0">driveline/in/throttle_norm</property> <!-- accelerator pedal, 0 to 1 -->
 	<property value="1.0">driveline/in/direction</property> <!-- 1 = forward, -1 = reverse -->
 	<property value="1.0">driveline/in/motor_on</property> <!-- 0 switches the motor off: no drive, no coast regen, park lock on -->
+	<property value="1.0">driveline/in/drive_mode</property> <!-- 1.0 = Performance, 0.65 = Comfort, 0.4 = Low Power (matches /controls/mode) -->
 
 	<!-- State: wheel speeds, and what the ABS and stability control channels read before the wheels compute it -->
 	<property value="0.0">tyre/fl/omega_rad_sec</property>
@@ -655,13 +664,13 @@
 					<p>tc/front_driven</p>
 					<ifthen>
 						<lt>
-							<p>tc/speed_kmh</p>
+							<p>driveline/speed_kmh</p>
 							<p>tc/par/lock_engage_kmh</p>
 						</lt>
 						<v>1.0</v>
 						<product>
 							<lt>
-								<p>tc/speed_kmh</p>
+								<p>driveline/speed_kmh</p>
 								<p>tc/par/lock_cutout_kmh</p>
 							</lt>
 							<lt>
@@ -798,13 +807,13 @@
 					<p>tc/front_driven</p>
 					<ifthen>
 						<lt>
-							<p>tc/speed_kmh</p>
+							<p>driveline/speed_kmh</p>
 							<p>tc/par/lock_engage_kmh</p>
 						</lt>
 						<v>1.0</v>
 						<product>
 							<lt>
-								<p>tc/speed_kmh</p>
+								<p>driveline/speed_kmh</p>
 								<p>tc/par/lock_cutout_kmh</p>
 							</lt>
 							<lt>
@@ -941,13 +950,13 @@
 					<p>tc/rear_driven</p>
 					<ifthen>
 						<lt>
-							<p>tc/speed_kmh</p>
+							<p>driveline/speed_kmh</p>
 							<p>tc/par/lock_engage_kmh</p>
 						</lt>
 						<v>1.0</v>
 						<product>
 							<lt>
-								<p>tc/speed_kmh</p>
+								<p>driveline/speed_kmh</p>
 								<p>tc/par/lock_cutout_kmh</p>
 							</lt>
 							<lt>
@@ -1084,13 +1093,13 @@
 					<p>tc/rear_driven</p>
 					<ifthen>
 						<lt>
-							<p>tc/speed_kmh</p>
+							<p>driveline/speed_kmh</p>
 							<p>tc/par/lock_engage_kmh</p>
 						</lt>
 						<v>1.0</v>
 						<product>
 							<lt>
-								<p>tc/speed_kmh</p>
+								<p>driveline/speed_kmh</p>
 								<p>tc/par/lock_cutout_kmh</p>
 							</lt>
 							<lt>
@@ -2780,6 +2789,186 @@
 				</product>
 			</function>
 		</fcs_function>
+		<!-- speed_kmh = abs(u_mps) * 3.6 -->
+		<fcs_function name="driveline/speed_kmh">
+			<function>
+				<product>
+					<abs>
+						<p>driveline/u_mps</p>
+					</abs>
+					<v>3.6</v>
+				</product>
+			</function>
+		</fcs_function>
+		<fcs_function name="driveline/pedal_perf">
+			<function>
+				<table>
+					<independentVar lookup="row">driveline/in/throttle_norm</independentVar>
+					<independentVar lookup="column">driveline/speed_kmh</independentVar>
+					<tableData>
+						          0     20     50    100    160    220
+						0.00  0.000  0.000  0.000  0.000  0.000  0.000
+						0.10  0.070  0.060  0.050  0.040  0.030  0.020
+						0.20  0.180  0.160  0.140  0.110  0.090  0.070
+						0.30  0.300  0.280  0.250  0.210  0.170  0.140
+						0.50  0.560  0.540  0.500  0.450  0.400  0.360
+						0.70  0.780  0.760  0.740  0.700  0.660  0.620
+						0.85  0.920  0.910  0.900  0.880  0.860  0.840
+						1.00  1.000  1.000  1.000  1.000  1.000  1.000
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		<fcs_function name="driveline/pedal_comfort">
+			<function>
+				<table>
+					<independentVar lookup="row">driveline/in/throttle_norm</independentVar>
+					<independentVar lookup="column">driveline/speed_kmh</independentVar>
+					<tableData>
+						          0     20     50    100    160    220
+						0.00  0.000  0.000  0.000  0.000  0.000  0.000
+						0.10  0.040  0.035  0.030  0.025  0.020  0.015
+						0.20  0.100  0.090  0.080  0.065  0.050  0.040
+						0.30  0.170  0.160  0.140  0.115  0.090  0.075
+						0.50  0.330  0.310  0.280  0.240  0.200  0.170
+						0.70  0.480  0.460  0.430  0.390  0.350  0.310
+						0.85  0.580  0.570  0.550  0.520  0.490  0.460
+						1.00  0.650  0.650  0.650  0.650  0.650  0.650
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		<fcs_function name="driveline/pedal_eco">
+			<function>
+				<table>
+					<independentVar lookup="row">driveline/in/throttle_norm</independentVar>
+					<independentVar lookup="column">driveline/speed_kmh</independentVar>
+					<tableData>
+						          0     20     50    100    160    220
+						0.00  0.000  0.000  0.000  0.000  0.000  0.000
+						0.10  0.025  0.020  0.018  0.015  0.010  0.010
+						0.20  0.060  0.055  0.045  0.035  0.030  0.025
+						0.30  0.100  0.095  0.080  0.065  0.055  0.045
+						0.50  0.190  0.180  0.160  0.135  0.110  0.095
+						0.70  0.290  0.275  0.250  0.220  0.190  0.165
+						0.85  0.350  0.340  0.325  0.300  0.275  0.250
+						1.00  0.400  0.400  0.400  0.400  0.400  0.400
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		<!-- is_perf = lt(0.85, drive_mode) -->
+		<fcs_function name="driveline/is_perf">
+			<function>
+				<lt>
+					<v>0.85</v>
+					<p>driveline/in/drive_mode</p>
+				</lt>
+			</function>
+		</fcs_function>
+		<!-- is_comfort = lt(0.50, drive_mode) * (1.0 - is_perf) -->
+		<fcs_function name="driveline/is_comfort">
+			<function>
+				<product>
+					<lt>
+						<v>0.5</v>
+						<p>driveline/in/drive_mode</p>
+					</lt>
+					<difference>
+						<v>1.0</v>
+						<p>driveline/is_perf</p>
+					</difference>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- is_eco = 1.0 - is_perf - is_comfort -->
+		<fcs_function name="driveline/is_eco">
+			<function>
+				<difference>
+					<difference>
+						<v>1.0</v>
+						<p>driveline/is_perf</p>
+					</difference>
+					<p>driveline/is_comfort</p>
+				</difference>
+			</function>
+		</fcs_function>
+		<!-- pedal_torque_share = is_perf * pedal_perf + is_comfort * pedal_comfort + is_eco * pedal_eco -->
+		<fcs_function name="driveline/pedal_torque_share">
+			<function>
+				<sum>
+					<product>
+						<p>driveline/is_perf</p>
+						<p>driveline/pedal_perf</p>
+					</product>
+					<product>
+						<p>driveline/is_comfort</p>
+						<p>driveline/pedal_comfort</p>
+					</product>
+					<product>
+						<p>driveline/is_eco</p>
+						<p>driveline/pedal_eco</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- mode_power_w = max_power_w * (is_perf + is_comfort * comfort_power_share + is_eco * eco_power_share) -->
+		<fcs_function name="driveline/mode_power_w">
+			<function>
+				<product>
+					<p>driveline/par/max_power_w</p>
+					<sum>
+						<p>driveline/is_perf</p>
+						<product>
+							<p>driveline/is_comfort</p>
+							<p>driveline/par/comfort_power_share</p>
+						</product>
+						<product>
+							<p>driveline/is_eco</p>
+							<p>driveline/par/eco_power_share</p>
+						</product>
+					</sum>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- tip_in_rate = is_perf * tip_in_rate_perf + is_comfort * tip_in_rate_comfort + is_eco * tip_in_rate_eco -->
+		<fcs_function name="driveline/tip_in_rate">
+			<function>
+				<sum>
+					<product>
+						<p>driveline/is_perf</p>
+						<p>driveline/par/tip_in_rate_perf</p>
+					</product>
+					<product>
+						<p>driveline/is_comfort</p>
+						<p>driveline/par/tip_in_rate_comfort</p>
+					</product>
+					<product>
+						<p>driveline/is_eco</p>
+						<p>driveline/par/tip_in_rate_eco</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		<!-- tip_out_rate = is_perf * tip_out_rate_perf + is_comfort * tip_out_rate_comfort + is_eco * tip_out_rate_eco -->
+		<fcs_function name="driveline/tip_out_rate">
+			<function>
+				<sum>
+					<product>
+						<p>driveline/is_perf</p>
+						<p>driveline/par/tip_out_rate_perf</p>
+					</product>
+					<product>
+						<p>driveline/is_comfort</p>
+						<p>driveline/par/tip_out_rate_comfort</p>
+					</product>
+					<product>
+						<p>driveline/is_eco</p>
+						<p>driveline/par/tip_out_rate_eco</p>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
 		<!-- motor_rad_sec = gear * (front_torque_share * (omega_fl + omega_fr) / 2.0 + (1.0 - front_torque_share) * (omega_bl + omega_br) / 2.0) -->
 		<fcs_function name="driveline/motor_rad_sec">
 			<function>
@@ -2836,17 +3025,19 @@
 				</max>
 			</function>
 		</fcs_function>
-		<!-- request_torque_nm = throttle_norm * direction * rev_limit * min(max_torque_nm, max_power_w / max(abs(motor_rad_sec), 1.0)) -->
-		<fcs_function name="driveline/request_torque_nm">
+		<!-- target_torque_nm = direction * rev_limit * min(pedal_torque_share * max_torque_nm, mode_power_w / max(abs(motor_rad_sec), 1.0)) -->
+		<fcs_function name="driveline/target_torque_nm">
 			<function>
 				<product>
-					<p>driveline/in/throttle_norm</p>
 					<p>driveline/in/direction</p>
 					<p>driveline/rev_limit</p>
 					<min>
-						<p>driveline/par/max_torque_nm</p>
+						<product>
+							<p>driveline/pedal_torque_share</p>
+							<p>driveline/par/max_torque_nm</p>
+						</product>
 						<quotient>
-							<p>driveline/par/max_power_w</p>
+							<p>driveline/mode_power_w</p>
 							<max>
 								<abs>
 									<p>driveline/motor_rad_sec</p>
@@ -2855,6 +3046,51 @@
 							</max>
 						</quotient>
 					</min>
+				</product>
+			</function>
+		</fcs_function>
+		<!-- rate_limit = ifthen(lt(abs(request_torque_nm), abs(target_torque_nm)), tip_in_rate, tip_out_rate) -->
+		<fcs_function name="driveline/rate_limit">
+			<function>
+				<ifthen>
+					<lt>
+						<abs>
+							<p>driveline/request_torque_nm</p>
+						</abs>
+						<abs>
+							<p>driveline/target_torque_nm</p>
+						</abs>
+					</lt>
+					<p>driveline/tip_in_rate</p>
+					<p>driveline/tip_out_rate</p>
+				</ifthen>
+			</function>
+		</fcs_function>
+		<!-- request_torque_nm = motor_on * (request_torque_nm + max(-1.0 * rate_limit * dt_s, min(rate_limit * dt_s, target_torque_nm - request_torque_nm))) -->
+		<fcs_function name="driveline/request_torque_nm">
+			<function>
+				<product>
+					<p>driveline/in/motor_on</p>
+					<sum>
+						<p>driveline/request_torque_nm</p>
+						<max>
+							<product>
+								<v>-1.0</v>
+								<p>driveline/rate_limit</p>
+								<p>driveline/dt_s</p>
+							</product>
+							<min>
+								<product>
+									<p>driveline/rate_limit</p>
+									<p>driveline/dt_s</p>
+								</product>
+								<difference>
+									<p>driveline/target_torque_nm</p>
+									<p>driveline/request_torque_nm</p>
+								</difference>
+							</min>
+						</max>
+					</sum>
 				</product>
 			</function>
 		</fcs_function>

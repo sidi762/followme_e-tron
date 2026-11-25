@@ -28,6 +28,7 @@ if(props.getNode("/fdm/jsbsim/driveline/in/throttle_norm") != nil){
         throttle: props.getNode("/fdm/jsbsim/driveline/in/throttle_norm"),
         direction: props.getNode("/fdm/jsbsim/driveline/in/direction"),
         motorOn: props.getNode("/fdm/jsbsim/driveline/in/motor_on"),
+        driveMode: props.getNode("/fdm/jsbsim/driveline/in/drive_mode"),
         gear: props.getNode("/fdm/jsbsim/driveline/par/gear"),
         maxTorque: props.getNode("/fdm/jsbsim/driveline/par/max_torque_nm"),
         maxPower: props.getNode("/fdm/jsbsim/driveline/par/max_power_w"),
@@ -237,15 +238,17 @@ var Engine = {
             me.runningState = 1;
             me.engineNode.isStarted.setValue(1);
         }
-        throttle = throttle * mode;
+        var pedal = throttle;
+        throttle = pedal * mode;
         #print("throttle:" ~throttle);
 
         if(tyreModel != nil){
-            #//Hand the pedal, the gearing and the motor limits to the FDM, which turns them
-            #//into wheel torque. All of it is sent on every update because FlightGear
-            #//resets the properties of the FDM whenever it repositions the car.
+            #//Hand the raw pedal, drive mode, gearing and motor ratings to the FDM, which
+            #//applies the 2D pedal map, mode power limit and torque rate limiter at 120 Hz.
+            #//All of it is sent on every update because FlightGear resets the FDM on reposition.
             tyreModel.motorOn.setValue(1);
-            tyreModel.throttle.setValue(throttle);
+            tyreModel.throttle.setValue(pedal);
+            if(tyreModel.driveMode != nil) tyreModel.driveMode.setValue(mode);
             tyreModel.direction.setValue(direction);
             tyreModel.gear.setValue(me.gear);
             tyreModel.maxTorque.setValue(me.maxTorque);
