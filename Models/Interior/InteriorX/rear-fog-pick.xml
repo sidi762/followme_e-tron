@@ -1,0 +1,12 @@
+<PropertyList>
+	<type>pick</type>
+	<object-name>rear_foglight_switch</object-name>
+	<action>
+		<button>0</button>
+		<repeatable>false</repeatable>
+		<binding>
+			<command>property-toggle</command>
+			<property>/controls/lighting/rear-fog</property>
+		</binding>
+	</action>
+</PropertyList>

@@ -138,7 +138,7 @@ var ConfigDialogClass = {
         # Interior style dropdown - using dropdown widget
         var interiorStyles = [
             "404Design (Default)", "404Design 2.0", "404Design 2022", 
-            "404Design 2023", "Luxury", "Luxury 2.0", "Race", 
+            "404Design 2023", "404Design 2025", "404Design Offroad", "Luxury", "Luxury 2.0", "Race",
             "Sport (Legacy)", "Followme Original"
         ];
         

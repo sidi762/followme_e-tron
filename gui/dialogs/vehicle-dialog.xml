@@ -190,6 +190,42 @@
         </group>
     -->
     <hrule></hrule>
+    <group>
+        <layout>hbox</layout>
+        <text><label>Front wipers</label></text>
+        <button>
+            <legend>Off</legend>
+            <binding><command>nasal</command><script>followme.frontWiper.Stop()</script></binding>
+        </button>
+        <button>
+            <legend>Intermittent</legend>
+            <binding><command>nasal</command><script>followme.frontWiper.Slow()</script></binding>
+        </button>
+        <button>
+            <legend>Low</legend>
+            <binding><command>nasal</command><script>followme.frontWiper.Mid()</script></binding>
+        </button>
+        <button>
+            <legend>High</legend>
+            <binding><command>nasal</command><script>followme.frontWiper.Fast()</script></binding>
+        </button>
+    </group>
+    <group>
+        <layout>hbox</layout>
+        <text><label>Rear wipers</label></text>
+        <button>
+            <legend>Off</legend>
+            <binding><command>nasal</command><script>followme.rearWiper.Stop()</script></binding>
+        </button>
+        <button>
+            <legend>Intermittent</legend>
+            <binding><command>nasal</command><script>followme.rearWiper.Slow()</script></binding>
+        </button>
+        <button>
+            <legend>Continuous</legend>
+            <binding><command>nasal</command><script>followme.rearWiper.Mid()</script></binding>
+        </button>
+    </group>
     <text>
         <label>Keyboard braking intensity</label>
     </text>

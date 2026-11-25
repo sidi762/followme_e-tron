@@ -27,11 +27,95 @@
 
 
 
+	<controls include="driver-controls.xml" omit-node="y"/>
+	<controls include="esc-switch.xml" omit-node="y"/>
+
+	<animation>
+		<type>rotate</type>
+		<object-name>armrest_lid</object-name>
+		<property>sim/multiplay/generic/float[39]</property>
+		<factor>72</factor>
+		<center>
+			<x-m>2.007</x-m>
+			<y-m>0.002</y-m>
+			<z-m>0.749</z-m>
+		</center>
+		<axis>
+			<x>0</x>
+			<y>1</y>
+			<z>0</z>
+		</axis>
+	</animation>
+
+	<animation>
+		<type>rotate</type>
+		<object-name>headlight_switch</object-name>
+		<property>sim/multiplay/generic/int[17]</property>
+		<interpolation>
+			<entry>
+				<ind>0</ind>
+				<dep>26</dep>
+			</entry>
+			<entry>
+				<ind>1</ind>
+				<dep>0</dep>
+			</entry>
+			<entry>
+				<ind>2</ind>
+				<dep>-26</dep>
+			</entry>
+			<entry>
+				<ind>3</ind>
+				<dep>-59</dep>
+			</entry>
+		</interpolation>
+		<center>
+			<x-m>1.301833</x-m>
+			<y-m>-0.539152</y-m>
+			<z-m>0.928475</z-m>
+		</center>
+		<axis>
+			<x>0.865311</x>
+			<y>0.039019</y>
+			<z>0.499714</z>
+		</axis>
+	</animation>
+
+	<animation>
+		<type>translate</type>
+		<object-name>front_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[14]</property>
+		<factor>-0.0014</factor>
+		<axis>
+			<x>0.860443</x>
+			<y>0.031316</y>
+			<z>0.508584</z>
+		</axis>
+	</animation>
+
+	<animation>
+		<type>translate</type>
+		<object-name>rear_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[15]</property>
+		<factor>-0.0014</factor>
+		<axis>
+			<x>0.861034</x>
+			<y>0.031337</y>
+			<z>0.507581</z>
+		</axis>
+	</animation>
+
 <!-- STEERINGWHEEL -->
 
+	<model>
+		<name>wheel-keycaps</name>
+		<path>wheel-buttons.ac</path>
+	</model>
+	<controls include="wheel-controls.xml" omit-node="y"/>
 <animation>
  <type>rotate</type>
  <object-name>steeringwheel</object-name>
+		<object-name>wheel-keycaps</object-name>
  <property>sim/multiplay/generic/float[18]</property>
  <factor>-1</factor>
  <center>
@@ -87,7 +171,7 @@
 <!-- GEAR HANDLE -->
 <animation>
     <type>pick</type>
-    <object-name>gearhandle</object-name>
+    <object-name>gear_handle</object-name>
     <action>
       <button>0</button>
       <binding>
@@ -317,17 +401,6 @@
 </animation>
 
 
-<!-- AEB -->
-<animation>
-     <type>select</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-</animation>
 
 
 <!-- Headlight -->
@@ -432,44 +505,9 @@
 </animation>
 
 <!-- Rain wiper -->
-<animation>
-    <type>rotate</type>
-    <object-name>frontwiper1</object-name>
-    <property>/fdm/jsbsim/animation/wiper_pos</property>
-    <factor> 75 </factor>
-    <center>
-      <x-m> 0.89 </x-m>
-      <y-m> 0.11 </y-m>
-      <z-m> 1.02 </z-m>
-    </center>
-    <axis>
-        <x1-m>0</x1-m>
-        <y1-m>0</y1-m>
-        <z1-m>0</z1-m>
-        <x2-m>1</x2-m>
-        <y2-m>0</y2-m>
-        <z2-m>-1</z2-m>
-    </axis>
-</animation>
-<animation>
-    <type>rotate</type>
-    <object-name>frontwiper2</object-name>
-    <property>/fdm/jsbsim/animation/wiper_pos</property>
-    <factor> 75 </factor>
-    <center>
-      <x-m> 0.89 </x-m>
-      <y-m> -0.52 </y-m>
-      <z-m> 1.02 </z-m>
-    </center>
-    <axis>
-        <x1-m>0</x1-m>
-        <y1-m>0</y1-m>
-        <z1-m>0</z1-m>
-        <x2-m>1</x2-m>
-        <y2-m>0</y2-m>
-        <z2-m>-1.3</z2-m>
-    </axis>
-</animation>
+	<wipers include="../Instruments/front-wipers.xml" omit-node="y"/>
+	<animation include="../Instruments/lamp-stalk.xml"/>
+	<stalk include="../Instruments/wiper-stalk.xml" omit-node="y"/>
 
 <!-- Accelerator -->
 <animation>
@@ -485,4 +523,5 @@
 </animation>
 <!-- Brake pedal -->
 <animation include="../Instruments/brake-pedal.xml"/>
+	<controls include="panel-brightness.xml" omit-node="y"/>
 </PropertyList>

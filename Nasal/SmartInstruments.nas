@@ -177,6 +177,12 @@ var SmartInstruments = {
                 if (m.phase == "driving") m.update();
             }
         }, 0, 0);
+		# Dim the entire finished display, including gauges, telltales and text.
+		var shade = m.instrumentCanvas.createGroup().createChild("path").rect(0, 0, 1509, 736);
+		shade.set("fill", "#000000");
+		setlistener(followme.panelBrightness, func(n) {
+			shade.set("fill-opacity", 1 - n.getDoubleValue());
+		}, 1);
         return m;
     },
     startupSoundIsEnabled: 0, startupSound: nil, showingWarningMessage: 0,
@@ -359,8 +365,8 @@ var SmartInstruments = {
         me.distanceDisplay.setText(sprintf("TOTAL   %.1f km", me.km));
     },
     updateLamps: func() {
-        # These two lamps only light during the ignition test.
-        me.foglightSign.hide();
+        me.foglightSign.setVisible(followme.frontFogPowered.getBoolValue()
+                                   or followme.rearFogPowered.getBoolValue());
         me.escOffSign.hide();
         var safety = followme.safety;
         me.airbagSign.setVisible(!safety.isOn or safety.frontAirbagProp.getBoolValue()

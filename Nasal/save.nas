@@ -12,6 +12,7 @@ var savedProperties = [
     ["/orientation/pitch-deg", "/save/pitch-deg"],
     ["/orientation/roll-deg", "/save/roll-deg"],
     ["/controls/lighting/headlight", "/save/headlight"],
+    ["/controls/lighting/headlight-selector", "/save/headlight-selector"],
     ["/systems/horn", "/save/horn"],
     ["/controls/mode", "/save/controls/mode"],
     ["/controls/direction", "/save/controls/dir"],

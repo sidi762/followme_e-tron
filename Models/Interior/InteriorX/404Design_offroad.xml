@@ -1,0 +1,42 @@
+<PropertyList>
+	<path>404Design_offroad.ac</path>
+	<controls include="404Design-driving-controls.xml" omit-node="y"/>
+	<controls include="esc-switch.xml" omit-node="y"/>
+	<animation include="../Instruments/armrest-pick.xml"/>
+	<animation>
+		<type>rotate</type>
+		<object-name>armrest_lid</object-name>
+		<property>sim/multiplay/generic/float[27]</property>
+		<factor>72</factor>
+		<center><x-m>2.003</x-m><y-m>0</y-m><z-m>0.782</z-m></center>
+		<axis><x>0</x><y>1</y><z>0</z></axis>
+	</animation>
+	<controls include="headlight-controls.xml" omit-node="y"/>
+	<animation include="front-fog-pick.xml"/>
+	<animation include="rear-fog-pick.xml"/>
+	<animation>
+		<type>rotate</type><object-name>headlight_switch</object-name>
+		<property>sim/multiplay/generic/int[17]</property>
+		<interpolation>
+			<entry><ind>0</ind><dep>31.8</dep></entry>
+			<entry><ind>1</ind><dep>0.0</dep></entry>
+			<entry><ind>2</ind><dep>-34.7</dep></entry>
+			<entry><ind>3</ind><dep>-70.0</dep></entry>
+		</interpolation>
+		<center><x-m>1.3424402</x-m><y-m>-0.5068606</y-m><z-m>1.0156718</z-m></center>
+		<axis><x>0.9866948</x><y>-0.0000005</y><z>0.1625832</z></axis>
+	</animation>
+	<animation>
+		<type>translate</type><object-name>front_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[14]</property>
+		<factor>-0.0012</factor>
+		<axis><x>0.9866948</x><y>-0.0000031</y><z>0.1625832</z></axis>
+	</animation>
+	<animation>
+		<type>translate</type><object-name>rear_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[15]</property>
+		<factor>-0.0012</factor>
+		<axis><x>0.9866948</x><y>-0.0000031</y><z>0.1625832</z></axis>
+	</animation>
+	<controls include="panel-brightness.xml" omit-node="y"/>
+</PropertyList>

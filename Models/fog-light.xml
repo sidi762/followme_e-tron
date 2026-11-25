@@ -1,0 +1,10 @@
+<PropertyList>
+	<type>spot</type>
+	<direction><pitch-deg>90</pitch-deg></direction>
+	<diffuse><r>0.90</r><g>0.84</g><b>0.68</b><a>1</a></diffuse>
+	<specular><r>0.25</r><g>0.23</g><b>0.20</b><a>1</a></specular>
+	<attenuation><c>1</c><l>0.12</l><q>0.04</q></attenuation>
+	<spot-exponent>2</spot-exponent>
+	<spot-cutoff>65</spot-cutoff>
+	<range-m>18</range-m>
+</PropertyList>

@@ -301,18 +301,12 @@
         </indicator-off>
         <armrest_box_open>
             <name>armrest_box_open</name>
-            <mode>in-transit</mode>
+            <mode>once</mode>
             <path>Aircraft/followme_e-tron/Sounds/armrestbox_open.wav</path>
             <condition>
                 <and>
-                    <less-than>
-                        <property>sim/multiplay/generic/float[27]</property>
-                        <value>0.99</value>
-                    </less-than>
-                    <greater-than>
-                        <property>sim/multiplay/generic/float[27]</property>
-                        <value>0.01</value>
-                    </greater-than>
+                    <or include="armrest-interiors.xml"/>
+                    <less-than><property>fdm/jsbsim/animation/armrest-seconds</property><value>1.12</value></less-than>
                     <equals>
                         <property>controls/interior/armrest_cover_pos</property>
                         <value>1</value>
@@ -330,18 +324,12 @@
         </armrest_box_open>
         <armrest_box_close>
             <name>armrest_box_close</name>
-            <mode>in-transit</mode>
+            <mode>once</mode>
             <path>Aircraft/followme_e-tron/Sounds/armrestbox_close.wav</path>
             <condition>
                 <and>
-                    <less-than>
-                        <property>sim/multiplay/generic/float[27]</property>
-                        <value>0.99</value>
-                    </less-than>
-                    <greater-than>
-                        <property>sim/multiplay/generic/float[27]</property>
-                        <value>0.01</value>
-                    </greater-than>
+                    <or include="armrest-interiors.xml"/>
+                    <less-than><property>fdm/jsbsim/animation/armrest-seconds</property><value>1.12</value></less-than>
                     <equals>
                         <property>controls/interior/armrest_cover_pos</property>
                         <value>0</value>

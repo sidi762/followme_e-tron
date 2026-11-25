@@ -1,0 +1,6 @@
+<PropertyList>
+	<animation include="../Instruments/armrest-pick.xml"/>
+	<controls include="headlight-controls.xml" omit-node="y"/>
+	<animation include="front-fog-pick.xml"/>
+	<animation include="rear-fog-pick.xml"/>
+</PropertyList>

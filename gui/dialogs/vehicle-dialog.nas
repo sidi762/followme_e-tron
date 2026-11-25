@@ -49,7 +49,7 @@ var VehicleDialogClass = {
     },
 
     open: func() {        
-        me._window = canvas.Window.new([400, 825], "dialog");
+        me._window = canvas.Window.new([400, 893], "dialog");
         me._window.setTitle(me._title);
         me._window.setPosition(100, 100);
         
@@ -81,6 +81,7 @@ var VehicleDialogClass = {
         yPos = me._createVehicleModesSection(mainWidget, yPos, availableWidth);
         yPos = me._createSteeringSection(mainWidget, yPos, availableWidth);
         yPos = me._createBrakingSection(mainWidget, yPos, availableWidth);
+        yPos = me._createWiperSection(mainWidget, yPos);
         yPos = me._createWelcomeSection(mainWidget, yPos, availableWidth);
         yPos = me._createDriftingSection(mainWidget, yPos, availableWidth);
         yPos = me._createConfigSection(mainWidget, yPos, availableWidth);
@@ -153,6 +154,22 @@ var VehicleDialogClass = {
         widget.createSeparator(0, yPos, width);
         yPos += 15;
 
+        return yPos;
+    },
+
+    # Match the wiper contacts available in the native Vehicle Options dialog.
+    _createWiperSection: func(widget, yPos) {
+        widget.createLabel(5, yPos + 5, "Front wipers", 14);
+        widget.createButton(93, yPos, 54, 25, "Off", func followme.frontWiper.Stop());
+        widget.createButton(151, yPos, 96, 25, "Intermittent", func followme.frontWiper.Slow());
+        widget.createButton(251, yPos, 54, 25, "Low", func followme.frontWiper.Mid());
+        widget.createButton(309, yPos, 54, 25, "High", func followme.frontWiper.Fast());
+        yPos += 34;
+        widget.createLabel(5, yPos + 5, "Rear wipers", 14);
+        widget.createButton(93, yPos, 54, 25, "Off", func followme.rearWiper.Stop());
+        widget.createButton(151, yPos, 96, 25, "Intermittent", func followme.rearWiper.Slow());
+        widget.createButton(251, yPos, 96, 25, "Continuous", func followme.rearWiper.Mid());
+        yPos += 34;
         return yPos;
     },
 

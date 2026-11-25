@@ -234,29 +234,6 @@
      <texture>panel_black.png</texture>
 </animation>
 
-<!-- AEB -->
-<animation>
-     <type>material</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>1</value>
-	     </equals>
-     </condition>
-     <texture>AEB_LIT.png</texture>
-</animation>
-<animation>
-     <type>material</type>
-     <object-name>AEB_LIT</object-name>
-     <condition>
-         <equals>
-	 	     <property>sim/multiplay/generic/bool[4]</property>
-	 	     <value>0</value>
-	     </equals>
-     </condition>
-     <texture>panel_black.png</texture>
-</animation>
 
 <!-- Headlight -->
 <animation>
@@ -393,10 +370,10 @@
     <type>select</type>
     <object-name>storage</object-name>
     <condition>
-        <equals>
-            <property>sim/multiplay/generic/float[24]</property>
-            <value>1</value>
-        </equals>
+        <greater-than>
+            <property>sim/multiplay/generic/float[23]</property>
+            <value>0.001</value>
+        </greater-than>
     </condition>
 </animation>
 
@@ -414,4 +391,53 @@
 </animation>
 <!-- Brake pedal -->
 <animation include="../Instruments/brake-pedal.xml"/>
+	<wipers include="../Instruments/front-wipers.xml" omit-node="y"/>
+	<animation include="../Instruments/lamp-stalk.xml"/>
+	<stalk include="../Instruments/wiper-stalk.xml" omit-node="y">
+		<animation n="1"><center><x-m>1.3869</x-m><y-m>-0.2808</y-m><z-m>0.9083</z-m></center></animation>
+	</stalk>
+	<animation include="../Instruments/armrest-pick.xml"/>
+	<animation>
+		<type>rotate</type>
+		<object-name>armrest_lid</object-name>
+		<property>sim/multiplay/generic/float[27]</property>
+		<factor>72</factor>
+		<center><x-m>1.994</x-m><y-m>0.002</y-m><z-m>0.762</z-m></center>
+		<axis><x>0</x><y>1</y><z>0</z></axis>
+	</animation>
+	<controls include="../InteriorX/headlight-controls.xml" omit-node="y"/>
+	<animation include="../InteriorX/rear-fog-pick.xml"/>
+	<animation>
+		<type>rotate</type><object-name>headlight_switch</object-name>
+		<property>sim/multiplay/generic/int[17]</property>
+		<interpolation>
+			<entry><ind>0</ind><dep>-9.9</dep></entry>
+			<entry><ind>1</ind><dep>-35.1</dep></entry>
+			<entry><ind>2</ind><dep>-63.6</dep></entry>
+			<entry><ind>3</ind><dep>-88.1</dep></entry>
+		</interpolation>
+		<center><x-m>1.3155688</x-m><y-m>-0.5500894</y-m><z-m>0.9170353</z-m></center>
+		<axis><x>0.7717179</x><y>0.0086434</y><z>0.6359063</z></axis>
+	</animation>
+	<animation>
+		<type>translate</type><object-name>rear_foglight_switch</object-name>
+		<property>sim/multiplay/generic/bool[15]</property>
+		<factor>-0.0012</factor>
+		<axis><x>0.7717179</x><y>0.0086434</y><z>0.6359063</z></axis>
+	</animation>
+	<animation>
+		<type>pick</type><object-name>esc_switch</object-name>
+		<action><button>0</button><binding><command>nasal</command><script>followme.toggleStabilityControl()</script></binding></action>
+	</animation>
+	<animation>
+		<type>material</type><object-name>esc_switch</object-name>
+		<condition><and><property>sim/multiplay/generic/bool[13]</property><not><property>sim/multiplay/generic/bool[16]</property></not></and></condition>
+		<emission><red>0.85</red><green>0.45</green><blue>0.05</blue></emission>
+	</animation>
+	<animation>
+		<type>pick</type><object-name>headlight_level</object-name>
+		<action><button>0</button><binding><command>nasal</command><script>followme.adjustHeadlightLevel(1, 1)</script></binding></action>
+		<action><button>3</button><binding><command>nasal</command><script>followme.adjustHeadlightLevel(-1)</script></binding></action>
+		<action><button>4</button><binding><command>nasal</command><script>followme.adjustHeadlightLevel(1)</script></binding></action>
+	</animation>
 </PropertyList>

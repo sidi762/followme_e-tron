@@ -1,0 +1,26 @@
+<PropertyList>
+	<animation>
+		<type>pick</type>
+		<object-name>panel_brighter</object-name>
+		<visible>false</visible>
+		<action>
+			<button>0</button>
+			<binding>
+				<command>nasal</command>
+				<script>followme.adjustPanelBrightness(1)</script>
+			</binding>
+		</action>
+	</animation>
+	<animation>
+		<type>pick</type>
+		<object-name>panel_dimmer</object-name>
+		<visible>false</visible>
+		<action>
+			<button>0</button>
+			<binding>
+				<command>nasal</command>
+				<script>followme.adjustPanelBrightness(-1)</script>
+			</binding>
+		</action>
+	</animation>
+</PropertyList>

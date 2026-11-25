@@ -72,11 +72,26 @@ var poweredAuxSwitch = func(path) {
 
 # Wiper
 io.include("systems/wiper.nas");
-frontWiper = wiper.new("/controls/wiper/frontwiper");
+var frontWiper = wiper.new("/controls/wiper/frontwiper");
+var rearWiper = wiper.new("/controls/wiper/rearwiper", 1);
 
 # Lights
 io.include("systems/lights.nas");
 var indicatorController = IndicatorController.new();
+
+# Mirror the tyre FDM's initialized ESC switch. An aircraft-set alias would
+# create the JSBSim property before the FDM can set its enabled default.
+var escControl = props.globals.getNode("/fdm/jsbsim/esc/par/enabled");
+if (escControl != nil)
+	setlistener(escControl, func(n) { setprop("/sim/multiplay/generic/bool[16]", n.getBoolValue()); }, 1);
+var toggleStabilityControl = func {
+	if (escControl == nil) {
+		gui.popupTip("ESC requires the tyre model");
+		return;
+	}
+	escControl.setDoubleValue(!escControl.getBoolValue());
+	gui.popupTip(escControl.getBoolValue() ? "ESC ON" : "ESC OFF");
+};
 
 # Brakes
 io.include("systems/brakes.nas");
